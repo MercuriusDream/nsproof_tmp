@@ -74,6 +74,9 @@ class ContinuityConstraint:
     kind: str
     left: int
     right: int
+    derivative_direction: str = ""
+    derivative_order: int = 0
+    derivative_step: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -201,15 +204,132 @@ def eval_origin_total(data: dict[str, object], component: str, q: float, x: floa
     )
 
 
+def finite_derivative_1d(
+    func: object,
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+    step: float,
+    lower: float,
+    upper: float,
+) -> float:
+    if order == 0:
+        return func(q, x)  # type: ignore[operator]
+    if order not in (1, 2):
+        raise ValueError("only derivative orders 0, 1, and 2 are supported")
+    if direction not in ("q", "x"):
+        raise ValueError("derivative direction must be q or x")
+    if step <= 0.0:
+        raise ValueError("derivative step must be positive")
+    coordinate = q if direction == "q" else x
+
+    def value(offset: float) -> float:
+        if direction == "q":
+            return func(q + offset, x)  # type: ignore[operator]
+        return func(q, x + offset)  # type: ignore[operator]
+
+    can_plus = coordinate + step <= upper + 1e-15
+    can_minus = coordinate - step >= lower - 1e-15
+    can_plus2 = coordinate + 2.0 * step <= upper + 1e-15
+    can_minus2 = coordinate - 2.0 * step >= lower - 1e-15
+    if order == 1:
+        if can_plus and can_minus:
+            return (value(step) - value(-step)) / (2.0 * step)
+        if can_plus:
+            return (value(step) - value(0.0)) / step
+        if can_minus:
+            return (value(0.0) - value(-step)) / step
+    else:
+        if can_plus and can_minus:
+            return (value(step) - 2.0 * value(0.0) + value(-step)) / (step * step)
+        if can_plus2:
+            return (value(2.0 * step) - 2.0 * value(step) + value(0.0)) / (step * step)
+        if can_minus2:
+            return (value(0.0) - 2.0 * value(-step) + value(-2.0 * step)) / (step * step)
+    raise ValueError(f"cannot take derivative at {direction}={coordinate} with step {step}")
+
+
+def patch_derivative_value(
+    patch: dict[str, object],
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+    step: float,
+    normal_side: int,
+) -> float:
+    if order == 0:
+        return eval_patch_item(patch, q, x)
+    q0, q1, x0, x1 = patch_interval(patch)
+    if direction == "q":
+        lower, upper = q0, q1
+    elif direction == "x":
+        lower, upper = x0, x1
+    else:
+        raise ValueError("derivative direction must be q or x")
+
+    def value(offset: float) -> float:
+        if direction == "q":
+            return eval_patch_item(patch, q + offset, x)
+        return eval_patch_item(patch, q, x + offset)
+
+    if normal_side < 0:
+        if order == 1:
+            return (value(0.0) - value(-step)) / step
+        return (value(0.0) - 2.0 * value(-step) + value(-2.0 * step)) / (step * step)
+    if normal_side > 0:
+        if order == 1:
+            return (value(step) - value(0.0)) / step
+        return (value(2.0 * step) - 2.0 * value(step) + value(0.0)) / (step * step)
+    return finite_derivative_1d(lambda qq, xx: eval_patch_item(patch, qq, xx), q, x, direction, order, step, lower, upper)
+
+
+def total_derivative_value(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+    step: float,
+    source: str,
+) -> float:
+    if source == "rect":
+        func = lambda qq, xx: eval_rect_total(data, component, qq, xx)
+    elif source == "origin":
+        func = lambda qq, xx: eval_origin_total(data, component, qq, xx)
+    else:
+        raise ValueError("source must be rect or origin")
+    lower, upper = (0.0, 1.0)
+    return finite_derivative_1d(func, q, x, direction, order, step, lower, upper)
+
+
+def derivative_constraint_specs(max_order: int, weight: float, derivative_weight: float, step: float) -> list[tuple[str, int, float, float]]:
+    specs: list[tuple[str, int, float, float]] = [("", 0, weight, 0.0)]
+    if max_order <= 0:
+        return specs
+    if derivative_weight <= 0.0:
+        return specs
+    for order in range(1, min(max_order, 2) + 1):
+        for direction in ("q", "x"):
+            specs.append((direction, order, weight * derivative_weight, step))
+    return specs
+
+
 def build_patch_continuity_constraints(
     data: dict[str, object],
     blocks: tuple[str, ...],
     samples: int,
     weight: float,
+    derivative_order: int,
+    derivative_weight: float,
+    derivative_step: float,
 ) -> list[ContinuityConstraint]:
     if weight <= 0.0 or samples <= 0:
         return []
     constraints: list[ContinuityConstraint] = []
+    specs = derivative_constraint_specs(derivative_order, weight, derivative_weight, derivative_step)
     block_names = [block for block in blocks if block in ("F_an", "G_an", "F_frac0", "G_frac0")]
     for block in block_names:
         patches = as_patch_items(data, block)
@@ -223,13 +343,41 @@ def build_patch_continuity_constraints(
                     x1 = min(lx1, rx1)
                     if x1 > x0 + 1e-14:
                         for x in grid(x0, x1, samples):
-                            constraints.append(ContinuityConstraint(block, lq1, x, weight, "q-seam", i, j))
+                            for direction, order, constraint_weight, step in specs:
+                                constraints.append(
+                                    ContinuityConstraint(
+                                        block,
+                                        lq1,
+                                        x,
+                                        constraint_weight,
+                                        "q-seam",
+                                        i,
+                                        j,
+                                        direction,
+                                        order,
+                                        step,
+                                    )
+                                )
                 if abs(lx1 - rx0) <= 1e-14:
                     q0 = max(lq0, rq0)
                     q1 = min(lq1, rq1)
                     if q1 > q0 + 1e-14:
                         for q in grid(q0, q1, samples):
-                            constraints.append(ContinuityConstraint(block, q, lx1, weight, "x-seam", i, j))
+                            for direction, order, constraint_weight, step in specs:
+                                constraints.append(
+                                    ContinuityConstraint(
+                                        block,
+                                        q,
+                                        lx1,
+                                        constraint_weight,
+                                        "x-seam",
+                                        i,
+                                        j,
+                                        direction,
+                                        order,
+                                        step,
+                                    )
+                                )
     return constraints
 
 
@@ -238,14 +386,32 @@ def build_origin_matching_constraints(
     q_values: tuple[float, ...],
     x_samples: int,
     weight: float,
+    derivative_order: int,
+    derivative_weight: float,
+    derivative_step: float,
 ) -> list[ContinuityConstraint]:
     if weight <= 0.0 or x_samples <= 0:
         return []
     constraints: list[ContinuityConstraint] = []
+    specs = derivative_constraint_specs(derivative_order, weight, derivative_weight, derivative_step)
     for component in ("F", "G"):
         for q in q_values:
             for x in grid(0.0, 1.0, x_samples):
-                constraints.append(ContinuityConstraint(component, q, x, weight, "origin-match", -1, -1))
+                for direction, order, constraint_weight, step in specs:
+                    constraints.append(
+                        ContinuityConstraint(
+                            component,
+                            q,
+                            x,
+                            constraint_weight,
+                            "origin-match",
+                            -1,
+                            -1,
+                            direction,
+                            order,
+                            step,
+                        )
+                    )
     return constraints
 
 
@@ -553,13 +719,49 @@ def residual_vector(
     for constraint in constraints:
         scale = math.sqrt(constraint.weight)
         if constraint.kind == "origin-match":
-            diff = eval_rect_total(data, constraint.component, constraint.q, constraint.x) - eval_origin_total(
-                data, constraint.component, constraint.q, constraint.x
+            diff = total_derivative_value(
+                data,
+                constraint.component,
+                constraint.q,
+                constraint.x,
+                constraint.derivative_direction,
+                constraint.derivative_order,
+                constraint.derivative_step,
+                "rect",
+            ) - total_derivative_value(
+                data,
+                constraint.component,
+                constraint.q,
+                constraint.x,
+                constraint.derivative_direction,
+                constraint.derivative_order,
+                constraint.derivative_step,
+                "origin",
             )
         else:
             patches = as_patch_items(data, constraint.component)
-            diff = eval_patch_item(patches[constraint.left], constraint.q, constraint.x) - eval_patch_item(
-                patches[constraint.right], constraint.q, constraint.x
+            normal_direction = (
+                (constraint.kind == "q-seam" and constraint.derivative_direction == "q")
+                or (constraint.kind == "x-seam" and constraint.derivative_direction == "x")
+            )
+            left_side = -1 if normal_direction else 0
+            right_side = 1 if normal_direction else 0
+            diff = patch_derivative_value(
+                patches[constraint.left],
+                constraint.q,
+                constraint.x,
+                constraint.derivative_direction,
+                constraint.derivative_order,
+                constraint.derivative_step,
+                left_side,
+            ) - patch_derivative_value(
+                patches[constraint.right],
+                constraint.q,
+                constraint.x,
+                constraint.derivative_direction,
+                constraint.derivative_order,
+                constraint.derivative_step,
+                right_side,
             )
         value = scale * diff
         values.append(value)
@@ -575,6 +777,8 @@ def residual_vector(
                 "x": constraint.x,
                 "residual": value,
                 "max_abs": abs(value),
+                "derivative_direction": constraint.derivative_direction,
+                "derivative_order": constraint.derivative_order,
             }
     return values, {"max_abs": worst_abs, "rms": math.sqrt(total / max(count, 1)), "worst": worst_item}
 
@@ -690,9 +894,13 @@ def main() -> None:
     parser.add_argument("--residual-kind", choices=RESIDUAL_KINDS, default="raw")
     parser.add_argument("--continuity-weight", type=float, default=0.0)
     parser.add_argument("--continuity-samples", type=int, default=3)
+    parser.add_argument("--continuity-derivative-order", type=int, default=0)
     parser.add_argument("--origin-match-weight", type=float, default=0.0)
     parser.add_argument("--origin-match-q", default="0.9")
     parser.add_argument("--origin-match-x-samples", type=int, default=7)
+    parser.add_argument("--origin-match-derivative-order", type=int, default=0)
+    parser.add_argument("--mortar-derivative-weight", type=float, default=1.0)
+    parser.add_argument("--mortar-derivative-step", type=float, default=1e-4)
     parser.add_argument("--d1-weight", type=float, default=0.0)
     parser.add_argument("--d2-weight", type=float, default=0.0)
     parser.add_argument("--derivative-step-q", type=float, default=0.005)
@@ -726,12 +934,18 @@ def main() -> None:
             blocks,
             samples=args.continuity_samples,
             weight=args.continuity_weight,
+            derivative_order=args.continuity_derivative_order,
+            derivative_weight=args.mortar_derivative_weight,
+            derivative_step=args.mortar_derivative_step,
         )
         + build_origin_matching_constraints(
             data,
             q_values=parse_q_values(args.origin_match_q),
             x_samples=args.origin_match_x_samples,
             weight=args.origin_match_weight,
+            derivative_order=args.origin_match_derivative_order,
+            derivative_weight=args.mortar_derivative_weight,
+            derivative_step=args.mortar_derivative_step,
         )
     )
 
@@ -752,6 +966,11 @@ def main() -> None:
     print(
         f"constraints={len(constraints)} continuity_weight={args.continuity_weight:.3e} "
         f"origin_match_weight={args.origin_match_weight:.3e}"
+    )
+    print(
+        f"mortar_derivatives continuity_order={args.continuity_derivative_order} "
+        f"origin_order={args.origin_match_derivative_order} "
+        f"weight={args.mortar_derivative_weight:.3e} step={args.mortar_derivative_step:.3e}"
     )
     print(
         f"derivative_loss d1_weight={args.d1_weight:.3e} d2_weight={args.d2_weight:.3e} "
@@ -830,6 +1049,9 @@ def main() -> None:
                 "kind": constraint.kind,
                 "left": constraint.left,
                 "right": constraint.right,
+                "derivative_direction": constraint.derivative_direction,
+                "derivative_order": constraint.derivative_order,
+                "derivative_step": constraint.derivative_step,
             }
             for constraint in constraints
         ],
@@ -843,6 +1065,12 @@ def main() -> None:
             "d2_weight": args.d2_weight,
             "dq": args.derivative_step_q,
             "db": args.derivative_step_b,
+        },
+        "mortar_derivatives": {
+            "continuity_order": args.continuity_derivative_order,
+            "origin_match_order": args.origin_match_derivative_order,
+            "weight": args.mortar_derivative_weight,
+            "step": args.mortar_derivative_step,
         },
     }
     save_json(args.out, best_data)

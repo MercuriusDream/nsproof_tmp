@@ -2393,6 +2393,83 @@ This is useful because the solver can now move the correct patches while
 keeping the formal `q^p` trace fixed.  It is not yet close to an NK-entry
 center; the origin and high-`|b|` obstruction still dominates.
 
+The Chebyshev Newton scaffold now also supports derivative mortar constraints:
+
+```text
+--continuity-derivative-order
+--origin-match-derivative-order
+--mortar-derivative-weight
+--mortar-derivative-step
+```
+
+These constraints compare one-sided normal derivatives across Chebyshev patch
+seams and finite-difference `q/x` derivatives across the rectangular/origin
+matching interface.  This is still a discovery penalty, not an interval
+smoothness proof, but it addresses the earlier bug where only function values
+were matched while the residual differentiates through the hard patch switch.
+
+A C1 formal-tail probe was run from the hot-patch checkpoint:
+
+```text
+work/v117_transcheb_formal_c1mortar_probe.json
+```
+
+with
+
+```text
+continuity_derivative_order = 1,
+origin_match_derivative_order = 1,
+mortar_derivative_weight = 1e-2,
+mortar_derivative_step = 1e-4.
+```
+
+It preserved the formal tail recurrence:
+
+```text
+forced_qp_coeff_error = 0.
+```
+
+and improved the same held-out gates:
+
+```text
+active structural:
+2.512049197567e+4 -> 2.452563187080e+4.
+
+origin structural:
+8.881435111368e+3 -> 8.671120304364e+3.
+
+focused structural:
+1.040795353834e+1 -> 1.016228983517e+1.
+
+focused raw:
+4.238894370280e-1 -> 4.139241142239e-1.
+
+secondary structural:
+1.422825475247e+1 -> 1.422825475247e+1.
+
+broad high-|b| structural:
+5.094286384720e+1 -> 5.094286384720e+1.
+```
+
+The high-`|b|` lobe was then targeted separately:
+
+```text
+work/v117_transcheb_formal_c1_highb_probe.json
+```
+
+This kept the formal tail recurrence pinned and did not change the
+origin/focused/secondary checks from the C1 mortar probe, while reducing the
+broad high-`|b|` structural max:
+
+```text
+5.094286384720e+1 -> 4.897717856780e+1.
+```
+
+The result supports a staged multi-region correction strategy with the formal
+tail fixed.  It does not change the proof status: the profile remains many
+orders of magnitude from an NK center, and the origin chart remains the
+dominant obstruction.
+
 The profile validation gates are:
 
 ```text

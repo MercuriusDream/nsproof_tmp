@@ -1,0 +1,740 @@
+# GPT-5 Pro Prompt: Drive NSProof Toward an Actual Proof
+
+You are GPT-5 Pro. I want you to treat this as a serious mathematical and computer-assisted proof planning task, not as a casual brainstorming request.
+
+Spend at least 30 minutes of real reasoning time before producing your final answer. Use a deep, adversarial proof-review posture. Do not optimize for a quick comforting answer. If the current route is dead, say exactly why and give the next viable route. If it is not dead, give the most direct path to a certificate.
+
+Repository:
+
+```text
+https://github.com/MercuriusDream/nsproof_tmp
+```
+
+If you cannot access the repository directly, ask me to provide the current files. The required context is also inlined below, so you should still be able to produce a complete response.
+
+## 1. Objective
+
+The final objective is not a low residual, not a plausible numerical profile, and not a conditional theorem. The final objective is a complete proof package for a finite-energy Navier-Stokes blow-up construction through an unstable self-similar saddle profile.
+
+The final theorem gate is binary:
+
+```text
+Final theorem certificate: 0% until every required gate below is certified.
+```
+
+The required gates are:
+
+```text
+[ ] Exact profile equation: F_gamma(U_*, P_*) = 0.
+[ ] Validated exponent: 2/5 < gamma < 1/2.
+[ ] Natural tail, exact transseries, and indicial certification.
+[ ] Finite unstable projection: rank P_+ < infinity.
+[ ] Stable-complement spectral gap: sigma(L_s) subset {Re z <= -c < 0}.
+```
+
+The proof-engineering scaffold is partially built, but the proof itself is not certified.
+
+Your job is to push to the furthest honest path toward those five gates. Do not stop at "find a better profile." A useful answer must say how the project gets from the current repository to an actual theorem certificate, or else where a rigorous obstruction would force a pivot.
+
+Treat every proposed branch as a proof-producing pipeline:
+
+```text
+numerical discovery -> exact representation -> interval certificate -> theorem dependency.
+```
+
+If a branch cannot plausibly reach the interval-certificate stage, kill it and replace it with a better branch.
+
+## 2. Current Mathematical Target
+
+Use the Type-II Euler-dominated ansatz
+
+```text
+tau = T - t,
+s = -log(tau),
+y = (x - x(t)) / tau^gamma,
+u(x,t) = tau^(gamma - 1) [U_*(y) + v(y,s)].
+```
+
+The exponent must satisfy
+
+```text
+2/5 < gamma < 1/2.
+```
+
+The stationary Euler profile equation is
+
+```text
+(1-gamma) U_* + gamma (y . grad) U_* + (U_* . grad) U_* + grad P_* = 0,
+div U_* = 0.
+```
+
+The Navier-Stokes perturbation equation in similarity variables contains the decaying viscous term
+
+```text
+exp(-(1 - 2 gamma) s) Delta v,
+```
+
+so viscosity is perturbative only when `gamma < 1/2`.
+
+The natural tail is
+
+```text
+U_*(y) ~ |y|^(1 - 1/gamma) H(y/|y|).
+```
+
+For `gamma in (2/5, 1/2)`, this tail is non-L2 as a global self-similar profile, so finite-energy Navier-Stokes data require moving outer truncation, divergence repair, pressure correction, and Lyapunov-Perron closure.
+
+## 3. Axisymmetric-With-Swirl Formulation
+
+Work in cylindrical variables with swirl:
+
+```text
+U = u^r e_r + u^theta e_theta + u^z e_z,
+u^r = -psi_z / r,
+u^z = psi_r / r,
+Gamma = r u^theta.
+```
+
+Define
+
+```text
+A = psi_rr - r^(-1) psi_r + psi_zz.
+```
+
+The pressure-eliminated profile equations are
+
+```text
+E_psi =
+(1-gamma) r^2 A
++ gamma r^3 A_r
++ gamma z r^2 A_z
++ r(psi_r A_z - psi_z A_r)
++ 2 psi_z A
++ (Gamma^2)_z
+= 0,
+```
+
+```text
+E_Gamma =
+(1-2 gamma) Gamma
++ gamma(r Gamma_r + z Gamma_z)
++ (psi_r Gamma_z - psi_z Gamma_r)/r
+= 0.
+```
+
+Recover velocity and pressure only after the profile equations are validated:
+
+```text
+u^r = -psi_z/r,
+u^z = psi_r/r,
+u^theta = Gamma/r.
+```
+
+Pressure reconstruction must prove that
+
+```text
+R(U) + grad P = 0,
+R(U) = (1-gamma)U + gamma(y.grad)U + (U.grad)U.
+```
+
+The pressure-eliminated equations are not enough unless the one-form is globally exact.
+
+## 4. Compactified Variables and Current Main Ansatz
+
+Use
+
+```text
+q = (1 + r^2 + z^2)^(-1/2),
+b = z / sqrt(r^2 + z^2),
+x = b^2,
+p = 1/gamma.
+```
+
+At the current regression target,
+
+```text
+gamma = 9/20 = 0.45,
+B = 1,
+p = 20/9.
+```
+
+The streamfunction/swirl variables are represented as
+
+```text
+psi = r^2 z q^p F(q,x),
+Gamma = r^2 q^p G(q,x).
+```
+
+The proof-native representation should be
+
+```text
+F(q,x) =
+1/2
++ q^2 F_an(q,x)
++ sum_{k=1}^K q^(k p) F_k(q,x),
+```
+
+```text
+G(q,x) =
+B
++ q^2 G_an(q,x)
++ sum_{k=1}^K q^(k p) G_k(q,x).
+```
+
+The ordinary `q^1` channel is forbidden. It must be absent structurally, not merely small.
+
+The `q^p` fractional channel is forced by the tail recurrence. For `gamma=9/20, B=1`, the formal forced coefficients are
+
+```text
+F_p(x) = 1.9218140929535197 - 0.9786773280026653 x,
+G_p(x) = 0.11111111111111108 - 1.1111111111111112 x.
+```
+
+Any candidate profile whose `q^p` trace disagrees with this recurrence is not in the current admissible branch.
+
+Origin regularity is non-negotiable. Near `q=1`, use
+
+```text
+rho^2 = (1-q^2)/q^2,
+R = r^2 = rho^2(1-x),
+Z = z^2 = rho^2 x.
+```
+
+Represent the origin patch by a triangular Taylor/Bernstein expansion:
+
+```text
+F = sum_{a+b <= N_0} f_ab R^a Z^b,
+G = sum_{a+b <= N_0} g_ab R^a Z^b.
+```
+
+A generic angular polynomial at `q=1` is not acceptable because it may be smooth on the compactified rectangle while failing to be smooth at the physical origin.
+
+## 5. Current Numerical State
+
+The old sparse flat-bump family is retired as a proof object. It remains useful only as a ridge locator and initial-data diagnostic.
+
+Important facts:
+
+```text
+v117/v118 sparse-bump seeds have stable raw residual around 4.3e-1.
+This residual is grid-stable and not a finite-difference artifact.
+The obstruction is a real streamfunction-equation lobe.
+The obstruction moved from high-|b| to a broad low-|b| ridge after bump optimization.
+The old low-residual seed used the forbidden ordinary q^1 tail channel.
+The q1-free forced-tail branch has not recovered low residual.
+```
+
+The strict formal-tail projection is:
+
+```text
+work/v117_transcheb_formal_forced.json
+```
+
+It pins the forced `q^p` recurrence exactly:
+
+```text
+forced_qp_coeff_error = 0.
+```
+
+But it still fails the origin Taylor gate and has large normalized residual:
+
+```text
+origin structural max: 9.139966362302e+3
+focused structural/raw: 1.071336959068e+1 / 4.364551896246e-1
+secondary structural: 1.439516431487e+1
+broad high-|b| structural: 5.094286384720e+1
+```
+
+After coupled origin/interior, C1 mortar, and high-|b| probes, the current best formal-tail diagnostic checkpoint is:
+
+```text
+work/v117_transcheb_formal_c1_highb_probe.json
+```
+
+It still has exact forced tail:
+
+```text
+forced_qp_coeff_error = 0.
+ordinary q1 channel = structurally absent.
+```
+
+Recent diagnostics:
+
+```text
+origin structural: 8.671120304364e+3
+focused structural/raw: 1.016228983517e+1 / 4.139241142239e-1
+secondary structural: 1.422825475247e+1
+broad high-|b| structural: 4.897717856780e+1
+```
+
+This is still far from a Newton-Kantorovich center. A profile proof likely needs coefficient residual around `1e-8` to `1e-10`, depending on the inverse bound.
+
+## 6. Current Repository Tooling
+
+The repository has these relevant tools and validators:
+
+```text
+tools/profile_project_cheb.py
+tools/profile_newton_cheb.py
+tools/profile_newton_adaptive.py
+tools/profile_projected_hardpoints.py
+tools/validate_tail.py
+tools/validate_indicial_evans.py
+tools/linearized_spectrum_probe.py
+validators/compactified_equations.py
+validators/tail_transseries.py
+validators/pluecker.py
+```
+
+Recent additions:
+
+```text
+tools/profile_project_cheb.py:
+  supports --forced-qp-mode formal.
+
+tools/validate_tail.py and validators/tail_transseries.py:
+  reject profiles whose forced q^p trace disagrees with the formal recurrence.
+
+tools/profile_newton_cheb.py:
+  supports proof-native Chebyshev/transseries coefficient Gauss-Newton,
+  origin Taylor variables,
+  patch-seam continuity penalties,
+  origin-rectangle matching penalties,
+  optional derivative-loss rows,
+  optional derivative mortar constraints,
+  active hard-point injection,
+  normalized structural residuals.
+
+tools/profile_newton_adaptive.py:
+  wraps hard-point discovery and Chebyshev Newton probes.
+
+validators/compactified_equations.py:
+  contains normalized structural residual diagnostics and origin-patch evaluation.
+```
+
+The current tools are discovery/proof-scaffold tools. They are not yet interval proof tools.
+
+## 7. Lessons from arXiv-2509.14185v1
+
+The archive `arXiv-2509.14185v1.tar.gz` in the workspace is the "Discovery of Unstable Singularities" paper package. Use the following lessons, but do not confuse them with certificates:
+
+```text
+1. Factor mechanical vanishing prefactors before optimizing residuals.
+2. Add higher-derivative and smoothness losses to prevent spiky collocation overfit.
+3. Use residual-driven adaptive hard-point sampling.
+4. Use staged linearized correction rather than blind global optimization.
+5. Discover parameters through smoothness/funnel scans, not blind continuation.
+6. Treat neural/PINN-style discovery as a profile-finding engine, not a proof certificate.
+```
+
+Reported residual scales in that paper package are roughly:
+
+```text
+CCF stable / first unstable: about 1e-13,
+IPM: about 1e-11 to 1e-8,
+Boussinesq: about 1e-8 to 1e-7.
+```
+
+For this NSProof project, use those numbers only as discovery-scale references. They do not certify anything. They indicate that the current `O(1)` residual is nowhere near a plausible CAP entry point.
+
+The specific methodology transfer should include:
+
+```text
+hard-code all symmetry/tail/origin constraints instead of asking optimization to learn them,
+track d0/d1/d2 residuals on validation grids,
+use shifted/off-grid validation to detect overfit,
+run full-matrix Gauss-Newton or Levenberg-Marquardt correction in coefficient space,
+run second-stage linearized correction D E[u] h = -E[u],
+choose enrichment modes from residual spectral content,
+use funnel scans in (gamma,B) as discovery diagnostics,
+replace any successful discovery by interval transversality and NK proof.
+```
+
+For this NSProof project, the hard parts are worse than the model examples:
+
+```text
+3D pressure is nonlocal.
+Vortex stretching is fully coupled.
+Swirl creates the quadratic forcing (Gamma^2)_z.
+The domain has axis, origin, equator, infinity, and patch-interface singular charts.
+The downstream spectrum must be the true Leray-projected 3D operator, not the residual Jacobian.
+```
+
+## 8. Known Indicial Situation
+
+Floating indicial and Pluecker/Evans diagnostics have not found a validated non-geometric dangerous root.
+
+Current evidence:
+
+```text
+The exact delta = 1 branch exists.
+It corresponds to the axial-center/Galilean geometric mode:
+  Psi = r^2,
+  G = 0,
+  a = 0.
+It is removable by centering/parity.
+Other apparent complex basins are dominated by forbidden far-field modes.
+No interval-validated box-cover proof exists yet.
+```
+
+The needed theorem is:
+
+```text
+Only delta = 1 is admissible in the dangerous domain,
+and that root is geometric/removable.
+```
+
+Dangerous domain to start:
+
+```text
+0 <= Re(delta) <= 1.10,
+0 <= Im(delta) <= 4,
+then prove exterior exclusion for larger Im(delta).
+```
+
+## 9. Spectrum Situation
+
+The current `tools/linearized_spectrum_probe.py` is only a rough residual-Jacobian scaffold. It is not the true spectral operator.
+
+The true linearized operator should be
+
+```text
+L v =
+- P_Leray [
+  (1-gamma)v
+  + gamma(y.grad)v
+  + (U_*.grad)v
+  + (v.grad)U_*
+],
+```
+
+acting on a weighted divergence-free space such as
+
+```text
+X_{eta,k}^{div}
+= {v: div v = 0, ||v||_{eta,k} < infinity},
+
+||v||_{eta,k}
+= sum_{|alpha| <= k} sup_y <y>^(eta+|alpha|) |partial^alpha v(y)|.
+```
+
+For `gamma=9/20`, choose initially
+
+```text
+eta = 1,
+k >= 6.
+```
+
+The tail essential bound gives at most
+
+```text
+(1-gamma) - gamma eta = 1/10.
+```
+
+So a realistic stable gap target is only
+
+```text
+c = 0.02 to 0.05,
+```
+
+not a large gap.
+
+The spectral tool must first recover geometric modes:
+
+```text
+time translation: eigenvalue 1,
+spatial translations: eigenvalue gamma,
+rotations: eigenvalue 0.
+```
+
+If those modes are not recovered, the spectral implementation is invalid.
+
+## 10. Your Required Output
+
+Produce a detailed, concrete answer with the following sections.
+
+Before writing the final answer, reason through at least these competing possibilities:
+
+```text
+1. the fixed (gamma,B)=(9/20,1) compactified branch exists but current basis is badly conditioned;
+2. the branch exists only after freeing (gamma,B);
+3. the compactified q/x formulation is numerically wrong but radial core-tail matching works;
+4. the axisymmetric-with-swirl branch is absent in this admissible tail class;
+5. the profile exists but the full 3D spectral theorem fails;
+6. only an axisymmetric or conditional theorem is reachable with the present scaffold.
+```
+
+Your final output must distinguish these cases and give the decisive test for each.
+
+### A. Executive Verdict
+
+State whether the present branch is still worth pursuing, under what conditions it should be killed, and what must be done next.
+
+Do not say "more research is needed" without specifying the exact computation or theorem that decides the issue.
+
+### B. Fastest Path to a Real Proof
+
+Give the shortest honest path from the current repository state to a final proof. Include:
+
+```text
+profile representation,
+exact residual/factorization,
+floating discovery threshold,
+interval Newton-Kantorovich theorem,
+pressure reconstruction,
+tail/indicial validation,
+projected spectral validation,
+Lyapunov-Perron/modulation closure.
+```
+
+For every stage, include:
+
+```text
+input artifact,
+mathematical object,
+implementation file/module,
+acceptance criterion,
+failure criterion,
+next branch if it fails.
+```
+
+### C. Furthest Viable Branch Search
+
+Design the most aggressive but mathematically controlled branch search, including all of:
+
+```text
+fixed (gamma,B) = (9/20,1),
+free (gamma,B) in a box,
+alternative q/x patch schedules,
+radial core-tail matching pivot,
+neural/PINN-inspired discovery only if hard constraints are exact,
+proof-native Chebyshev/Bernstein projection,
+origin Taylor simplex,
+tail transseries constraints,
+ordinary q1 exclusion.
+```
+
+Explain when each branch is abandoned.
+
+### D. Exact Profile Proof Plan
+
+Specify a Newton-Kantorovich/radii-polynomial theorem for the profile:
+
+```text
+Banach spaces X and Y,
+norms,
+residual map E,
+approximate inverse A,
+Y0, Z0, Z2 bounds,
+radii polynomial,
+interval arithmetic backend,
+tail inverse for unresolved coefficients,
+patch mortar constraints.
+```
+
+State exactly what residual scale is needed before interval validation begins.
+
+### E. Tail and Indicial Proof Plan
+
+Give the formal transseries recurrence and the interval indicial/Evans proof plan.
+
+Include:
+
+```text
+ordinary q1 exclusion,
+forced q^(1/gamma) trace,
+fractional exponent semigroup,
+local Frobenius plane at zeta=0,
+far-field forbidden modes,
+Pluecker minors,
+box-cover exclusion,
+local factorization at delta=1,
+exterior large-Im(delta) exclusion.
+```
+
+### F. Pressure Reconstruction Plan
+
+Explain how to prove that the pressure-eliminated solution gives a true Euler profile:
+
+```text
+construct P,
+validate partial_r P + R^r = 0,
+validate partial_z P + R^z = 0,
+validate R^theta = 0,
+prove one-form exactness,
+validate pressure tail.
+```
+
+### G. Spectral Theorem Plan
+
+Give a concrete path to the finite-rank unstable projection and stable gap:
+
+```text
+weighted divergence-free space,
+true Leray projection,
+azimuthal Fourier blocks,
+geometric mode certificates,
+essential spectrum tail estimate,
+large-|m| and high-frequency exclusion,
+finite-block interval Galerkin/Evans validation,
+Riesz projection,
+stable semigroup bound.
+```
+
+If full 3D spectral validation is unrealistic from the current scaffold, say whether an axisymmetric conditional theorem is the only viable intermediate result.
+
+### H. Lyapunov-Perron / Finite-Energy NS Closure
+
+Give the exact final perturbation theorem:
+
+```text
+moving truncation,
+divergence repair,
+pressure correction,
+modulation equations,
+unstable finite-codimension conditions,
+stable semigroup estimates,
+viscous forcing decay,
+quadratic estimates,
+contraction space,
+codimension count,
+blow-up rate.
+```
+
+Include the condition
+
+```text
+0 < c_1 < min(c, 1 - 2 gamma).
+```
+
+### I. Concrete Repository Instructions
+
+Give an ordered command-level plan using the existing repo. Use and improve these tools where appropriate:
+
+```text
+tools/profile_project_cheb.py
+tools/profile_newton_cheb.py
+tools/profile_newton_adaptive.py
+tools/profile_projected_hardpoints.py
+tools/validate_tail.py
+validators/compactified_equations.py
+tools/validate_indicial_evans.py
+tools/linearized_spectrum_probe.py
+```
+
+Also state which new modules must be created, for example:
+
+```text
+tools/validate_profile_nk.py
+tools/validate_pressure_reconstruction.py
+tools/spectrum_projected_galerkin.py
+tools/validate_spectrum_evans.py
+validators/radii_polynomial.py
+validators/essential_spectrum.py
+validators/bernstein_ball.py
+validators/arb_backend.py
+```
+
+For every command, say what result decides "continue", "refine", or "abandon".
+
+Also give an agentizable work split. Assume several workers can run in parallel. Assign disjoint workstreams such as:
+
+```text
+profile discovery,
+exact residual/factorization,
+tail/indicial validation,
+interval NK infrastructure,
+pressure reconstruction,
+projected spectrum,
+finite-energy gluing/Lyapunov-Perron estimates.
+```
+
+For each workstream, state the file ownership, expected artifact, and merge criterion.
+
+### J. Kill Criteria
+
+Give explicit no-ambiguity stop rules for:
+
+```text
+the v117/v118 sparse bump branch,
+fixed gamma=9/20, B=1,
+free gamma,B search,
+compactified q/x Chebyshev route,
+radial core-tail matching route,
+tail/indicial validation,
+profile NK proof,
+pressure reconstruction,
+projected spectrum,
+high-frequency spectral exclusion,
+Lyapunov-Perron closure.
+```
+
+### K. Final Theorem Dependency Graph
+
+Write the final theorem as a dependency graph of lemmas/theorems:
+
+```text
+validated profile theorem,
+regularity and tail theorem,
+pressure reconstruction theorem,
+indicial theorem,
+matching/transversality theorem,
+spectral theorem,
+nonlinear perturbation theorem,
+modulation theorem,
+Lyapunov-Perron theorem,
+finite-codimension initial data theorem,
+blow-up rate theorem.
+```
+
+Each theorem must list its exact dependencies and its failure mode.
+
+### L. One-Page Execution Sheet
+
+End with a compact execution sheet that another agent can follow immediately:
+
+```text
+Priority 0: commands to run now.
+Priority 1: code modules to implement next.
+Priority 2: validation certificates to build.
+Priority 3: theorem-writing dependencies.
+Kill switches: exact numerical/theorem thresholds.
+Most likely bottleneck.
+Most credible pivot.
+Definition of done.
+```
+
+## 11. Non-Negotiable Constraints
+
+Follow these constraints:
+
+```text
+1. Do not claim a proof from an O(1) residual.
+2. Do not accept small ordinary q1 leakage; q1 must be structurally forbidden.
+3. Do not accept a fractional q^p block unless it matches the formal recurrence.
+4. Do not use sparse bumps as the proof representation.
+5. Do not validate finite differences as a proof object; use exact symbolic/AD residuals.
+6. Do not proceed to spectrum before pressure reconstruction is certified.
+7. Do not interpret residual-Jacobian eigenvalues as the true spectrum.
+8. Do not count geometric modes as non-geometric codimension.
+9. Do not claim finite-energy Navier-Stokes closure without moving truncation and divergence repair.
+10. If the branch is likely dead, state the next mathematical pivot, not just "try more optimization".
+```
+
+## 12. Desired Final Answer Style
+
+Your answer should be long, technical, and decisive.
+
+I want:
+
+```text
+a full situation analysis,
+a complete path to the actual proof if one exists,
+a branch-kill decision tree,
+mathematical theorem statements,
+implementation instructions,
+validation thresholds,
+and the most likely bottlenecks.
+```
+
+Avoid vague optimism. The acceptable output is a proof roadmap precise enough that another agent can execute it in the repository.

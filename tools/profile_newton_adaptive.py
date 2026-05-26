@@ -187,12 +187,20 @@ def run_newton(args: argparse.Namespace, input_path: str, output_path: str, acti
         str(args.continuity_weight),
         "--continuity-samples",
         str(args.continuity_samples),
+        "--continuity-derivative-order",
+        str(args.continuity_derivative_order),
         "--origin-match-weight",
         str(args.origin_match_weight),
         "--origin-match-q",
         args.origin_match_q,
         "--origin-match-x-samples",
         str(args.origin_match_x_samples),
+        "--origin-match-derivative-order",
+        str(args.origin_match_derivative_order),
+        "--mortar-derivative-weight",
+        str(args.mortar_derivative_weight),
+        "--mortar-derivative-step",
+        str(args.mortar_derivative_step),
         "--d1-weight",
         str(args.d1_weight),
         "--d2-weight",
@@ -243,9 +251,13 @@ def main() -> None:
     parser.add_argument("--line-search", default="1,0.5,0.25,0.125,0.0625")
     parser.add_argument("--continuity-weight", type=float, default=0.25)
     parser.add_argument("--continuity-samples", type=int, default=2)
+    parser.add_argument("--continuity-derivative-order", type=int, default=0)
     parser.add_argument("--origin-match-weight", type=float, default=0.25)
     parser.add_argument("--origin-match-q", default="0.9")
     parser.add_argument("--origin-match-x-samples", type=int, default=5)
+    parser.add_argument("--origin-match-derivative-order", type=int, default=0)
+    parser.add_argument("--mortar-derivative-weight", type=float, default=1.0)
+    parser.add_argument("--mortar-derivative-step", type=float, default=1e-4)
     parser.add_argument("--d1-weight", type=float, default=0.0)
     parser.add_argument("--d2-weight", type=float, default=0.0)
     parser.add_argument("--derivative-step-q", type=float, default=0.005)
