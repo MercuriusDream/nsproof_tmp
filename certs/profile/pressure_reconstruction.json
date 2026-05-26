@@ -1,0 +1,125 @@
+{
+  "backend": "ledger-only-no-pressure-interval-backend",
+  "basis_hash_sha256": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
+  "blockers": [
+    "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+    "pressure reconstruction interval backend is not implemented",
+    "exact one-form/pressure interval bounds are not available",
+    "velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U",
+    "theta_residual_zero not validated: outward-rounded interval bound for R^theta",
+    "one_form_closedness not validated: outward-rounded interval bound for one-form curl",
+    "pressure_potential_equations not validated: directed-rounding pressure integration/potential backend",
+    "chart_pressure_matching not validated: interval chart-overlap pressure matching certificate",
+    "pressure_tail not validated: pressure tail interval certificate"
+  ],
+  "certificate_name": "pressure_reconstruction",
+  "commands": [
+    "tools/validate_pressure_reconstruction.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --profile-nk certs/profile/profile_nk.json --out certs/profile/pressure_reconstruction.json --native-c"
+  ],
+  "dependency_hashes": {
+    "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
+    "pressure_reconstruction_map": "13d3b13cbb5d7f3168743a676521e956f4585c8f55ab5f85978679b9a8e421fc",
+    "profile_nk_file": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921",
+    "profile_nk_stable_json": "9b74b606ea0a7d716085c050fad02eee65d4ca4082fcf32cb19b532e09081cc0",
+    "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
+  },
+  "failure_reason": "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate",
+  "input_hashes": {
+    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+    "profile_nk": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
+  },
+  "interval_bounds": {
+    "R_theta": null,
+    "one_form_curl": null,
+    "pressure_chart_matching": null,
+    "pressure_tail": null
+  },
+  "interval_widths": {
+    "max": null,
+    "median": null
+  },
+  "mathematical_statement": "Pressure reconstruction from the pressure-eliminated two-chart profile: build U from psi/Gamma, validate R^theta=0, validate partial_z R^r - partial_r R^z=0, construct chart pressures that match on overlaps up to one additive constant, and validate the pressure tail.",
+  "native_c_requested": true,
+  "native_c_status": "not-used-pressure-interval-backend-missing",
+  "obligations": [
+    {
+      "obligation_id": "velocity_from_streamfunction_swirl",
+      "required_artifact": "interval Taylor-jet evaluator for psi, Gamma, and U",
+      "statement": "Build U from psi/Gamma using u^r=-partial_z psi/r, u^z=partial_r psi/r, and u^theta=Gamma/r on both charts.",
+      "status": "formula-recorded-no-interval-bounds",
+      "validated": false
+    },
+    {
+      "obligation_id": "theta_residual_zero",
+      "required_artifact": "outward-rounded interval bound for R^theta",
+      "statement": "Validate R^theta=0, equivalently r R^theta=E_Gamma=0.",
+      "status": "missing-interval-bound",
+      "validated": false
+    },
+    {
+      "obligation_id": "one_form_closedness",
+      "required_artifact": "outward-rounded interval bound for one-form curl",
+      "statement": "Validate closedness of the pressure one-form: partial_z R^r - partial_r R^z = 0.",
+      "status": "missing-interval-bound",
+      "validated": false
+    },
+    {
+      "obligation_id": "pressure_potential_equations",
+      "required_artifact": "directed-rounding pressure integration/potential backend",
+      "statement": "Construct P and validate partial_r P + R^r=0 and partial_z P + R^z=0.",
+      "status": "missing-pressure-potential-backend",
+      "validated": false
+    },
+    {
+      "obligation_id": "chart_pressure_matching",
+      "required_artifact": "interval chart-overlap pressure matching certificate",
+      "statement": "Validate tail-chart and origin-chart pressure potentials match on the overlap up to one fixed additive constant.",
+      "status": "missing-chart-matching-bound",
+      "validated": false
+    },
+    {
+      "obligation_id": "pressure_tail",
+      "required_artifact": "pressure tail interval certificate",
+      "statement": "Validate the reconstructed pressure tail and its derivative bounds.",
+      "status": "missing-pressure-tail-bound",
+      "validated": false
+    }
+  ],
+  "pass": false,
+  "precision_bits": null,
+  "pressure_reconstruction_hash_sha256": "13d3b13cbb5d7f3168743a676521e956f4585c8f55ab5f85978679b9a8e421fc",
+  "pressure_reconstruction_statement": "Given the two-chart profile ansatz\n\n  psi = r^2 z q^p F(q,x),  Gamma = r^2 q^p G(q,x),\n  q = (1 + r^2 + z^2)^(-1/2),  x = z^2/(r^2 + z^2),\n\nbuild the axisymmetric-with-swirl velocity\n\n  U = u^r e_r + u^theta e_theta + u^z e_z,\n  u^r = -partial_z psi / r,\n  u^z =  partial_r psi / r,\n  u^theta = Gamma / r.\n\nLet R^r, R^theta, R^z be the non-pressure self-similar momentum residual\ncomputed from this U in cylindrical coordinates.  A pressure reconstruction\ncertificate must validate, with outward-rounded interval bounds, that\n\n  R^theta = 0,\n  partial_z R^r - partial_r R^z = 0,\n  partial_r P + R^r = 0,\n  partial_z P + R^z = 0,\n\non every tail and origin chart, that the chart pressure potentials agree on\ntheir overlap up to one fixed additive constant, and that the reconstructed\npressure has the required tail class.\n\nThe pressure-eliminated profile equations provide the formal identities\n\n  r R^theta = E_Gamma,\n  E_psi = -r^3 (partial_z R^r - partial_r R^z),\n\nbut those identities become a pressure certificate only after the profile\nNewton-Kantorovich gate passes and the one-form, chart-matching, and pressure\ntail bounds are interval validated.",
+  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "profile_nk_dependency": {
+    "certificate_name": "profile_nk",
+    "exists": true,
+    "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+    "pass": false,
+    "path": "certs/profile/profile_nk.json",
+    "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+    "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+    "schema_version": "nsproof-cert-v1",
+    "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921",
+    "stable_json_hash_sha256": "9b74b606ea0a7d716085c050fad02eee65d4ca4082fcf32cb19b532e09081cc0"
+  },
+  "profile_summary": {
+    "B": 1.0,
+    "format": "twochart_profile_projection_v1",
+    "gamma": 0.45,
+    "p": 2.2222222222222223,
+    "source_profile": {
+      "B": 1.0,
+      "format": "transseries_cheb_projection_v1",
+      "gamma": 0.45,
+      "p": 2.2222222222222223,
+      "source_seed_json": "profile-seeds/gamma0p45-forced-tail-sparse-flatbumpFG-v117-ridge-strip.json",
+      "status": "projection_scaffold_not_validated"
+    }
+  },
+  "repo_commit": "83cd9ab6fc46cafa641d7582add30e27053d9200",
+  "rounding_mode": null,
+  "schema_version": "nsproof-cert-v1",
+  "status": "PRESSURE_RECONSTRUCTION_LEDGER_NOT_INTERVAL",
+  "tail_policy_hash_sha256": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
+}

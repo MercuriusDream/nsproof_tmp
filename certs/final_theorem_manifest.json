@@ -23,12 +23,14 @@
           "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
         },
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "pressure_reconstruction",
+          "exists": true,
+          "failure_reason": "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate",
           "pass": false,
           "path": "certs/profile/pressure_reconstruction.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "d29942817ed78e26b93bd83b2c4ee99a7713ef7e7282806a6a9e2e4a0b08d5f0"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -56,7 +58,7 @@
           "path": "certs/tail/tail_recurrence.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "1cbb3bdebb33f5e5af742f04d6943859805af6f561151db8b9bde33b7e7f7d8d"
+          "sha256": "8cc43d54b9ac2aba98adb76369e08d2770337f35dfb3187dd0e23f99508dcd43"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -74,7 +76,7 @@
           "path": "certs/tail/tail_recurrence.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "1cbb3bdebb33f5e5af742f04d6943859805af6f561151db8b9bde33b7e7f7d8d"
+          "sha256": "8cc43d54b9ac2aba98adb76369e08d2770337f35dfb3187dd0e23f99508dcd43"
         },
         {
           "certificate_name": "indicial_pluecker_cover",
@@ -84,7 +86,7 @@
           "path": "certs/tail/indicial_pluecker_cover.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "d652ef0c4abc66cac01cc038a90fb2a7e00829fe1447e98cc539fabde856b3e6"
+          "sha256": "8113ac8d01df20c254896a2639d03f0d120803ac2796dcc3c7aa9ad3c5324803"
         },
         {
           "certificate_name": "matching_determinant",
@@ -94,7 +96,7 @@
           "path": "certs/profile/matching_determinant.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "6226e2e423753d9a081104b9c969bc5965271dcde853a95a314af3c32a2c7684"
+          "sha256": "03a3eceddf39c42811f7f8d87e65634ebc67833e44a333d1147bbfe2d7083f79"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -105,12 +107,14 @@
     {
       "dependencies": [
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "projected_spectrum",
+          "exists": true,
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/projected_spectrum.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "60cb85ac8285225159569abd870f2e09a3b9cb620fd70af8741376a1aa256bb9"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -121,20 +125,24 @@
     {
       "dependencies": [
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "high_frequency_exclusion",
+          "exists": true,
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/high_frequency_exclusion.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "4ce0153bf6d3769673d8f295f1e3ff0ca9171fc5e145a6a09764afd93d9e0085"
         },
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "stable_semigroup",
+          "exists": true,
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/stable_semigroup.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "e9649a75189347e7564dc238d448c457e6adb5783a0f8f4c8937b4205d2c8f3c"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -145,6 +153,6 @@
   ],
   "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
   "pass": false,
-  "repo_commit": "9849821464d62c0130783726f252c4f9c02ce442",
+  "repo_commit": "83cd9ab6fc46cafa641d7582add30e27053d9200",
   "schema_version": "nsproof-cert-v1"
 }

@@ -22,7 +22,7 @@
   },
   "dependency_hashes": {
     "profile_nk": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921",
-    "tail_recurrence": "3bd422e6e040af1df01bb158a512266bc82cf346d8adbf2b4b26c88895b982de"
+    "tail_recurrence": "3119f88809e24ef9d118238ef9af7063a8cc46a04d3e655ad6ea9c00574bad3f"
   },
   "determinant_interval": null,
   "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
@@ -38,7 +38,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "9849821464d62c0130783726f252c4f9c02ce442",
+  "repo_commit": "83cd9ab6fc46cafa641d7582add30e27053d9200",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "transversality_margin": null
