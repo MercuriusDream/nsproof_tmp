@@ -1073,6 +1073,64 @@ python3 tools/profile_newton_twochart.py \
   --line-search 1,0.5,0.25,0.125,0.0625
 ```
 
+Given the latest origin-only R/Z refit evidence, the next commands should not
+be more isolated origin refits. They should test coupled conditioning and
+variable blocking:
+
+```bash
+# Branch A: coupled origin+tail solve with active physical R/Z rows and small
+# mortar weight, preserving PDE scale.
+python3 tools/profile_newton_twochart.py \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_stage0_rz_coupled_tail_origin.json \
+  --report-out work/twochart_stage0_rz_coupled_tail_origin_report.json \
+  --blocks origin,interface \
+  --variable-charts tail,origin \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-coordinates RZ \
+  --mortar-order 2 \
+  --mortar-q-samples 2 \
+  --mortar-x-samples 5 \
+  --mortar-active-count 24 \
+  --max-variables 128 \
+  --candidate-origin-degree-max 8 \
+  --candidate-kq-max 8 \
+  --candidate-kx-max 8 \
+  --max-iter 5 \
+  --trust 0.02 \
+  --lm-lambda 1e-6 \
+  --pde-weight 1 \
+  --mortar-weight 0.01 \
+  --line-search 1,0.5,0.25,0.125,0.0625
+
+# Branch B: origin-only control run. It should preserve PDE scale but is not
+# expected to solve the seam; use it only to measure conflict.
+python3 tools/profile_newton_twochart.py \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_stage0_origin_only_rz_coupled.json \
+  --report-out work/twochart_stage0_origin_only_rz_coupled_report.json \
+  --blocks origin,interface \
+  --variable-charts origin \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-coordinates RZ \
+  --mortar-order 2 \
+  --mortar-q-samples 2 \
+  --mortar-x-samples 5 \
+  --mortar-active-count 18 \
+  --max-variables 56 \
+  --candidate-origin-degree-max 6 \
+  --max-iter 5 \
+  --trust 0.05 \
+  --lm-lambda 1e-6 \
+  --pde-weight 1 \
+  --mortar-weight 0.01 \
+  --line-search 1,0.5,0.25,0.125,0.0625
+```
+
 Stage-0 go criterion:
 
 ```text
