@@ -3927,6 +3927,40 @@ C2 R/Z mortar max: 4.214529161145e3 -> 4.214524899404e3
 edge holdout: 4.489165350285e2 -> 4.499902802188e2
 ```
 
+An origin-only physical R/Z refit diagnostic was then added in
+`tools/profile_refit_origin_rz_twochart.py`.  It updates only
+`F_origin_taylor/G_origin_taylor`, preserving the tail chart and formal tail
+gates.  The degree-8 unregularized refit shows that the origin Taylor block can
+fit the sampled C2 R/Z seam very well if the PDE residual is ignored:
+
+```text
+work/twochart_origin_rz_refit_c2_d8.json
+C2 R/Z mortar max: 4.214529161145e3 -> 2.199811301294e1
+edge holdout: 2.280280780287e3
+origin holdout: 2.265980488606e3
+```
+
+The regularized degree-8 refit keeps coefficients closer to the source but
+still destroys the PDE scale:
+
+```text
+work/twochart_origin_rz_refit_c2_d8_ridge1e6.json
+C2 R/Z mortar max: 3.463926251164e2
+edge holdout: 2.034185352189e3
+```
+
+A coupled origin-only Stage-0 run was added using `--variable-charts origin`.
+It includes PDE rows and preserves the held-out PDE scale, but barely moves the
+R/Z seam:
+
+```text
+work/twochart_stage0_origin_only_rz_coupled_report.json
+objective: 6.211181500240e4 -> 6.211129410195e4
+C2 R/Z mortar max: 4.214529161145e3 -> 4.214511547830e3
+origin holdout: 9.132494634431e1 -> 9.132455612598e1
+edge holdout: 4.489165350285e2
+```
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -3938,8 +3972,11 @@ edge = 4.489150149273e2
 C0-C2 R,Z mortar max = 4.214529161145e3
 ```
 
-Conclusion: the immediate blocker is still the two-chart Stage-0 linear
-system and interface formulation. The new R/Z rows are the right coordinate
-language, but the active solve is rank/variable limited at the current degree
-and weighting. It is too early to free `(gamma,B)`, pivot to radial matching,
-or start spectral validation as a theorem dependency.
+Conclusion: the immediate blocker is still the two-chart Stage-0 coupled
+linear system and interface/PDE balance. The new R/Z rows are the right
+coordinate language, and the origin chart has enough algebraic freedom to match
+the seam alone. The obstruction is that seam fitting and the normalized profile
+equations fight unless tail/interior and origin coefficients are solved together
+with better conditioning, blocking, and row normalization. It is too early to
+free `(gamma,B)`, pivot to radial matching, or start spectral validation as a
+theorem dependency.

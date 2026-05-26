@@ -80,6 +80,17 @@ def parse_blocks(raw: str) -> tuple[str, ...]:
     return blocks
 
 
+def parse_variable_charts(raw: str) -> tuple[str, ...]:
+    charts = tuple(item.strip() for item in raw.split(",") if item.strip())
+    allowed = {"tail", "origin"}
+    unknown = [chart for chart in charts if chart not in allowed]
+    if unknown:
+        raise ValueError(f"unknown --variable-charts item(s): {', '.join(unknown)}")
+    if not charts:
+        raise ValueError("--variable-charts must name tail and/or origin")
+    return charts
+
+
 def hook_report() -> HookReport:
     module_name = "validators.compactified_equations_twochart"
     try:
@@ -166,6 +177,10 @@ def variable_allowed_for_blocks(variable: Any, blocks: tuple[str, ...]) -> bool:
     if variable.chart == "tail":
         return "tail" in blocks or "interface" in blocks
     return False
+
+
+def variable_allowed_for_chart_filter(variable: Any, charts: tuple[str, ...]) -> bool:
+    return variable.chart in charts
 
 
 def variable_is_origin_constant(variable: Any) -> bool:
@@ -430,6 +445,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     projection = projection_from_twochart(data)
     all_variables = enumerate_coefficients(data)
     pde_points = parse_qb_points(args.pde_qb_points)
+    variable_charts = parse_variable_charts(args.variable_charts)
     q_values = grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples) if "interface" in blocks else []
     x_values = grid(0.0, 1.0, args.mortar_x_samples) if "interface" in blocks else []
     mortar_points = [(q, x) for q in q_values for x in x_values]
@@ -437,6 +453,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         variable
         for variable in all_variables
         if variable_allowed_for_blocks(variable, blocks)
+        and variable_allowed_for_chart_filter(variable, variable_charts)
         and (args.include_origin_constants or not variable_is_origin_constant(variable))
         and variable_relevant_for_samples(data, variable, pde_points, mortar_points)
         and variable_under_candidate_caps(variable, args)
@@ -661,6 +678,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         "tail_legality": tail_legality,
         "requested_solver": {
             "blocks": list(blocks),
+            "variable_charts": list(parse_variable_charts(args.variable_charts)),
             "residual_kind": args.residual_kind,
             "q2_policy": args.q2_policy,
             "mortar_order": args.mortar_order,
@@ -721,6 +739,7 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         },
         "requested_solver": {
             "blocks": list(blocks),
+            "variable_charts": list(parse_variable_charts(args.variable_charts)),
             "gamma_fixed": True,
             "B_fixed": True,
             "residual_kind": args.residual_kind,
@@ -770,6 +789,7 @@ def main() -> None:
     parser.add_argument("--report-out", default="", help="Optional full Stage-0 run report JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Write the old solver plan without mutating coefficients.")
     parser.add_argument("--blocks", default="origin,interface", help="Comma list: tail,origin,interface.")
+    parser.add_argument("--variable-charts", default="tail,origin", help="Comma list of mutable charts: tail,origin.")
     parser.add_argument("--gamma-fixed", action="store_true", default=True, help="Accepted planned flag; enforced true.")
     parser.add_argument("--B-fixed", action="store_true", default=True, help="Accepted planned flag; enforced true.")
     parser.add_argument("--residual-kind", default="normalized-structural")

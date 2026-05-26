@@ -53,7 +53,7 @@ Current progress ledger:
 ```text
 Final theorem certificate: 0%
 Certified stop-condition gates: 0/5
-Proof-engineering scaffold: about 33%
+Proof-engineering scaffold: about 34%
 ```
 
 The current two-chart seed is:
@@ -101,10 +101,15 @@ work/twochart_stage0_smoke_report.json
 work/twochart_stage0_pde_hardpoints_report.json
 work/twochart_stage0_mortar_c2_report.json
 work/twochart_stage0_rz_active_mortar_trust5_report.json
+work/twochart_origin_rz_refit_c2_d6.json
+work/twochart_origin_rz_refit_c2_d8.json
+work/twochart_origin_rz_refit_c2_d8_ridge1e6.json
+work/twochart_stage0_origin_only_rz_coupled_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
 work/twochart_stage0_rz_active_mortar_trust5_residual.json
+work/twochart_stage0_origin_only_rz_coupled_residual.json
 ```
 
 The safe locked solver does not yet show a real Newton basin:
@@ -117,6 +122,20 @@ mortar C2: accepted_any_step = true, but tiny objective change only
 R/Z active mortar: accepted_any_step = true, but still tiny and harms edge holdout
   C2 R/Z mortar max 4.214529161145e3 -> 4.214524899404e3
   edge holdout 4.489165350285e2 -> 4.499902802188e2
+
+origin-only R/Z refit, degree 8: proves interface algebraic freedom if PDE is ignored
+  C2 R/Z mortar max 4.214529161145e3 -> 2.199811301294e1
+  edge holdout -> 2.280280780287e3
+  origin holdout -> 2.265980488606e3
+
+regularized origin-only R/Z refit, degree 8, ridge 1e-6:
+  C2 R/Z mortar max -> 3.463926251164e2
+  edge holdout -> 2.034185352189e3
+
+coupled origin-only Stage-0 with PDE rows:
+  C2 R/Z mortar max 4.214529161145e3 -> 4.214511547830e3
+  edge holdout stays 4.489165350285e2
+  origin holdout 9.132494634431e1 -> 9.132455612598e1
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -135,7 +154,11 @@ Important interpretation:
 ```text
 The pre-lock toy smoke improvement is no longer trusted.
 After q=0 tail locking, the solver mostly rejects updates.
-This suggests the immediate blocker is still Stage-0 linear-system/variable-choice/mortar formulation, not gamma/B and not spectrum.
+The origin Taylor block has enough degrees to match the physical R/Z seam in
+isolation, but doing so destroys the PDE residual. Therefore the blocker is not
+mere origin algebraic capacity. It is the coupled tail-origin PDE/mortar balance
+and the conditioning/blocking of the Stage-0 linear system, not gamma/B and not
+spectrum.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -512,9 +535,46 @@ a trial only if the same sampled objective decreases while the formal tail gate
 still passes. The current safe locked probes mostly reject updates; the
 mortar-dominant C2 probe accepts only a tiny objective decrease. The next
 implementation step is therefore not a parameter search; it is to make the
-Stage-0 system less toy-like by adding proper physical `(R,Z)` interface rows,
-better active variable blocking, and broader sampled residual rows without
-unlocking the tail gates.
+Stage-0 system less toy-like by improving the coupled physical `(R,Z)` interface
+solve, active variable blocking, row normalization, and broader sampled residual
+rows without unlocking the tail gates.
+
+Update after the latest origin R/Z refit diagnostic:
+`tools/profile_refit_origin_rz_twochart.py` fits only
+`F_origin_taylor/G_origin_taylor` against physical R/Z seam derivatives while
+preserving the tail chart and all tail gates. It proves that the origin Taylor
+block has enough algebraic freedom to fit the sampled seam if the PDE residual
+is ignored:
+
+```text
+degree 6 origin-only refit:
+  C2 R/Z mortar max = 2.341176985530e2
+  edge holdout = 1.432848968335e3
+
+degree 8 origin-only refit:
+  C2 R/Z mortar max = 2.199811301294e1
+  edge holdout = 2.280280780287e3
+  origin holdout = 2.265980488606e3
+
+degree 8 ridge 1e-6 origin-only refit:
+  C2 R/Z mortar max = 3.463926251164e2
+  edge holdout = 2.034185352189e3
+```
+
+The companion `--variable-charts origin` Stage-0 run includes PDE rows while
+varying only origin coefficients:
+
+```text
+work/twochart_stage0_origin_only_rz_coupled_report.json
+objective = 6.211181500240e4 -> 6.211129410195e4
+C2 R/Z mortar max = 4.214529161145e3 -> 4.214511547830e3
+origin holdout = 9.132494634431e1 -> 9.132455612598e1
+edge holdout = 4.489165350285e2
+```
+
+Interpretation: origin seam fitting and PDE balance conflict unless tail and
+origin coefficients are solved together in a better-conditioned coupled system.
+Do not spend the next branch on more origin-only refits except as diagnostics.
 
 ## 6. Current Repository Tooling
 
