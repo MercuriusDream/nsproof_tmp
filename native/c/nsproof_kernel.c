@@ -1303,3 +1303,109 @@ NSPROOF_EXPORT int nsproof_pde_tail_coeff_columns_batch(
     }
     return first_status;
 }
+
+NSPROOF_EXPORT int nsproof_stage0_prediction_scan_batch(
+    int row_count,
+    int column_count,
+    int alpha_count,
+    const double *jacobian_rows,
+    const double *residuals,
+    const double *step,
+    const double *alphas,
+    double *out_l2,
+    double *out_max_abs,
+    double *out_objective,
+    int *out_status
+) {
+    int alpha_index;
+    int row;
+    int col;
+    int first_status = NSPROOF_KERNEL_OK;
+
+    if (row_count < 0 || column_count < 0 || alpha_count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (alpha_count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        jacobian_rows == NULL ||
+        residuals == NULL ||
+        step == NULL ||
+        alphas == NULL ||
+        out_l2 == NULL ||
+        out_max_abs == NULL ||
+        out_objective == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+
+    for (alpha_index = 0; alpha_index < alpha_count; alpha_index++) {
+        double alpha = alphas[alpha_index];
+        long double sumsq = 0.0L;
+        double max_abs = 0.0;
+        int status = NSPROOF_KERNEL_OK;
+
+        if (!check_finite(alpha)) {
+            status = NSPROOF_KERNEL_NONFINITE_INPUT;
+        }
+        for (row = 0; row < row_count && status == NSPROOF_KERNEL_OK; row++) {
+            long double value = (long double)residuals[row];
+            if (!check_finite(residuals[row])) {
+                status = NSPROOF_KERNEL_NONFINITE_INPUT;
+                break;
+            }
+            for (col = 0; col < column_count; col++) {
+                double j_value = jacobian_rows[row * column_count + col];
+                double step_value = step[col];
+                if (!check_finite(j_value) || !check_finite(step_value)) {
+                    status = NSPROOF_KERNEL_NONFINITE_INPUT;
+                    break;
+                }
+                value += (long double)alpha * (long double)j_value * (long double)step_value;
+            }
+            if (status != NSPROOF_KERNEL_OK) {
+                break;
+            }
+            if (!isfinite((double)value)) {
+                status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+                break;
+            }
+            {
+                long double abs_value = fabsl(value);
+                if (abs_value > (long double)max_abs) {
+                    max_abs = (double)abs_value;
+                }
+                sumsq += value * value;
+            }
+            if (!isfinite((double)sumsq)) {
+                status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+                break;
+            }
+        }
+
+        if (status == NSPROOF_KERNEL_OK) {
+            long double objective = 0.5L * sumsq;
+            long double l2 = sqrtl(sumsq);
+            if (!isfinite((double)objective) || !isfinite((double)l2)) {
+                status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+            } else {
+                out_l2[alpha_index] = (double)l2;
+                out_max_abs[alpha_index] = max_abs;
+                out_objective[alpha_index] = (double)objective;
+            }
+        }
+        if (status != NSPROOF_KERNEL_OK) {
+            out_l2[alpha_index] = 0.0;
+            out_max_abs[alpha_index] = 0.0;
+            out_objective[alpha_index] = 0.0;
+            if (first_status == NSPROOF_KERNEL_OK) {
+                first_status = status;
+            }
+        }
+        if (out_status != NULL) {
+            out_status[alpha_index] = status;
+        }
+    }
+    return first_status;
+}

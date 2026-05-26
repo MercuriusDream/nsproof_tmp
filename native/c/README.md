@@ -43,6 +43,12 @@ PDE/guard tail-coefficient column batch path are wired into Stage-0 behind
     quotients as the Python path.
   - Uses caller-provided base profile scalars so Python can still own profile
     evaluation while the repeated tail-column work moves to C.
+- `nsproof_stage0_prediction_scan_batch(...)`
+  - Batched linear prediction metrics for already-built Stage-0 rows.
+  - Evaluates `residual + alpha * J * step` for several applied alphas and
+    returns `l2`, `max_abs`, and objective values.
+  - This is diagnostic/reporting infrastructure only; actual nonlinear
+    line-search acceptance still uses the existing Python objective evaluation.
 
 All exported functions use only plain C types and caller-owned buffers. Error
 status values are:
@@ -126,31 +132,34 @@ current_128_exact_c_accelerable_without_solver_changes = false
 ```
 
 That probe is now historical for the q/x inner-kernel boundary. The current C
-ABI also includes the R/Z chain-rule kernel and a PDE/guard tail-column kernel,
-so the remaining large non-native slice in the 128 run is mostly origin-column
-PDE work, base profile evaluation, active-set linear algebra, and
-prediction/line-search bookkeeping.
+ABI also includes the R/Z chain-rule kernel, a PDE/guard tail-column kernel, and
+a linear prediction scan kernel, so the remaining large non-native slice in the
+128 run is mostly origin-column PDE work, base profile evaluation, active-set
+linear algebra, and nonlinear objective/guard reevaluation.
 
 ## Stage-0 Native Paths
 
-The R/Z mortar and PDE/guard tail-column slices are now available in the solver:
+The R/Z mortar, PDE/guard tail-column, and linear-prediction slices are now
+available in the solver:
 
 ```bash
 python3 tools/profile_newton_twochart.py ... --mortar-coordinates RZ --native-c
 ```
 
-The latest 128-variable scaled inequality diagnostic using both native paths is:
+The latest 128-variable scaled inequality diagnostic using all current native
+paths is:
 
 ```text
-work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_report.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepred_w8_c_report.json
 ```
 
 It records:
 
 ```text
-real time = 37.06s
-native_c_rz calls = 42, cases = 804, seconds = 0.000598
-native_c_pde cases = 1222, seconds = 0.004336
+real time = 38.06s
+native_c_rz calls = 42, cases = 804, seconds = 0.000593
+native_c_pde cases = 1222, seconds = 0.004282
+native_c_prediction cases = 426240, seconds = 0.003939
 selected variables = 128 = 101 tail + 27 origin
 accepted block = full
 held-out edge = 4.489165334070e2
@@ -160,12 +169,12 @@ C0-C4 R/Z mortar = 5.833745908165e6
 The C4 mortar audit:
 
 ```text
-work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_mortar_c4.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepred_w8_c_mortar_c4.json
 ```
 
 uses the same native path for `43560` R/Z tail cases.
 
-Validation against the Python R/Z jet and PDE tail-column paths:
+Validation against the Python R/Z jet, PDE tail-column, and prediction paths:
 
 ```text
 R/Z max_abs = 4.628673195839e-7
@@ -175,17 +184,18 @@ PDE tail validation points = 4
 PDE tail validation cases = 320
 PDE tail max_abs = 1.997e-6
 PDE tail max_rel = 2.239e-13
+prediction scan validation passed on deterministic dense matrices
 ```
 
 `tools/benchmark_native_c_kernel.py` now validates both the Chebyshev
-microkernel, the R/Z batch kernel, and the PDE tail-column batch kernel. Latest
-local run:
+microkernel, the R/Z batch kernel, the PDE tail-column batch kernel, and the
+prediction scan kernel. Latest local run:
 
 ```text
 NSPROOF_NATIVE_C_VALIDATION_PASSES=2 NSPROOF_NATIVE_C_REPEATS=50
-native/c Chebyshev+RZ+PDE-tail kernel validation: ok
-scalar ctypes C: 10.27x vs Python
-batch ctypes C: 97.12x vs Python
+native/c Chebyshev+RZ+PDE-tail+prediction kernel validation: ok
+scalar ctypes C: 11.16x vs Python
+batch ctypes C: 100.86x vs Python
 ```
 
 ## Remaining Native Work
@@ -219,6 +229,7 @@ int nsproof_stage0_prediction_scan_batch(
     const double *alphas,
     double *out_l2,
     double *out_max_abs,
+    double *out_objective,
     int *out_status
 );
 ```

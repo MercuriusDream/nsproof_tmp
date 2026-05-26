@@ -13,11 +13,13 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import copy
+import ctypes
 import importlib
 import json
 import math
 import os
 import sys
+import time
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -544,6 +546,85 @@ def vector_metrics(vec: list[float]) -> dict[str, float]:
         "max_abs": max(abs(value) for value in vec),
         "rms": math.sqrt(total / len(vec)),
         "objective": 0.5 * total,
+    }
+
+
+def native_stage0_prediction_scan(
+    system: dict[str, Any],
+    delta: list[float],
+    alphas: list[float],
+    max_update_norm: float,
+) -> tuple[dict[float, dict[str, float]], dict[str, Any]]:
+    if not alphas:
+        return {}, {"enabled": True, "calls": 0, "cases": 0, "seconds": 0.0}
+    from validators.twochart_mortar_jacobian import native_c_library
+
+    residual_vector = [float(value) for value in system["residual_vector"]]
+    jacobian_rows = [[float(value) for value in row] for row in system["jacobian_rows"]]
+    row_count = len(residual_vector)
+    column_count = len(delta)
+    alpha_count = len(alphas)
+    if row_count == 0 or column_count == 0:
+        return {
+            float(alpha): {"count": 0.0, "max_abs": 0.0, "rms": 0.0, "objective": 0.0, "l2": 0.0}
+            for alpha in alphas
+        }, {"enabled": True, "calls": 1, "cases": 0, "seconds": 0.0}
+
+    norm = math.sqrt(sum(value * value for value in delta))
+    trust_scale = 1.0
+    if max_update_norm > 0.0 and norm > max_update_norm:
+        trust_scale = max_update_norm / max(norm, 1e-300)
+    applied = [float(alpha) * trust_scale for alpha in alphas]
+
+    double_jacobian = ctypes.c_double * (row_count * column_count)
+    double_rows = ctypes.c_double * row_count
+    double_columns = ctypes.c_double * column_count
+    double_alphas = ctypes.c_double * alpha_count
+    int_alphas = ctypes.c_int * alpha_count
+    flat_jacobian = [value for row in jacobian_rows for value in row]
+    out_l2 = double_alphas()
+    out_max_abs = double_alphas()
+    out_objective = double_alphas()
+    statuses = int_alphas()
+    lib = native_c_library()
+    start = time.perf_counter()
+    rc = lib.nsproof_stage0_prediction_scan_batch(
+        row_count,
+        column_count,
+        alpha_count,
+        double_jacobian(*flat_jacobian),
+        double_rows(*residual_vector),
+        double_columns(*[float(value) for value in delta]),
+        double_alphas(*applied),
+        out_l2,
+        out_max_abs,
+        out_objective,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(alpha_count)))
+        raise RuntimeError(f"native C prediction scan failed rc={rc} statuses={bad_statuses}")
+
+    metrics: dict[float, dict[str, float]] = {}
+    for index, alpha in enumerate(alphas):
+        l2 = float(out_l2[index])
+        metrics[float(alpha)] = {
+            "count": float(row_count),
+            "max_abs": float(out_max_abs[index]),
+            "rms": l2 / math.sqrt(row_count),
+            "objective": float(out_objective[index]),
+            "l2": l2,
+            "alpha_applied": applied[index],
+        }
+    return metrics, {
+        "enabled": True,
+        "calls": 1,
+        "cases": row_count * column_count * alpha_count,
+        "rows": row_count,
+        "columns": column_count,
+        "alphas": alpha_count,
+        "seconds": elapsed,
     }
 
 
@@ -1729,6 +1810,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         line_trials: list[dict[str, Any]] = []
         candidate_previews: list[dict[str, Any]] = []
         best_accepted: dict[str, Any] | None = None
+        native_c_prediction = {"enabled": bool(args.native_c), "calls": 0, "cases": 0, "seconds": 0.0}
         accepted = False
         for block_spec in block_specs:
             try:
@@ -1791,6 +1873,17 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     else scaling_report,
                 }
             )
+            native_predictions: dict[float, dict[str, float]] = {}
+            if args.native_c:
+                native_predictions, native_prediction_stats = native_stage0_prediction_scan(
+                    system,
+                    delta,
+                    args.line_search,
+                    args.trust,
+                )
+                native_c_prediction["calls"] += int(native_prediction_stats.get("calls", 0))
+                native_c_prediction["cases"] += int(native_prediction_stats.get("cases", 0))
+                native_c_prediction["seconds"] += float(native_prediction_stats.get("seconds", 0.0))
             for alpha in args.line_search:
                 trial_data, update_metrics = apply_delta(current, system["variables"], delta, alpha, args.trust)
                 tail_gate = attach_stage0_tail_gate(trial_data, args)
@@ -1803,6 +1896,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     "column_scaling": scaling_report.get("column_scaling", scaling_report)
                     if isinstance(scaling_report, dict)
                     else scaling_report,
+                    "native_linear_prediction": native_predictions.get(float(alpha)),
                     **update_metrics,
                 }
                 if not tail_gate["all_ok"]:
@@ -1906,6 +2000,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "parallel_fallbacks": system.get("parallel_fallbacks", []),
                 "native_c_rz": system.get("native_c_rz", {}),
                 "native_c_pde": system.get("native_c_pde", {}),
+                "native_c_prediction": native_c_prediction,
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
@@ -2042,6 +2137,15 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
             predicted_improvement = -float(predicted_delta.get("objective", 0.0) or 0.0)
             actual_improvement = float(trial.get("objective_decrease", 0.0) or 0.0)
             ratio = actual_improvement / predicted_improvement if predicted_improvement > 0.0 else None
+            native_prediction = trial.get("native_linear_prediction")
+            if not isinstance(native_prediction, dict):
+                native_prediction = {}
+            native_objective = native_prediction.get("objective")
+            native_improvement = (
+                float(base.get("objective", 0.0) or 0.0) - float(native_objective)
+                if native_objective is not None
+                else None
+            )
             entries.append(
                 {
                     "iteration": history.get("iteration"),
@@ -2052,6 +2156,9 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     "predicted_primary_objective_improvement": predicted_improvement,
                     "actual_sampled_objective_improvement": actual_improvement,
                     "actual_over_predicted": ratio,
+                    "native_linear_objective": native_objective,
+                    "native_linear_objective_improvement": native_improvement,
+                    "native_linear_max_abs": native_prediction.get("max_abs"),
                     "raw_max_abs": trial.get("raw_max_abs"),
                     "guard_max_abs": trial.get("guard_metrics", {}).get("max_abs")
                     if isinstance(trial.get("guard_metrics"), dict)
@@ -2530,6 +2637,13 @@ def main() -> None:
                     "native_c_pde="
                     f"cases:{native_c_pde.get('cases', 0)} "
                     f"seconds:{float(native_c_pde.get('seconds', 0.0)):.6f}"
+                )
+            native_c_prediction = last.get("native_c_prediction", {})
+            if native_c_prediction.get("enabled"):
+                print(
+                    "native_c_prediction="
+                    f"cases:{native_c_prediction.get('cases', 0)} "
+                    f"seconds:{float(native_c_prediction.get('seconds', 0.0)):.6f}"
                 )
             print(f"base_objective_first={first['base']['objective']:.12e}")
             final_metrics = result["candidate"]["twochart_newton_stage0_summary"].get("final_metrics", {})

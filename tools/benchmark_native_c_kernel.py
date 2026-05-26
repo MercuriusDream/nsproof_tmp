@@ -182,6 +182,21 @@ def load_library(path: Path) -> ctypes.CDLL:
     ]
     lib.nsproof_pde_tail_coeff_columns_batch.restype = ctypes.c_int
 
+    lib.nsproof_stage0_prediction_scan_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_stage0_prediction_scan_batch.restype = ctypes.c_int
+
     return lib
 
 
@@ -385,8 +400,74 @@ def validate_repeated(lib: ctypes.CDLL, passes: int) -> list[tuple[float, float,
         cases = validate(lib)
         validate_rz_batch(lib)
         validate_pde_tail_batch(lib)
+        validate_prediction_scan(lib)
         validate_error_statuses(lib)
     return cases
+
+
+def validate_prediction_scan(lib: ctypes.CDLL) -> None:
+    row_count = 7
+    column_count = 5
+    alpha_count = 4
+    jacobian = [
+        math.sin(0.37 * (row + 1) * (col + 2)) + 0.1 * (row - col)
+        for row in range(row_count)
+        for col in range(column_count)
+    ]
+    residuals = [math.cos(0.23 * (row + 3)) - 0.05 * row for row in range(row_count)]
+    step = [0.2 * math.sin(0.41 * (col + 1)) for col in range(column_count)]
+    alphas = [0.0, 0.125, 1.0, -0.5]
+
+    double_array_j = ctypes.c_double * (row_count * column_count)
+    double_array_rows = ctypes.c_double * row_count
+    double_array_cols = ctypes.c_double * column_count
+    double_array_alpha = ctypes.c_double * alpha_count
+    int_array_alpha = ctypes.c_int * alpha_count
+    out_l2 = double_array_alpha()
+    out_max_abs = double_array_alpha()
+    out_objective = double_array_alpha()
+    statuses = int_array_alpha()
+    status = lib.nsproof_stage0_prediction_scan_batch(
+        row_count,
+        column_count,
+        alpha_count,
+        double_array_j(*jacobian),
+        double_array_rows(*residuals),
+        double_array_cols(*step),
+        double_array_alpha(*alphas),
+        out_l2,
+        out_max_abs,
+        out_objective,
+        statuses,
+    )
+    if status != 0:
+        raise AssertionError(f"prediction scan status {status}")
+
+    for alpha_index, alpha in enumerate(alphas):
+        predicted = []
+        for row in range(row_count):
+            value = residuals[row]
+            offset = row * column_count
+            for col in range(column_count):
+                value += alpha * jacobian[offset + col] * step[col]
+            predicted.append(value)
+        sumsq = sum(value * value for value in predicted)
+        expected_l2 = math.sqrt(sumsq)
+        expected_max_abs = max(abs(value) for value in predicted)
+        expected_objective = 0.5 * sumsq
+        assert_close(f"prediction l2 alpha={alpha}", float(out_l2[alpha_index]), expected_l2, tol=1e-12)
+        assert_close(
+            f"prediction max_abs alpha={alpha}",
+            float(out_max_abs[alpha_index]),
+            expected_max_abs,
+            tol=1e-12,
+        )
+        assert_close(
+            f"prediction objective alpha={alpha}",
+            float(out_objective[alpha_index]),
+            expected_objective,
+            tol=1e-12,
+        )
 
 
 def validate_pde_tail_batch(lib: ctypes.CDLL) -> dict[str, float]:
@@ -635,7 +716,7 @@ def main() -> int:
         scalar_py, scalar_c, scalar_acc = benchmark_scalar(lib, patch, cases, repeats)
         batch_py, batch_c, batch_acc = benchmark_batch(lib, patch, cases, repeats)
 
-    print("native/c Chebyshev+RZ+PDE-tail kernel validation: ok")
+    print("native/c Chebyshev+RZ+PDE-tail+prediction kernel validation: ok")
     print(f"validation passes: {validation_passes}")
     print(
         "pde tail validation: "
