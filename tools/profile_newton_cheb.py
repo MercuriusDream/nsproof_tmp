@@ -16,6 +16,7 @@ import json
 import math
 import os
 import sys
+import tempfile
 from dataclasses import dataclass
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -372,7 +373,19 @@ def variables_from_projection(
     max_mode_x: int,
     skip_constant: bool,
     max_variables: int,
+    support_points: tuple[Point, ...] = (),
 ) -> list[Variable]:
+    support_x = tuple((point.q, point.b * point.b) for point in support_points)
+
+    def patch_is_supported(patch: dict[str, object]) -> bool:
+        if not support_x:
+            return False
+        q0, q1, x0, x1 = patch_interval(patch)
+        for q, x in support_x:
+            if q0 - 1e-15 <= q <= q1 + 1e-15 and x0 - 1e-15 <= x <= x1 + 1e-15:
+                return True
+        return False
+
     groups: dict[str, list[Variable]] = {block: [] for block in blocks}
     for block in blocks:
         if block in ("F_origin", "G_origin"):
@@ -388,7 +401,9 @@ def variables_from_projection(
             )
             continue
         frac_index, patches = block_patch_items(data, block)
-        for patch_index, patch in enumerate(patches):
+        patch_order = sorted(range(len(patches)), key=lambda index: (not patch_is_supported(patches[index]), index))
+        for patch_index in patch_order:
+            patch = patches[patch_index]
             q0, q1 = patch["q_interval"]
             x0, x1 = patch["x_interval"]
             if not intervals_intersect(float(q0), float(q1), q_min, q_max):
@@ -415,11 +430,27 @@ def variable_counts(variables: list[Variable]) -> dict[str, int]:
     return counts
 
 
-def load_profile_from_data(data: dict[str, object], tmp_path: str) -> ProjectedProfile:
+def load_profile_from_data(data: dict[str, object], tmp_dir: str) -> ProjectedProfile:
     # ProjectedProfile currently loads from JSON.  Keep this mechanical until
     # the validator gets a direct from-dict constructor.
-    save_json(tmp_path, data)
-    return ProjectedProfile.load(tmp_path)
+    os.makedirs(tmp_dir, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        dir=tmp_dir,
+        prefix=".profile_newton_cheb_",
+        suffix=".json",
+        delete=False,
+    )
+    tmp_path = handle.name
+    try:
+        with handle:
+            json.dump(data, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        return ProjectedProfile.load(tmp_path)
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 def residual_vector(
@@ -578,11 +609,11 @@ def gn_step(
     constraints: tuple[ContinuityConstraint, ...],
     fd_step: float,
     damping: float,
-    tmp_path: str,
+    tmp_dir: str,
     residual_kind: str,
     derivative_loss: DerivativeLoss,
 ) -> tuple[list[float], dict[str, object]]:
-    base_profile = load_profile_from_data(data, tmp_path)
+    base_profile = load_profile_from_data(data, tmp_dir)
     base_vec, base_metrics = residual_vector(
         base_profile,
         data,
@@ -597,7 +628,7 @@ def gn_step(
     for variable in variables:
         perturbed = copy.deepcopy(data)
         set_coeff(perturbed, variable, get_coeff(perturbed, variable) + fd_step)
-        profile = load_profile_from_data(perturbed, tmp_path)
+        profile = load_profile_from_data(perturbed, tmp_dir)
         vec, _metrics = residual_vector(profile, perturbed, points, residual_kind, constraints, derivative_loss)
         jac_columns.append([(vec[i] - base_vec[i]) / fd_step for i in range(m)])
     normal = [[0.0 for _ in range(n)] for _ in range(n)]
@@ -685,6 +716,7 @@ def main() -> None:
         max_mode_x=args.max_mode_x,
         skip_constant=not args.include_constant,
         max_variables=args.max_variables,
+        support_points=points,
     )
     if not variables:
         raise ValueError("no Chebyshev variables selected")
@@ -703,7 +735,7 @@ def main() -> None:
         )
     )
 
-    tmp_path = os.path.join(os.path.dirname(args.out) or ".", ".profile_newton_cheb_tmp.json")
+    tmp_dir = os.path.dirname(args.out) or "."
     line_search = tuple(float(item) for item in args.line_search.split(",") if item.strip())
     derivative_loss = DerivativeLoss(
         d1_weight=args.d1_weight,
@@ -726,7 +758,7 @@ def main() -> None:
         f"dq={args.derivative_step_q:.3e} db={args.derivative_step_b:.3e}"
     )
     best_data = copy.deepcopy(data)
-    best_profile = load_profile_from_data(best_data, tmp_path)
+    best_profile = load_profile_from_data(best_data, tmp_dir)
     _vec, best_metrics = residual_vector(
         best_profile,
         best_data,
@@ -749,14 +781,14 @@ def main() -> None:
             constraints,
             args.fd_step,
             args.damping,
-            tmp_path,
+            tmp_dir,
             args.residual_kind,
             derivative_loss,
         )
         accepted = False
         for alpha in line_search:
             candidate = apply_delta(best_data, variables, delta, alpha, args.max_update_norm)
-            profile = load_profile_from_data(candidate, tmp_path)
+            profile = load_profile_from_data(candidate, tmp_dir)
             _vec, metrics = residual_vector(
                 profile,
                 candidate,
@@ -814,8 +846,6 @@ def main() -> None:
         },
     }
     save_json(args.out, best_data)
-    if os.path.exists(tmp_path):
-        os.unlink(tmp_path)
     print(f"saved={args.out}")
     print(f"final_max_abs={best_metrics['max_abs']:.12e}")
     print(f"final_rms={best_metrics['rms']:.12e}")

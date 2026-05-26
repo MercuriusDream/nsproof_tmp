@@ -2278,6 +2278,121 @@ adaptive run therefore does not supersede
 current rectangular/origin representation is running into an interface and
 axis-edge obstruction, not merely missing a few active collocation points.
 
+The later GPT-Pro update made one tail issue sharper.  The old structural tail
+check only verified that a fractional `q^(1/gamma)` block was present.  That is
+too weak.  The first forced trace must match the formal recurrence.  For
+`gamma=9/20`, `B=1`, the recurrence gives
+
+```text
+F_p(x) = 1.9218140929535197 - 0.9786773280026653 x,
+G_p(x) = 0.11111111111111108 - 1.1111111111111112 x.
+```
+
+`validators/tail_transseries.py` and `tools/validate_tail.py` now check this
+coefficient equality.  With the stricter check,
+`work/v117_transcheb_structural_mortar_probe2.json` is no longer tail-OK:
+
+```text
+ordinary_q1_F_max = 0,
+ordinary_q1_G_max = 0,
+forced_qp_coeff_error = 1.384330015818e-2,
+tail_structural_ok = False.
+```
+
+This matters because the mortar solve had moved the first fractional block in
+a way that helped the sampled residual but violated the formal tail recurrence.
+
+`tools/profile_project_cheb.py` now has a formal forced-tail projection mode:
+
+```text
+--forced-qp-mode formal
+--forced-origin-cutoff-power 6
+```
+
+It replaces the seed-derived `q^p` trace by the recurrence coefficient and
+multiplies that angular trace by `(1-q^2)^6` so it does not pollute the
+physical origin.  The resulting
+`work/v117_transcheb_formal_forced.json` passes the tightened forced-tail gate:
+
+```text
+forced_qp_coeff_error = 0,
+projection_F_error = 2.060504508128e-7,
+projection_G_error = 2.567489394645e-6.
+```
+
+But the profile residual is back at the original projected scale:
+
+```text
+origin structural = 9.139966362302e+3,
+focused structural = 1.071336959068e+1,
+focused raw = 4.364551896246e-1,
+secondary structural = 1.439516431487e+1,
+broad high-|b| structural = 5.094286384720e+1.
+```
+
+So the current conclusion is stricter than before: the best mortar checkpoint
+is useful as a diagnostic of where the residual wants to move, but it is not an
+admissible tail object.  The next real profile solve must keep the formal
+`q^p` recurrence pinned and solve the analytic/origin degrees around it.
+
+Two code-hygiene fixes were also applied to the Chebyshev Newton scaffold.
+First, `tools/profile_newton_cheb.py` no longer writes every trial profile to a
+shared `work/.profile_newton_cheb_tmp.json`; it uses unique temporary files.
+Second, when a variable cap is active, coefficient variables from patches
+containing the current grid or active hard points are prioritized.  This fixes
+the failure mode where adaptive residual points were included in the objective
+while no local coefficient patch could move them.
+
+A small post-fix probe was run from the formal-tail projection:
+
+```text
+work/v117_transcheb_formal_hotpatch_probe.json
+```
+
+The solve included both rectangular and origin variables:
+
+```text
+variables = 40,
+counts = {'F_an': 16, 'G_an': 16, 'F_origin': 4, 'G_origin': 4}.
+```
+
+It kept the formal tail recurrence pinned:
+
+```text
+ordinary_q1_F_max = 0,
+ordinary_q1_G_max = 0,
+forced_qp_coeff_error = 0.
+```
+
+The active objective improved but remained enormous:
+
+```text
+2.585172877840e+4 -> 2.512049197567e+4.
+```
+
+Held-out checks moved in the right direction, but only slightly:
+
+```text
+origin structural:
+9.139966362302e+3 -> 8.881435111368e+3.
+
+focused structural:
+1.071336959068e+1 -> 1.040795353834e+1.
+
+focused raw:
+4.364551896246e-1 -> 4.238894370280e-1.
+
+secondary structural:
+1.439516431487e+1 -> 1.422825475247e+1.
+
+broad high-|b| structural:
+5.094286384720e+1 -> 5.094286384720e+1.
+```
+
+This is useful because the solver can now move the correct patches while
+keeping the formal `q^p` trace fixed.  It is not yet close to an NK-entry
+center; the origin and high-`|b|` obstruction still dominates.
+
 The profile validation gates are:
 
 ```text
