@@ -509,6 +509,39 @@ def _native_c_library() -> ctypes.CDLL:
     lib = ctypes.CDLL(str(lib_path))
     c_double_p = ctypes.POINTER(ctypes.c_double)
     c_int_p = ctypes.POINTER(ctypes.c_int)
+    for name in ("add", "sub", "mul"):
+        fn = getattr(lib, f"nsproof_interval_{name}_batch")
+        fn.argtypes = [
+            ctypes.c_int,
+            c_double_p,
+            c_double_p,
+            c_double_p,
+            c_double_p,
+            c_double_p,
+            c_double_p,
+            c_int_p,
+        ]
+        fn.restype = ctypes.c_int
+    lib.nsproof_interval_recip_batch.argtypes = [
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_interval_recip_batch.restype = ctypes.c_int
+    lib.nsproof_interval_poly_eval_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_interval_poly_eval_batch.restype = ctypes.c_int
     lib.nsproof_rz_weighted_coeff_partials_batch.argtypes = [
         ctypes.c_int,
         ctypes.c_int,

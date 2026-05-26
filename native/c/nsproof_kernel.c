@@ -43,6 +43,365 @@ static double falling(double value, int order) {
     return out;
 }
 
+static int interval_inputs_ok(double lo, double hi) {
+    return check_finite(lo) && check_finite(hi) && lo <= hi;
+}
+
+static double interval_down(double value) {
+    if (isnan(value)) {
+        return value;
+    }
+    if (value == -INFINITY) {
+        return value;
+    }
+    return nextafter(value, -INFINITY);
+}
+
+static double interval_up(double value) {
+    if (isnan(value)) {
+        return value;
+    }
+    if (value == INFINITY) {
+        return value;
+    }
+    return nextafter(value, INFINITY);
+}
+
+static int interval_add_impl(
+    double a_lo,
+    double a_hi,
+    double b_lo,
+    double b_hi,
+    double *out_lo,
+    double *out_hi
+) {
+    if (out_lo == NULL || out_hi == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!interval_inputs_ok(a_lo, a_hi) || !interval_inputs_ok(b_lo, b_hi)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    *out_lo = interval_down(a_lo + b_lo);
+    *out_hi = interval_up(a_hi + b_hi);
+    if (isnan(*out_lo) || isnan(*out_hi) || *out_lo > *out_hi) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int interval_sub_impl(
+    double a_lo,
+    double a_hi,
+    double b_lo,
+    double b_hi,
+    double *out_lo,
+    double *out_hi
+) {
+    if (out_lo == NULL || out_hi == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!interval_inputs_ok(a_lo, a_hi) || !interval_inputs_ok(b_lo, b_hi)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    *out_lo = interval_down(a_lo - b_hi);
+    *out_hi = interval_up(a_hi - b_lo);
+    if (isnan(*out_lo) || isnan(*out_hi) || *out_lo > *out_hi) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int interval_mul_impl(
+    double a_lo,
+    double a_hi,
+    double b_lo,
+    double b_hi,
+    double *out_lo,
+    double *out_hi
+) {
+    double p0;
+    double p1;
+    double p2;
+    double p3;
+    double lo;
+    double hi;
+
+    if (out_lo == NULL || out_hi == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!interval_inputs_ok(a_lo, a_hi) || !interval_inputs_ok(b_lo, b_hi)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    p0 = a_lo * b_lo;
+    p1 = a_lo * b_hi;
+    p2 = a_hi * b_lo;
+    p3 = a_hi * b_hi;
+    if (!check_finite(p0) || !check_finite(p1) || !check_finite(p2) || !check_finite(p3)) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    lo = fmin(fmin(p0, p1), fmin(p2, p3));
+    hi = fmax(fmax(p0, p1), fmax(p2, p3));
+    *out_lo = interval_down(lo);
+    *out_hi = interval_up(hi);
+    if (isnan(*out_lo) || isnan(*out_hi) || *out_lo > *out_hi) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int interval_recip_impl(
+    double a_lo,
+    double a_hi,
+    double *out_lo,
+    double *out_hi
+) {
+    double r0;
+    double r1;
+    double lo;
+    double hi;
+
+    if (out_lo == NULL || out_hi == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!interval_inputs_ok(a_lo, a_hi)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    if (a_lo <= 0.0 && a_hi >= 0.0) {
+        return NSPROOF_KERNEL_DEGENERATE_INTERVAL;
+    }
+    r0 = 1.0 / a_lo;
+    r1 = 1.0 / a_hi;
+    if (!check_finite(r0) || !check_finite(r1)) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    lo = fmin(r0, r1);
+    hi = fmax(r0, r1);
+    *out_lo = interval_down(lo);
+    *out_hi = interval_up(hi);
+    if (isnan(*out_lo) || isnan(*out_hi) || *out_lo > *out_hi) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int interval_poly_eval_impl(
+    int coeff_count,
+    const double *coeffs,
+    double x_lo,
+    double x_hi,
+    double *out_lo,
+    double *out_hi
+) {
+    double acc_lo;
+    double acc_hi;
+    double prod_lo;
+    double prod_hi;
+    int i;
+    int status;
+
+    if (coeff_count <= 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (coeffs == NULL || out_lo == NULL || out_hi == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!interval_inputs_ok(x_lo, x_hi)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    for (i = 0; i < coeff_count; i++) {
+        if (!check_finite(coeffs[i])) {
+            return NSPROOF_KERNEL_NONFINITE_INPUT;
+        }
+    }
+    acc_lo = coeffs[coeff_count - 1];
+    acc_hi = coeffs[coeff_count - 1];
+    for (i = coeff_count - 2; i >= 0; i--) {
+        status = interval_mul_impl(acc_lo, acc_hi, x_lo, x_hi, &prod_lo, &prod_hi);
+        if (status != NSPROOF_KERNEL_OK) {
+            return status;
+        }
+        status = interval_add_impl(prod_lo, prod_hi, coeffs[i], coeffs[i], &acc_lo, &acc_hi);
+        if (status != NSPROOF_KERNEL_OK) {
+            return status;
+        }
+    }
+    *out_lo = acc_lo;
+    *out_hi = acc_hi;
+    return NSPROOF_KERNEL_OK;
+}
+
+NSPROOF_EXPORT int nsproof_interval_add_batch(
+    int count,
+    const double *a_lo,
+    const double *a_hi,
+    const double *b_lo,
+    const double *b_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int i;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        a_lo == NULL || a_hi == NULL || b_lo == NULL || b_hi == NULL ||
+        out_lo == NULL || out_hi == NULL || statuses == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < count; i++) {
+        statuses[i] = interval_add_impl(a_lo[i], a_hi[i], b_lo[i], b_hi[i], &out_lo[i], &out_hi[i]);
+        if (statuses[i] != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = statuses[i];
+        }
+    }
+    return first_error;
+}
+
+NSPROOF_EXPORT int nsproof_interval_sub_batch(
+    int count,
+    const double *a_lo,
+    const double *a_hi,
+    const double *b_lo,
+    const double *b_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int i;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        a_lo == NULL || a_hi == NULL || b_lo == NULL || b_hi == NULL ||
+        out_lo == NULL || out_hi == NULL || statuses == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < count; i++) {
+        statuses[i] = interval_sub_impl(a_lo[i], a_hi[i], b_lo[i], b_hi[i], &out_lo[i], &out_hi[i]);
+        if (statuses[i] != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = statuses[i];
+        }
+    }
+    return first_error;
+}
+
+NSPROOF_EXPORT int nsproof_interval_mul_batch(
+    int count,
+    const double *a_lo,
+    const double *a_hi,
+    const double *b_lo,
+    const double *b_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int i;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        a_lo == NULL || a_hi == NULL || b_lo == NULL || b_hi == NULL ||
+        out_lo == NULL || out_hi == NULL || statuses == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < count; i++) {
+        statuses[i] = interval_mul_impl(a_lo[i], a_hi[i], b_lo[i], b_hi[i], &out_lo[i], &out_hi[i]);
+        if (statuses[i] != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = statuses[i];
+        }
+    }
+    return first_error;
+}
+
+NSPROOF_EXPORT int nsproof_interval_recip_batch(
+    int count,
+    const double *a_lo,
+    const double *a_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int i;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (a_lo == NULL || a_hi == NULL || out_lo == NULL || out_hi == NULL || statuses == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < count; i++) {
+        statuses[i] = interval_recip_impl(a_lo[i], a_hi[i], &out_lo[i], &out_hi[i]);
+        if (statuses[i] != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = statuses[i];
+        }
+    }
+    return first_error;
+}
+
+NSPROOF_EXPORT int nsproof_interval_poly_eval_batch(
+    int point_count,
+    int coeff_count,
+    const double *coeffs,
+    const double *x_lo,
+    const double *x_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int i;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (point_count < 0 || coeff_count <= 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (point_count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        coeffs == NULL || x_lo == NULL || x_hi == NULL ||
+        out_lo == NULL || out_hi == NULL || statuses == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < point_count; i++) {
+        statuses[i] = interval_poly_eval_impl(
+            coeff_count,
+            coeffs,
+            x_lo[i],
+            x_hi[i],
+            &out_lo[i],
+            &out_hi[i]
+        );
+        if (statuses[i] != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = statuses[i];
+        }
+    }
+    return first_error;
+}
+
 static int binom_small(int n, int k) {
     int i;
     int out;
