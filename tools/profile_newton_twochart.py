@@ -365,6 +365,25 @@ def cap_candidate_pool(variables: list[Any], limit: int) -> list[Any]:
     return capped
 
 
+def mortar_row_jacobian_norm(row: Any) -> float:
+    return math.sqrt(sum(float(value) * float(value) for _var_index, value in row.jacobian))
+
+
+def mortar_leverage_score(
+    row: Any,
+    jac_value: float,
+    weight: float,
+    normalization: str,
+    row_norm: float | None = None,
+) -> float:
+    base = abs(weight * float(row.residual) * float(jac_value))
+    if normalization == "row-norm":
+        if row_norm is None:
+            row_norm = mortar_row_jacobian_norm(row)
+        return base / max(row_norm, 1e-300)
+    return base
+
+
 def select_active_variables(ranked: list[Any], max_variables: int, chart_balanced: bool) -> list[Any]:
     if not chart_balanced:
         return ranked[:max_variables]
@@ -998,6 +1017,32 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             data, variables, q_values, x_values, args.mortar_order, use_native_c=args.native_c
         )
 
+    def build_mortar_audit_rows() -> list[Any]:
+        if "interface" not in blocks or args.max_mortar_audit_growth <= 0.0:
+            return []
+        audit_order = args.line_search_mortar_audit_order
+        if audit_order < 0:
+            audit_order = args.mortar_order
+        audit_q_samples = args.line_search_mortar_audit_q_samples or max(args.mortar_q_samples, 9)
+        audit_x_samples = args.line_search_mortar_audit_x_samples or max(args.mortar_x_samples, 9)
+        audit_q_values = grid(args.overlap_q_min, args.overlap_q_max, audit_q_samples)
+        audit_x_values = grid(0.0, 1.0, audit_x_samples)
+        if args.mortar_coordinates == "RZ":
+            rows = build_rz_rows(data, [], audit_q_values, audit_x_values, audit_order, use_native_c=False)
+        elif args.mortar_coordinates == "qx":
+            rows = build_rows(data, [], audit_q_values, audit_x_values, audit_order)
+        else:
+            rows = build_rows(data, [], audit_q_values, audit_x_values, audit_order) + build_rz_rows(
+                data, [], audit_q_values, audit_x_values, audit_order, use_native_c=False
+            )
+        if args.line_search_mortar_audit_active_count > 0 and len(rows) > args.line_search_mortar_audit_active_count:
+            rows = sorted(rows, key=lambda row: abs(row.residual), reverse=True)[
+                : args.line_search_mortar_audit_active_count
+            ]
+        return rows
+
+    mortar_audit_rows = build_mortar_audit_rows()
+
     if "interface" in blocks and args.mortar_jacobian_candidate_count > 0:
         mortar_variable_pool = [
             variable
@@ -1013,31 +1058,86 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             exploratory_rows = sorted(exploratory_rows, key=lambda row: abs(row.residual), reverse=True)[
                 : args.mortar_active_count
             ]
+        highest_order_rows = [
+            row for row in exploratory_rows if int(row.dq_order) + int(row.dx_order) == int(args.mortar_order)
+        ]
+        injection_rows = highest_order_rows or exploratory_rows
         injection_scores: dict[int, float] = {}
         injection_best: dict[int, tuple[str, float]] = {}
-        for row in exploratory_rows:
+        row_local_records: list[tuple[float, Any, int, float]] = []
+        for row in injection_rows:
+            row_norm = mortar_row_jacobian_norm(row)
+            best_by_chart: dict[str, tuple[float, int, float]] = {}
             for var_index, jac_value in row.jacobian:
-                score = abs(args.mortar_weight * jac_value * row.residual)
+                score = mortar_leverage_score(
+                    row,
+                    jac_value,
+                    args.mortar_weight,
+                    args.mortar_score_normalization,
+                    row_norm=row_norm,
+                )
                 injection_scores[var_index] = injection_scores.get(var_index, 0.0) + score
                 current_best = injection_best.get(var_index)
                 if current_best is None or score > current_best[1]:
                     injection_best[var_index] = (row.derivative_label, score)
-        for var_index, score in sorted(injection_scores.items(), key=lambda item: item[1], reverse=True):
+                variable = all_variables_by_index.get(var_index)
+                if variable is None:
+                    continue
+                current_chart_best = best_by_chart.get(variable.chart)
+                if current_chart_best is None or score > current_chart_best[0]:
+                    best_by_chart[variable.chart] = (score, var_index, jac_value)
+            for score, var_index, jac_value in best_by_chart.values():
+                row_local_records.append((score, row, var_index, jac_value))
+
+        injected_indexes: set[int] = set()
+        for score, row, var_index, jac_value in sorted(row_local_records, key=lambda item: item[0], reverse=True):
             if len(injected_mortar_candidates) >= args.mortar_jacobian_candidate_count:
                 break
-            if var_index in candidate_by_index:
+            if var_index in candidate_by_index or var_index in injected_indexes:
                 continue
             variable = all_variables_by_index[var_index]
             candidate_variables.append(variable)
             candidate_by_index[var_index] = variable
+            injected_indexes.add(var_index)
+            injected_mortar_candidates.append(
+                {
+                    "variable": variable.label,
+                    "var_index": var_index,
+                    "chart": variable.chart,
+                    "component": variable.component,
+                    "score": score,
+                    "best_row_derivative": row.derivative_label,
+                    "best_row_score": score,
+                    "row_derivative": row.derivative_label,
+                    "row_q": row.q,
+                    "row_x": row.x,
+                    "row_component": row.component,
+                    "row_normalized_score": score,
+                    "jacobian_value": jac_value,
+                    "selection_mode": "row_local_chart",
+                }
+            )
+
+        for var_index, score in sorted(injection_scores.items(), key=lambda item: item[1], reverse=True):
+            if len(injected_mortar_candidates) >= args.mortar_jacobian_candidate_count:
+                break
+            if var_index in candidate_by_index or var_index in injected_indexes:
+                continue
+            variable = all_variables_by_index[var_index]
+            candidate_variables.append(variable)
+            candidate_by_index[var_index] = variable
+            injected_indexes.add(var_index)
             derivative_label, best_score = injection_best[var_index]
             injected_mortar_candidates.append(
                 {
                     "variable": variable.label,
                     "var_index": var_index,
+                    "chart": variable.chart,
+                    "component": variable.component,
                     "score": score,
                     "best_row_derivative": derivative_label,
                     "best_row_score": best_score,
+                    "selection_mode": "global",
                 }
             )
 
@@ -1091,9 +1191,16 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             ]
         candidate_indexes = {variable.index for variable in candidate_variables}
         for row in mortar_rows:
+            row_norm = mortar_row_jacobian_norm(row)
             for var_index, jac_value in row.jacobian:
                 if var_index in candidate_indexes:
-                    variable_scores[var_index] += abs(args.mortar_weight * jac_value * row.residual)
+                    variable_scores[var_index] += mortar_leverage_score(
+                        row,
+                        jac_value,
+                        args.mortar_weight,
+                        args.mortar_score_normalization,
+                        row_norm=row_norm,
+                    )
 
     ranked = sorted(candidate_variables, key=lambda variable: variable_scores.get(variable.index, 0.0), reverse=True)
     selected = [variable for variable in ranked if variable_scores.get(variable.index, 0.0) > 0.0]
@@ -1270,6 +1377,8 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "mortar_rows_active": len(mortar_rows),
         "mortar_rows_unfiltered_max_abs": mortar_rows_unfiltered_max_abs,
         "mortar_rows_unfiltered_worst": mortar_rows_unfiltered_worst,
+        "mortar_audit_rows": mortar_audit_rows,
+        "mortar_audit_rows_count": len(mortar_audit_rows),
         "pre_score_candidate_count": pre_score_candidate_count,
         "post_pool_candidate_count": len(candidate_variables),
         "injected_mortar_candidates": injected_mortar_candidates,
@@ -1323,6 +1432,30 @@ def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespac
             values.append(args.active_guard_weight * residual.e_psi)
             values.append(args.active_guard_weight * residual.e_gamma)
     return {**vector_metrics(values), "native_c_tail_exact": native_stats}
+
+
+def mortar_audit_metrics(data: dict[str, Any], rows: list[Any]) -> dict[str, Any]:
+    if not rows:
+        return {"enabled": False, **vector_metrics([])}
+    from validators.twochart_mortar_jacobian import residual_for_row
+
+    values = [float(residual_for_row(data, row)) for row in rows]
+    worst_index, worst_value = max(enumerate(values), key=lambda item: abs(item[1]))
+    worst_row = rows[worst_index]
+    return {
+        "enabled": True,
+        "worst": {
+            "row_index": int(worst_index),
+            "component": worst_row.component,
+            "coordinate": worst_row.coordinate,
+            "q": worst_row.q,
+            "x": worst_row.x,
+            "derivative": worst_row.derivative_label,
+            "value": worst_value,
+            "abs": abs(worst_value),
+        },
+        **vector_metrics(values),
+    }
 
 
 def normal_step(
@@ -1863,6 +1996,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         base_metrics = vector_metrics(base_vec)
         base_raw_metrics = system["raw_residual_metrics"]
         base_guard_metrics = guard_point_metrics(current, args, guard_points)
+        base_mortar_audit_metrics = mortar_audit_metrics(current, system.get("mortar_audit_rows", []))
         block_specs = stage0_block_specs(system["variables"], args.solve_mode, args.block_search_labels)
         line_trials: list[dict[str, Any]] = []
         candidate_previews: list[dict[str, Any]] = []
@@ -1973,6 +2107,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     trial_metrics = vector_metrics(trial_system["residual_vector"])
                     trial_raw_metrics = trial_system["raw_residual_metrics"]
                 trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
+                trial_mortar_audit_metrics = mortar_audit_metrics(trial_data, system.get("mortar_audit_rows", []))
                 raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
                     base_raw_metrics["objective"], 1e-300
                 )
@@ -1984,13 +2119,19 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         and trial_guard_metrics["max_abs"]
                         <= args.max_guard_max_growth * max(base_guard_metrics["max_abs"], 1e-300)
                     )
+                mortar_audit_growth_ok = True
+                if base_mortar_audit_metrics.get("enabled"):
+                    mortar_audit_growth_ok = (
+                        trial_mortar_audit_metrics["max_abs"]
+                        <= args.max_mortar_audit_growth * max(base_mortar_audit_metrics["max_abs"], 1e-300)
+                    )
                 objective_decrease = base_metrics["objective"] - trial_metrics["objective"]
                 required_decrease = max(
                     args.min_objective_decrease_abs,
                     args.min_objective_decrease_rel * max(base_metrics["objective"], 1e-300),
                 )
                 improved = objective_decrease > required_decrease
-                accepted_here = improved and raw_growth_ok and guard_growth_ok
+                accepted_here = improved and raw_growth_ok and guard_growth_ok and mortar_audit_growth_ok
                 line_trials.append(
                     {
                         **trial_record,
@@ -2002,6 +2143,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "raw_growth_ok": raw_growth_ok,
                         "guard_metrics": trial_guard_metrics,
                         "guard_growth_ok": guard_growth_ok,
+                        "mortar_audit_metrics": trial_mortar_audit_metrics,
+                        "mortar_audit_growth_ok": mortar_audit_growth_ok,
                         "accepted": accepted_here,
                         "tail_gate": tail_gate,
                     }
@@ -2037,12 +2180,14 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "raw_residual_metrics": system["raw_residual_metrics"],
                 "row_scaling": system["row_scaling"],
                 "base_guard_metrics": base_guard_metrics,
+                "base_mortar_audit_metrics": base_mortar_audit_metrics,
                 "selected_by_chart": system["selected_by_chart"],
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
                 "mortar_rows_active": system["mortar_rows_active"],
                 "mortar_rows_unfiltered_max_abs": system["mortar_rows_unfiltered_max_abs"],
                 "mortar_rows_unfiltered_worst": system["mortar_rows_unfiltered_worst"],
+                "mortar_audit_rows_count": system.get("mortar_audit_rows_count", 0),
                 "rank_report_summary": {
                     "coverage": rank_report.get("coverage", {}) if rank_report else {},
                     "constraint_space": rank_report.get("constraint_space", {}) if rank_report else {},
@@ -2157,6 +2302,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "candidate_origin_degree_max": args.candidate_origin_degree_max,
             "candidate_pool_limit": args.candidate_pool_limit,
             "mortar_jacobian_candidate_count": args.mortar_jacobian_candidate_count,
+            "mortar_score_normalization": args.mortar_score_normalization,
             "pde_weight": args.pde_weight,
             "mortar_weight": args.mortar_weight,
             "line_search": args.line_search,
@@ -2168,6 +2314,11 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "row_scale_min": args.row_scale_min,
             "row_scale_max": args.row_scale_max,
             "max_raw_objective_growth": args.max_raw_objective_growth,
+            "max_mortar_audit_growth": args.max_mortar_audit_growth,
+            "line_search_mortar_audit_order": args.line_search_mortar_audit_order,
+            "line_search_mortar_audit_q_samples": args.line_search_mortar_audit_q_samples,
+            "line_search_mortar_audit_x_samples": args.line_search_mortar_audit_x_samples,
+            "line_search_mortar_audit_active_count": args.line_search_mortar_audit_active_count,
             "tail_gate_samples_per_patch": args.tail_gate_samples_per_patch,
             "forced_tol": args.forced_tol,
             "q2_tol": args.q2_tol,
@@ -2222,6 +2373,10 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     else None,
                     "guard_growth_ok": trial.get("guard_growth_ok"),
                     "raw_growth_ok": trial.get("raw_growth_ok"),
+                    "mortar_audit_max_abs": trial.get("mortar_audit_metrics", {}).get("max_abs")
+                    if isinstance(trial.get("mortar_audit_metrics"), dict)
+                    else None,
+                    "mortar_audit_growth_ok": trial.get("mortar_audit_growth_ok"),
                     "max_abs_update": trial.get("max_abs_update"),
                     "delta_norm": trial.get("delta_norm"),
                     "base_objective": base.get("objective"),
@@ -2464,6 +2619,15 @@ def main() -> None:
         default=0,
         help="Inject this many extra variables by largest active mortar-row Jacobian score, ignoring degree caps.",
     )
+    parser.add_argument(
+        "--mortar-score-normalization",
+        choices=("raw", "row-norm"),
+        default="raw",
+        help=(
+            "Scoring geometry for mortar-driven variable ranking/injection. "
+            "'row-norm' uses per-row Jacobian leverage so high-order tail columns do not bury coupled origin columns."
+        ),
+    )
     parser.add_argument("--line-search", type=parse_float_list, default=parse_float_list("1,0.5,0.25,0.125"))
     parser.add_argument(
         "--line-search-eval",
@@ -2574,6 +2738,39 @@ def main() -> None:
         default=1.0,
         help="Reject line-search steps whose unnormalized sampled objective grows by more than this factor.",
     )
+    parser.add_argument(
+        "--max-mortar-audit-growth",
+        type=nonnegative_float,
+        default=0.0,
+        help=(
+            "When positive, reject line-search steps whose held-out mortar-audit max grows by more than this factor. "
+            "Uses a denser C0-Ck mortar grid and is intended to catch active-row overfit."
+        ),
+    )
+    parser.add_argument(
+        "--line-search-mortar-audit-order",
+        type=int,
+        default=-1,
+        help="Mortar derivative order for line-search audit; -1 reuses --mortar-order.",
+    )
+    parser.add_argument(
+        "--line-search-mortar-audit-q-samples",
+        type=nonnegative_int,
+        default=0,
+        help="q sample count for line-search mortar audit; 0 uses max(--mortar-q-samples, 9).",
+    )
+    parser.add_argument(
+        "--line-search-mortar-audit-x-samples",
+        type=nonnegative_int,
+        default=0,
+        help="x sample count for line-search mortar audit; 0 uses max(--mortar-x-samples, 9).",
+    )
+    parser.add_argument(
+        "--line-search-mortar-audit-active-count",
+        type=nonnegative_int,
+        default=0,
+        help="Keep this many largest-residual held-out mortar audit rows during line search; 0 keeps all.",
+    )
     parser.add_argument("--max-iter", type=positive_int, default=20)
     parser.add_argument("--trust", type=positive_float, default=0.05)
     parser.add_argument("--lm-lambda", type=positive_float, default=1e-8)
@@ -2585,6 +2782,8 @@ def main() -> None:
         parser.error("--mortar-active-count must be nonnegative")
     if args.candidate_kq_max < 0 or args.candidate_kx_max < 0 or args.candidate_origin_degree_max < 0:
         parser.error("candidate degree caps must be nonnegative")
+    if args.line_search_mortar_audit_order < -1 or args.line_search_mortar_audit_order > 4:
+        parser.error("--line-search-mortar-audit-order must be -1 or between 0 and 4")
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
         parser.error("--line-search must contain positive floats")
     if args.row_scale_min < 0.0:
