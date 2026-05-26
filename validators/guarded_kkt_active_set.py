@@ -25,6 +25,7 @@ except ImportError:  # pragma: no cover - depends on the local Python env.
 
 
 STATUS = "GUARDED_ACTIVE_SET_KKT_FLOATING_NOT_PROOF"
+FINITE_CAP = 1e100
 
 
 def _json_float(value: Any) -> float | str:
@@ -36,15 +37,28 @@ def _json_float(value: Any) -> float | str:
     return out
 
 
+def _finite_float(value: Any, cap: float = FINITE_CAP) -> float:
+    out = float(value)
+    if math.isnan(out):
+        return 0.0
+    if math.isinf(out):
+        return cap if out > 0.0 else -cap
+    if out > cap:
+        return cap
+    if out < -cap:
+        return -cap
+    return out
+
+
 def _json_list(values: Iterable[Any]) -> list[float | str]:
     return [_json_float(value) for value in values]
 
 
 def _metrics(values: Iterable[float]) -> dict[str, Any]:
-    raw = [float(value) for value in values]
+    raw = [_finite_float(value) for value in values]
     if not raw:
         return {"count": 0, "max_abs": 0.0, "min": 0.0, "max": 0.0, "l2": 0.0, "rms": 0.0}
-    l2 = math.sqrt(sum(value * value for value in raw))
+    l2 = math.hypot(*raw)
     return {
         "count": len(raw),
         "max_abs": max(abs(value) for value in raw),
@@ -66,7 +80,7 @@ def _positive_metrics(values: Iterable[float], tolerance: float) -> dict[str, An
 
 
 def _shape_matrix(matrix: Iterable[Iterable[Any]], name: str) -> tuple[list[list[float]], int, int]:
-    rows = [[float(value) for value in row] for row in matrix]
+    rows = [[_finite_float(value) for value in row] for row in matrix]
     if not rows:
         return [], 0, 0
     columns = len(rows[0])
@@ -77,7 +91,7 @@ def _shape_matrix(matrix: Iterable[Iterable[Any]], name: str) -> tuple[list[list
 
 
 def _shape_vector(vector: Iterable[Any], name: str, expected: int | None = None) -> list[float]:
-    values = [float(value) for value in vector]
+    values = [_finite_float(value) for value in vector]
     if expected is not None and len(values) != expected:
         raise ValueError(f"{name} has length {len(values)}; expected {expected}")
     return values
@@ -202,6 +216,7 @@ def _solve_kkt_numpy(
     signed_guard_jacobian: list[list[float]],
     active: list[int],
     lm_lambda: float,
+    svd_rcond: float | None = None,
 ) -> tuple[list[float], list[float]]:
     assert np is not None
     jp = np.asarray(primary_jacobian, dtype=float)
@@ -211,23 +226,76 @@ def _solve_kkt_numpy(
     )
     if columns == 0:
         return [], []
+    jp = np.clip(
+        np.nan_to_num(jp, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+        -FINITE_CAP,
+        FINITE_CAP,
+    )
+    rp = np.clip(
+        np.nan_to_num(rp, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+        -FINITE_CAP,
+        FINITE_CAP,
+    )
+    c_rows = np.asarray(signed_guard_jacobian, dtype=float) if signed_guard_jacobian else np.zeros((0, columns))
+    c_rows = np.clip(
+        np.nan_to_num(c_rows, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+        -FINITE_CAP,
+        FINITE_CAP,
+    )
+    max_abs = 1.0
     if jp.size:
-        hessian = jp.T @ jp
-        gradient = jp.T @ rp
+        max_abs = max(max_abs, float(np.max(np.abs(jp))))
+    if rp.size:
+        max_abs = max(max_abs, float(np.max(np.abs(rp))))
+    if c_rows.size:
+        max_abs = max(max_abs, float(np.max(np.abs(c_rows))))
+    solve_scale = max_abs if math.isfinite(max_abs) and max_abs > 1e50 else 1.0
+    if not math.isfinite(max_abs):
+        solve_scale = FINITE_CAP
+    if solve_scale != 1.0:
+        jp = jp / solve_scale
+        rp = rp / solve_scale
+        c_rows = c_rows / solve_scale
+        lm_lambda = float(lm_lambda) / (solve_scale * solve_scale)
+    if jp.size:
+        with np.errstate(divide="ignore", over="ignore", invalid="ignore"):
+            hessian = jp.T @ jp
+            gradient = jp.T @ rp
+        hessian = np.clip(
+            np.nan_to_num(hessian, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+            -FINITE_CAP,
+            FINITE_CAP,
+        )
+        gradient = np.clip(
+            np.nan_to_num(gradient, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+            -FINITE_CAP,
+            FINITE_CAP,
+        )
     else:
         hessian = np.zeros((columns, columns), dtype=float)
         gradient = np.zeros(columns, dtype=float)
     hessian = hessian + float(lm_lambda) * np.eye(columns)
     rhs_top = -gradient
+    rcond = svd_rcond if svd_rcond is not None and svd_rcond > 0.0 else None
     if not active:
-        step = np.linalg.lstsq(hessian, rhs_top, rcond=None)[0]
+        step = np.linalg.lstsq(hessian, rhs_top, rcond=rcond)[0]
         return _json_list(step), []
-    c = np.asarray([signed_guard_jacobian[index] for index in active], dtype=float)
+    c = c_rows[active, :]
     top = np.concatenate([hessian, c.T], axis=1)
     bottom = np.concatenate([c, np.zeros((len(active), len(active)), dtype=float)], axis=1)
     kkt = np.concatenate([top, bottom], axis=0)
     rhs = np.concatenate([rhs_top, np.zeros(len(active), dtype=float)])
-    solution = np.linalg.lstsq(kkt, rhs, rcond=None)[0]
+    kkt = np.clip(
+        np.nan_to_num(kkt, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+        -FINITE_CAP,
+        FINITE_CAP,
+    )
+    rhs = np.clip(
+        np.nan_to_num(rhs, nan=0.0, posinf=FINITE_CAP, neginf=-FINITE_CAP),
+        -FINITE_CAP,
+        FINITE_CAP,
+    )
+    solution = np.linalg.lstsq(kkt, rhs, rcond=rcond)[0]
     return _json_list(solution[:columns]), _json_list(solution[columns:])
 
 
@@ -236,7 +304,9 @@ def _predicted(primary_jacobian: list[list[float]], primary_residual: list[float
 
 
 def _objective(primary_values: list[float], step: list[float], lm_lambda: float) -> float:
-    return 0.5 * sum(value * value for value in primary_values) + 0.5 * float(lm_lambda) * sum(value * value for value in step)
+    primary_l2 = math.hypot(*primary_values) if primary_values else 0.0
+    step_l2 = math.hypot(*step) if step else 0.0
+    return 0.5 * primary_l2 * primary_l2 + 0.5 * float(lm_lambda) * step_l2 * step_l2
 
 
 def _build_guard_data(
@@ -264,6 +334,8 @@ def solve_guarded_active_set(
     max_active: int = 64,
     tolerance: float = 1e-10,
     target: str = "nonincrease",
+    svd_rcond: float = 0.0,
+    max_step_norm: float = 0.0,
 ) -> dict[str, Any]:
     """Solve a floating guarded least-squares step by active-set KKT.
 
@@ -304,7 +376,14 @@ def solve_guarded_active_set(
         max_iterations = max(1, int(max_active) + guard_rows + 1)
         for iteration in range(max_iterations):
             if np is not None:
-                step, multipliers = _solve_kkt_numpy(jp, rp, signed_jg, active, lm_lambda)
+                step, multipliers = _solve_kkt_numpy(
+                    jp,
+                    rp,
+                    signed_jg,
+                    active,
+                    lm_lambda,
+                    svd_rcond=svd_rcond,
+                )
             else:
                 step, multipliers = _solve_kkt_python(jp, rp, signed_jg, active, lm_lambda)
             signed_growth = [
@@ -327,7 +406,7 @@ def solve_guarded_active_set(
                     "added_constraint": worst_index if worst_violation > tolerance else None,
                     "max_violation": _json_float(worst_violation),
                     "primary_max_abs": _json_float(_metrics(predicted_primary)["max_abs"]),
-                    "step_l2": _json_float(math.sqrt(sum(value * value for value in step))),
+                    "step_l2": _json_float(math.hypot(*step) if step else 0.0),
                 }
             )
             if worst_violation <= tolerance:
@@ -340,6 +419,13 @@ def solve_guarded_active_set(
             active.append(worst_index)
         else:
             failure_reason = "max_iterations_reached"
+
+        unclipped_step = list(step)
+        unclipped_step_norm = math.hypot(*unclipped_step) if unclipped_step else 0.0
+        step_clip_scale = 1.0
+        if max_step_norm > 0.0 and unclipped_step_norm > max_step_norm:
+            step_clip_scale = max_step_norm / max(unclipped_step_norm, 1e-300)
+            step = [step_clip_scale * value for value in step]
 
         signed_growth = [_dot(row, step) - guard_rhs[index] for index, row in enumerate(signed_jg)]
         guard_predicted = [residual + _dot(row, step) for row, residual in zip(jg, rg)]
@@ -375,6 +461,8 @@ def solve_guarded_active_set(
                 "lm_lambda": float(lm_lambda),
                 "max_active": int(max_active),
                 "tolerance": float(tolerance),
+                "svd_rcond": float(svd_rcond),
+                "max_step_norm": float(max_step_norm),
             },
             "dimensions": {
                 "primary_rows": primary_rows,
@@ -382,6 +470,8 @@ def solve_guarded_active_set(
                 "columns": columns,
             },
             "step": _json_list(step),
+            "unclipped_step_metrics": _metrics(unclipped_step),
+            "step_clip_scale": _json_float(step_clip_scale),
             "active_constraints": active_constraints,
             "iterations": iterations,
             "predicted_primary_metrics": {
@@ -440,6 +530,8 @@ def solve_guarded_active_set(
                 "lm_lambda": float(lm_lambda),
                 "max_active": int(max_active),
                 "tolerance": float(tolerance),
+                "svd_rcond": float(svd_rcond),
+                "max_step_norm": float(max_step_norm),
             },
         }
 

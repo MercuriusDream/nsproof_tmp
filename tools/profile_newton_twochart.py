@@ -11,6 +11,7 @@ interval proof or a final Newton-Kantorovich validator.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import copy
 import importlib
 import json
@@ -37,6 +38,11 @@ SUPPORTED_FORMATS = {
     "compactified_twochart_profile_v1",
 }
 REQUIRED_HOOKS = ("eval_residual_and_jacobian",)
+
+_STAGE0_WORKER_DATA: dict[str, Any] | None = None
+_STAGE0_WORKER_PROJECTION: Any = None
+_STAGE0_WORKER_VARIABLES: list[Any] = []
+_STAGE0_WORKER_RESIDUAL_KIND = "normalized-structural"
 
 
 class NewtonNoImprovement(RuntimeError):
@@ -648,15 +654,153 @@ def stage0_row_scaling(
     }
 
 
+def _init_stage0_point_worker(data: dict[str, Any], variables: list[Any], residual_kind: str) -> None:
+    global _STAGE0_WORKER_DATA
+    global _STAGE0_WORKER_PROJECTION
+    global _STAGE0_WORKER_VARIABLES
+    global _STAGE0_WORKER_RESIDUAL_KIND
+    from validators.compactified_equations_twochart import projection_from_twochart
+
+    _STAGE0_WORKER_DATA = data
+    _STAGE0_WORKER_PROJECTION = projection_from_twochart(data)
+    _STAGE0_WORKER_VARIABLES = variables
+    _STAGE0_WORKER_RESIDUAL_KIND = residual_kind
+
+
+def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str, Any]:
+    if _STAGE0_WORKER_DATA is None or _STAGE0_WORKER_PROJECTION is None:
+        raise RuntimeError("stage-0 point worker was not initialized")
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import linearized_residual_with_kind
+
+    q, b, weight, label, row_type = task
+    projection = _STAGE0_WORKER_PROJECTION
+    if not compactified_residual_defined(q, b, projection.p, _STAGE0_WORKER_RESIDUAL_KIND):
+        return {"skipped": True, "q": q, "b": b, "label": label, "row_type": row_type}
+    r, z = qb_to_rz(q, b)
+    raw = projection.exact_residual_at(r, z)
+    residual = residual_with_kind(raw, q, b, projection.p, _STAGE0_WORKER_RESIDUAL_KIND)
+    columns = [
+        linearized_residual_with_kind(
+            _STAGE0_WORKER_DATA,
+            projection,
+            variable,
+            q,
+            b,
+            _STAGE0_WORKER_RESIDUAL_KIND,
+        )
+        for variable in _STAGE0_WORKER_VARIABLES
+    ]
+    return {
+        "skipped": False,
+        "q": q,
+        "b": b,
+        "label": label,
+        "row_type": row_type,
+        "weight": weight,
+        "residuals": {"e_psi": residual.e_psi, "e_gamma": residual.e_gamma},
+        "jacobian_rows": {
+            "e_psi": [weight * column.e_psi for column in columns],
+            "e_gamma": [weight * column.e_gamma for column in columns],
+        },
+    }
+
+
+def build_stage0_point_rows(
+    data: dict[str, Any],
+    projection: Any,
+    selected: list[Any],
+    points: list[tuple[float, float]],
+    residual_kind: str,
+    weight: float,
+    label: str,
+    row_type: str,
+    workers: int,
+) -> list[dict[str, Any]]:
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import linearized_residual_with_kind
+
+    if not points:
+        return []
+    if workers > 1 and len(points) > 1:
+        tasks = [(float(q), float(b), float(weight), label, row_type) for q, b in points]
+        try:
+            with concurrent.futures.ProcessPoolExecutor(
+                max_workers=workers,
+                initializer=_init_stage0_point_worker,
+                initargs=(data, selected, residual_kind),
+            ) as pool:
+                return [item for item in pool.map(_stage0_point_worker, tasks) if not item.get("skipped")]
+        except Exception as exc:  # noqa: BLE001 - fall back to serial diagnostics.
+            return [
+                {
+                    "skipped": True,
+                    "fallback_reason": f"{type(exc).__name__}: {exc}",
+                    "q": float(points[0][0]),
+                    "b": float(points[0][1]),
+                    "label": label,
+                    "row_type": row_type,
+                }
+            ] + build_stage0_point_rows(
+                data,
+                projection,
+                selected,
+                points,
+                residual_kind,
+                weight,
+                label,
+                row_type,
+                workers=1,
+            )
+
+    rows: list[dict[str, Any]] = []
+    for q, b in points:
+        q = float(q)
+        b = float(b)
+        if not compactified_residual_defined(q, b, projection.p, residual_kind):
+            continue
+        r, z = qb_to_rz(q, b)
+        raw = projection.exact_residual_at(r, z)
+        residual = residual_with_kind(raw, q, b, projection.p, residual_kind)
+        columns = [
+            linearized_residual_with_kind(data, projection, variable, q, b, residual_kind)
+            for variable in selected
+        ]
+        rows.append(
+            {
+                "skipped": False,
+                "q": q,
+                "b": b,
+                "label": label,
+                "row_type": row_type,
+                "weight": weight,
+                "residuals": {"e_psi": residual.e_psi, "e_gamma": residual.e_gamma},
+                "jacobian_rows": {
+                    "e_psi": [weight * column.e_psi for column in columns],
+                    "e_gamma": [weight * column.e_gamma for column in columns],
+                },
+            }
+        )
+    return rows
+
+
 def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: tuple[str, ...]) -> dict[str, Any]:
     from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
         linearized_residual_with_kind,
         projection_from_twochart,
     )
-    from validators.twochart_mortar_jacobian import build_rows, build_rz_rows, enumerate_coefficients, grid
+    from validators.twochart_mortar_jacobian import (
+        build_rows,
+        build_rz_rows,
+        enumerate_coefficients,
+        grid,
+        native_c_rz_stats,
+        reset_native_c_rz_stats,
+    )
 
     projection = projection_from_twochart(data)
+    reset_native_c_rz_stats()
     all_variables = enumerate_coefficients(data)
     all_variables_by_index = {variable.index: variable for variable in all_variables}
     pde_points = parse_qb_points(args.pde_qb_points)
@@ -681,11 +825,11 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 
     def build_mortar_rows(variables: list[Any]) -> list[Any]:
         if args.mortar_coordinates == "RZ":
-            return build_rz_rows(data, variables, q_values, x_values, args.mortar_order)
+            return build_rz_rows(data, variables, q_values, x_values, args.mortar_order, use_native_c=args.native_c)
         if args.mortar_coordinates == "qx":
             return build_rows(data, variables, q_values, x_values, args.mortar_order)
         return build_rows(data, variables, q_values, x_values, args.mortar_order) + build_rz_rows(
-            data, variables, q_values, x_values, args.mortar_order
+            data, variables, q_values, x_values, args.mortar_order, use_native_c=args.native_c
         )
 
     if "interface" in blocks and args.mortar_jacobian_candidate_count > 0:
@@ -779,33 +923,45 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     row_labels: list[str] = []
     row_records: list[dict[str, Any]] = []
     row_groups: dict[str, int] = {"pde": 0, "mortar": 0, "active_guard": 0}
+    parallel_fallbacks: list[dict[str, Any]] = []
 
-    for row in pde_rows:
-        q = float(row["q"])
-        b = float(row["b"])
-        component = str(row["component"])
-        residual_raw = float(row["residual"])
-        residual_vector.append(args.pde_weight * residual_raw)
-        jac_row: list[float] = []
-        for variable in selected:
-            column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
-            jac_row.append(args.pde_weight * (column.e_psi if component == "e_psi" else column.e_gamma))
-        jacobian_rows.append(jac_row)
-        row_labels.append("pde")
-        row_records.append(
-            {
-                "row_id": f"pde:{len(row_records)}",
-                "label": "pde",
-                "row_type": "pde",
-                "q": q,
-                "b": b,
-                "component": component,
-                "residual_raw": residual_raw,
-                "weight": args.pde_weight,
-                "residual_weighted_before_scaling": args.pde_weight * residual_raw,
-            }
-        )
-        row_groups["pde"] += 1
+    pde_point_rows = build_stage0_point_rows(
+        data,
+        projection,
+        selected,
+        pde_points,
+        args.residual_kind,
+        args.pde_weight,
+        "pde",
+        "pde",
+        args.stage0_workers,
+    )
+    for point_row in pde_point_rows:
+        if point_row.get("skipped"):
+            if point_row.get("fallback_reason"):
+                parallel_fallbacks.append(point_row)
+            continue
+        q = float(point_row["q"])
+        b = float(point_row["b"])
+        for component in ("e_psi", "e_gamma"):
+            residual_raw = float(point_row["residuals"][component])
+            residual_vector.append(args.pde_weight * residual_raw)
+            jacobian_rows.append(list(point_row["jacobian_rows"][component]))
+            row_labels.append("pde")
+            row_records.append(
+                {
+                    "row_id": f"pde:{len(row_records)}",
+                    "label": "pde",
+                    "row_type": "pde",
+                    "q": q,
+                    "b": b,
+                    "component": component,
+                    "residual_raw": residual_raw,
+                    "weight": args.pde_weight,
+                    "residual_weighted_before_scaling": args.pde_weight * residual_raw,
+                }
+            )
+            row_groups["pde"] += 1
 
     objective_mortar_rows: list[Any] = []
     for row in mortar_rows:
@@ -844,22 +1000,28 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     objective_active_guard_points: list[tuple[float, float]] = []
     active_guard_rows_added = 0
     if active_guard_points:
-        for q, b in active_guard_points:
-            if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+        guard_point_rows = build_stage0_point_rows(
+            data,
+            projection,
+            selected,
+            active_guard_points,
+            args.residual_kind,
+            args.active_guard_weight,
+            "active_guard",
+            "active_guard",
+            args.stage0_workers,
+        )
+        for point_row in guard_point_rows:
+            if point_row.get("skipped"):
+                if point_row.get("fallback_reason"):
+                    parallel_fallbacks.append(point_row)
                 continue
+            q = float(point_row["q"])
+            b = float(point_row["b"])
             objective_active_guard_points.append((q, b))
-            r, z = qb_to_rz(q, b)
-            raw = projection.exact_residual_at(r, z)
-            residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
-            for component, value in (("e_psi", residual.e_psi), ("e_gamma", residual.e_gamma)):
-                residual_raw = float(value)
-                jac_row: list[float] = []
-                for variable in selected:
-                    column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
-                    jac_row.append(
-                        args.active_guard_weight * (column.e_psi if component == "e_psi" else column.e_gamma)
-                    )
-                jacobian_rows.append(jac_row)
+            for component in ("e_psi", "e_gamma"):
+                residual_raw = float(point_row["residuals"][component])
+                jacobian_rows.append(list(point_row["jacobian_rows"][component]))
                 residual_vector.append(args.active_guard_weight * residual_raw)
                 row_labels.append("active_guard")
                 row_records.append(
@@ -897,6 +1059,9 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "row_records": row_records,
         "active_guard_rows": active_guard_rows_added,
         "active_guard_points": [[q, b] for q, b in objective_active_guard_points],
+        "stage0_workers": args.stage0_workers,
+        "parallel_fallbacks": parallel_fallbacks,
+        "native_c_rz": native_c_rz_stats(),
         "objective_pde_rows": pde_rows,
         "objective_mortar_rows": objective_mortar_rows,
         "objective_active_guard_points": objective_active_guard_points,
@@ -1130,10 +1295,102 @@ def restricted_guarded_kkt_step(
     }
 
 
+def coefficient_penalty(variable: Any, args: argparse.Namespace) -> float:
+    if args.coefficient_norm in {"euclidean", "column"}:
+        return 1.0
+    if variable.chart == "tail":
+        kq = max(int(variable.kq or 0), 0)
+        kx = max(int(variable.kx or 0), 0)
+        log_weight = kq * math.log(args.tail_degree_weight) + kx * math.log(args.tail_angular_weight)
+    elif variable.chart == "origin":
+        degree = max(int(variable.r_power or 0) + int(variable.z_power or 0), 0)
+        log_weight = degree * math.log(args.origin_degree_weight)
+    else:
+        log_weight = 0.0
+    return min(math.exp(min(log_weight, 690.0)), 1e300)
+
+
+def equilibrate_rows(
+    rows: list[list[float]],
+    residuals: list[float],
+    enabled: bool,
+) -> tuple[list[list[float]], list[float], dict[str, Any]]:
+    if not enabled:
+        return rows, residuals, {"enabled": False, "scale_min": 1.0, "scale_max": 1.0}
+    scales: list[float] = []
+    out_rows: list[list[float]] = []
+    out_residuals: list[float] = []
+    for row, residual in zip(rows, residuals):
+        finite_row = [value if math.isfinite(value) else 0.0 for value in row]
+        finite_residual = residual if math.isfinite(residual) else 0.0
+        row_norm = math.hypot(*finite_row) if finite_row else 0.0
+        denom = max(row_norm, abs(finite_residual), 1e-300)
+        scale = 1.0 / denom if math.isfinite(denom) else 0.0
+        scales.append(scale)
+        out_rows.append([scale * value if math.isfinite(value) else 0.0 for value in row])
+        out_residuals.append(scale * residual if math.isfinite(residual) else 0.0)
+    return out_rows, out_residuals, {
+        "enabled": True,
+        "scale_min": min(scales) if scales else 0.0,
+        "scale_max": max(scales) if scales else 0.0,
+    }
+
+
+def scale_columns(
+    primary_rows: list[list[float]],
+    constraint_rows: list[list[float]],
+    active_variables: list[Any],
+    args: argparse.Namespace,
+) -> tuple[list[list[float]], list[list[float]], list[float], dict[str, Any]]:
+    coefficient_scales = [1.0 / coefficient_penalty(variable, args) for variable in active_variables]
+    pre_column_rows = [
+        [value * coefficient_scales[index] for index, value in enumerate(row)]
+        for row in primary_rows
+    ]
+    pre_column_constraints = [
+        [value * coefficient_scales[index] for index, value in enumerate(row)]
+        for row in constraint_rows
+    ]
+    column_equilibration_scales = [1.0 for _variable in active_variables]
+    if args.active_set_column_equilibration or args.coefficient_norm == "column":
+        all_rows = pre_column_rows + pre_column_constraints
+        for column in range(len(active_variables)):
+            values = [row[column] for row in all_rows if math.isfinite(row[column])]
+            norm = math.hypot(*values) if values else 0.0
+            column_equilibration_scales[column] = 1.0 / norm if math.isfinite(norm) and norm > 1e-14 else 1.0
+    total_scales = [
+        coefficient_scales[index] * column_equilibration_scales[index]
+        for index in range(len(active_variables))
+    ]
+    scaled_primary = [
+        [value * column_equilibration_scales[index] for index, value in enumerate(row)]
+        for row in pre_column_rows
+    ]
+    scaled_constraints = [
+        [value * column_equilibration_scales[index] for index, value in enumerate(row)]
+        for row in pre_column_constraints
+    ]
+    coefficient_penalties = [1.0 / max(scale, 1e-300) for scale in coefficient_scales]
+    return scaled_primary, scaled_constraints, total_scales, {
+        "coefficient_norm": args.coefficient_norm,
+        "coefficient_penalty_min": min(coefficient_penalties) if coefficient_penalties else 0.0,
+        "coefficient_penalty_max": max(coefficient_penalties) if coefficient_penalties else 0.0,
+        "coefficient_scale_min": min(coefficient_scales) if coefficient_scales else 0.0,
+        "coefficient_scale_max": max(coefficient_scales) if coefficient_scales else 0.0,
+        "column_equilibration_enabled": bool(args.active_set_column_equilibration or args.coefficient_norm == "column"),
+        "column_equilibration_scale_min": min(column_equilibration_scales) if column_equilibration_scales else 0.0,
+        "column_equilibration_scale_max": max(column_equilibration_scales) if column_equilibration_scales else 0.0,
+        "total_scale_min": min(total_scales) if total_scales else 0.0,
+        "total_scale_max": max(total_scales) if total_scales else 0.0,
+    }
+
+
 def restricted_guarded_ineq_kkt_step(
     jacobian_rows: list[list[float]],
     residual_vector: list[float],
     row_labels: list[str],
+    variables: list[Any],
+    args: argparse.Namespace,
     active_columns: list[int],
     total_columns: int,
     lm_lambda: float,
@@ -1157,6 +1414,8 @@ def restricted_guarded_ineq_kkt_step(
             :max_constraints
         ]
 
+    n = len(active_columns)
+    active_variables = [variables[column] for column in active_columns]
     restricted_primary = [[jacobian_rows[index][column] for column in active_columns] for index in primary_indexes]
     primary_residuals = [residual_vector[index] for index in primary_indexes]
     restricted_constraints = [
@@ -1164,27 +1423,36 @@ def restricted_guarded_ineq_kkt_step(
     ]
     constraint_residuals = [residual_vector[index] for index in constraint_indexes]
 
-    n = len(active_columns)
-    column_norms: list[float] = []
-    all_rows = restricted_primary + restricted_constraints
-    for column in range(n):
-        norm = math.sqrt(sum(row[column] * row[column] for row in all_rows))
-        column_norms.append(norm)
-    scales = [1.0 / norm if norm > 1e-14 else 1.0 for norm in column_norms]
-    primary_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_primary]
-    constraint_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_constraints]
+    primary_rows, primary_residuals_scaled, primary_row_report = equilibrate_rows(
+        restricted_primary,
+        primary_residuals,
+        args.active_set_row_equilibration,
+    )
+    constraint_rows, constraint_residuals_scaled, constraint_row_report = equilibrate_rows(
+        restricted_constraints,
+        constraint_residuals,
+        args.active_set_row_equilibration,
+    )
+    primary_rows, constraint_rows, scales, column_report = scale_columns(
+        primary_rows,
+        constraint_rows,
+        active_variables,
+        args,
+    )
 
     from validators.guarded_kkt_active_set import solve_guarded_active_set
 
     active_set_report = solve_guarded_active_set(
         primary_rows,
-        primary_residuals,
+        primary_residuals_scaled,
         constraint_rows,
-        constraint_residuals,
+        constraint_residuals_scaled,
         lm_lambda=lm_lambda,
         max_active=max_active,
         tolerance=tolerance,
         target=target,
+        svd_rcond=args.svd_rcond,
+        max_step_norm=args.max_scaled_step_norm,
     )
     scaled_delta_raw = active_set_report.get("step", [])
     if len(scaled_delta_raw) != n:
@@ -1214,7 +1482,6 @@ def restricted_guarded_ineq_kkt_step(
         (1.0 if residual_vector[index] >= 0.0 else -1.0) * change
         for index, change in zip(constraint_indexes, constraint_change)
     ]
-    nonzero_norms = [value for value in column_norms if value > 0.0]
     return full_delta, {
         "method": "guarded-ineq-kkt-active-set",
         "active_columns": len(active_columns),
@@ -1232,8 +1499,11 @@ def restricted_guarded_ineq_kkt_step(
         "backend": active_set_report.get("backend"),
         "active_constraint_count": len(active_set_report.get("active_constraints", [])),
         "active_set_report": active_set_report,
-        "column_norm_min": min(nonzero_norms) if nonzero_norms else 0.0,
-        "column_norm_max": max(column_norms) if column_norms else 0.0,
+        "row_equilibration": {
+            "primary": primary_row_report,
+            "constraint": constraint_row_report,
+        },
+        "column_scaling": column_report,
         "column_scale_min": min(scales) if scales else 0.0,
         "column_scale_max": max(scales) if scales else 0.0,
         "primary_residual_metrics": vector_metrics(primary_residuals),
@@ -1407,6 +1677,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         system["jacobian_rows"],
                         base_vec,
                         system["row_labels"],
+                        system["variables"],
+                        args,
                         list(block_spec["columns"]),
                         len(system["variables"]),
                         args.lm_lambda,
@@ -1440,7 +1712,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     "block": block_spec["label"],
                     "active_columns": len(block_spec["columns"]),
                     "delta_norm": delta_norm,
-                    "column_scaling": scaling_report,
+                    "solver_report": scaling_report,
+                    "column_scaling": scaling_report.get("column_scaling", scaling_report)
+                    if isinstance(scaling_report, dict)
+                    else scaling_report,
                 }
             )
             for alpha in args.line_search:
@@ -1451,7 +1726,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     "active_columns": len(block_spec["columns"]),
                     "alpha": alpha,
                     "delta_norm": delta_norm,
-                    "column_scaling": scaling_report,
+                    "solver_report": scaling_report,
+                    "column_scaling": scaling_report.get("column_scaling", scaling_report)
+                    if isinstance(scaling_report, dict)
+                    else scaling_report,
                     **update_metrics,
                 }
                 if not tail_gate["all_ok"]:
@@ -1551,6 +1829,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "active_guard_weight": args.active_guard_weight,
                 "active_guard_rows": system["active_guard_rows"],
                 "active_guard_points": system["active_guard_points"],
+                "stage0_workers": system.get("stage0_workers", 1),
+                "parallel_fallbacks": system.get("parallel_fallbacks", []),
+                "native_c_rz": system.get("native_c_rz", {}),
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
@@ -1594,6 +1875,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "q2_policy": args.q2_policy,
             "mortar_order": args.mortar_order,
             "mortar_coordinates": args.mortar_coordinates,
+            "native_c": args.native_c,
             "mortar_q_samples": args.mortar_q_samples,
             "mortar_x_samples": args.mortar_x_samples,
             "mortar_active_count": args.mortar_active_count,
@@ -1627,6 +1909,16 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guarded_ineq_tolerance": args.guarded_ineq_tolerance,
             "guarded_ineq_max_active": args.guarded_ineq_max_active,
             "guarded_ineq_target": args.guarded_ineq_target,
+            "coefficient_norm": args.coefficient_norm,
+            "tail_degree_weight": args.tail_degree_weight,
+            "tail_angular_weight": args.tail_angular_weight,
+            "origin_degree_weight": args.origin_degree_weight,
+            "max_scaled_step_norm": args.max_scaled_step_norm,
+            "svd_rcond": args.svd_rcond,
+            "active_set_row_equilibration": args.active_set_row_equilibration,
+            "active_set_column_equilibration": args.active_set_column_equilibration,
+            "prediction_actual_report_out": args.prediction_actual_report_out,
+            "stage0_workers": args.stage0_workers,
             "rank_report_out": args.rank_report_out,
             "rank_coverage_min": args.rank_coverage_min,
             "row_cache_out": args.row_cache_out,
@@ -1659,6 +1951,72 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         "row_cache_out": args.row_cache_out,
         "candidate": final_data,
         "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+    }
+
+
+def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any]) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    for history in run_report.get("history", []):
+        base = history.get("base", {})
+        for trial in history.get("line_trials", []):
+            solver_report = trial.get("solver_report", {})
+            if not isinstance(solver_report, dict):
+                solver_report = trial.get("column_scaling", {})
+            scaling = solver_report if isinstance(solver_report, dict) else {}
+            predicted = scaling.get("active_set_report", {}).get("predicted_primary_metrics", {})
+            predicted_delta = predicted.get("delta", {}) if isinstance(predicted, dict) else {}
+            predicted_improvement = -float(predicted_delta.get("objective", 0.0) or 0.0)
+            actual_improvement = float(trial.get("objective_decrease", 0.0) or 0.0)
+            ratio = actual_improvement / predicted_improvement if predicted_improvement > 0.0 else None
+            entries.append(
+                {
+                    "iteration": history.get("iteration"),
+                    "block": trial.get("block"),
+                    "alpha": trial.get("alpha"),
+                    "alpha_applied": trial.get("alpha_applied"),
+                    "accepted": trial.get("accepted", False),
+                    "predicted_primary_objective_improvement": predicted_improvement,
+                    "actual_sampled_objective_improvement": actual_improvement,
+                    "actual_over_predicted": ratio,
+                    "raw_max_abs": trial.get("raw_max_abs"),
+                    "guard_max_abs": trial.get("guard_metrics", {}).get("max_abs")
+                    if isinstance(trial.get("guard_metrics"), dict)
+                    else None,
+                    "guard_growth_ok": trial.get("guard_growth_ok"),
+                    "raw_growth_ok": trial.get("raw_growth_ok"),
+                    "max_abs_update": trial.get("max_abs_update"),
+                    "delta_norm": trial.get("delta_norm"),
+                    "base_objective": base.get("objective"),
+                    "trial_objective": trial.get("objective"),
+                    "solver_method": scaling.get("method"),
+                    "scaled_step_clip": scaling.get("active_set_report", {}).get("step_clip_scale")
+                    if isinstance(scaling.get("active_set_report"), dict)
+                    else None,
+                }
+            )
+    accepted_entries = [entry for entry in entries if entry.get("accepted")]
+    ratios = [
+        float(entry["actual_over_predicted"])
+        for entry in entries
+        if entry.get("actual_over_predicted") is not None
+    ]
+    return {
+        "format": "twochart_prediction_actual_report_v1",
+        "status": run_report.get("status", ""),
+        "diagnostic_vs_proof": "floating prediction-vs-actual line-search diagnostics only; no interval proof",
+        "input": args.input,
+        "out": args.out,
+        "solve_mode": args.solve_mode,
+        "coefficient_norm": args.coefficient_norm,
+        "active_set_row_equilibration": args.active_set_row_equilibration,
+        "active_set_column_equilibration": args.active_set_column_equilibration,
+        "max_scaled_step_norm": args.max_scaled_step_norm,
+        "svd_rcond": args.svd_rcond,
+        "entry_count": len(entries),
+        "accepted_entry_count": len(accepted_entries),
+        "actual_over_predicted_min": min(ratios) if ratios else None,
+        "actual_over_predicted_max": max(ratios) if ratios else None,
+        "entries": entries,
     }
 
 
@@ -1779,6 +2137,11 @@ def main() -> None:
     parser.add_argument("--q2-policy", choices=("zero",), default="zero")
     parser.add_argument("--mortar-order", type=positive_int, default=4)
     parser.add_argument("--mortar-coordinates", choices=("RZ", "qx", "both"), default="RZ")
+    parser.add_argument(
+        "--native-c",
+        action="store_true",
+        help="Use native C for R/Z tail coefficient Jacobian jets when mortar-coordinates includes RZ.",
+    )
     parser.add_argument("--mortar-active-count", type=int, default=0)
     parser.add_argument("--mortar-q-samples", type=positive_int, default=3)
     parser.add_argument("--mortar-x-samples", type=positive_int, default=5)
@@ -1915,6 +2278,47 @@ def main() -> None:
         help="Guard inequality target for --solve-mode guarded-ineq-kkt.",
     )
     parser.add_argument(
+        "--coefficient-norm",
+        choices=("euclidean", "analytic", "column"),
+        default="euclidean",
+        help=(
+            "Coefficient geometry for --solve-mode guarded-ineq-kkt. "
+            "'analytic' applies degree/angular penalties before solving; "
+            "'column' uses only column equilibration."
+        ),
+    )
+    parser.add_argument("--tail-degree-weight", type=positive_float, default=1.0)
+    parser.add_argument("--tail-angular-weight", type=positive_float, default=1.0)
+    parser.add_argument("--origin-degree-weight", type=positive_float, default=1.0)
+    parser.add_argument(
+        "--max-scaled-step-norm",
+        type=nonnegative_float,
+        default=0.0,
+        help="Clip the active-set step in scaled variables before mapping back to coefficients; 0 disables.",
+    )
+    parser.add_argument(
+        "--svd-rcond",
+        type=nonnegative_float,
+        default=0.0,
+        help="rcond passed to NumPy lstsq inside guarded active-set KKT; 0 uses NumPy default.",
+    )
+    parser.add_argument("--active-set-row-equilibration", action="store_true")
+    parser.add_argument("--active-set-column-equilibration", action="store_true")
+    parser.add_argument(
+        "--prediction-actual-report-out",
+        default="",
+        help="Optional JSON report summarizing predicted-vs-actual line-search behavior.",
+    )
+    parser.add_argument(
+        "--stage0-workers",
+        type=positive_int,
+        default=1,
+        help=(
+            "CPU worker processes for Stage-0 PDE/active-guard row assembly. "
+            "Values above 1 parallelize point rows while preserving the existing formulas."
+        ),
+    )
+    parser.add_argument(
         "--rank-coverage-min",
         type=nonnegative_float,
         default=0.5,
@@ -1980,6 +2384,8 @@ def main() -> None:
             save_json(args.out, candidate)
             if args.report_out:
                 save_json(args.report_out, run_report)
+            if args.prediction_actual_report_out:
+                save_json(args.prediction_actual_report_out, prediction_actual_report(args, run_report))
             if args.rank_report_out:
                 save_json(
                     args.rank_report_out,
@@ -1996,6 +2402,8 @@ def main() -> None:
             save_json(args.out, result)
             if args.report_out:
                 save_json(args.report_out, result)
+            if args.prediction_actual_report_out:
+                save_json(args.prediction_actual_report_out, prediction_actual_report(args, result))
             if args.rank_report_out:
                 save_json(
                     args.rank_report_out,
@@ -2017,6 +2425,8 @@ def main() -> None:
         print(f"rank_report_saved={args.rank_report_out}")
     if args.row_cache_out:
         print(f"row_cache_saved={args.row_cache_out}")
+    if args.prediction_actual_report_out:
+        print(f"prediction_actual_report_saved={args.prediction_actual_report_out}")
     print(f"status={result['status']}")
     print(f"newton_executed={result['newton_executed']}")
     print(f"q2_policy={args.q2_policy}")
@@ -2032,6 +2442,14 @@ def main() -> None:
             print(f"accepted_block={last.get('accepted_block', '')}")
             print(f"selected_by_chart={last.get('selected_by_chart', {})}")
             print(f"selected_variables={last['selected_variables']}")
+            native_c_rz = last.get("native_c_rz", {})
+            if native_c_rz.get("enabled"):
+                print(
+                    "native_c_rz="
+                    f"cases:{native_c_rz.get('cases', 0)} "
+                    f"calls:{native_c_rz.get('calls', 0)} "
+                    f"seconds:{float(native_c_rz.get('seconds', 0.0)):.6f}"
+                )
             print(f"base_objective_first={first['base']['objective']:.12e}")
             final_metrics = result["candidate"]["twochart_newton_stage0_summary"].get("final_metrics", {})
             if final_metrics:

@@ -21,6 +21,7 @@ except ImportError:  # pragma: no cover - depends on the local Python env.
 
 
 STATUS = "GUARDED_KKT_RANK_DIAGNOSTIC_NOT_PROOF"
+FINITE_CAP = 1e100
 
 
 def require_numpy() -> Any:
@@ -48,15 +49,37 @@ def _json_float(value: Any) -> float | str:
     return out
 
 
+def _finite_float(value: Any, cap: float = FINITE_CAP) -> float:
+    out = float(value)
+    if math.isnan(out):
+        return 0.0
+    if math.isinf(out):
+        return cap if out > 0.0 else -cap
+    if out > cap:
+        return cap
+    if out < -cap:
+        return -cap
+    return out
+
+
+def _finite_array(array: Any, cap: float = FINITE_CAP) -> Any:
+    require_numpy()
+    return np.clip(
+        np.nan_to_num(np.asarray(array, dtype=float), nan=0.0, posinf=cap, neginf=-cap),
+        -cap,
+        cap,
+    )
+
+
 def _metrics(values: Iterable[float]) -> dict[str, Any]:
-    array = np.asarray(list(values), dtype=float)
-    if array.size == 0:
+    raw = [_finite_float(value) for value in values]
+    if not raw:
         return {"count": 0, "max_abs": 0.0, "rms": 0.0, "l2": 0.0}
-    l2 = float(np.linalg.norm(array))
+    l2 = math.hypot(*raw)
     return {
-        "count": int(array.size),
-        "max_abs": float(np.max(np.abs(array))),
-        "rms": float(l2 / math.sqrt(float(array.size))),
+        "count": int(len(raw)),
+        "max_abs": max(abs(value) for value in raw),
+        "rms": float(l2 / math.sqrt(float(len(raw)))),
         "l2": l2,
     }
 
@@ -418,8 +441,8 @@ def compute_guarded_kkt_rank_report(
         )
 
     require_numpy()
-    r = np.asarray(residual_vector, dtype=float)
-    j = np.asarray(jacobian_rows, dtype=float)
+    r = _finite_array(residual_vector)
+    j = _finite_array(jacobian_rows)
     if j.ndim != 2:
         raise ValueError("jacobian_rows must be a 2D array")
     if r.ndim != 1 or r.size != j.shape[0]:
@@ -440,21 +463,25 @@ def compute_guarded_kkt_rank_report(
     if not primary_indexes:
         raise ValueError("rank report has no primary rows")
 
-    jm = j[primary_indexes, :]
-    rm = r[primary_indexes]
-    c = j[constraint_indexes, :] if constraint_indexes else np.zeros((0, j.shape[1]))
+    jm = _finite_array(j[primary_indexes, :])
+    rm = _finite_array(r[primary_indexes])
+    c = _finite_array(j[constraint_indexes, :]) if constraint_indexes else np.zeros((0, j.shape[1]))
     jm_singular = np.linalg.svd(jm, compute_uv=False) if jm.size else np.asarray([], dtype=float)
     jm_rank = _rank_from_svd(jm_singular)
     n_basis, c_singular, c_rank = _nullspace(c)
-    jmn = jm @ n_basis if n_basis.size else np.zeros((jm.shape[0], 0))
+    n_basis = _finite_array(n_basis)
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        jmn = _finite_array(jm @ n_basis) if n_basis.size else np.zeros((jm.shape[0], 0))
     jmn_singular = np.linalg.svd(jmn, compute_uv=False) if jmn.size else np.asarray([], dtype=float)
     jmn_rank = _rank_from_svd(jmn_singular)
 
     target = -rm
     if jmn.size and jmn.shape[1] > 0:
         z, *_ = np.linalg.lstsq(jmn, target, rcond=None)
-        projected_change = jmn @ z
-        feasible_step = n_basis @ z
+        z = _finite_array(z)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            projected_change = _finite_array(jmn @ z)
+            feasible_step = _finite_array(n_basis @ z)
     else:
         projected_change = np.zeros_like(rm)
         feasible_step = np.zeros(j.shape[1])
@@ -463,9 +490,11 @@ def compute_guarded_kkt_rank_report(
     rm_max = float(np.max(np.abs(rm))) if rm.size else 0.0
     projected_l2 = float(np.linalg.norm(projected_change))
     rho_range = projected_l2 / max(rm_l2, 1e-300)
-    gradient = jm.T @ rm
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        gradient = _finite_array(jm.T @ rm)
     if n_basis.size:
-        projected_gradient = n_basis @ (n_basis.T @ gradient)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            projected_gradient = _finite_array(n_basis @ (n_basis.T @ gradient))
     else:
         projected_gradient = np.zeros_like(gradient)
     rho_grad = float(np.linalg.norm(projected_gradient)) / max(float(np.linalg.norm(gradient)), 1e-300)
@@ -474,8 +503,9 @@ def compute_guarded_kkt_rank_report(
         float(np.max(np.abs(residual_after_best))) / max(rm_max, 1e-300) if rm.size else 0.0
     )
 
-    step_array = np.asarray(step, dtype=float) if step is not None else None
-    constraint_change = c @ step_array if step_array is not None and c.size else np.asarray([], dtype=float)
+    step_array = _finite_array(step) if step is not None else None
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        constraint_change = _finite_array(c @ step_array) if step_array is not None and c.size else np.asarray([], dtype=float)
     signed_constraint_growth = (
         np.sign(r[constraint_indexes]) * constraint_change
         if constraint_change.size and constraint_indexes

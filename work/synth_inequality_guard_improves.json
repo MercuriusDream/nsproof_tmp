@@ -110,6 +110,8 @@
       "parameters": {
         "lm_lambda": 1e-12,
         "max_active": 64,
+        "max_step_norm": 0.0,
+        "svd_rcond": 0.0,
         "tolerance": 1e-10
       },
       "pass": true,
@@ -163,7 +165,16 @@
       "step": [
         -9.999999999989999
       ],
-      "target": "nonincrease"
+      "step_clip_scale": 1.0,
+      "target": "nonincrease",
+      "unclipped_step_metrics": {
+        "count": 1,
+        "l2": 9.999999999989999,
+        "max": -9.999999999989999,
+        "max_abs": 9.999999999989999,
+        "min": -9.999999999989999,
+        "rms": 9.999999999989999
+      }
     },
     "guard_final_metrics": {
       "count": 1.0,
@@ -188,7 +199,7 @@
     ]
   },
   "inputs": {
-    "expect_guard_growth": 0.0,
+    "expect_guard_growth": 1.0,
     "expect_mortar_factor": 100.0
   },
   "not_proof": true,

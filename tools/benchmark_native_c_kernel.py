@@ -1,0 +1,512 @@
+#!/usr/bin/env python3
+"""Compile and benchmark the C Chebyshev kernel prototype.
+
+This script is self-contained: it uses clang, ctypes, and the Python standard
+library only. The compiled shared library is written to a temporary directory.
+"""
+
+from __future__ import annotations
+
+import ctypes
+import math
+import os
+import platform
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from validators.twochart_mortar_jacobian import (  # noqa: E402
+    cheb_basis_partial,
+    cheb_basis_values,
+    rz_coordinate_jets,
+    rz_derivative_indices,
+    weighted_coeff_rz_jet,
+    weighted_cheb_coeff_partial,
+)
+from validators.origin_chart import qx_to_rz  # noqa: E402
+
+
+def compile_library(tmpdir: Path) -> Path:
+    clang = shutil.which("clang")
+    if clang is None:
+        raise RuntimeError("clang was not found on PATH")
+
+    src = ROOT / "native" / "c" / "nsproof_kernel.c"
+    lib = tmpdir / ("libnsproof_kernel.dylib" if platform.system() == "Darwin" else "libnsproof_kernel.so")
+    cmd = [
+        clang,
+        "-O3",
+        "-std=c99",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-fPIC",
+    ]
+    if platform.system() == "Darwin":
+        cmd.append("-dynamiclib")
+    else:
+        cmd.append("-shared")
+    cmd.extend([str(src), "-o", str(lib)])
+    if platform.system() != "Darwin":
+        cmd.append("-lm")
+
+    subprocess.run(cmd, check=True, cwd=str(ROOT))
+    return lib
+
+
+def load_library(path: Path) -> ctypes.CDLL:
+    lib = ctypes.CDLL(str(path))
+
+    c_int_p = ctypes.POINTER(ctypes.c_int)
+    c_double_p = ctypes.POINTER(ctypes.c_double)
+
+    lib.nsproof_cheb_basis_values.argtypes = [
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_int,
+        c_double_p,
+    ]
+    lib.nsproof_cheb_basis_values.restype = ctypes.c_int
+
+    lib.nsproof_cheb_basis_partial.argtypes = [
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        c_int_p,
+    ]
+    lib.nsproof_cheb_basis_partial.restype = ctypes.c_double
+
+    lib.nsproof_weighted_cheb_coeff_partial.argtypes = [
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        c_int_p,
+    ]
+    lib.nsproof_weighted_cheb_coeff_partial.restype = ctypes.c_double
+
+    lib.nsproof_weighted_cheb_coeff_partial_array.argtypes = [
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+    ]
+    lib.nsproof_weighted_cheb_coeff_partial_array.restype = ctypes.c_int
+
+    lib.nsproof_rz_weighted_coeff_partials_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.c_int),
+        c_double_p,
+        ctypes.POINTER(ctypes.c_int),
+    ]
+    lib.nsproof_rz_weighted_coeff_partials_batch.restype = ctypes.c_int
+
+    return lib
+
+
+def assert_close(label: str, got: float, expected: float, tol: float = 1e-10) -> None:
+    scale = max(1.0, abs(expected))
+    if abs(got - expected) > tol * scale:
+        raise AssertionError(f"{label}: got {got!r}, expected {expected!r}")
+
+
+def c_basis_values(lib: ctypes.CDLL, count: int, t: float, order: int) -> list[float]:
+    if count <= 0:
+        status = lib.nsproof_cheb_basis_values(count, t, order, None)
+        if status != 0:
+            raise AssertionError(f"basis status {status}")
+        return []
+    out = (ctypes.c_double * count)()
+    status = lib.nsproof_cheb_basis_values(count, t, order, out)
+    if status != 0:
+        raise AssertionError(f"basis status {status}")
+    return list(out)
+
+
+def c_basis_partial(
+    lib: ctypes.CDLL,
+    patch: dict[str, tuple[float, float]],
+    q: float,
+    x: float,
+    kq: int,
+    kx: int,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    status = ctypes.c_int(0)
+    q0, q1 = patch["q_interval"]
+    x0, x1 = patch["x_interval"]
+    value = lib.nsproof_cheb_basis_partial(
+        q0,
+        q1,
+        x0,
+        x1,
+        q,
+        x,
+        kq,
+        kx,
+        dq_order,
+        dx_order,
+        ctypes.byref(status),
+    )
+    if status.value != 0:
+        raise AssertionError(f"basis partial status {status.value}")
+    return float(value)
+
+
+def c_weighted_partial(
+    lib: ctypes.CDLL,
+    patch: dict[str, tuple[float, float]],
+    alpha: float,
+    q: float,
+    x: float,
+    kq: int,
+    kx: int,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    status = ctypes.c_int(0)
+    q0, q1 = patch["q_interval"]
+    x0, x1 = patch["x_interval"]
+    value = lib.nsproof_weighted_cheb_coeff_partial(
+        q0,
+        q1,
+        x0,
+        x1,
+        alpha,
+        q,
+        x,
+        kq,
+        kx,
+        dq_order,
+        dx_order,
+        ctypes.byref(status),
+    )
+    if status.value != 0:
+        raise AssertionError(f"weighted partial status {status.value}")
+    return float(value)
+
+
+def validate(lib: ctypes.CDLL) -> list[tuple[float, float, float, int, int, int, int]]:
+    for count in (0, 1, 2, 5, 12, 32):
+        for t in (-1.0, -0.75, -0.1, 0.0, 0.5, 0.95, 1.0, 1.2):
+            for order in range(5):
+                expected = cheb_basis_values(count, t, order)
+                got = c_basis_values(lib, count, t, order)
+                if len(got) != len(expected):
+                    raise AssertionError("basis length mismatch")
+                for index, (c_value, py_value) in enumerate(zip(got, expected)):
+                    assert_close(f"basis count={count} t={t} order={order} index={index}", c_value, py_value)
+
+    patch = {"q_interval": (0.5, 2.5), "x_interval": (-1.25, 1.75)}
+    weighted_cases: list[tuple[float, float, float, int, int, int, int]] = []
+
+    for q in (0.65, 1.1, 2.2):
+        for x in (-1.0, -0.2, 1.4):
+            for kq, kx in ((0, 0), (1, 3), (4, 2), (8, 7)):
+                for dq_order, dx_order in ((0, 0), (1, 0), (0, 1), (2, 2), (4, 1), (3, 4)):
+                    expected = cheb_basis_partial(patch, q, x, kq, kx, dq_order, dx_order)
+                    got = c_basis_partial(lib, patch, q, x, kq, kx, dq_order, dx_order)
+                    assert_close(
+                        f"basis_partial q={q} x={x} k=({kq},{kx}) d=({dq_order},{dx_order})",
+                        got,
+                        expected,
+                    )
+
+    for alpha in (-1.25, 0.0, 0.5, 2.75):
+        for q in (0.65, 1.1, 2.2):
+            for x in (-1.0, -0.2, 1.4):
+                for kq, kx in ((0, 0), (1, 3), (4, 2), (8, 7)):
+                    for dq_order, dx_order in ((0, 0), (1, 0), (0, 1), (2, 2), (4, 1), (3, 4)):
+                        expected = weighted_cheb_coeff_partial(
+                            patch,
+                            alpha,
+                            q,
+                            x,
+                            kq,
+                            kx,
+                            dq_order,
+                            dx_order,
+                        )
+                        got = c_weighted_partial(lib, patch, alpha, q, x, kq, kx, dq_order, dx_order)
+                        assert_close(
+                            (
+                                "weighted_partial "
+                                f"alpha={alpha} q={q} x={x} k=({kq},{kx}) d=({dq_order},{dx_order})"
+                            ),
+                            got,
+                            expected,
+                        )
+                        weighted_cases.append((alpha, q, x, kq, kx, dq_order, dx_order))
+
+    return weighted_cases
+
+
+def validate_error_statuses(lib: ctypes.CDLL) -> None:
+    status = ctypes.c_int(0)
+    _ = lib.nsproof_weighted_cheb_coeff_partial(
+        0.0,
+        0.0,
+        -1.0,
+        1.0,
+        2.0,
+        0.5,
+        0.1,
+        1,
+        1,
+        0,
+        0,
+        ctypes.byref(status),
+    )
+    if status.value != -4:
+        raise AssertionError(f"degenerate interval status {status.value}, expected -4")
+
+    status = ctypes.c_int(0)
+    _ = lib.nsproof_weighted_cheb_coeff_partial(
+        0.0,
+        1.0,
+        -1.0,
+        1.0,
+        math.inf,
+        0.5,
+        0.1,
+        1,
+        1,
+        0,
+        0,
+        ctypes.byref(status),
+    )
+    if status.value != -5:
+        raise AssertionError(f"nonfinite input status {status.value}, expected -5")
+
+    status = ctypes.c_int(0)
+    _ = lib.nsproof_weighted_cheb_coeff_partial(
+        0.0,
+        1.0,
+        -1.0,
+        1.0,
+        2.0,
+        0.5,
+        0.1,
+        -1,
+        1,
+        0,
+        0,
+        ctypes.byref(status),
+    )
+    if status.value != -3:
+        raise AssertionError(f"bad index status {status.value}, expected -3")
+
+
+def validate_repeated(lib: ctypes.CDLL, passes: int) -> list[tuple[float, float, float, int, int, int, int]]:
+    cases: list[tuple[float, float, float, int, int, int, int]] = []
+    for _index in range(passes):
+        cases = validate(lib)
+        validate_rz_batch(lib)
+        validate_error_statuses(lib)
+    return cases
+
+
+def validate_rz_batch(lib: ctypes.CDLL) -> None:
+    cases: list[tuple[float, float, float, float, float, float, float, int, int]] = []
+    for alpha in (2.0, 20.0 / 9.0):
+        for q in (0.84, 0.88, 0.92):
+            for x in (0.0, 0.5, 1.0):
+                for kq, kx in ((0, 0), (1, 2), (4, 3)):
+                    cases.append((q, x, 0.80, 0.96, 0.0, 1.0, alpha, kq, kx))
+
+    count = len(cases)
+    max_order = 4
+    spec_count = len(rz_derivative_indices(max_order))
+    double_array = ctypes.c_double * count
+    int_array = ctypes.c_int * count
+    q_arr = double_array(*[case[0] for case in cases])
+    x_arr = double_array(*[case[1] for case in cases])
+    q0_arr = double_array(*[case[2] for case in cases])
+    q1_arr = double_array(*[case[3] for case in cases])
+    x0_arr = double_array(*[case[4] for case in cases])
+    x1_arr = double_array(*[case[5] for case in cases])
+    alpha_arr = double_array(*[case[6] for case in cases])
+    kq_arr = int_array(*[case[7] for case in cases])
+    kx_arr = int_array(*[case[8] for case in cases])
+    out = (ctypes.c_double * (count * spec_count))()
+    statuses = int_array()
+
+    status = lib.nsproof_rz_weighted_coeff_partials_batch(
+        count,
+        max_order,
+        q_arr,
+        x_arr,
+        q0_arr,
+        q1_arr,
+        x0_arr,
+        x1_arr,
+        alpha_arr,
+        kq_arr,
+        kx_arr,
+        out,
+        statuses,
+    )
+    if status != 0:
+        raise AssertionError(f"RZ batch status {status}")
+
+    for row, (q, x, q0, q1, x0, x1, alpha, kq, kx) in enumerate(cases):
+        coeffs = [[0.0 for _ in range(kx + 1)] for _ in range(kq + 1)]
+        coeffs[kq][kx] = 1.0
+        patch = {"q_interval": [q0, q1], "x_interval": [x0, x1], "coeffs": coeffs}
+        R0, Z0 = qx_to_rz(q, x)
+        _R, _Z, q_jet, x_jet = rz_coordinate_jets(R0, Z0, max_order)
+        expected_jet = weighted_coeff_rz_jet(patch, alpha, q_jet, x_jet, kq, kx)
+        for spec_index, (dR, dZ) in enumerate(rz_derivative_indices(max_order)):
+            got = float(out[row * spec_count + spec_index])
+            expected = expected_jet.partial(dR, dZ)
+            assert_close(
+                f"rz_batch q={q} x={x} alpha={alpha} k=({kq},{kx}) d=({dR},{dZ})",
+                got,
+                expected,
+                tol=1e-9,
+            )
+
+
+def benchmark_scalar(
+    lib: ctypes.CDLL,
+    patch: dict[str, tuple[float, float]],
+    cases: list[tuple[float, float, float, int, int, int, int]],
+    repeats: int,
+) -> tuple[float, float, float]:
+    t0 = time.perf_counter()
+    py_acc = 0.0
+    for _ in range(repeats):
+        for alpha, q, x, kq, kx, dq_order, dx_order in cases:
+            py_acc += weighted_cheb_coeff_partial(patch, alpha, q, x, kq, kx, dq_order, dx_order)
+    py_time = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
+    c_acc = 0.0
+    for _ in range(repeats):
+        for alpha, q, x, kq, kx, dq_order, dx_order in cases:
+            c_acc += c_weighted_partial(lib, patch, alpha, q, x, kq, kx, dq_order, dx_order)
+    c_time = time.perf_counter() - t0
+
+    assert_close("scalar timing accumulator", c_acc, py_acc, tol=1e-9)
+    return py_time, c_time, c_acc
+
+
+def benchmark_batch(
+    lib: ctypes.CDLL,
+    patch: dict[str, tuple[float, float]],
+    cases: list[tuple[float, float, float, int, int, int, int]],
+    repeats: int,
+) -> tuple[float, float, float]:
+    count = len(cases)
+    q0, q1 = patch["q_interval"]
+    x0, x1 = patch["x_interval"]
+    alpha_arr = (ctypes.c_double * count)(*[case[0] for case in cases])
+    q_arr = (ctypes.c_double * count)(*[case[1] for case in cases])
+    x_arr = (ctypes.c_double * count)(*[case[2] for case in cases])
+    kq_arr = (ctypes.c_int * count)(*[case[3] for case in cases])
+    kx_arr = (ctypes.c_int * count)(*[case[4] for case in cases])
+    dq_arr = (ctypes.c_int * count)(*[case[5] for case in cases])
+    dx_arr = (ctypes.c_int * count)(*[case[6] for case in cases])
+    out = (ctypes.c_double * count)()
+
+    t0 = time.perf_counter()
+    py_acc = 0.0
+    for _ in range(repeats):
+        for alpha, q, x, kq, kx, dq_order, dx_order in cases:
+            py_acc += weighted_cheb_coeff_partial(patch, alpha, q, x, kq, kx, dq_order, dx_order)
+    py_time = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
+    c_acc = 0.0
+    for _ in range(repeats):
+        status = lib.nsproof_weighted_cheb_coeff_partial_array(
+            count,
+            q0,
+            q1,
+            x0,
+            x1,
+            alpha_arr,
+            q_arr,
+            x_arr,
+            kq_arr,
+            kx_arr,
+            dq_arr,
+            dx_arr,
+            out,
+        )
+        if status != 0:
+            raise AssertionError(f"batch status {status}")
+        c_acc += sum(out)
+    c_time = time.perf_counter() - t0
+
+    assert_close("batch timing accumulator", c_acc, py_acc, tol=1e-9)
+    return py_time, c_time, c_acc
+
+
+def main() -> int:
+    repeats = int(os.environ.get("NSPROOF_NATIVE_C_REPEATS", "500"))
+    with tempfile.TemporaryDirectory(prefix="nsproof-c-kernel-") as tmp:
+        lib_path = compile_library(Path(tmp))
+        lib = load_library(lib_path)
+        validation_passes = int(os.environ.get("NSPROOF_NATIVE_C_VALIDATION_PASSES", "3"))
+        cases = validate_repeated(lib, validation_passes)
+
+        patch = {"q_interval": (0.5, 2.5), "x_interval": (-1.25, 1.75)}
+        scalar_py, scalar_c, scalar_acc = benchmark_scalar(lib, patch, cases, repeats)
+        batch_py, batch_c, batch_acc = benchmark_batch(lib, patch, cases, repeats)
+
+    print("native/c Chebyshev+RZ kernel validation: ok")
+    print(f"validation passes: {validation_passes}")
+    print(f"weighted cases: {len(cases)}")
+    print(f"repeats: {repeats}")
+    print(f"scalar Python: {scalar_py:.6f}s")
+    print(f"scalar ctypes C: {scalar_c:.6f}s ({scalar_py / scalar_c:.2f}x vs Python)")
+    print(f"batch Python: {batch_py:.6f}s")
+    print(f"batch ctypes C: {batch_c:.6f}s ({batch_py / batch_c:.2f}x vs Python)")
+    print(f"accumulators: scalar={scalar_acc:.17g} batch={batch_acc:.17g}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

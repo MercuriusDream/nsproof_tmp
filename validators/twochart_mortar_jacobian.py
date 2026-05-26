@@ -12,11 +12,18 @@ from __future__ import annotations
 
 import argparse
 import copy
+import ctypes
 import json
 import math
 import os
+import platform
+import shutil
+import subprocess
 import sys
+import tempfile
+import time
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import Any, Iterable
 
 
@@ -34,6 +41,17 @@ from validators.origin_chart import (  # noqa: E402
 
 STATUS = "TWOCHART_MORTAR_JACOBIAN_FLOATING_NOT_PROOF"
 SUPPORTED_FORMAT = "twochart_profile_projection_v1"
+
+_NATIVE_C_LIB: ctypes.CDLL | None = None
+_NATIVE_C_BUILD_DIR: tempfile.TemporaryDirectory[str] | None = None
+_NATIVE_C_RZ_STATS: dict[str, Any] = {
+    "enabled": False,
+    "available": False,
+    "calls": 0,
+    "cases": 0,
+    "seconds": 0.0,
+    "compile_seconds": 0.0,
+}
 
 
 @dataclass(frozen=True)
@@ -460,6 +478,155 @@ def variable_rz_residual_jet(
     return RZJet2.const(order, 0.0)
 
 
+def _native_c_library() -> ctypes.CDLL:
+    global _NATIVE_C_LIB
+    global _NATIVE_C_BUILD_DIR
+    if _NATIVE_C_LIB is not None:
+        return _NATIVE_C_LIB
+
+    clang = shutil.which("clang")
+    if clang is None:
+        raise RuntimeError("clang not found; cannot build native C kernel")
+    src = Path(ROOT_DIR) / "native" / "c" / "nsproof_kernel.c"
+    if not src.exists():
+        raise RuntimeError(f"native C source not found: {src}")
+
+    start = time.perf_counter()
+    _NATIVE_C_BUILD_DIR = tempfile.TemporaryDirectory(prefix="nsproof-native-c-")
+    lib_path = Path(_NATIVE_C_BUILD_DIR.name) / (
+        "libnsproof_kernel.dylib" if platform.system() == "Darwin" else "libnsproof_kernel.so"
+    )
+    cmd = [clang, "-O3", "-std=c99", "-Wall", "-Wextra", "-pedantic", "-fPIC"]
+    if platform.system() == "Darwin":
+        cmd.append("-dynamiclib")
+    else:
+        cmd.append("-shared")
+    cmd.extend([str(src), "-o", str(lib_path)])
+    if platform.system() != "Darwin":
+        cmd.append("-lm")
+    subprocess.run(cmd, check=True, cwd=ROOT_DIR)
+
+    lib = ctypes.CDLL(str(lib_path))
+    c_double_p = ctypes.POINTER(ctypes.c_double)
+    c_int_p = ctypes.POINTER(ctypes.c_int)
+    lib.nsproof_rz_weighted_coeff_partials_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_rz_weighted_coeff_partials_batch.restype = ctypes.c_int
+    _NATIVE_C_LIB = lib
+    _NATIVE_C_RZ_STATS["available"] = True
+    _NATIVE_C_RZ_STATS["compile_seconds"] += time.perf_counter() - start
+    return lib
+
+
+def native_c_rz_stats() -> dict[str, Any]:
+    return dict(_NATIVE_C_RZ_STATS)
+
+
+def reset_native_c_rz_stats() -> None:
+    _NATIVE_C_RZ_STATS.update(
+        {
+            "enabled": False,
+            "available": _NATIVE_C_LIB is not None,
+            "calls": 0,
+            "cases": 0,
+            "seconds": 0.0,
+            "compile_seconds": _NATIVE_C_RZ_STATS.get("compile_seconds", 0.0),
+        }
+    )
+
+
+def _origin_rz_residual_partial(variable: CoefficientVariable, R0: float, Z0: float, dR: int, dZ: int) -> float:
+    r_power = int(variable.r_power)
+    z_power = int(variable.z_power)
+    if dR > r_power or dZ > z_power:
+        return 0.0
+    return -(
+        falling(float(r_power), dR)
+        * falling(float(z_power), dZ)
+        * (R0 ** (r_power - dR))
+        * (Z0 ** (z_power - dZ))
+    )
+
+
+def _native_rz_tail_partials(
+    data: dict[str, Any],
+    variables: list[CoefficientVariable],
+    component: str,
+    q: float,
+    x: float,
+    max_order: int,
+) -> dict[int, tuple[float, ...]]:
+    cases: list[tuple[CoefficientVariable, tuple[float, float, float, float]]] = []
+    for variable in variables:
+        if variable.component != component or variable.chart != "tail":
+            continue
+        patch = variable_tail_patch(data, variable)
+        if point_in_patch(patch, q, x):
+            cases.append((variable, patch_interval(patch)))
+    if not cases:
+        return {}
+
+    lib = _native_c_library()
+    count = len(cases)
+    spec_count = len(rz_derivative_indices(max_order))
+    double_array = ctypes.c_double * count
+    int_array = ctypes.c_int * count
+    q_values = double_array(*([float(q)] * count))
+    x_values = double_array(*([float(x)] * count))
+    q0_values = double_array(*[interval[0] for _variable, interval in cases])
+    q1_values = double_array(*[interval[1] for _variable, interval in cases])
+    x0_values = double_array(*[interval[2] for _variable, interval in cases])
+    x1_values = double_array(*[interval[3] for _variable, interval in cases])
+    alpha_values = double_array(*[float(variable.alpha) for variable, _interval in cases])
+    kq_values = int_array(*[int(variable.kq) for variable, _interval in cases])
+    kx_values = int_array(*[int(variable.kx) for variable, _interval in cases])
+    out = (ctypes.c_double * (count * spec_count))()
+    statuses = int_array()
+
+    start = time.perf_counter()
+    rc = lib.nsproof_rz_weighted_coeff_partials_batch(
+        count,
+        max_order,
+        q_values,
+        x_values,
+        q0_values,
+        q1_values,
+        x0_values,
+        x1_values,
+        alpha_values,
+        kq_values,
+        kx_values,
+        out,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    _NATIVE_C_RZ_STATS["enabled"] = True
+    _NATIVE_C_RZ_STATS["calls"] = int(_NATIVE_C_RZ_STATS.get("calls", 0)) + 1
+    _NATIVE_C_RZ_STATS["cases"] = int(_NATIVE_C_RZ_STATS.get("cases", 0)) + count
+    _NATIVE_C_RZ_STATS["seconds"] = float(_NATIVE_C_RZ_STATS.get("seconds", 0.0)) + elapsed
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(count)))
+        raise RuntimeError(f"native C RZ weighted partial batch failed rc={rc} statuses={bad_statuses}")
+
+    return {
+        variable.index: tuple(float(out[row * spec_count + col]) for col in range(spec_count))
+        for row, (variable, _interval) in enumerate(cases)
+    }
+
+
 def tail_total_partial(
     data: dict[str, Any],
     component: str,
@@ -706,28 +873,55 @@ def build_rz_rows(
     q_values: Iterable[float],
     x_values: Iterable[float],
     max_order: int,
+    use_native_c: bool = False,
 ) -> list[MortarRow]:
     if max_order < 0 or max_order > 4:
         raise ValueError("--max-order must be between 0 and 4")
     rows: list[MortarRow] = []
     specs = rz_derivative_indices(max_order)
+    component_variables = {
+        component: [variable for variable in variables if variable.component == component]
+        for component in ("F", "G")
+    }
     for component in ("F", "G"):
         for q in q_values:
             for x in x_values:
                 R0, Z0 = qx_to_rz(q, x)
                 tail = tail_total_rz_jet(data, component, R0, Z0, max_order)
                 origin = origin_total_rz_jet(data, component, R0, Z0, max_order)
-                variable_jets = [
-                    (variable.index, variable_rz_residual_jet(data, variable, component, R0, Z0, max_order))
-                    for variable in variables
-                    if variable.component == component
-                ]
-                for dR_order, dZ_order in specs:
-                    jacobian = tuple(
-                        (var_index, jet.partial(dR_order, dZ_order))
-                        for var_index, jet in variable_jets
-                        if jet.partial(dR_order, dZ_order) != 0.0
+                if use_native_c:
+                    native_tail_partials = _native_rz_tail_partials(
+                        data, component_variables[component], component, q, x, max_order
                     )
+                    jacobian_by_spec: list[list[tuple[int, float]]] = [[] for _spec in specs]
+                    for variable in component_variables[component]:
+                        if variable.chart == "tail":
+                            partials = native_tail_partials.get(variable.index)
+                            if partials is None:
+                                continue
+                            for spec_index, value in enumerate(partials):
+                                if value != 0.0:
+                                    jacobian_by_spec[spec_index].append((variable.index, value))
+                        elif variable.chart == "origin":
+                            for spec_index, (dR_order, dZ_order) in enumerate(specs):
+                                value = _origin_rz_residual_partial(variable, R0, Z0, dR_order, dZ_order)
+                                if value != 0.0:
+                                    jacobian_by_spec[spec_index].append((variable.index, value))
+                else:
+                    variable_jets = [
+                        (variable.index, variable_rz_residual_jet(data, variable, component, R0, Z0, max_order))
+                        for variable in component_variables[component]
+                    ]
+                    jacobian_by_spec = []
+                    for dR_order, dZ_order in specs:
+                        jacobian_by_spec.append(
+                            [
+                                (var_index, jet.partial(dR_order, dZ_order))
+                                for var_index, jet in variable_jets
+                                if jet.partial(dR_order, dZ_order) != 0.0
+                            ]
+                        )
+                for spec_index, (dR_order, dZ_order) in enumerate(specs):
                     tail_value = tail.partial(dR_order, dZ_order)
                     origin_value = origin.partial(dR_order, dZ_order)
                     rows.append(
@@ -741,7 +935,7 @@ def build_rz_rows(
                             tail_value=tail_value,
                             origin_value=origin_value,
                             residual=tail_value - origin_value,
-                            jacobian=jacobian,
+                            jacobian=tuple(jacobian_by_spec[spec_index]),
                             coordinate="RZ",
                         )
                     )
@@ -915,14 +1109,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     variables = enumerate_coefficients(data)
     q_values = grid(args.q_min, args.q_max, args.q_samples)
     x_values = grid(0.0, 1.0, args.x_samples)
+    use_native_c = bool(getattr(args, "native_c", False))
+    reset_native_c_rz_stats()
     if args.coordinates == "qx":
         rows = build_rows(data, variables, q_values, x_values, args.max_order)
     elif args.coordinates == "RZ":
-        rows = build_rz_rows(data, variables, q_values, x_values, args.max_order)
+        rows = build_rz_rows(data, variables, q_values, x_values, args.max_order, use_native_c=use_native_c)
     else:
         rows = renumber_rows(
             build_rows(data, variables, q_values, x_values, args.max_order)
-            + build_rz_rows(data, variables, q_values, x_values, args.max_order)
+            + build_rz_rows(data, variables, q_values, x_values, args.max_order, use_native_c=use_native_c)
         )
     smoke = smoke_finite_difference(data, variables, rows, args.fd_epsilon) if args.smoke else None
 
@@ -966,6 +1162,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ),
         "coefficient_inventory": summarize_inventory(variables),
         "summary": summarize_rows(rows),
+        "native_c_rz": native_c_rz_stats(),
         "rows_included": row_preview_count,
         "rows_truncated": row_preview_count < len(rows),
         "rows": [row.as_json(variables) for row in rows[:row_preview_count]],
@@ -984,6 +1181,12 @@ def print_summary(result: dict[str, Any]) -> None:
     print(f"max_order=C{result['max_order']}")
     print(f"coefficients={result['coefficient_inventory']['count']}")
     print(f"rows={summary['count']} jacobian_total_nnz={summary['jacobian_total_nnz']}")
+    native_c = result.get("native_c_rz", {})
+    if native_c.get("enabled"):
+        print(
+            f"native_c_rz_cases={native_c.get('cases', 0)} "
+            f"native_c_rz_seconds={float(native_c.get('seconds', 0.0)):.6f}"
+        )
     print(f"max_abs={float(summary['max_abs']):.12e}")
     print(f"rms={float(summary['rms']):.12e}")
     if "finite_difference_smoke" in result:
@@ -1004,6 +1207,11 @@ def main() -> None:
     parser.add_argument("--json-out", default="")
     parser.add_argument("--row-limit", type=int, default=20)
     parser.add_argument("--include-rows", action="store_true", help="write all rows instead of a preview")
+    parser.add_argument(
+        "--native-c",
+        action="store_true",
+        help="Use native C for R/Z tail coefficient Jacobian jets when coordinates include RZ.",
+    )
     parser.add_argument("--smoke", action="store_true", help="run three coefficient finite-difference checks")
     parser.add_argument("--fd-epsilon", type=float, default=1e-6)
     args = parser.parse_args()

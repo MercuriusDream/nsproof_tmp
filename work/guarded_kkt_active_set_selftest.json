@@ -74,6 +74,8 @@
     "parameters": {
       "lm_lambda": 1e-10,
       "max_active": 4,
+      "max_step_norm": 0.0,
+      "svd_rcond": 0.0,
       "tolerance": 1e-09
     },
     "pass": true,
@@ -97,15 +99,15 @@
       "delta": {
         "l2": -0.23606797749979003,
         "max_abs": -2.220446049250313e-16,
-        "objective": -0.49999999995000044
+        "objective": -0.4999999999500009
       },
       "factor": {
         "l2": 0.8944271909999157,
         "max_abs": 0.9999999999999999,
-        "objective": 0.8000000000199998
+        "objective": 0.8000000000199997
       },
       "objective_after": 2.0000000000499996,
-      "objective_before": 2.5
+      "objective_before": 2.5000000000000004
     },
     "signed_guard_growth_metrics": {
       "all": {
@@ -128,7 +130,16 @@
       3.140184917210541e-16,
       0.9999999999
     ],
-    "target": "nonincrease"
+    "step_clip_scale": 1.0,
+    "target": "nonincrease",
+    "unclipped_step_metrics": {
+      "count": 2,
+      "l2": 0.9999999999,
+      "max": 0.9999999999,
+      "max_abs": 0.9999999999,
+      "min": 3.140184917210541e-16,
+      "rms": 0.7071067811158368
+    }
   },
   "numpy_available": true,
   "ok": true,
@@ -183,6 +194,8 @@
     "parameters": {
       "lm_lambda": 1e-10,
       "max_active": 4,
+      "max_step_norm": 0.0,
+      "svd_rcond": 0.0,
       "tolerance": 1e-09
     },
     "pass": true,
@@ -206,15 +219,15 @@
       "delta": {
         "l2": -1.1180339886380914,
         "max_abs": -0.9999999999,
-        "objective": -0.6249999999375
+        "objective": -0.6249999999375001
       },
       "factor": {
         "l2": 1.000000082740371e-10,
         "max_abs": 1.000000082740371e-10,
-        "objective": 9.999999999e-11
+        "objective": 9.999999998999997e-11
       },
       "objective_after": 6.249999999375e-11,
-      "objective_before": 0.625
+      "objective_before": 0.6250000000000001
     },
     "signed_guard_growth_metrics": {
       "all": {
@@ -237,6 +250,15 @@
       0.9999999999,
       0.49999999995
     ],
-    "target": "nonincrease"
+    "step_clip_scale": 1.0,
+    "target": "nonincrease",
+    "unclipped_step_metrics": {
+      "count": 2,
+      "l2": 1.1180339886380914,
+      "max": 0.9999999999,
+      "max_abs": 0.9999999999,
+      "min": 0.49999999995,
+      "rms": 0.7905694149630378
+    }
   }
 }
