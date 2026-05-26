@@ -1,0 +1,62 @@
+{
+  "backend": "python-bernstein-smoke",
+  "blockers": [
+    "Bernstein backend is not yet wired to exact two-chart residual expressions",
+    "directed-rounding coefficient generation from profile charts is missing",
+    "subdivision/domain cover selection for profile NK is missing"
+  ],
+  "certificate_name": "bernstein_backend_smoke",
+  "commands": [
+    "tools/validate_bernstein_backend.py"
+  ],
+  "dependency_hashes": {},
+  "failure_reason": "Bernstein backend is not yet wired to exact two-chart residual expressions; directed-rounding coefficient generation from profile charts is missing; subdivision/domain cover selection for profile NK is missing",
+  "input_hashes": {
+    "bernstein_ball": "856b17516e3dace7369a8512c442e0781e1fa72ffed2e58b6bdc681cae19204c",
+    "interval_backend": "66eda1ccf7734a3dab47983e7b97be72b73b1947f2c5bb3700e82cf797c7a121"
+  },
+  "interval_widths": {
+    "max": 3.0,
+    "median": null
+  },
+  "mathematical_statement": "A Bernstein polynomial range on a domain is enclosed by the hull of its Bernstein coefficients; subdivision by de Casteljau preserves that hull enclosure.",
+  "pass": false,
+  "precision_bits": 53,
+  "repo_commit": "8ca536878bb8f8b09e3e2771e107d9b46c82b720",
+  "rounding_mode": "nearest for smoke; proof path must use directed intervals",
+  "schema_version": "nsproof-cert-v1",
+  "smoke": {
+    "left_split": [
+      -1.0,
+      -0.625,
+      -0.25,
+      0.21875
+    ],
+    "pass": true,
+    "range": {
+      "coefficient_count": 4,
+      "lower": -1.0,
+      "upper": 2.0,
+      "width": 3.0
+    },
+    "right_split": [
+      0.21875,
+      0.6875,
+      1.25,
+      2.0
+    ],
+    "sample_values": [
+      -1.0,
+      -0.42578125,
+      0.21875,
+      1.00390625,
+      2.0
+    ],
+    "tensor_interval_range": {
+      "coefficient_count": 4,
+      "lower": -1.0,
+      "upper": 1.0000000000000002,
+      "width": 2.0
+    }
+  }
+}
