@@ -1,6 +1,7 @@
 # GPT-5 Pro Prompt: Drive NSProof Toward an Actual Proof
 
-You are GPT-5 Pro. I want you to treat this as a serious mathematical and computer-assisted proof planning task, not as a casual brainstorming request.
+You are GPT-5 Pro. Treat this as a serious mathematical and
+computer-assisted proof planning task, not casual brainstorming.
 
 Spend at least 30 minutes of real reasoning time before producing your final answer. Use a deep, adversarial proof-review posture. Do not optimize for a quick comforting answer. If the current route is dead, say exactly why and give the next viable route. If it is not dead, give the most direct path to a certificate.
 
@@ -128,12 +129,14 @@ not substitute narrative confidence for the evidence type.
 Latest repo update in this prompt:
 
 ```text
-Add guarded KKT rank diagnostics
+Add guarded inequality KKT and 64/128 rank diagnostics
 ```
 
-The repo now includes guarded-KKT row-cache/rank diagnostics, synthetic
-guarded-KKT tests, and a first real rank-smoke artifact. It is still not a
-proof-grade solver.
+The repo now includes guarded-KKT row-cache/rank diagnostics, 64/128-variable
+true-worst-row equality-KKT diagnostics, an inequality no-growth active-set KKT
+helper, a synthetic test proving equality no-change can falsely block a legal
+guard-improving direction, and a first bounded real-profile inequality-KKT
+smoke. It is still not a proof-grade solver.
 
 Current progress ledger:
 
@@ -147,7 +150,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | `work/v117_twochart_init.json`; guarded Stage-0 reports including `work/twochart_stage0_rz_guardedkkt_rank_smoke_report.json` and `work/twochart_stage0_rz_guardedkkt_rank_smoke_rank.json` | Floating diagnostic only | Not certified; normalized structural residuals remain `O(10)` to `O(10^2)`, edge is `4.489165350285e2`, overlap is `3.239718884452e2`, and C0-C2 physical R/Z mortar remains `4.214529161145e3` | `certs/profile/profile_nk.json` plus `certs/profile/pressure_reconstruction.json` |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | `work/v117_twochart_init.json`; rank reports `work/twochart_stage0_rz_kkt_seamlimit64_rank.json`, `work/twochart_stage0_rz_kkt_seamlimit128_rank.json`; inequality smoke `work/twochart_stage0_rz_ineqkkt_ffrac64_report.json` and residual scan `work/twochart_stage0_rz_ineqkkt_ffrac64_residual.json` | Floating diagnostic only | Not certified; normalized structural residuals remain `O(10)` to `O(10^2)`, edge is `4.489164259811e2` after the bounded inequality smoke, overlap is `3.239718884452e2`, origin is `9.132494634431e1`, and C0-C4 physical R/Z mortar remains `5.833745519362e6` | `certs/profile/profile_nk.json` plus `certs/profile/pressure_reconstruction.json` |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile | Not certified as a theorem gate because no interval-certified admissible profile is linked to it | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and manifest linkage |
 | Natural tail, transseries, indicial certification | q1/forced-`q^p`/q2-zero diagnostics and floating Pluecker/Evans probes | Formal/floating; no interval box cover | Not certified; q1 exclusion and forced `q^p` are enforced in current seed, but recurrence and indicial exclusion are not interval-certified | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json` |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not true Leray-projected operator | Not certified; geometric modes and Riesz projection are not validated | `certs/spectrum/projected_spectrum.json` |
@@ -183,6 +186,7 @@ supports objective-only line-search scoring via --line-search-eval objective-onl
 supports two-sided seam-limit guard generation via --guard-seam-sides,
   --guard-seam-q, --guard-seam-eps, and --guard-seam-b-points.
 supports first guarded-KKT diagnostic mode via --solve-mode guarded-kkt.
+supports inequality active-set no-growth KKT via --solve-mode guarded-ineq-kkt.
 supports meaningful acceptance thresholds via --min-objective-decrease-abs/rel.
 supports guarded rank/angle report output via --rank-report-out.
 supports first-row cache output via --row-cache-out.
@@ -232,6 +236,17 @@ work/twochart_stage0_rz_guardedkkt_full16_probe_residual.json
 work/twochart_stage0_rz_guardedkkt_rank_smoke_report.json
 work/twochart_stage0_rz_guardedkkt_rank_smoke_rank.json
 work/twochart_stage0_rz_guardedkkt_rank_smoke_rows.json
+work/twochart_stage0_rz_kkt_seamlimit64_report.json
+work/twochart_stage0_rz_kkt_seamlimit64_rank.json
+work/twochart_stage0_rz_kkt_seamlimit64_residual.json
+work/twochart_stage0_rz_kkt_seamlimit128_report.json
+work/twochart_stage0_rz_kkt_seamlimit128_rank.json
+work/twochart_stage0_rz_kkt_seamlimit128_residual.json
+work/guarded_kkt_active_set_selftest.json
+work/synth_inequality_guard_improves.json
+work/twochart_stage0_rz_ineqkkt_ffrac64_report.json
+work/twochart_stage0_rz_ineqkkt_ffrac64_rank.json
+work/twochart_stage0_rz_ineqkkt_ffrac64_residual.json
 work/synth_mortar_polynomial_guardedkkt.json
 work/synth_seam_switch_guardedkkt.json
 work/synth_infeasible_edge_rank.json
@@ -329,6 +344,64 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
       at requested b values.
     a later guarded-KKT full16 diagnostic accepts only a tiny constrained step,
       so this interface is infrastructure, not profile progress.
+  equality guarded-KKT rank diagnostics:
+    16-variable rank smoke:
+      coverage = 1.0, active primary row is true worst F dZZ at q=0.84,x=1.0
+      constraint rank/nullity = 15/1
+      projected primary rank = 1
+      rho_range = 2.104570557051e-1
+      rho_grad = 3.551808344195e-17
+      predicted_best_factor_inf = 1.001655284853
+      accepted_any_step = false
+    64-variable equality run:
+      artifact = work/twochart_stage0_rz_kkt_seamlimit64_rank.json
+      coverage = 1.0
+      constraint rank/nullity = 61/3
+      projected primary rank = 3
+      rho_range = 4.641735513260e-1
+      rho_grad = 1.166791334125e-6
+      predicted_best_factor_inf = 1.005631658942
+      held-out scan remains baseline-sized.
+    128-variable equality run:
+      artifact = work/twochart_stage0_rz_kkt_seamlimit128_rank.json
+      coverage = 1.0
+      constraint rank/nullity = 82/46
+      projected primary rank = 8
+      rho_range = 7.707656533008e-1
+      rho_grad = 7.377401860355e-2
+      predicted_best_factor_inf = 4.302267443263e-1
+      best feasible step metrics are enormous
+        l2 = 6.525901138807e12
+        max_abs = 4.044264535809e12
+      accepted nonlinear step still does not improve held-out scans:
+        edge = 4.489165349915e2
+        origin = 9.132494634431e1
+        overlap = 3.239718884452e2
+        C0-C4 R/Z mortar = 5.830256183569e6
+  inequality active-set no-growth KKT:
+    new helper = validators/guarded_kkt_active_set.py
+    new solve mode = --solve-mode guarded-ineq-kkt
+    self-test = work/guarded_kkt_active_set_selftest.json, ok = true
+    synthetic inequality artifact = work/synth_inequality_guard_improves.json
+      method = validators.guarded_kkt_active_set.solve_guarded_active_set
+      equality no-change step h=0 leaves primary factor 1.0
+      inequality no-growth step h ~= -10 reduces primary to ~1e-11
+      signed guard growth is negative, so equality no-change is overrestrictive.
+    bounded real-profile F_frac smoke:
+      artifact = work/twochart_stage0_rz_ineqkkt_ffrac64_report.json
+      pass = true for the linearized active-set constraints
+      active constraints = 3 of 18 selected guard rows
+      accepted block = block:F_frac, alpha = 1.0
+      sampled objective 6.513151638216e7 -> 6.512774814621e7
+      held-out edge = 4.489164259811e2
+      origin = 9.132494634431e1
+      overlap = 3.239718884452e2
+      C0-C4 R/Z mortar = 5.833745519362e6
+      This is not profile progress; it only proves the inequality mode is wired.
+    A broad all-block 64-variable inequality run was stopped after several
+    minutes because active-set linear algebra produced overflow warnings and
+    became a runtime sink. The next implementation should improve row/column
+    scaling and then run bounded 128/256 inequality diagnostics.
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -341,8 +414,11 @@ overlap = 3.239719410176e2
 edge baseline = 4.489150149273e2
 edge after latest accepted active-guard seam-limit tail step = 3.119540552543e4
 latest guarded-KKT full16 held-out edge = 4.489165350285e2
+latest equality-KKT 128 held-out edge = 4.489165349915e2
+latest bounded inequality-KKT F_frac held-out edge = 4.489164259811e2
 C0-C2 R,Z mortar max = 4.214529161145e3
 latest guarded-KKT full16 C0-C2 R,Z mortar max = 4.214529161145e3
+latest bounded inequality-KKT F_frac C0-C4 R,Z mortar max = 5.833745519362e6
 ```
 
 Important interpretation:
@@ -371,8 +447,13 @@ q=0.8999999999999999 tests also show a one-sided seam-switch sensitivity: the
 origin-side sample can look moderate while the tail-side seam-limit sample is
 large. The next viable solver fork is explicit two-sided seam-limit guard
 generation plus a cached KKT/Schur-style correction that computes seam descent
-inside the edge-feasible tangent space. This is safe Stage-0 infrastructure
-progress, not a Newton basin.
+inside the edge-feasible tangent space. The 64/128 equality-KKT rank reports now
+show that larger spaces can expose a nominal seam direction, but the accepted
+nonlinear steps do not improve held-out residuals. The first inequality
+active-set implementation proves equality no-change is too restrictive on a
+synthetic case and is wired into the real solver, but the bounded real-profile
+smoke still leaves the theorem-scale blockers unchanged. This is safe Stage-0
+infrastructure progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -390,7 +471,8 @@ The immediate solver fork is:
 
 ```text
 two-sided seam-limit guard generation / cached active-row evaluation /
-guarded KKT-Schur coupled seam solve.
+bounded inequality active-set KKT with improved row/column scaling, then
+64/128/256 shifted-overlap diagnostics.
 ```
 
 Do not propose more sparse bumps, origin-only refits, or one-chart polishing as
@@ -1667,7 +1749,7 @@ implementation work is:
    and selected q,b/mortar rows with `--row-cache-out`. This is not yet a
    reusable incremental evaluator, but it makes the sampled KKT system auditable.
 
-3. PARTIAL: add a guarded KKT/Schur solve mode:
+3. DONE/PARTIAL: add guarded KKT/Schur solve modes:
    - primary equation: reduce active R/Z seam mortar rows;
    - constraints: no growth in broad edge/seam-limit PDE rows and no tail-gate
      damage;
@@ -1675,13 +1757,22 @@ implementation work is:
      oscillation;
    - fallback: if the KKT system is singular, return a certificate of rank
      deficiency and the offending row/column subspace.
-   Current implementation has a damped equality-constrained KKT diagnostic in
-   `tools/profile_newton_twochart.py` plus a rank/angle diagnostic. It is not
-   yet an inequality no-growth active-set solver.
+   Current implementation has a damped equality-constrained KKT diagnostic, a
+   rank/angle diagnostic, and a first inequality active-set no-growth solver in
+   `tools/profile_newton_twochart.py`. The inequality mode is wired and passes
+   synthetic tests, but the broad real-profile run needs better scaling before
+   it can be used as a branch-kill diagnostic.
 
-4. NEXT: rerun larger 64/128/256-variable Stage-0 rank diagnostics and then
-   implement inequality no-growth KKT. Start with a bounded smoke version before
-   uncapping the candidate pool.
+4. DONE FOR 64/128 EQUALITY AND BOUNDED 64 INEQUALITY: run larger Stage-0
+   diagnostics.
+   - 64 equality: no useful seam descent, nullity 3.
+   - 128 equality: nominal seam direction appears, but accepted nonlinear step
+     does not improve held-out residuals.
+   - 64 bounded inequality F_frac: mode is wired, but held-outs remain baseline.
+
+5. NEXT: improve active-set row/column scaling, run bounded 128 inequality
+   diagnostics, then run 256 only if 128 is numerically stable. Add shifted
+   overlap schedules before any fixed-branch kill claim.
 ```
 
 ```bash
@@ -1732,10 +1823,68 @@ python3 tools/profile_newton_twochart.py \
 ```
 
 The flags `--guard-seam-sides`, `--guard-seam-q`, `--guard-seam-eps`,
-`--guard-seam-b-points`, `--solve-mode guarded-kkt`, `--rank-report-out`, and
-`--row-cache-out` are implemented. Synthetic guarded-KKT tests pass. The missing
-pieces are larger 64/128/256-variable rank runs, inequality active-set
-no-growth KKT, and shifted overlap schedule tests.
+`--guard-seam-b-points`, `--solve-mode guarded-kkt`,
+`--solve-mode guarded-ineq-kkt`, `--rank-report-out`, and `--row-cache-out` are
+implemented. Synthetic guarded-KKT and inequality-over-equality tests pass. The
+missing pieces are numerically stable 128/256 inequality diagnostics, better
+active-set scaling, and shifted overlap schedule tests.
+
+Next bounded inequality diagnostic after scaling cleanup:
+
+```bash
+python3 tools/profile_newton_twochart.py \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_stage0_rz_ineqkkt_seamlimit128.json \
+  --report-out work/twochart_stage0_rz_ineqkkt_seamlimit128_report.json \
+  --rank-report-out work/twochart_stage0_rz_ineqkkt_seamlimit128_rank.json \
+  --row-cache-out work/twochart_stage0_rz_ineqkkt_seamlimit128_rows.json \
+  --blocks tail,origin,interface \
+  --variable-charts tail,origin \
+  --solve-mode guarded-ineq-kkt \
+  --block-search-labels full,block:F_frac,chart:origin \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-coordinates RZ \
+  --mortar-order 2 \
+  --mortar-q-samples 3 \
+  --mortar-x-samples 7 \
+  --mortar-active-count 16 \
+  --guard-grid edge \
+  --guard-q-min 0.76 --guard-q-max 0.92 \
+  --guard-b-min 0.10 --guard-b-max 0.98 \
+  --guard-q-samples 9 --guard-b-samples 9 \
+  --guard-seam-sides both \
+  --guard-seam-q 0.90 \
+  --guard-seam-eps 1e-12 \
+  --active-guard-weight 10 \
+  --guarded-kkt-primary-labels mortar \
+  --guarded-kkt-constraint-labels active_guard \
+  --guarded-kkt-max-constraints 32 \
+  --guarded-ineq-max-active 32 \
+  --guarded-ineq-tolerance 1e-10 \
+  --guarded-ineq-target nonincrease \
+  --line-search-eval objective-only \
+  --row-normalization none \
+  --max-raw-objective-growth 1 \
+  --max-guard-objective-growth 1 \
+  --max-guard-max-growth 1 \
+  --max-variables 128 \
+  --candidate-origin-degree-max 10 \
+  --candidate-kq-max 10 \
+  --candidate-kx-max 10 \
+  --candidate-pool-limit 512 \
+  --max-iter 1 \
+  --trust 0.001 \
+  --lm-lambda 1e-6 \
+  --pde-weight 1 \
+  --mortar-weight 0.01 \
+  --line-search 1,0.25,0.0625,0.015625,0.00390625
+```
+
+Continue only if held-out C2/C4 mortar and edge/origin scans improve together.
+If active-set overflow warnings recur, fix row/column scaling before treating
+the run as evidence.
 
 Stage-0 go criterion:
 

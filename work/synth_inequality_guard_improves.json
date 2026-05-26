@@ -1,0 +1,213 @@
+{
+  "case": "inequality-guard-improves",
+  "checks": {
+    "equality_no_change_is_bad": true,
+    "inequality_reduces_primary": true,
+    "signed_guard_growth_nonpositive": true
+  },
+  "equality_no_change": {
+    "guard_final_metrics": {
+      "count": 1.0,
+      "l2": 5.0,
+      "linf": 5.0,
+      "mean_abs": 5.0
+    },
+    "kkt_report": {
+      "constraint_change_metrics": {
+        "count": 1.0,
+        "l2": 0.0,
+        "linf": 0.0,
+        "mean_abs": 0.0
+      },
+      "constraint_rows": 1,
+      "kkt_rank": 2,
+      "lm_lambda": 1e-12,
+      "method": "synthetic-guarded-kkt-equality",
+      "primary_change_metrics": {
+        "count": 1.0,
+        "l2": 0.0,
+        "linf": 0.0,
+        "mean_abs": 0.0
+      },
+      "primary_rows": 1,
+      "step_metrics": {
+        "count": 1.0,
+        "l2": 0.0,
+        "linf": 0.0,
+        "mean_abs": 0.0
+      },
+      "variables": 1
+    },
+    "primary_factor_linf": 1.0,
+    "primary_final_metrics": {
+      "count": 1.0,
+      "l2": 10.0,
+      "linf": 10.0,
+      "mean_abs": 10.0
+    },
+    "signed_guard_growth": [
+      0.0
+    ],
+    "step": [
+      0.0
+    ]
+  },
+  "guard_initial_metrics": {
+    "count": 1.0,
+    "l2": 5.0,
+    "linf": 5.0,
+    "mean_abs": 5.0
+  },
+  "inequality_no_growth": {
+    "active_set_report": {
+      "active_constraints": [],
+      "backend": "numpy_lstsq",
+      "dimensions": {
+        "columns": 1,
+        "guard_rows": 1,
+        "primary_rows": 1
+      },
+      "failure_reason": null,
+      "guard_abs_metrics": {
+        "after": {
+          "count": 1,
+          "l2": 4.999999999989999,
+          "max": 4.999999999989999,
+          "max_abs": 4.999999999989999,
+          "min": 4.999999999989999,
+          "rms": 4.999999999989999
+        },
+        "before": {
+          "count": 1,
+          "l2": 5.0,
+          "max": 5.0,
+          "max_abs": 5.0,
+          "min": 5.0,
+          "rms": 5.0
+        }
+      },
+      "guard_predictions": [
+        {
+          "guard_residual": 5.0,
+          "index": 0,
+          "predicted_guard_residual": -4.999999999989999,
+          "sign": 1.0,
+          "signed_growth": -9.999999999989999,
+          "violates": false
+        }
+      ],
+      "iterations": [
+        {
+          "active_count": 0,
+          "added_constraint": null,
+          "iteration": 0,
+          "max_violation": 0.0,
+          "primary_max_abs": 1.000088900582341e-11,
+          "step_l2": 9.999999999989999
+        }
+      ],
+      "method": "validators.guarded_kkt_active_set.solve_guarded_active_set",
+      "parameters": {
+        "lm_lambda": 1e-12,
+        "max_active": 64,
+        "tolerance": 1e-10
+      },
+      "pass": true,
+      "predicted_primary_metrics": {
+        "after": {
+          "count": 1,
+          "l2": 1.000088900582341e-11,
+          "max": 1.000088900582341e-11,
+          "max_abs": 1.000088900582341e-11,
+          "min": 1.000088900582341e-11,
+          "rms": 1.000088900582341e-11
+        },
+        "before": {
+          "count": 1,
+          "l2": 10.0,
+          "max": 10.0,
+          "max_abs": 10.0,
+          "min": 10.0,
+          "rms": 10.0
+        },
+        "delta": {
+          "l2": -9.999999999989999,
+          "max_abs": -9.999999999989999,
+          "objective": -49.99999999995
+        },
+        "factor": {
+          "l2": 1.000088900582341e-12,
+          "max_abs": 1.000088900582341e-12,
+          "objective": 9.999999999990001e-13
+        },
+        "objective_after": 4.999999999995e-11,
+        "objective_before": 50.0
+      },
+      "signed_guard_growth_metrics": {
+        "all": {
+          "count": 1,
+          "l2": 9.999999999989999,
+          "max": -9.999999999989999,
+          "max_abs": 9.999999999989999,
+          "min": -9.999999999989999,
+          "rms": 9.999999999989999
+        },
+        "max_violation": -9.999999999989999,
+        "positive": {
+          "max_positive": 0.0,
+          "positive_count": 0,
+          "tolerance": 1e-10
+        }
+      },
+      "status": "GUARDED_ACTIVE_SET_KKT_FLOATING_NOT_PROOF",
+      "step": [
+        -9.999999999989999
+      ],
+      "target": "nonincrease"
+    },
+    "guard_final_metrics": {
+      "count": 1.0,
+      "l2": 4.999999999989999,
+      "linf": 4.999999999989999,
+      "mean_abs": 4.999999999989999
+    },
+    "max_signed_guard_growth": -9.999999999989999,
+    "primary_final_metrics": {
+      "count": 1.0,
+      "l2": 1.000088900582341e-11,
+      "linf": 1.000088900582341e-11,
+      "mean_abs": 1.000088900582341e-11
+    },
+    "primary_reduction_factor_linf": 999911107320.27,
+    "signed_guard_growth": [
+      -9.999999999989999
+    ],
+    "signed_guard_growth_threshold": 0.0,
+    "step": [
+      -9.999999999989999
+    ]
+  },
+  "inputs": {
+    "expect_guard_growth": 0.0,
+    "expect_mortar_factor": 100.0
+  },
+  "not_proof": true,
+  "pass": true,
+  "primary_initial_metrics": {
+    "count": 1.0,
+    "l2": 10.0,
+    "linf": 10.0,
+    "mean_abs": 10.0
+  },
+  "rows": [
+    {
+      "label": "mortar",
+      "row_id": "mortar-ineq:shared-descent-direction"
+    },
+    {
+      "label": "active_guard",
+      "row_id": "edge-guard:positive-residual-allows-negative-change"
+    }
+  ],
+  "status": "SYNTHETIC_GUARDED_KKT_PASS_NOT_PROOF"
+}

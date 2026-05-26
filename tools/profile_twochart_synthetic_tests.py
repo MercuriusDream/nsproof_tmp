@@ -18,6 +18,10 @@ import sys
 from typing import Any
 
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 PASS_STATUS = "SYNTHETIC_GUARDED_KKT_PASS_NOT_PROOF"
 FAIL_STATUS = "SYNTHETIC_GUARDED_KKT_FAIL_NOT_PROOF"
 
@@ -257,6 +261,177 @@ def guarded_kkt_step(
     }
 
 
+def objective_value(jacobian: Matrix, residual: Vector, step: Vector, lm_lambda: float) -> float:
+    updated = add_vectors(residual, mat_vec(jacobian, step))
+    return 0.5 * dot(updated, updated) + 0.5 * lm_lambda * dot(step, step)
+
+
+def sign_value(value: float) -> float:
+    return 1.0 if value >= 0.0 else -1.0
+
+
+def signed_guard_jacobian(guard_jacobian: Matrix, guard_residual: Vector) -> Matrix:
+    return [
+        scale_vector(sign_value(guard_residual[index]), row_values)
+        for index, row_values in enumerate(guard_jacobian)
+    ]
+
+
+def signed_guard_growth(guard_jacobian: Matrix, guard_residual: Vector, step: Vector) -> Vector:
+    raw_change = mat_vec(guard_jacobian, step)
+    return [
+        sign_value(guard_residual[index]) * value
+        for index, value in enumerate(raw_change)
+    ]
+
+
+def local_active_set_step(
+    primary_jacobian: Matrix,
+    primary_residual: Vector,
+    guard_jacobian: Matrix,
+    guard_residual: Vector,
+    lm_lambda: float,
+    tolerance: float = 1e-12,
+) -> tuple[Vector, dict[str, Any]]:
+    """Solve a tiny deterministic guard no-growth problem by active-set enumeration.
+
+    This fallback is intentionally small and auditable.  It solves
+
+        min_h 1/2 ||r + J h||^2 + lambda/2 ||h||^2
+        subject to sign(g_i) J_g_i h <= 0.
+
+    The synthetic cases have very few guard rows, so enumerating active subsets
+    is clearer than embedding a general QP implementation in this harness.
+    """
+
+    if not primary_jacobian:
+        raise ValueError("active-set fallback requires primary rows")
+    guard_count = len(guard_jacobian)
+    signed_constraints = signed_guard_jacobian(guard_jacobian, guard_residual)
+    best_step: Vector | None = None
+    best_objective = math.inf
+    best_active_set: list[int] = []
+    feasible_candidates = 0
+    max_masks = 1 << guard_count
+    for mask in range(max_masks):
+        active_indices = [index for index in range(guard_count) if mask & (1 << index)]
+        active_constraints = [signed_constraints[index] for index in active_indices]
+        try:
+            step, _report = guarded_kkt_step(
+                primary_jacobian,
+                primary_residual,
+                active_constraints,
+                lm_lambda,
+            )
+        except Exception:
+            continue
+        signed_growth = mat_vec(signed_constraints, step)
+        if any(value > tolerance for value in signed_growth):
+            continue
+        feasible_candidates += 1
+        objective = objective_value(primary_jacobian, primary_residual, step, lm_lambda)
+        if objective < best_objective:
+            best_step = step
+            best_objective = objective
+            best_active_set = active_indices
+    if best_step is None:
+        best_step = [0.0 for _column in range(len(primary_jacobian[0]))]
+        best_objective = objective_value(primary_jacobian, primary_residual, best_step, lm_lambda)
+    signed_growth = signed_guard_growth(guard_jacobian, guard_residual, best_step)
+    return best_step, {
+        "method": "local-active-set-enumeration",
+        "variables": len(primary_jacobian[0]),
+        "primary_rows": len(primary_jacobian),
+        "guard_rows": guard_count,
+        "lm_lambda": lm_lambda,
+        "active_set": best_active_set,
+        "enumerated_active_sets": max_masks,
+        "feasible_candidates": feasible_candidates,
+        "objective": best_objective,
+        "signed_guard_growth_metrics": vector_metrics(signed_growth),
+        "max_signed_guard_growth": max(signed_growth, default=0.0),
+        "step_metrics": vector_metrics(best_step),
+    }
+
+
+def external_active_set_step(
+    primary_jacobian: Matrix,
+    primary_residual: Vector,
+    guard_jacobian: Matrix,
+    guard_residual: Vector,
+    lm_lambda: float,
+) -> tuple[Vector, dict[str, Any]] | None:
+    try:
+        module = importlib.import_module("validators.guarded_kkt_active_set")
+    except Exception:
+        return None
+    function_names = (
+        "solve_guarded_active_set",
+        "guarded_active_set_step",
+        "guarded_ineq_kkt_step",
+        "active_set_step",
+        "solve_active_set",
+    )
+    for function_name in function_names:
+        function = getattr(module, function_name, None)
+        if not callable(function):
+            continue
+        try:
+            result = function(
+                primary_jacobian=primary_jacobian,
+                primary_residual=primary_residual,
+                guard_jacobian=guard_jacobian,
+                guard_residual=guard_residual,
+                lm_lambda=lm_lambda,
+            )
+        except TypeError:
+            try:
+                result = function(primary_jacobian, primary_residual, guard_jacobian, guard_residual, lm_lambda)
+            except Exception:
+                continue
+        except Exception:
+            continue
+        if isinstance(result, tuple) and len(result) == 2:
+            step, report = result
+        elif isinstance(result, dict) and "step" in result:
+            step = result["step"]
+            report = result
+        else:
+            continue
+        if not isinstance(step, list):
+            continue
+        return [float(value) for value in step], {
+            "method": f"validators.guarded_kkt_active_set.{function_name}",
+            **(report if isinstance(report, dict) else {}),
+        }
+    return None
+
+
+def active_set_step(
+    primary_jacobian: Matrix,
+    primary_residual: Vector,
+    guard_jacobian: Matrix,
+    guard_residual: Vector,
+    lm_lambda: float,
+) -> tuple[Vector, dict[str, Any]]:
+    external = external_active_set_step(
+        primary_jacobian,
+        primary_residual,
+        guard_jacobian,
+        guard_residual,
+        lm_lambda,
+    )
+    if external is not None:
+        return external
+    return local_active_set_step(
+        primary_jacobian,
+        primary_residual,
+        guard_jacobian,
+        guard_residual,
+        lm_lambda,
+    )
+
+
 def column_norms(matrix: Matrix) -> Vector:
     if not matrix or not matrix[0]:
         return []
@@ -470,11 +645,95 @@ def run_infeasible_edge(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def run_inequality_guard_improves(args: argparse.Namespace) -> dict[str, Any]:
+    if args.solve_mode != "guarded-kkt":
+        raise ValueError("synthetic harness currently supports only --solve-mode guarded-kkt")
+
+    # One primary seam row and one positive guard row share the same direction.
+    # Equality no-change forces h=0, while the true signed no-growth inequality
+    # h <= 0 allows h=-10, removing the primary residual and improving the guard.
+    primary_jacobian = [[1.0]]
+    primary_residual = [10.0]
+    guard_jacobian = [[1.0]]
+    guard_residual = [5.0]
+
+    equality_step, equality_report = guarded_kkt_step(
+        primary_jacobian,
+        primary_residual,
+        guard_jacobian,
+        args.lm_lambda,
+    )
+    inequality_step, inequality_report = active_set_step(
+        primary_jacobian,
+        primary_residual,
+        guard_jacobian,
+        guard_residual,
+        args.lm_lambda,
+    )
+
+    equality_primary = add_vectors(primary_residual, mat_vec(primary_jacobian, equality_step))
+    inequality_primary = add_vectors(primary_residual, mat_vec(primary_jacobian, inequality_step))
+    equality_guard = add_vectors(guard_residual, mat_vec(guard_jacobian, equality_step))
+    inequality_guard = add_vectors(guard_residual, mat_vec(guard_jacobian, inequality_step))
+    equality_signed_growth = signed_guard_growth(guard_jacobian, guard_residual, equality_step)
+    inequality_signed_growth = signed_guard_growth(guard_jacobian, guard_residual, inequality_step)
+
+    equality_factor = linf(equality_primary) / max(linf(primary_residual), 1e-300)
+    inequality_factor = linf(inequality_primary) / max(linf(primary_residual), 1e-300)
+    inequality_reduction_factor = linf(primary_residual) / max(linf(inequality_primary), 1e-300)
+    max_signed_growth = max(inequality_signed_growth, default=0.0)
+    equality_bad = equality_factor >= 0.99
+    inequality_good = inequality_reduction_factor >= args.expect_mortar_factor
+    guard_threshold = min(args.expect_guard_growth, 0.0)
+    guard_ok = max_signed_growth <= guard_threshold + 1e-12
+    passed = equality_bad and inequality_good and guard_ok
+
+    return {
+        "case": "inequality-guard-improves",
+        "status": PASS_STATUS if passed else FAIL_STATUS,
+        "pass": passed,
+        "not_proof": True,
+        "inputs": {
+            "expect_mortar_factor": args.expect_mortar_factor,
+            "expect_guard_growth": args.expect_guard_growth,
+        },
+        "rows": [
+            row("mortar-ineq:shared-descent-direction", "mortar"),
+            row("edge-guard:positive-residual-allows-negative-change", "active_guard"),
+        ],
+        "equality_no_change": {
+            "step": equality_step,
+            "primary_final_metrics": vector_metrics(equality_primary),
+            "guard_final_metrics": vector_metrics(equality_guard),
+            "signed_guard_growth": equality_signed_growth,
+            "primary_factor_linf": equality_factor,
+            "kkt_report": equality_report,
+        },
+        "inequality_no_growth": {
+            "step": inequality_step,
+            "primary_final_metrics": vector_metrics(inequality_primary),
+            "guard_final_metrics": vector_metrics(inequality_guard),
+            "signed_guard_growth": inequality_signed_growth,
+            "primary_reduction_factor_linf": inequality_reduction_factor,
+            "max_signed_guard_growth": max_signed_growth,
+            "signed_guard_growth_threshold": guard_threshold,
+            "active_set_report": inequality_report,
+        },
+        "primary_initial_metrics": vector_metrics(primary_residual),
+        "guard_initial_metrics": vector_metrics(guard_residual),
+        "checks": {
+            "equality_no_change_is_bad": equality_bad,
+            "inequality_reduces_primary": inequality_good,
+            "signed_guard_growth_nonpositive": guard_ok,
+        },
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--case",
-        choices=("mortar-polynomial", "seam-switch", "infeasible-edge"),
+        choices=("mortar-polynomial", "seam-switch", "infeasible-edge", "inequality-guard-improves"),
         required=True,
     )
     parser.add_argument("--solve-mode", choices=("guarded-kkt",), default="guarded-kkt")
@@ -502,6 +761,8 @@ def main(argv: list[str] | None = None) -> int:
             report = run_seam_switch(args)
         elif args.case == "infeasible-edge":
             report = run_infeasible_edge(args)
+        elif args.case == "inequality-guard-improves":
+            report = run_inequality_guard_improves(args)
         else:  # pragma: no cover - argparse prevents this.
             raise ValueError(f"unknown case {args.case!r}")
     except Exception as exc:

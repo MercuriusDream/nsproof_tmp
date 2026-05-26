@@ -1130,6 +1130,121 @@ def restricted_guarded_kkt_step(
     }
 
 
+def restricted_guarded_ineq_kkt_step(
+    jacobian_rows: list[list[float]],
+    residual_vector: list[float],
+    row_labels: list[str],
+    active_columns: list[int],
+    total_columns: int,
+    lm_lambda: float,
+    primary_labels: set[str],
+    constraint_labels: set[str],
+    max_constraints: int,
+    tolerance: float,
+    max_active: int,
+    target: str,
+) -> tuple[list[float], dict[str, Any]]:
+    if not active_columns:
+        raise ValueError("empty active column set")
+    primary_indexes = [index for index, label in enumerate(row_labels) if label in primary_labels]
+    constraint_indexes = [index for index, label in enumerate(row_labels) if label in constraint_labels]
+    if not primary_indexes:
+        primary_indexes = [index for index, label in enumerate(row_labels) if label not in constraint_labels]
+    if not primary_indexes:
+        raise ValueError("guarded inequality KKT has no primary rows")
+    if max_constraints > 0 and len(constraint_indexes) > max_constraints:
+        constraint_indexes = sorted(constraint_indexes, key=lambda index: abs(residual_vector[index]), reverse=True)[
+            :max_constraints
+        ]
+
+    restricted_primary = [[jacobian_rows[index][column] for column in active_columns] for index in primary_indexes]
+    primary_residuals = [residual_vector[index] for index in primary_indexes]
+    restricted_constraints = [
+        [jacobian_rows[index][column] for column in active_columns] for index in constraint_indexes
+    ]
+    constraint_residuals = [residual_vector[index] for index in constraint_indexes]
+
+    n = len(active_columns)
+    column_norms: list[float] = []
+    all_rows = restricted_primary + restricted_constraints
+    for column in range(n):
+        norm = math.sqrt(sum(row[column] * row[column] for row in all_rows))
+        column_norms.append(norm)
+    scales = [1.0 / norm if norm > 1e-14 else 1.0 for norm in column_norms]
+    primary_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_primary]
+    constraint_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_constraints]
+
+    from validators.guarded_kkt_active_set import solve_guarded_active_set
+
+    active_set_report = solve_guarded_active_set(
+        primary_rows,
+        primary_residuals,
+        constraint_rows,
+        constraint_residuals,
+        lm_lambda=lm_lambda,
+        max_active=max_active,
+        tolerance=tolerance,
+        target=target,
+    )
+    scaled_delta_raw = active_set_report.get("step", [])
+    if len(scaled_delta_raw) != n:
+        raise ValueError(
+            "guarded inequality KKT did not return a full step"
+            + (
+                f": {active_set_report.get('failure_reason')}"
+                if active_set_report.get("failure_reason")
+                else ""
+            )
+        )
+    scaled_delta = [float(value) for value in scaled_delta_raw]
+    delta = [value * scales[index] for index, value in enumerate(scaled_delta)]
+    full_delta = [0.0 for _ in range(total_columns)]
+    for local_index, column in enumerate(active_columns):
+        full_delta[column] = delta[local_index]
+
+    primary_change = [
+        sum(jacobian_rows[index][column] * full_delta[column] for column in active_columns)
+        for index in primary_indexes
+    ]
+    constraint_change = [
+        sum(jacobian_rows[index][column] * full_delta[column] for column in active_columns)
+        for index in constraint_indexes
+    ]
+    signed_constraint_change = [
+        (1.0 if residual_vector[index] >= 0.0 else -1.0) * change
+        for index, change in zip(constraint_indexes, constraint_change)
+    ]
+    nonzero_norms = [value for value in column_norms if value > 0.0]
+    return full_delta, {
+        "method": "guarded-ineq-kkt-active-set",
+        "active_columns": len(active_columns),
+        "total_columns": total_columns,
+        "primary_rows": len(primary_indexes),
+        "constraint_rows": len(constraint_indexes),
+        "constraint_rows_available": len([index for index, label in enumerate(row_labels) if label in constraint_labels]),
+        "primary_labels": sorted(primary_labels),
+        "constraint_labels": sorted(constraint_labels),
+        "target": target,
+        "tolerance": tolerance,
+        "max_active": max_active,
+        "pass": bool(active_set_report.get("pass")),
+        "failure_reason": active_set_report.get("failure_reason"),
+        "backend": active_set_report.get("backend"),
+        "active_constraint_count": len(active_set_report.get("active_constraints", [])),
+        "active_set_report": active_set_report,
+        "column_norm_min": min(nonzero_norms) if nonzero_norms else 0.0,
+        "column_norm_max": max(column_norms) if column_norms else 0.0,
+        "column_scale_min": min(scales) if scales else 0.0,
+        "column_scale_max": max(scales) if scales else 0.0,
+        "primary_residual_metrics": vector_metrics(primary_residuals),
+        "constraint_residual_metrics": vector_metrics(constraint_residuals),
+        "delta_metrics": vector_metrics(delta),
+        "predicted_primary_change": vector_metrics(primary_change),
+        "predicted_constraint_change": vector_metrics(constraint_change),
+        "signed_constraint_change": vector_metrics(signed_constraint_change),
+    }
+
+
 def guarded_kkt_rank_report(args: argparse.Namespace, system: dict[str, Any], iteration: int) -> dict[str, Any]:
     primary_labels = parse_label_set(args.guarded_kkt_primary_labels)
     active_primary_raw_max = 0.0
@@ -1286,6 +1401,21 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         parse_label_set(args.guarded_kkt_constraint_labels),
                         args.guarded_kkt_constraint_damping,
                         args.guarded_kkt_max_constraints,
+                    )
+                elif args.solve_mode == "guarded-ineq-kkt":
+                    delta, scaling_report = restricted_guarded_ineq_kkt_step(
+                        system["jacobian_rows"],
+                        base_vec,
+                        system["row_labels"],
+                        list(block_spec["columns"]),
+                        len(system["variables"]),
+                        args.lm_lambda,
+                        parse_label_set(args.guarded_kkt_primary_labels),
+                        parse_label_set(args.guarded_kkt_constraint_labels),
+                        args.guarded_kkt_max_constraints,
+                        args.guarded_ineq_tolerance,
+                        args.guarded_ineq_max_active,
+                        args.guarded_ineq_target,
                     )
                 else:
                     delta, scaling_report = restricted_normal_step(
@@ -1494,6 +1624,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
             "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
             "guarded_kkt_max_constraints": args.guarded_kkt_max_constraints,
+            "guarded_ineq_tolerance": args.guarded_ineq_tolerance,
+            "guarded_ineq_max_active": args.guarded_ineq_max_active,
+            "guarded_ineq_target": args.guarded_ineq_target,
             "rank_report_out": args.rank_report_out,
             "rank_coverage_min": args.rank_coverage_min,
             "row_cache_out": args.row_cache_out,
@@ -1708,7 +1841,7 @@ def main() -> None:
             "without using the guard grid for expensive candidate scoring."
         ),
     )
-    parser.add_argument("--solve-mode", choices=("full", "block-search", "guarded-kkt"), default="full")
+    parser.add_argument("--solve-mode", choices=("full", "block-search", "guarded-kkt", "guarded-ineq-kkt"), default="full")
     parser.add_argument(
         "--block-search-labels",
         default="",
@@ -1762,6 +1895,24 @@ def main() -> None:
         type=nonnegative_int,
         default=128,
         help="Keep this many largest-residual constraint rows in guarded KKT; 0 keeps all.",
+    )
+    parser.add_argument(
+        "--guarded-ineq-tolerance",
+        type=nonnegative_float,
+        default=1e-10,
+        help="Signed guard-growth tolerance for --solve-mode guarded-ineq-kkt.",
+    )
+    parser.add_argument(
+        "--guarded-ineq-max-active",
+        type=nonnegative_int,
+        default=64,
+        help="Maximum active guard inequalities for --solve-mode guarded-ineq-kkt.",
+    )
+    parser.add_argument(
+        "--guarded-ineq-target",
+        choices=("nonincrease",),
+        default="nonincrease",
+        help="Guard inequality target for --solve-mode guarded-ineq-kkt.",
     )
     parser.add_argument(
         "--rank-coverage-min",
