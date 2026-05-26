@@ -1,0 +1,345 @@
+\def\cprime{$'$}
+\begin{thebibliography}{10}
+\urlstyle{rm}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname doiprefix\endcsname\relax\def\doiprefix{DOI: }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem{Euler:euler-equations}
+\bibinfo{author}{Euler, L.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Principes g{\'e}n{\'e}raux du mouvement des fluides}}.
+\newblock {\emph{\JournalTitle{M{\'e}moires de l'acad{\'e}mie des sciences de Berlin}}} \bibinfo{pages}{274--315} (\bibinfo{year}{1757}).
+
+\bibitem{Majda-Bertozzi:vorticity-incompressible-flow}
+\bibinfo{author}{Majda, A.~J.} \& \bibinfo{author}{Bertozzi, A.~L.}
+\newblock \emph{\bibinfo{title}{Vorticity and incompressible flow}}, vol.~\bibinfo{volume}{27} of \emph{\bibinfo{series}{Cambridge Texts in Applied Mathematics}} (\bibinfo{publisher}{Cambridge University Press, Cambridge}, \bibinfo{year}{2002}).
+
+\bibitem{Bear:dynamics-porous-media}
+\bibinfo{author}{Bear, J.}
+\newblock \emph{\bibinfo{title}{Dynamics of fluids in porous media}} (\bibinfo{publisher}{Courier Dover Publications}, \bibinfo{year}{1972}).
+
+\bibitem{Cordoba-Cordoba-Fontelos:CCF-model}
+\bibinfo{author}{C\'ordoba, A.}, \bibinfo{author}{C\'ordoba, D.} \& \bibinfo{author}{Fontelos, M.~A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Formation of singularities for a transport equation with nonlocal velocity}}.
+\newblock {\emph{\JournalTitle{Ann. of Math. (2)}}} \textbf{\bibinfo{volume}{162}}, \bibinfo{pages}{1377--1389}, \doiprefix\url{10.4007/annals.2005.162.1377} (\bibinfo{year}{2005}).
+
+\bibitem{Fefferman:clay-statement}
+\bibinfo{author}{Fefferman, C.~L.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Existence and smoothness of the {N}avier-{S}tokes equation}}.
+\newblock {\emph{\JournalTitle{The millennium prize problems}}} \textbf{\bibinfo{volume}{57}}, \bibinfo{pages}{67} (\bibinfo{year}{2000}).
+
+\bibitem{Smale:problem-list}
+\bibinfo{author}{Smale, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Mathematical problems for the next century}}.
+\newblock {\emph{\JournalTitle{Math. Intelligencer}}} \textbf{\bibinfo{volume}{20}}, \bibinfo{pages}{7--15}, \doiprefix\url{10.1007/BF03025291} (\bibinfo{year}{1998}).
+
+\bibitem{Hou:survey-blowup-euler-ns}
+\bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Blow-up or no blow-up? {A} unified computational and analytic approach to 3{D} incompressible {E}uler and {N}avier-{S}tokes equations}}.
+\newblock {\emph{\JournalTitle{Acta Numer.}}} \textbf{\bibinfo{volume}{18}}, \bibinfo{pages}{277--346}, \doiprefix\url{10.1017/S0962492906420018} (\bibinfo{year}{2009}).
+
+\bibitem{Gibbon:3d-euler-survey}
+\bibinfo{author}{Gibbon, J.~D.}
+\newblock \bibinfo{journal}{\bibinfo{title}{The three-dimensional {E}uler equations: where do we stand?}}
+\newblock {\emph{\JournalTitle{Phys. D}}} \textbf{\bibinfo{volume}{237}}, \bibinfo{pages}{1894--1904}, \doiprefix\url{10.1016/j.physd.2007.10.014} (\bibinfo{year}{2008}).
+
+\bibitem{PumirSiggia}
+\bibinfo{author}{Pumir, A.} \& \bibinfo{author}{Siggia, E.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Collapsing solutions to the 3-d euler equations}}.
+\newblock {\emph{\JournalTitle{Physics of Fluids A: Fluid Dynamics}}} \textbf{\bibinfo{volume}{2}}, \bibinfo{pages}{220--241}, \doiprefix\url{10.1063/1.857824} (\bibinfo{year}{1990}).
+\newblock \eprint{https://pubs.aip.org/aip/pof/article-pdf/2/2/220/12260670/220\_1\_online.pdf}.
+
+\bibitem{kerr}
+\bibinfo{author}{Kerr, R.~M.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Evidence for a singularity of the three-dimensional, incompressible euler equations}}.
+\newblock {\emph{\JournalTitle{Physics of Fluids A: Fluid Dynamics}}} \textbf{\bibinfo{volume}{5}}, \bibinfo{pages}{1725--1746}, \doiprefix\url{10.1063/1.858849} (\bibinfo{year}{1993}).
+\newblock \eprint{https://pubs.aip.org/aip/pof/article-pdf/5/7/1725/12783847/1725\_1\_online.pdf}.
+
+\bibitem{Hou2022}
+\bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Potential singularity of the 3d euler equations in the interior domain}}.
+\newblock {\emph{\JournalTitle{Foundations of Computational Mathematics}}} \textbf{\bibinfo{volume}{23}}, \bibinfo{pages}{2203–2249}, \doiprefix\url{10.1007/s10208-022-09585-5} (\bibinfo{year}{2022}).
+
+\bibitem{Luo-Hou:singularities-euler-3d}
+\bibinfo{author}{Luo, G.} \& \bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Potentially singular solutions of the 3d axisymmetric euler equations}}.
+\newblock {\emph{\JournalTitle{Proceedings of the National Academy of Sciences}}} \textbf{\bibinfo{volume}{111}}, \bibinfo{pages}{12968--12973}, \doiprefix\url{10.1073/pnas.1405238111} (\bibinfo{year}{2014}).
+\newblock \eprint{http://www.pnas.org/content/111/36/12968.full.pdf}.
+
+\bibitem{GomezSerrano:survey-cap-in-pde}
+\bibinfo{author}{G\'{o}mez-Serrano, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Computer-assisted proofs in {PDE}: a survey}}.
+\newblock {\emph{\JournalTitle{SeMA J.}}} \textbf{\bibinfo{volume}{76}}, \bibinfo{pages}{459--484}, \doiprefix\url{10.1007/s40324-019-00186-x} (\bibinfo{year}{2019}).
+
+\bibitem{Raissi-Perdikaris-Karniadakis:pinn-first-paper}
+\bibinfo{author}{Raissi, M.}, \bibinfo{author}{Perdikaris, P.} \& \bibinfo{author}{Karniadakis, G.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations}}.
+\newblock {\emph{\JournalTitle{Journal of Computational Physics}}} \textbf{\bibinfo{volume}{378}}, \bibinfo{pages}{686--707}, \doiprefix\url{10.1016/j.jcp.2018.10.045} (\bibinfo{year}{2019}).
+
+\bibitem{Karniadakis-Kevrekidis-Lu-Perdikaris-Wang-Yang:pinn-nature-reviews}
+\bibinfo{author}{Karniadakis, G.~E.} \emph{et~al.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Physics-informed machine learning}}.
+\newblock {\emph{\JournalTitle{Nature Reviews Physics}}} \textbf{\bibinfo{volume}{3}}, \bibinfo{pages}{422--440}, \doiprefix\url{10.1038/s42254-021-00314-5} (\bibinfo{year}{2021}).
+
+\bibitem{Wang-Lai-GomezSerrano-Buckmaster:pinn-selfsimilar-boussinesq}
+\bibinfo{author}{Wang, Y.}, \bibinfo{author}{Lai, C.-Y.}, \bibinfo{author}{G\'{o}mez-Serrano, J.} \& \bibinfo{author}{Buckmaster, T.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Asymptotic {S}elf-{S}imilar {B}low-{U}p {P}rofile for {T}hree-{D}imensional {A}xisymmetric {E}uler {E}quations {U}sing {N}eural {N}etworks}}.
+\newblock {\emph{\JournalTitle{Phys. Rev. Lett.}}} \textbf{\bibinfo{volume}{130}}, \bibinfo{pages}{Paper No. 244002}, \doiprefix\url{10.1103/physrevlett.130.244002} (\bibinfo{year}{2023}).
+
+\bibitem{Chen-Hou:stable-nearly-self-similar-blowup-boussinesq-part-i}
+\bibinfo{author}{Chen, J.} \& \bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Stable nearly self-similar blowup of the 2d boussinesq and 3d euler equations with smooth data i: Analysis}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2210.07191}}}  (\bibinfo{year}{2022}).
+
+\bibitem{Chen-Hou:stable-nearly-self-similar-blowup-boussinesq-part-ii}
+\bibinfo{author}{Chen, J.} \& \bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Stable nearly self-similar blowup of the 2d boussinesq and 3d euler equations with smooth data ii: rigorous numerics}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2305.05660}}}  (\bibinfo{year}{2023}).
+
+\bibitem{2025arXiv250619243W}
+\bibinfo{author}{{Wang}, Y.}, \bibinfo{author}{{Liu}, Z.}, \bibinfo{author}{{Li}, Z.}, \bibinfo{author}{{Anandkumar}, A.} \& \bibinfo{author}{{Hou}, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{{High precision PINNs in unbounded domains: application to singularity formulation in PDEs}}}.
+\newblock {\emph{\JournalTitle{arXiv e-prints}}} \bibinfo{pages}{arXiv:2506.19243}, \doiprefix\url{10.48550/arXiv.2506.19243} (\bibinfo{year}{2025}).
+\newblock \eprint{2506.19243}.
+
+\bibitem{Costin-Tanveer:analytical-approximation-blasius}
+\bibinfo{author}{Costin, O.} \& \bibinfo{author}{Tanveer, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Analytical approximation of the {B}lasius similarity solution with rigorous error bounds}}.
+\newblock {\emph{\JournalTitle{SIAM J. Math. Anal.}}} \textbf{\bibinfo{volume}{46}}, \bibinfo{pages}{3782--3813}, \doiprefix\url{10.1137/13091470X} (\bibinfo{year}{2014}).
+
+\bibitem{Elgindi-Pasqualotto:invertibility-boussinesq-cap}
+\bibinfo{author}{Elgindi, T.} \& \bibinfo{author}{Pasqualotto, F.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Invertibility of a linearized {B}oussinesq flow: a symbolic approach}}.
+\newblock {\emph{\JournalTitle{Arxiv preprint arXiv:2310.19781}}}  (\bibinfo{year}{2022}).
+
+\bibitem{Castro-Cordoba-GomezSerrano:global-smooth-solutions-sqg}
+\bibinfo{author}{Castro, A.}, \bibinfo{author}{C{\'o}rdoba, D.} \& \bibinfo{author}{G{\'o}mez-Serrano, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Global smooth solutions for the inviscid {S}{Q}{G} equation}}.
+\newblock {\emph{\JournalTitle{Memoirs of the AMS}}} \textbf{\bibinfo{volume}{266}}, \bibinfo{pages}{89 pages} (\bibinfo{year}{2020}).
+
+\bibitem{Buckmaster-CaoLabora-GomezSerrano:implosion-compressible}
+\bibinfo{author}{Buckmaster, T.}, \bibinfo{author}{Cao-Labora, G.} \& \bibinfo{author}{G\'omez-Serrano, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Smooth imploding solutions for 3{D} compressible fluids}}.
+\newblock {\emph{\JournalTitle{Forum Math. Pi}}} \textbf{\bibinfo{volume}{13}}, \bibinfo{pages}{Paper No. e6}, \doiprefix\url{10.1017/fmp.2024.12} (\bibinfo{year}{2025}).
+
+\bibitem{Eggers-Fontelos:self-similarity}
+\bibinfo{author}{Eggers, J.} \& \bibinfo{author}{Fontelos, M.~A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{The role of self-similarity in singularities of partial differential equations}}.
+\newblock {\emph{\JournalTitle{Nonlinearity}}} \textbf{\bibinfo{volume}{22}}, \bibinfo{pages}{R1--R44}, \doiprefix\url{10.1088/0951-7715/22/1/001} (\bibinfo{year}{2009}).
+
+\bibitem{Elgindi:singularities-C1a-euler-R3}
+\bibinfo{author}{Elgindi, T.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Finite-time singularity formation for {$C^{1,\alpha}$} solutions to the incompressible {E}uler equations on {$\Bbb R^3$}}}.
+\newblock {\emph{\JournalTitle{Ann. of Math. (2)}}} \textbf{\bibinfo{volume}{194}}, \bibinfo{pages}{647--727}, \doiprefix\url{10.4007/annals.2021.194.3.2} (\bibinfo{year}{2021}).
+
+\bibitem{Guillod-Sverak:numerics-nonuniqueness-ns}
+\bibinfo{author}{Guillod, J.} \& \bibinfo{author}{\v{S}ver\'{a}k, V.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Numerical investigations of non-uniqueness for the {N}avier-{S}tokes initial value problem in borderline spaces}}.
+\newblock {\emph{\JournalTitle{J. Math. Fluid Mech.}}} \textbf{\bibinfo{volume}{25}}, \bibinfo{pages}{Paper No. 46, 25}, \doiprefix\url{10.1007/s00021-023-00789-5} (\bibinfo{year}{2023}).
+
+\bibitem{Lushnikov-Silantyev-Siegel:self-similar-gclm}
+\bibinfo{author}{Lushnikov, P.~M.}, \bibinfo{author}{Silantyev, D.~A.} \& \bibinfo{author}{Siegel, M.}
+\newblock \bibinfo{journal}{\bibinfo{title}{{C}ollapse {V}ersus {B}low-{U}p and {G}lobal {E}xistence in the {G}eneralized {C}onstantin{\textendash}{L}ax{\textendash}{M}ajda {E}quation}}.
+\newblock {\emph{\JournalTitle{Journal of Nonlinear Science}}} \textbf{\bibinfo{volume}{31}}, \doiprefix\url{10.1007/s00332-021-09737-x} (\bibinfo{year}{2021}).
+
+\bibitem{Hou:potential-singularity-euler}
+\bibinfo{author}{Hou, T.~Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Potential singularity of the 3{D} {E}uler equations in the interior domain}}.
+\newblock {\emph{\JournalTitle{Found. Comput. Math.}}} \textbf{\bibinfo{volume}{23}}, \bibinfo{pages}{2203--2249}, \doiprefix\url{10.1007/s10208-022-09585-5} (\bibinfo{year}{2023}).
+
+\bibitem{Silvestre-Vicol:transport-equation-nonlocal-drift}
+\bibinfo{author}{Silvestre, L.} \& \bibinfo{author}{Vicol, V.}
+\newblock \bibinfo{journal}{\bibinfo{title}{On a transport equation with nonlocal drift}}.
+\newblock {\emph{\JournalTitle{Trans. Amer. Math. Soc.}}} \textbf{\bibinfo{volume}{368}}, \bibinfo{pages}{6159--6188}, \doiprefix\url{10.1090/tran6651} (\bibinfo{year}{2016}).
+
+\bibitem{Kiselev:regularity-blowup-active-scalars}
+\bibinfo{author}{Kiselev, A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Regularity and blow up for active scalars}}.
+\newblock {\emph{\JournalTitle{Math. Model. Nat. Phenom.}}} \textbf{\bibinfo{volume}{5}}, \bibinfo{pages}{225--255}, \doiprefix\url{10.1051/mmnp/20105410} (\bibinfo{year}{2010}).
+
+\bibitem{eggers_2020}
+\bibinfo{author}{Eggers, J.} \& \bibinfo{author}{Fontelos, M.~A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Selection of singular solutions in non-local transport equations}}.
+\newblock {\emph{\JournalTitle{Nonlinearity}}} \textbf{\bibinfo{volume}{33}}, \bibinfo{pages}{325}, \doiprefix\url{10.1088/1361-6544/ab4e0b} (\bibinfo{year}{2019}).
+
+\bibitem{cordobagancedooriveipm2007}
+\bibinfo{author}{C\'ordoba, D.}, \bibinfo{author}{Gancedo, F.} \& \bibinfo{author}{Orive, R.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Analytical behavior of two-dimensional incompressible flow in porous media}}.
+\newblock {\emph{\JournalTitle{J. Math. Phys.}}} \textbf{\bibinfo{volume}{48}}, \bibinfo{pages}{065206, 19}, \doiprefix\url{10.1063/1.2404593} (\bibinfo{year}{2007}).
+
+\bibitem{cordobazoroaipm}
+\bibinfo{author}{C\'ordoba, D.} \& \bibinfo{author}{Mart\'inez-Zoroa, L.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Finite time singularities of smooth solutions for the 2{D} incompressible porous media ({IPM}) equation with a smooth source}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2410.22920}}}  (\bibinfo{year}{2024}).
+
+\bibitem{Merle-Raphael-Rodnianski-Szeftel:implosion-ii}
+\bibinfo{author}{Merle, F.}, \bibinfo{author}{Rapha\"{e}l, P.}, \bibinfo{author}{Rodnianski, I.} \& \bibinfo{author}{Szeftel, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{On the implosion of a compressible fluid {II}: singularity formation}}.
+\newblock {\emph{\JournalTitle{Ann. of Math. (2)}}} \textbf{\bibinfo{volume}{196}}, \bibinfo{pages}{779--889}, \doiprefix\url{10.4007/annals.2022.196.2.4} (\bibinfo{year}{2022}).
+
+\bibitem{Merle-Raphael-Rodnianski-Szeftel:implosion-nls}
+\bibinfo{author}{Merle, F.}, \bibinfo{author}{Rapha\"{e}l, P.}, \bibinfo{author}{Rodnianski, I.} \& \bibinfo{author}{Szeftel, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{On blow up for the energy super critical defocusing nonlinear {S}chr\"{o}dinger equations}}.
+\newblock {\emph{\JournalTitle{Invent. Math.}}} \textbf{\bibinfo{volume}{227}}, \bibinfo{pages}{247--413}, \doiprefix\url{10.1007/s00222-021-01067-9} (\bibinfo{year}{2022}).
+
+\bibitem{wang2023solution}
+\bibinfo{author}{Wang, Z.}, \bibinfo{author}{Meng, X.}, \bibinfo{author}{Jiang, X.}, \bibinfo{author}{Xiang, H.} \& \bibinfo{author}{Karniadakis, G.~E.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Solution multiplicity and effects of data and eddy viscosity on navier-stokes solutions inferred by physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2309.06010}}}  (\bibinfo{year}{2023}).
+
+\bibitem{zou2025learning}
+\bibinfo{author}{Zou, Z.}, \bibinfo{author}{Wang, Z.} \& \bibinfo{author}{Karniadakis, G.~E.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Learning and discovering multiple solutions using physics-informed neural networks with random initialization and deep ensemble}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2503.06320}}}  (\bibinfo{year}{2025}).
+
+\bibitem{jagtap2020adaptive}
+\bibinfo{author}{Jagtap, A.~D.}, \bibinfo{author}{Kawaguchi, K.} \& \bibinfo{author}{Karniadakis, G.~E.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Adaptive activation functions accelerate convergence in deep and physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{Journal of Computational Physics}}} \textbf{\bibinfo{volume}{404}}, \bibinfo{pages}{109136} (\bibinfo{year}{2020}).
+
+\bibitem{wang2023learning}
+\bibinfo{author}{Wang, H.}, \bibinfo{author}{Lu, L.}, \bibinfo{author}{Song, S.} \& \bibinfo{author}{Huang, G.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Learning specialized activation functions for physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2308.04073}}}  (\bibinfo{year}{2023}).
+
+\bibitem{jagtap2021extended}
+\bibinfo{author}{Jagtap, A.~D.} \& \bibinfo{author}{Karniadakis, G.~E.}
+\newblock \bibinfo{title}{Extended physics-informed neural networks (xpinns): A generalized space-time domain decomposition based deep learning framework for nonlinear partial differential equations.}
+\newblock In \emph{\bibinfo{booktitle}{AAAI Spring Symposium: MLPS}}, \bibinfo{pages}{2002--2041} (\bibinfo{year}{2021}).
+
+\bibitem{moseley2023finite}
+\bibinfo{author}{Moseley, B.}, \bibinfo{author}{Markham, A.} \& \bibinfo{author}{Nissen-Meyer, T.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Finite basis physics-informed neural networks (fbpinns): a scalable domain decomposition approach for solving differential equations}}.
+\newblock {\emph{\JournalTitle{Advances in Computational Mathematics}}} \textbf{\bibinfo{volume}{49}}, \bibinfo{pages}{62} (\bibinfo{year}{2023}).
+
+\bibitem{mcclenny2020self}
+\bibinfo{author}{McClenny, L.} \& \bibinfo{author}{Braga-Neto, U.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Self-adaptive physics-informed neural networks using a soft attention mechanism}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2009.04544}}}  (\bibinfo{year}{2020}).
+
+\bibitem{wang2021understanding}
+\bibinfo{author}{Wang, S.}, \bibinfo{author}{Teng, Y.} \& \bibinfo{author}{Perdikaris, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Understanding and mitigating gradient flow pathologies in physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{SIAM Journal on Scientific Computing}}} \textbf{\bibinfo{volume}{43}}, \bibinfo{pages}{A3055--A3081} (\bibinfo{year}{2021}).
+
+\bibitem{wang2022and}
+\bibinfo{author}{Wang, S.}, \bibinfo{author}{Yu, X.} \& \bibinfo{author}{Perdikaris, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{When and why pinns fail to train: A neural tangent kernel perspective}}.
+\newblock {\emph{\JournalTitle{Journal of Computational Physics}}} \textbf{\bibinfo{volume}{449}}, \bibinfo{pages}{110768} (\bibinfo{year}{2022}).
+
+\bibitem{wang2022respecting}
+\bibinfo{author}{Wang, S.}, \bibinfo{author}{Sankaran, S.} \& \bibinfo{author}{Perdikaris, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Respecting causality is all you need for training physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2203.07404}}}  (\bibinfo{year}{2022}).
+
+\bibitem{muller2023achieving}
+\bibinfo{author}{M{\"u}ller, J.} \& \bibinfo{author}{Zeinhofer, M.}
+\newblock \bibinfo{title}{Achieving high accuracy with pinns via energy natural gradient descent}.
+\newblock In \emph{\bibinfo{booktitle}{International Conference on Machine Learning}}, \bibinfo{pages}{25471--25485} (\bibinfo{organization}{PMLR}, \bibinfo{year}{2023}).
+
+\bibitem{Jnini-Vella-Zeinhofer:gauss-newton-natural-gradient-pinn}
+\bibinfo{author}{Jnini, A.}, \bibinfo{author}{Vella, F.} \& \bibinfo{author}{Zeinhofer, M.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Gauss-newton natural gradient descent for physics-informed computational fluid dynamics}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2402.10680}}}  (\bibinfo{year}{2024}).
+
+\bibitem{aldirany2024multi}
+\bibinfo{author}{Aldirany, Z.}, \bibinfo{author}{Cottereau, R.}, \bibinfo{author}{Laforest, M.} \& \bibinfo{author}{Prudhomme, S.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Multi-level neural networks for accurate solutions of boundary-value problems}}.
+\newblock {\emph{\JournalTitle{Computer Methods in Applied Mechanics and Engineering}}} \textbf{\bibinfo{volume}{419}}, \bibinfo{pages}{116666} (\bibinfo{year}{2024}).
+
+\bibitem{Wang-Lai:multistage-nn}
+\bibinfo{author}{Wang, Y.} \& \bibinfo{author}{Lai, C.-Y.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Multi-stage neural networks: function approximator of machine precision}}.
+\newblock {\emph{\JournalTitle{J. Comput. Phys.}}} \textbf{\bibinfo{volume}{504}}, \bibinfo{pages}{Paper No. 112865, 28}, \doiprefix\url{10.1016/j.jcp.2024.112865} (\bibinfo{year}{2024}).
+
+\bibitem{mcgreivy2024weak}
+\bibinfo{author}{McGreivy, N.} \& \bibinfo{author}{Hakim, A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Weak baselines and reporting biases lead to overoptimism in machine learning for fluid-related partial differential equations}}.
+\newblock {\emph{\JournalTitle{Nature Machine Intelligence}}} \textbf{\bibinfo{volume}{6}}, \bibinfo{pages}{1256--1269} (\bibinfo{year}{2024}).
+
+\bibitem{Dahne-GomezSerrano:highest-wave-burgershilbert}
+\bibinfo{author}{Dahne, J.} \& \bibinfo{author}{G\'{o}mez-Serrano, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Highest cusped waves for the {B}urgers-{H}ilbert equation}}.
+\newblock {\emph{\JournalTitle{Arch. Ration. Mech. Anal.}}} \textbf{\bibinfo{volume}{247}}, \bibinfo{pages}{Paper No. 74, 55}, \doiprefix\url{10.1007/s00205-023-01904-6} (\bibinfo{year}{2023}).
+
+\bibitem{dangel2024kronecker}
+\bibinfo{author}{Dangel, F.}, \bibinfo{author}{M{\"u}ller, J.} \& \bibinfo{author}{Zeinhofer, M.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Kronecker-factored approximate curvature for physics-informed neural networks}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2405.15603}}}  (\bibinfo{year}{2024}).
+
+\bibitem{nocedal1999numerical}
+\bibinfo{author}{Nocedal, J.} \& \bibinfo{author}{Wright, S.~J.}
+\newblock \emph{\bibinfo{title}{Numerical optimization}} (\bibinfo{publisher}{Springer}, \bibinfo{year}{1999}).
+
+\bibitem{martens2020new}
+\bibinfo{author}{Martens, J.}
+\newblock \bibinfo{journal}{\bibinfo{title}{New insights and perspectives on the natural gradient method}}.
+\newblock {\emph{\JournalTitle{Journal of Machine Learning Research}}} \textbf{\bibinfo{volume}{21}}, \bibinfo{pages}{1--76} (\bibinfo{year}{2020}).
+
+\bibitem{martens2015optimizing}
+\bibinfo{author}{Martens, J.} \& \bibinfo{author}{Grosse, R.}
+\newblock \bibinfo{title}{Optimizing neural networks with kronecker-factored approximate curvature}.
+\newblock In \emph{\bibinfo{booktitle}{International conference on machine learning}}, \bibinfo{pages}{2408--2417} (\bibinfo{organization}{PMLR}, \bibinfo{year}{2015}).
+
+\bibitem{kfac-jax2022github}
+\bibinfo{author}{Botev, A.} \& \bibinfo{author}{Martens, J.}
+\newblock \bibinfo{title}{{KFAC-JAX}} (\bibinfo{year}{2022}).
+
+\bibitem{eggers2008}
+\bibinfo{author}{Eggers, J.} \& \bibinfo{author}{Fontelos, M.~A.}
+\newblock \bibinfo{title}{The role of self-similarity in singularities of pde’s} (\bibinfo{year}{2008}).
+
+\bibitem{grosch1977numerical}
+\bibinfo{author}{Grosch, C.~E.} \& \bibinfo{author}{Orszag, S.~A.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Numerical solution of problems in unbounded regions: coordinate transforms}}.
+\newblock {\emph{\JournalTitle{Journal of Computational Physics}}} \textbf{\bibinfo{volume}{25}}, \bibinfo{pages}{273--295} (\bibinfo{year}{1977}).
+
+\bibitem{lushnikov2017new}
+\bibinfo{author}{Lushnikov, P.~M.}, \bibinfo{author}{Dyachenko, S.~A.} \& \bibinfo{author}{A.~Silantyev, D.}
+\newblock \bibinfo{journal}{\bibinfo{title}{New conformal mapping for adaptive resolving of the complex singularities of stokes wave}}.
+\newblock {\emph{\JournalTitle{Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences}}} \textbf{\bibinfo{volume}{473}}, \bibinfo{pages}{20170198} (\bibinfo{year}{2017}).
+
+\bibitem{boyd1987spectral}
+\bibinfo{author}{Boyd, J.~P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Spectral methods using rational basis functions on an infinite interval}}.
+\newblock {\emph{\JournalTitle{Journal of computational physics}}} \textbf{\bibinfo{volume}{69}}, \bibinfo{pages}{112--142} (\bibinfo{year}{1987}).
+
+\bibitem{rathore2024challenges}
+\bibinfo{author}{Rathore, P.}, \bibinfo{author}{Lei, W.}, \bibinfo{author}{Frangella, Z.}, \bibinfo{author}{Lu, L.} \& \bibinfo{author}{Udell, M.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Challenges in training pinns: A loss landscape perspective}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2402.01868}}}  (\bibinfo{year}{2024}).
+
+\bibitem{wang2025gradient}
+\bibinfo{author}{Wang, S.}, \bibinfo{author}{Bhartari, A.~K.}, \bibinfo{author}{Li, B.} \& \bibinfo{author}{Perdikaris, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Gradient alignment in physics-informed neural networks: A second-order optimization perspective}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2502.00604}}}  (\bibinfo{year}{2025}).
+
+\bibitem{levenberg1944method}
+\bibinfo{author}{Levenberg, K.}
+\newblock \bibinfo{journal}{\bibinfo{title}{A method for the solution of certain non-linear problems in least squares}}.
+\newblock {\emph{\JournalTitle{Quarterly of applied mathematics}}} \textbf{\bibinfo{volume}{2}}, \bibinfo{pages}{164--168} (\bibinfo{year}{1944}).
+
+\bibitem{marquardt1963algorithm}
+\bibinfo{author}{Marquardt, D.~W.}
+\newblock \bibinfo{journal}{\bibinfo{title}{An algorithm for least-squares estimation of nonlinear parameters}}.
+\newblock {\emph{\JournalTitle{Journal of the society for Industrial and Applied Mathematics}}} \textbf{\bibinfo{volume}{11}}, \bibinfo{pages}{431--441} (\bibinfo{year}{1963}).
+
+\bibitem{PratColomer:master-thesis}
+\bibinfo{author}{Prat-Colomer, M.}
+\newblock \emph{\bibinfo{title}{Machine Learning Methods in Incompressible Fluid Dynamics}}.
+\newblock Master's thesis, \bibinfo{school}{Universitat Politecnica de Catalunya} (\bibinfo{year}{2024}).
+
+\bibitem{trask2022hierarchical}
+\bibinfo{author}{Trask, N.}, \bibinfo{author}{Henriksen, A.}, \bibinfo{author}{Martinez, C.} \& \bibinfo{author}{Cyr, E.}
+\newblock \bibinfo{title}{Hierarchical partition of unity networks: fast multilevel training}.
+\newblock In \emph{\bibinfo{booktitle}{Mathematical and Scientific Machine Learning}}, \bibinfo{pages}{271--286} (\bibinfo{organization}{PMLR}, \bibinfo{year}{2022}).
+
+\bibitem{howard2023stacked}
+\bibinfo{author}{Howard, A.~A.}, \bibinfo{author}{Murphy, S.~H.}, \bibinfo{author}{Ahmed, S.~E.} \& \bibinfo{author}{Stinis, P.}
+\newblock \bibinfo{journal}{\bibinfo{title}{Stacked networks improve physics-informed training: applications to neural networks and deep operator networks}}.
+\newblock {\emph{\JournalTitle{arXiv preprint arXiv:2311.06483}}}  (\bibinfo{year}{2023}).
+
+\end{thebibliography}

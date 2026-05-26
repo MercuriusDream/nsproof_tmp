@@ -1,0 +1,28 @@
+gamma=0.45 B=1.0 delta=1.000000000000+0.000000000000i eps=1.000e-04 L=40 steps=8000 terms=12
+branch phi0:
+  local amplitudes phi0=1.000000000000e+00+0.000000000000e+00i chi0=0.000000000000e+00+0.000000000000e+00i
+  modal coefficients:
+    admissible_s1 = 1.000000000000e+00+0.000000000000e+00i
+    growing_s2 = -0.000000000000e+00+0.000000000000e+00i
+    lambda_w = 0.000000000000e+00+0.000000000000e+00i
+    lambda_ylog = -0.000000000000e+00-0.000000000000e+00i
+branch chi0:
+  local amplitudes phi0=0.000000000000e+00+0.000000000000e+00i chi0=1.000000000000e+00+0.000000000000e+00i
+  modal coefficients:
+    admissible_s1 = 8.116679287691e-02+0.000000000000e+00i
+    growing_s2 = 9.797277857868e-03+0.000000000000e+00i
+    lambda_w = -4.826735810101e-03+0.000000000000e+00i
+    lambda_ylog = 1.002167218199e+00-0.000000000000e+00i
+forbidden-mode matching:
+  sigma_max = 1.002226729470e+00
+  sigma_min = 0.000000000000e+00
+  sigma_min/sigma_max = 0.000000000000e+00
+  plucker_norm = 0.000000000000e+00
+  best local combo phi0_branch=1.000000000000e+00+0.000000000000e+00i chi0_branch=0.000000000000e+00+0.000000000000e+00i
+  best-combo modal coefficients:
+    admissible_s1 = 1.000000000000e+00+0.000000000000e+00i contribution_norm=1.000000000000e+00
+    growing_s2 = 0.000000000000e+00+0.000000000000e+00i contribution_norm=0.000000000000e+00
+    lambda_w = 0.000000000000e+00+0.000000000000e+00i contribution_norm=0.000000000000e+00
+    lambda_ylog = 0.000000000000e+00+0.000000000000e+00i contribution_norm=0.000000000000e+00
+  coefficient forbidden fraction = 0.000000000000e+00
+  contribution forbidden fraction = 0.000000000000e+00

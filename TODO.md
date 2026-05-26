@@ -1,0 +1,120 @@
+# NSS Proof Execution TODO
+
+This ledger is derived from `proof-problem.md` and `conver.md`.
+
+## Current proof percentage
+
+```text
+Final theorem certificate (binary gate): 0%
+Certified stop-condition gates: 0/5
+Proof-engineering scaffold progress: about 25%
+Last updated: 2026-05-26
+```
+
+The `0%` theorem number is intentional: no final proof gate is certified until
+an exact admissible profile is validated.  The `25%` scaffold estimate counts
+completed derivations, diagnostic solvers, tail/indicial evidence, projection
+tools, normalized residual checks, and early validator scaffolds, but it is not
+a proof certificate.
+
+Current certified gate status:
+
+```text
+[ ] exact profile F_gamma(U_*,P_*) = 0
+[ ] 2/5 < gamma < 1/2 with validated admissible profile
+[ ] natural tail and exact transseries/indicial certification
+[ ] rank P_+ < infinity
+[ ] stable-complement spectral gap Re z <= -c < 0
+```
+
+## Completed in this workspace
+
+- [x] Read both source documents and extracted the intended proof architecture.
+- [x] Normalized the exponent notation: the documents use both `beta` and `gamma`; the execution files use `gamma`.
+- [x] Re-derived the rescaled Navier-Stokes equation under the Type-II ansatz.
+- [x] Fixed the natural tail exponent as `U_*(y) ~ |y|^(1 - 1/gamma)`.
+- [x] Re-derived the conical homogeneity constraint for axisymmetric-with-swirl profiles.
+- [x] Re-derived the indicial first-order shooting system and Frobenius starting data.
+- [x] Proved the moving-cutoff gluing size in `H^8_1` at the scaling level.
+- [x] Stated the conditional saddle-core Navier-Stokes blow-up theorem with exact hypotheses.
+- [x] Added a pure-Python scaling checker.
+- [x] Added a pure-Python indicial shooting prototype, including complex-root scanning and bounded residual refinement.
+- [x] Added a finite-difference residual oracle for the axisymmetric profile equations and conical core.
+- [x] Added a compactified `(q,b)` tail-factored profile residual scaffold.
+- [x] Added a low-order coordinate-search profile residual optimizer.
+- [x] Added a damped Gauss-Newton profile solver with fixed normalization.
+- [x] Added machine-readable JSON seed load/save support for profile continuation.
+- [x] Added compactified `(q,b)` collocation checks and hybrid profile optimization.
+- [x] Added a compact profile gate runner for reproducible wide/interior/local residual checks and finite-difference `h` sweeps.
+- [x] Added an axis-regular bounded edge-basis solver that replaces the singular `(b^2/(1-b^2))^j` edge basis by bounded `(1-q)^i b^(2j)` terms.
+- [x] Added an indicial survey helper to test shooting candidates across truncation, step-count, and Frobenius-order settings.
+- [x] Produced approximate non-validated compactified profile seeds at `gamma=0.45`, `B=1.0`; the old low-residual bounded seed `profile-seeds/gamma0p45-bounded-edge-seed-v35.json` is non-admissible at `q=0`, while the first strong tail-admissible constrained seed was `profile-seeds/gamma0p45-vanishing-edge-seed-v49.json`.
+- [x] Stress-tested the best seed outside the original compactified box; widening to `q=0.30`, `|b|=0.85` exposes a larger residual, and `q=0.25`, `|b|=0.90` exposes a severe far/angular-edge failure.
+- [x] Projected the singular edge seed to the bounded basis and reduced the extreme stress max residual from `1.09e2` to `3.68e-1`.
+- [x] Added a bounded-shell continuation option and produced v35 by varying only the new order-12 bounded edge shell; v35 improves standard/moderate/extreme max residuals to `1.96e-1`, `3.10e-1`, and `3.63e-1`.
+- [x] Added a compactified residual-topology diagnostic. For v35, the far/angular defect is a streamfunction-equation lobe near `q` minimal and `|b| ~= 0.79`; extending the probe to `q=0.18` raises the max residual to `4.88e-1`.
+- [x] Added a far-boundary trace diagnostic. It shows v35 changes the leading `q=0` conical trace badly (`F(0,0.95)-1/2 ~= 1.05`, `G(0,0.95)-B ~= -32.1`), so the current edge corrections violate conical rigidity at infinity.
+- [x] Added a vanishing edge family `q(1-q)^i b^(2j)` and tail-angular freeze options. Tail-admissible v37 enforces `F(0,b)=1/2`, `G(0,b)=B` exactly, but finite-box residuals worsen (`standard max ~= 7.73e-1`, `extreme max ~= 7.20e-1`), so v35 cannot be repaired by a small projection.
+- [x] Continued the tail-admissible constrained solve through v49 with exact `q=0` trace. v49 beats non-admissible v35 on standard and original extreme gates (`standard max ~= 5.47e-2`, `extreme max ~= 5.54e-2`) but still has a farther-tail `q=0.18` max `2.68e-1`.
+- [x] Added configurable `q^sigma` vanishing edge powers and tested `sigma=0.5`; it preserves the conical trace but worsens the farther-tail max to `3.20e-1`, so slower vanishing did not fix the obstruction from this seed.
+- [x] Added localized high-order vanishing edge shell corrections. Shell-10/12/14 reduce the farther-tail `q=0.18` max from v49 `2.68e-1` to v53 `1.79e-1`, with exact conical trace, but trade off against the standard/local gates.
+- [x] Added a seed-blending diagnostic. Blending the balanced admissible v49 seed with the far-tail-focused v53 seed shows a monotone tradeoff; the best max-over-gates point is the v53 endpoint, saved with metadata as `profile-seeds/gamma0p45-vanishing-edge-blend-v54.json`.
+- [x] Added a tail-scaling diagnostic and a small shell-15 pilot. The pilot marginally improves the sampled lobe (`q=0.18` max `1.792e-1 -> 1.789e-1`) but leaves the far-tail log-log growth essentially unchanged, confirming that the current vanishing-edge polynomial basis is pushing the defect toward smaller `q`.
+- [x] Added a tail-series diagnostic and tested q1-filtered/q2-constrained seeds v56-v59. The current finite-box seeds rely on large forbidden integer `q^1` tail coefficients; removing that channel preserves the trace but makes the finite-box residual blow up, so the next representation must include the non-integer forced tail correction and validated indicial modes.
+- [x] Added a forced `q^(1/gamma)` tail solver and q1-frozen monomial continuation. The forced-tail seed v64 preserves the exact trace and zero q1 channel while cutting the `q in [0.18,0.30]` max from v54 `1.79e-1` to `9.02e-2`, but the standard/interior/local gates remain `O(1)`.
+- [x] Added localized forced-tail cutoffs and a q1-frozen interior solve. v72 improved the constrained balance to `standard/interior/local max ~= 6.45e-1`, with farther-tail max `4.33e-1`, while v64 remained the best far-tail-only asymptotic seed.
+- [x] Added a richer q1-frozen interior continuation from v72. v74 preserves the exact `q=0` trace and zero q1 channel and improves the balanced q1-free forced-tail gates to `standard/interior/local max ~= 5.91e-1/5.93e-1/5.93e-1`, with farther-tail max `4.17e-1`; the high-order q9 tail residual is large, so this is evidence for the next basis rather than validation.
+- [x] Added tail-filter and order-capped forced-tail continuations v75-v86. The best balanced q1-free forced-tail seed is now v86, with exact trace, zero q1, `standard/interior/local max ~= 5.40e-1/5.41e-1/5.42e-1`, and farther-tail max `3.98e-1`; the sequence also shows a plateau because removing the q6 channel worsens the balanced gate.
+- [x] Added compact and tail-flat interior bump basis support. Full bump solves v87-v89 overfit and worsen independent max gates, but a small v86-to-flat-F-bump blend v91 preserves the exact tail and improves the balanced q1-free forced-tail gates to `standard/interior/local max ~= 5.38e-1/5.39e-1/5.39e-1`, with farther-tail max `3.99e-1`.
+- [x] Added active max-gate point weighting to the bounded-edge Gauss-Newton solver. Full active steps v92/v94 overshoot, but a small v91-to-v92 blend v93 improved the balanced q1-free forced-tail seed at the time (`standard/interior/local max ~= 5.30e-1/5.27e-1/5.29e-1`, farther-tail max `4.02e-1`) with unchanged exact tail series.
+- [x] Added a max-aware coordinate-search solver for tail-flat bump coefficients, including optional active `(q,b)` gate points. The v96-v106 sequence preserves the exact trace, zero q1 channel, and forced tail while improving the best balanced q1-free forced-tail seed to v106 (`standard/interior/local max ~= 4.53e-1/4.52e-1/4.55e-1`, fine-grid/active max `4.55e-1`, 41x41 topology max `4.54e-1`, farther-tail max `3.85e-1`), still far from validation.
+- [x] Added a bump-grid expansion helper and a zero-start minimax option. Expanding the tail-flat interior bump centers and continuing through v107-v111 preserves the exact trace, zero q1 channel, and forced tail while improving the best balanced q1-free forced-tail seed to v111 (`standard/interior/local max ~= 4.37e-1/4.40e-1/4.40e-1`, fine-grid max `4.40e-1`, 41x41 topology max `4.40e-1`, farther-tail max `3.81e-1`), still far from validation.
+- [x] Added a sparse bump-center helper for topology-selected missing lobes. The targeted v112 sparse continuation preserves the exact trace, zero q1 channel, and forced tail while improving the constrained seed at that stage to v112 (`standard/interior/local max ~= 4.37e-1/4.40e-1/4.39e-1`, fine-grid max `4.40e-1`, 41x41 topology max `4.39e-1`, farther-tail max `3.81e-1`), still far from validation.
+- [x] Ran a parallel sparse-bump batch from v113/v114, including subagent high-|b| and far/extreme variants. The far-only objective was rejected because it worsened balanced gates, while the high-|b| solve exposed a useful continuation path. The best balanced q1-free forced-tail seed from that batch was v116-lowb (`standard max ~= 4.378e-1`, shifted max ~= `4.385e-1`, fine-grid max ~= `4.388e-1`, broad topology max ~= `4.370e-1`, far-tail holdout max ~= `4.091e-1`), still far from validation.
+- [x] Added an early-reject path to `tools/profile_minimax_coordinate.py` so rejected trial moves stop evaluating once a scored gate already exceeds the incumbent max; the acceptance rule is unchanged.
+- [x] Re-ran the two-branch indicial matching scan at `L=25` and `L=40`. The only sampled zero remains the exact geometric `delta=1` branch; all other low-ratio candidates remain dominated by forbidden far-field contribution and do not provide a non-geometric indicial root.
+- [x] Ran the current indicial shooting prototype near the apparent `Im delta ~= 1.79` basin; residuals remain `~7.6e-1` and candidate locations drift under truncation changes, so this is not a validated indicial root.
+- [x] Added component-level indicial diagnostics; the apparent basin fails mainly in the `phi` and `chi` far-field power-law residuals, not only in the amplitude compatibility equation.
+- [x] Added a far-field modal decomposition diagnostic for the indicial system. At the current apparent basin, the finite shot is `~99%` non-admissible by endpoint-scale modal contribution, dominated by the growing `s=3-delta` mode.
+- [x] Added a two-branch analytic Frobenius matching diagnostic. The full analytic local space exposes the exact `delta=1` branch `phi=1`, `chi=h=0`, while the non-geometric complex basin remains endpoint-scale dominated by forbidden far-field modes.
+- [x] Classified the exact `delta=1` branch as the axial-center/Galilean geometric mode: `Psi=r^2`, `G=0`, `a=0`, equivalently the derivative of the conical core under axial translation. It is removed by parity or center fixing and is not a non-geometric tail root.
+- [x] Added a Pluecker/Evans-style indicial diagnostic in `tools/indicial_evans.py`. Broad and near-`delta=1` scans at `gamma=0.45`, `B=1.0`, `L=25,40` again find only the geometric `delta=1` zero; all other near candidates have endpoint forbidden contribution essentially equal to one, so this is evidence against a non-geometric root but still not an interval-validated determinant proof.
+- [x] Added two proof-tool scaffolds without claiming validation: `tools/validate_indicial_evans.py` plus `validators/pluecker.py` provide a sampled Pluecker box-cover driver labeled heuristic, and `tools/linearized_spectrum_probe.py` provides a first-pass residual-Jacobian spectrum probe that still lacks pressure projection and geometric-mode certification.
+- [x] Completed the v117 ridge-strip sparse-bump branch. The final diagnostic seed `profile-seeds/gamma0p45-forced-tail-sparse-flatbumpFG-v117-ridge-strip.json` improves v116-lowb (`standard max ~= 4.344e-1`, shifted max ~= `4.365e-1`, fine-grid max ~= `4.362e-1`, broad 41x41 topology max ~= `4.348e-1`, focused hidden-ridge max ~= `4.365e-1`, secondary `q ~= 0.608`, `|b| ~= 0.241` max ~= `4.350e-1`, far-tail holdout max remains `O(3.8e-1)`). This is still an `O(1)` residual diagnostic, not a Newton-Kantorovich proof center.
+- [x] Added `tools/profile_project_cheb.py` and `tools/validate_tail.py` with `validators/tail_transseries.py` to move v117 into a proof-native transseries/Chebyshev scaffold. The projection `work/v117_transcheb.json` keeps the ordinary q1 channel structurally zero and lifts the forced `q^(1/gamma)` block, with sampling reconstruction errors `F ~= 9.34e-8`, `G ~= 2.57e-6`, but it fails the origin Taylor gate (`F ~= 6.49e-1`, `G ~= 3.17e-1`). `validators/compactified_equations.py` now has a Taylor-jet residual mode for projected profiles and confirms the same obstruction without finite differencing the projected Chebyshev data (`focused ridge max ~= 4.365e-1`, secondary ridge max ~= `4.350e-1`). This supports retiring sparse bumps as a proof representation.
+- [x] Added `tools/profile_newton_cheb.py`, a discovery-only damped Gauss-Newton scaffold over proof-native Chebyshev/transseries coefficients, and fixed two misleading selector bugs: capped variables are now balanced across requested blocks, and `F_frac0/G_frac0` mutations address the actual fractional JSON blocks. First fair coefficient solves still redistribute the obstruction rather than finding a Newton basin. A hidden-ridge run improves the focused held-out max to `4.346774703261e-1` but leaves the secondary ridge at `4.349878819316e-1`; a two-ridge run improves the secondary ridge to `4.339438267027e-1` but worsens the focused held-out max to `4.370029069859e-1`. Both remain `O(1)`.
+- [x] Wired the stored origin Taylor block into `validators/compactified_equations.py` evaluation for `q >= q_min`. This exposes the current origin scaffold as invalid rather than unused: `work/v117_transcheb.json` has origin-patch residual `max_abs ~= 1.427061295791e+1` on `q=[0.91,0.98]`, `b=[0.05,0.80]`, while the rectangular Chebyshev evaluator just below the origin patch gives `max_abs ~= 1.679666438145e-1` on `q=[0.82,0.895]`. The origin failure is now an explicit gate, not hidden metadata.
+- [x] Audited the later v118 sparse-bump artifacts. `profile-seeds/gamma0p45-forced-tail-sparse-flatbumpFG-v118-ridge-exact.json` is another non-validated sparse minimax seed with `score_max ~= 4.353608399992e-1`; it improves one hidden-ridge sample but worsens the secondary/broad balance relative to final v117 and has no projection, tail, origin, or NK evidence. It does not supersede v117.
+- [x] Added pointwise normalized residual diagnostics to `validators/compactified_equations.py` and `tools/profile_newton_cheb.py`: raw remains the regression mode, `normalized-structural` divides by `r^4 z q^(p+4)` and `r^2 q^(p+2)`, and `normalized-strict-tail` uses the stronger tail factors `r^4 z q^(2p+2)` and `r^2 q^(2p)`. On `work/v117_transcheb.json`, the structural quotient is `max_abs ~= 1.071336958406e+1` on the focused box and `max_abs ~= 9.139966362302e+3` on the origin patch, confirming the current profile is much farther from proof scale than raw residuals suggest.
+- [x] Extended `tools/profile_newton_cheb.py` to mutate `F_origin/G_origin` Taylor coefficients directly. Origin-only normalized Gauss-Newton reduces the origin structural defect only marginally under small steps and only from `1.283548767150e+3` to `1.226574061065e+3` under a large geometric-normalized trust region; this indicates the origin block must be solved coupled with the rectangular patches and matching constraints, not patched independently.
+- [x] Ran a first coupled normalized structural probe over rectangular plus origin variables. It reduced the sampled origin structural max from `9.139966362302e+3` to `8.347412637350e+3`, but the focused held-out structural max worsened to `1.515981821457e+1` and raw focused max worsened to `7.545806315318e-1`. Coupling helps the active origin point but damages the interior unless mortar/patch matching and a broader objective are enforced.
+- [x] Inspected `arXiv-2509.14185v1.tar.gz` (`Discovery of Unstable Singularities`) and extracted the directly useful solver lessons: factor out mechanical vanishing prefactors before optimizing residuals, add higher-derivative/regularity losses to prevent spiky collocation overfit, use residual-driven adaptive hard-point sampling, use staged linearized correction, and treat parameter discovery by smoothness/funnel scans rather than blind continuation.
+- [x] Added patch-seam continuity and origin-rectangle matching penalties to `tools/profile_newton_cheb.py` (`--continuity-weight`, `--origin-match-weight`). A constrained normalized structural run with 490 seam/matching constraints moved all primary held-out checks in the right direction relative to `work/v117_transcheb.json`: origin structural `9.139966362302e+3 -> 8.341813217829e+3`, focused structural `1.071336958406e+1 -> 1.021139387583e+1`, and focused raw `4.364551889010e-1 -> 3.984606191010e-1`. The secondary normalized lobe remains unchanged at `1.439516431593e+1`, so the next solver step is adaptive hard-point injection plus broader global constraints, not a proof claim.
+- [x] Added `tools/profile_projected_hardpoints.py` to scan projected profiles with normalized residuals and emit `--active-qb-points` strings. On `work/v117_transcheb_structural_mortar_probe2.json`, it finds the dominant normalized defects at the origin/high-`|b|` edge (`q ~= 0.9083`, `b ~= 0.85-0.92`) and, below the origin switch, at high `|b|` around `q ~= 0.89`, `b=0.92`. A first adaptive constrained pass lowered origin structural max further to `7.822452872401e+3` but worsened focused structural/raw checks to `1.164724939056e+1`/`4.721406319576e-1`, so the best diagnostic checkpoint remains `work/v117_transcheb_structural_mortar_probe2.json`.
+- [x] Added and smoke-tested `tools/profile_newton_adaptive.py`, an automated multi-region hard-point driver. A conservative balanced round from `work/v117_transcheb_structural_mortar_probe2.json` ran successfully but was not an improvement: the active objective was dominated by an interface defect near `q=0.9`, `b=0.865625` with normalized structural max `3.368939946152e+4`; held-out checks stayed at origin structural `8.341009469925e+3`, focused structural/raw `1.020735439617e+1`/`3.983177058335e-1`, secondary structural `1.439516431593e+1`, and broad high-`|b|` structural `5.094286384670e+1`. Tail q1/forced constraints still pass, but `origin_taylor_ok=False`. This confirms the automated adaptive path currently redistributes residual around the origin seam rather than finding a Newton basin.
+
+## Active mathematical obligations
+
+- [ ] Compute trusted indicial roots `delta_j(gamma,B)` with interval or ball validation; the current floating shooting, modal, matching, and Pluecker diagnostics have not found a non-geometric root-like candidate, and apparent basins are dominated by forbidden far-field modes.
+- [ ] Build a proof-native transseries/Chebyshev plus origin-regular Taylor representation while preserving the exact `q=0` conical boundary trace; v64 supplies the best forced-tail asymptotics, and final v117 supplies the best constrained diagnostic balance, but the projection currently fails origin regularity.
+- [ ] Re-solve the nonlinear compactified profile with the conical `q=0` trace enforced from the start; v49 is the best low-residual finite-box admissible seed, while final v117 is the best q1-free forced-tail diagnostic seed and still has residuals `O(1)`.
+- [ ] Produce a validated profile candidate `U_n` in the wedge `2/5 < gamma < 1/2`.
+- [ ] Build the matching determinant `D_match(gamma,B)` through a Lyapunov-Schmidt reduction.
+- [ ] Validate the linearized spectrum: geometric modes first, then non-geometric unstable count. The new `tools/linearized_spectrum_probe.py` is only a rough residual-Jacobian scaffold and does not yet certify the projected operator.
+- [ ] Prove finite-rank unstable projection and stable semigroup gap in the tail-subtracted space.
+- [ ] Add annular divergence repairs and pressure moment correctors with explicit operator bounds.
+- [ ] Assemble the final Lyapunov-Perron contraction using the validated profile/spectrum package.
+
+## Stop condition for a complete proof
+
+The proof is complete only after a specific profile/spectrum package is validated:
+
+```text
+F_gamma(U_*,P_*) = 0,
+2/5 < gamma < 1/2,
+U_*(y) = |y|^(1 - 1/gamma) H(y/|y|) + faster decay,
+rank P_+ < infinity,
+sigma(L) on the complement lies in Re z <= -c < 0.
+```
+
+Until those gates are proved, the strongest correct theorem is conditional.
