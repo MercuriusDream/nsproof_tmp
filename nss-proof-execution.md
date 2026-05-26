@@ -2542,6 +2542,89 @@ origin/rectangle representation?
 Until this is answered, more Newton steps are mainly measuring chart mismatch,
 not a proof-native PDE residual.
 
+To test this directly, `tools/profile_refit_origin_mortar.py` now refits only
+the origin Taylor coefficients against exact rectangular total traces.  It
+leaves
+
+```text
+gamma, B, p,
+tail_constraints,
+F_an/G_an,
+F_frac/G_frac
+```
+
+unchanged, so the q0/q1/forced-tail structure is preserved by construction.
+
+The best diagnostic branch so far is
+
+```text
+work/v117_transcheb_formal_origin_refit_c2_d6_a.json
+```
+
+produced by a degree-6 origin fit over
+
+```text
+q=0.9,0.94,0.98,
+match_order=2,
+value_weight=10,
+d1_weight=0.1,
+d2_weight=0.001.
+```
+
+Its structure audit is saved at
+
+```text
+work/v117_transcheb_formal_origin_refit_c2_d6_a_structure_audit.json.
+```
+
+The exact tail checks remain unchanged:
+
+```text
+q1_F=q1_G=0,
+forced_qp_coeff_error=0.
+```
+
+The focused interior and strict-tail residual checks are also unchanged:
+
+```text
+focused normalized-structural max=1.016228983517e+01,
+strict-tail max=2.287165521365e+01.
+```
+
+The origin-band audit changes decisively:
+
+```text
+before:
+  exact C2 origin mortar max=6.372865880897e+03,
+  origin-band normalized-structural max=2.444892773927e+04,
+  top_at_switch=8/8.
+
+after degree-6 multi-q C2 refit:
+  exact C2 mortar max=3.521152682922e+01,
+  origin-band normalized-structural max=2.111131935798e+02.
+```
+
+This proves the original `O(10^4)` spike was mostly a chart/mortar artifact.
+It does not prove the profile branch.  The remaining origin defect is still
+`O(10^2)`, the origin fit metadata still fails (`origin_taylor_ok=False`), and
+the profile remains many orders of magnitude from NK entry.
+
+Two negative controls are useful:
+
+```text
+C0-only or C1-only origin refits preserve small value mismatch but leave the
+old C2 switch spike at O(10^4).
+
+A pure origin-only Newton step from the degree-6 C2 refit barely changes the
+held-out audit:
+2.111131935798e+02 -> 2.110863508879e+02.
+```
+
+Therefore the next representation step is not another small origin-only Newton
+patch.  Either the origin patch must be solved as part of a genuinely coupled
+C2-compatible rectangular/origin spectral element, or the compactified route
+should pivot to radial core-tail matching once this redesign fails.
+
 The profile validation gates are:
 
 ```text
