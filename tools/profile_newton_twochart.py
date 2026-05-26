@@ -190,6 +190,46 @@ def parse_optional_qb_points(raw: str) -> list[tuple[float, float]]:
     return points
 
 
+def grid_values(start: float, stop: float, count: int) -> list[float]:
+    if count <= 0:
+        raise ValueError("grid count must be positive")
+    if count == 1:
+        return [0.5 * (start + stop)]
+    step = (stop - start) / float(count - 1)
+    return [start + step * index for index in range(count)]
+
+
+def dedupe_qb_points(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    seen: set[tuple[float, float]] = set()
+    out: list[tuple[float, float]] = []
+    for q, b in points:
+        key = (round(float(q), 15), round(float(b), 15))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append((float(q), float(b)))
+    return out
+
+
+def generated_guard_qb_points(args: argparse.Namespace) -> list[tuple[float, float]]:
+    if args.guard_grid == "none":
+        return []
+    q_values = grid_values(args.guard_q_min, args.guard_q_max, args.guard_q_samples)
+    b_values = grid_values(args.guard_b_min, args.guard_b_max, args.guard_b_samples)
+    return [(q, b) for q in q_values for b in b_values]
+
+
+def guard_qb_points_from_args(args: argparse.Namespace) -> dict[str, Any]:
+    explicit = parse_optional_qb_points(args.guard_qb_points)
+    generated = generated_guard_qb_points(args)
+    combined = dedupe_qb_points(explicit + generated)
+    return {
+        "explicit": explicit,
+        "generated": generated,
+        "combined": combined,
+    }
+
+
 def variable_allowed_for_blocks(variable: Any, blocks: tuple[str, ...]) -> bool:
     if variable.chart == "origin":
         return "origin" in blocks or "interface" in blocks
@@ -879,7 +919,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
     history: list[dict[str, Any]] = []
     best_trial: dict[str, Any] | None = None
     best_trial_metrics: dict[str, Any] | None = None
-    guard_points = parse_optional_qb_points(args.guard_qb_points)
+    guard_point_report = guard_qb_points_from_args(args)
+    guard_points = guard_point_report["combined"]
     for iteration in range(args.max_iter):
         system = build_stage0_system(current, args, blocks)
         base_vec = system["residual_vector"]
@@ -1052,6 +1093,12 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
             "guard_qb_points": [[q, b] for q, b in guard_points],
+            "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
+            "guard_qb_points_generated": [[q, b] for q, b in guard_point_report["generated"]],
+            "guard_grid": args.guard_grid,
+            "guard_grid_q_range": [args.guard_q_min, args.guard_q_max],
+            "guard_grid_b_range": [args.guard_b_min, args.guard_b_max],
+            "guard_grid_samples": [args.guard_q_samples, args.guard_b_samples],
             "solve_mode": args.solve_mode,
             "block_search_labels": args.block_search_labels,
             "max_guard_objective_growth": args.max_guard_objective_growth,
@@ -1088,6 +1135,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
 def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport) -> dict[str, Any]:
     blocks = parse_blocks(args.blocks)
     tail_legality = validate_hard_gates(data, args.q2_policy)
+    guard_point_report = guard_qb_points_from_args(args)
     hard_newton_schema = data.get("hard_newton_schema", {})
     residual_blocks = []
     unknown_blocks = []
@@ -1123,6 +1171,13 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_coordinates": args.mortar_coordinates,
             "mortar_active_count": args.mortar_active_count,
             "chart_balanced_selection": args.chart_balanced_selection,
+            "guard_qb_points": [[q, b] for q, b in guard_point_report["combined"]],
+            "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
+            "guard_qb_points_generated": [[q, b] for q, b in guard_point_report["generated"]],
+            "guard_grid": args.guard_grid,
+            "guard_grid_q_range": [args.guard_q_min, args.guard_q_max],
+            "guard_grid_b_range": [args.guard_b_min, args.guard_b_max],
+            "guard_grid_samples": [args.guard_q_samples, args.guard_b_samples],
             "row_normalization": args.row_normalization,
             "max_iter": args.max_iter,
             "trust": args.trust,
@@ -1181,6 +1236,21 @@ def main() -> None:
     parser.add_argument("--overlap-q-max", type=float, default=0.92)
     parser.add_argument("--pde-qb-points", default="")
     parser.add_argument("--guard-qb-points", default="", help="Semicolon-separated q,b points used only as line-search guards.")
+    parser.add_argument(
+        "--guard-grid",
+        choices=("none", "edge", "box"),
+        default="none",
+        help=(
+            "Generate an additional q,b guard grid. 'edge' and 'box' both use the "
+            "explicit guard-q/b ranges; names are kept separate for report clarity."
+        ),
+    )
+    parser.add_argument("--guard-q-min", type=float, default=0.84)
+    parser.add_argument("--guard-q-max", type=float, default=0.92)
+    parser.add_argument("--guard-b-min", type=float, default=0.10)
+    parser.add_argument("--guard-b-max", type=float, default=0.98)
+    parser.add_argument("--guard-q-samples", type=positive_int, default=5)
+    parser.add_argument("--guard-b-samples", type=positive_int, default=7)
     parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
     parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
     parser.add_argument("--solve-mode", choices=("full", "block-search"), default="full")
@@ -1235,6 +1305,10 @@ def main() -> None:
         parser.error("--row-scale-min must be nonnegative")
     if args.row_scale_min > args.row_scale_max:
         parser.error("--row-scale-min must be <= --row-scale-max")
+    if args.guard_q_max <= args.guard_q_min:
+        parser.error("--guard-q-max must be greater than --guard-q-min")
+    if args.guard_b_max <= args.guard_b_min:
+        parser.error("--guard-b-max must be greater than --guard-b-min")
 
     data = load_json(args.input)
     validate_input_schema(data, args.input)

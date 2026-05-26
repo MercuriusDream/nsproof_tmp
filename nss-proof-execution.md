@@ -4071,6 +4071,51 @@ direct high-degree tail controls are violently nonlocal in the edge diagnostic.
 They need broad edge regularization/guards or a true constrained Schur solve
 before they can be accepted.
 
+`tools/profile_newton_twochart.py` now has generated guard grids:
+
+```text
+--guard-grid edge|box
+--guard-q-min/--guard-q-max
+--guard-b-min/--guard-b-max
+--guard-q-samples/--guard-b-samples
+```
+
+The generated points are deduplicated with explicit `--guard-qb-points` and
+use the same existing guard objective/max acceptance checks.  The canonical
+broad-grid seam-injection probe is:
+
+```text
+work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json
+guard points: 46 effective points, 45 generated plus the explicit hidden point
+base broad-guard max: 3.891736619747e2 at q=0.88,b=0.98
+accepted_any_step: false
+```
+
+The raw sampled objective improves for the injected tail direction, but the
+broad guard rejects every tested line-search alpha.  The known hidden edge
+`q=0.86,b=0.20` remains the worst guard:
+
+```text
+alpha 1:        guard max = 3.169794284607e5
+alpha 0.25:     guard max = 8.014964806366e4
+alpha 0.0625:   guard max = 2.008315326633e4
+alpha 0.015625: guard max = 5.012838960870e3
+alpha 0.00390625: guard max = 1.241904721621e3
+```
+
+So the seam-Jacobian tail direction is not just failing a narrow guard.  It has
+a guarded-edge conflict even at tiny steps.  The next decisive test is to make
+the broad edge set active in the least-squares system, then, if that still
+rejects, implement a guarded KKT/Schur-style solve that computes a seam
+correction inside the edge-feasible tangent space.
+
+A direct active-edge-row retry was attempted in two forms: an uncapped
+64-variable tail candidate pass and a bounded 24-variable pass.  Both spent
+multiple minutes in repeated active-row scoring without producing artifacts, so
+they were stopped.  This is not evidence that active edge rows fail; it says
+the current Stage-0 implementation is too expensive for that experiment without
+caching row/column evaluations or adding a dedicated guarded KKT/Schur mode.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4086,11 +4131,12 @@ Conclusion: the immediate blocker is still the two-chart Stage-0 coupled
 linear system and interface/PDE balance. The new R/Z rows are the right
 coordinate language, and the origin chart has enough algebraic freedom to match
 the seam alone. Balanced tail+origin variables are now active, held-out guards
-prevent accepting edge-damaging steps, and restricted origin-block descent can
-improve origin/overlap while preserving the guard. The sampled system still
-cannot reduce the worst seam row and guarded edge simultaneously. Seam-Jacobian
-injection shows that the relevant tail variables create hidden-edge explosions.
-The next solver step should add a broad edge guard/regularization grid around
-the high-degree tail controls or implement a true constrained Schur-style solve;
-row normalization alone is not enough. It is too early to free `(gamma,B)`,
-pivot to radial matching, or start spectral validation as a theorem dependency.
+prevent accepting edge-damaging steps, restricted origin-block descent can
+improve origin/overlap while preserving the guard, and broad guard grids now
+catch the nonlocal hidden-edge damage from high-degree tail seam variables. The
+sampled system still cannot reduce the worst seam row and guarded edge
+simultaneously. The next solver step is not to weaken the guard; it is to make
+edge rows active in the linear system or implement a true constrained
+Schur-style solve with cached row/column evaluation. Row normalization alone is
+not enough. It is too early to free `(gamma,B)`, pivot to radial matching, or
+start spectral validation as a theorem dependency.

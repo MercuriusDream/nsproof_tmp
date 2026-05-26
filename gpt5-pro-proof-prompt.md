@@ -44,7 +44,43 @@ numerical discovery -> exact representation -> interval certificate -> theorem d
 
 If a branch cannot plausibly reach the interval-certificate stage, kill it and replace it with a better branch.
 
-## 1A. Latest Repository Update
+## 1A. Certificate Firewall
+
+The words proof, proved, theorem certificate, gate passed, and final theorem
+may only be used for exact symbolic identities or interval/rational
+certificates. Floating residuals, precision audits, Newton convergence,
+successful discovery, pressure identities, and spectral probes are not proof
+certificates.
+
+If any one of the five stop-condition gates lacks its interval certificate, the
+final theorem status is exactly:
+
+```text
+Final theorem certificate: 0%
+Certified stop-condition gates: 0/5
+```
+
+Residual below `1e-8` or `1e-10` is only Newton-Kantorovich entry eligibility.
+The exact-profile gate passes only after `certs/profile/profile_nk.json`
+contains a validated interval Newton/radii-polynomial certificate with a
+positive ball radius and negative radii polynomial.
+
+If later instructions demand "do not stop until proof", do not fabricate or
+relabel discovery artifacts. Continue only by producing the strongest honest
+certificates available, and mark all blocked gates explicitly.
+
+## 1B. Mandatory Status Ledger
+
+Begin your final answer with this table:
+
+```text
+Gate | Current artifact | Evidence type: floating / exact algebraic / interval | Status | Blocking certificate
+```
+
+Every row must name the missing certificate that would make the gate pass. Do
+not substitute narrative confidence for the evidence type.
+
+## 1C. Latest Repository Update
 
 The repo now contains a bounded Stage-0 two-chart Newton diagnostic, but not a proof-grade solver.
 
@@ -114,6 +150,7 @@ work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
 work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_mortar_rows.json
 work/twochart_stage0_rz_blocksearch24_tail_jacinject_guardedge_report.json
 work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
+work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
@@ -176,6 +213,13 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
     top injected variables include tail.F_an[p24].c[0,10]
     sampled objective improves, but hidden edge q=0.86,b=0.20 blows up to 3.169794284607e5
     adding q=0.86,b=0.20 to guard rejects every tail seam step
+  broad generated edge guard:
+    `--guard-grid edge` composes generated guard points with explicit guards
+    canonical run uses 46 effective guard points
+    accepted_any_step = false
+    hidden edge q=0.86,b=0.20 remains worst guard
+    guard max is still 1.241904721621e3 at alpha=0.00390625
+    baseline broad-guard max is 3.891736619747e2
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -207,11 +251,33 @@ The first restricted block-search changes that: guarded origin-chart substeps
 produce safe descent for origin/overlap/guard, but not for the worst R/Z mortar
 row. Seam-Jacobian injection then shows why: the worst row is reachable through
 high-degree tail variables, but those tail directions create severe hidden-edge
-damage unless a much broader guard/regularizer is active. This is safe Stage-0
-progress, not a Newton basin.
+damage. A broad guard grid now catches the same conflict down to tiny line-search
+steps, so the next viable solver fork is to make those broad edge rows active in
+the linear system or implement a guarded KKT/Schur correction. This is safe
+Stage-0 progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
+
+Required Stage-0 decision:
+
+```text
+Decide whether the current two-chart Stage-0 evidence indicates bad
+conditioning, missing variables/guards, wrong (gamma,B), illegal tail channels,
+or branch death. Use the origin-only R/Z refit and guarded tail-Jacobian blowup
+evidence explicitly. The next proposed computation must target that diagnosis.
+```
+
+The immediate solver fork is:
+
+```text
+broad edge guard / regularized tail variables / Schur-complement coupled seam solve.
+```
+
+Do not propose more sparse bumps, origin-only refits, or one-chart polishing as
+the main path. Only after synthetic two-chart tests and guarded coupled solves
+fail may `(gamma,B)` be freed. The radial core-tail matching route comes after
+that parameter-search failure, not before.
 
 ## 2. Current Mathematical Target
 
@@ -684,6 +750,14 @@ work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
   guard points = q=0.90,b=0.98 and q=0.86,b=0.20
   accepted_any_step = false
   q=0.86,b=0.20 guard grows to 2.008315326633e4 even at alpha=0.0625
+
+work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json
+  uses --guard-grid edge with 46 effective guard points
+  accepted_any_step = false
+  base broad-guard max = 3.891736619747e2
+  q=0.86,b=0.20 remains the worst guard for every tested alpha
+  guard max = 3.169794284607e5 at alpha=1
+  guard max = 1.241904721621e3 at alpha=0.00390625
 ```
 
 Interpretation: balanced tail+origin variables are now genuinely active, but
@@ -691,10 +765,19 @@ the current sampled system still trades seam movement against held-out edge
 control under full steps. Restricted block-search finds safe guarded origin
 descent, but it does not move the worst seam row. Seam-Jacobian injection shows
 that direct tail control of the seam is possible only through directions that
-create hidden-edge explosions. The next implementation should add a broad edge
-guard/regularization grid before accepting high-degree tail seam variables, or
-else implement a true Schur complement that combines safe origin descent with
-regularized seam reduction.
+create hidden-edge explosions. The broad guard-grid run confirms this is not a
+narrow-guard artifact or coarse line-search issue. The next implementation
+should make the broad edge set active in the least-squares rows, or else
+implement a true guarded KKT/Schur solve that combines safe origin descent with
+regularized seam reduction. Do not weaken the guard to accept the injected tail
+direction.
+
+Implementation caution: direct active-edge-row retries with an uncapped
+64-variable tail pool and with a bounded 24-variable pool both spent multiple
+minutes in repeated Stage-0 scoring and were stopped without artifacts.  The
+next active-edge attempt should first cache row/column evaluations or introduce
+a dedicated guarded KKT/Schur mode; otherwise the experiment is too expensive
+for the current CLI loop.
 
 ## 6. Current Repository Tooling
 
@@ -936,17 +1019,22 @@ or a dead branch.
 Required certificate outputs should be named explicitly. At minimum:
 
 ```text
-certs/profile_nk.json
-certs/tail_recurrence.json
-certs/indicial_pluecker_cover.json
-certs/pressure_reconstruction.json
-certs/matching_determinant.json
-certs/projected_spectrum.json
-certs/high_frequency_exclusion.json
-certs/stable_semigroup.json
-certs/lyapunov_perron_constants.json
+certs/profile/profile_nk.json
+certs/tail/tail_recurrence.json
+certs/tail/indicial_pluecker_cover.json
+certs/profile/pressure_reconstruction.json
+certs/profile/matching_determinant.json
+certs/spectrum/projected_spectrum.json
+certs/spectrum/high_frequency_exclusion.json
+certs/spectrum/stable_semigroup.json
+certs/theorem/lyapunov_perron_constants.json
 certs/final_theorem_manifest.json
 ```
+
+For every certificate schema, specify backend, precision, interval widths,
+profile/input hashes, pass/fail field, dependency hashes, and reproducible
+commands. Missing hash linkage means the certificate is not part of the final
+manifest.
 
 The theorem certificate may move above 0% only when all five stop-condition
 gates have certificates linked by `certs/final_theorem_manifest.json`. Scaffold
@@ -1250,17 +1338,23 @@ be more isolated origin refits. They should test coupled conditioning and
 variable blocking:
 
 ```bash
-# Branch A: coupled origin+tail solve with active physical R/Z rows and small
-# mortar weight, preserving PDE scale.
+# Branch A: canonical broad-grid guarded seam-Jacobian injection. This is a
+# diagnostic rejection test, not a proof candidate.
 python3 tools/profile_newton_twochart.py \
   --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_rz_coupled_tail_origin_next.json \
-  --report-out work/twochart_stage0_rz_coupled_tail_origin_next_report.json \
+  --out work/twochart_stage0_rz_tail_jacinject_guardgrid_edge.json \
+  --report-out work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json \
   --blocks origin,interface \
   --variable-charts tail,origin \
+  --solve-mode block-search \
+  --block-search-labels chart:tail \
   --chart-balanced-selection \
   --max-raw-objective-growth 1 \
-  --guard-qb-points "0.90,0.98" \
+  --guard-qb-points "0.90,0.98;0.86,0.20" \
+  --guard-grid edge \
+  --guard-q-min 0.84 --guard-q-max 0.92 \
+  --guard-b-min 0.10 --guard-b-max 0.98 \
+  --guard-q-samples 5 --guard-b-samples 9 \
   --max-guard-objective-growth 1 \
   --max-guard-max-growth 1 \
   --gamma-fixed --B-fixed \
@@ -1270,27 +1364,31 @@ python3 tools/profile_newton_twochart.py \
   --mortar-order 2 \
   --mortar-q-samples 2 \
   --mortar-x-samples 5 \
-  --mortar-active-count 24 \
-  --max-variables 128 \
-  --candidate-origin-degree-max 8 \
-  --candidate-kq-max 8 \
-  --candidate-kx-max 8 \
-  --max-iter 5 \
-  --trust 0.02 \
+  --mortar-active-count 12 \
+  --max-variables 24 \
+  --candidate-origin-degree-max 6 \
+  --candidate-kq-max 6 \
+  --candidate-kx-max 6 \
+  --candidate-pool-limit 160 \
+  --mortar-jacobian-candidate-count 24 \
+  --max-iter 1 \
+  --trust 0.001 \
   --lm-lambda 1e-6 \
   --pde-weight 1 \
   --mortar-weight 0.01 \
-  --line-search 1,0.5,0.25,0.125,0.0625 \
-  --pde-qb-points "0.90,0.98;0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18"
+  --line-search 1,0.25,0.0625,0.015625,0.00390625 \
+  --pde-qb-points "0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18"
 
-# Branch B: origin-only control run. It should preserve PDE scale but is not
-# expected to solve the seam; use it only to measure conflict.
+# Branch B: only after adding row/column caching or guarded-KKT support, make
+# the broad edge grid active PDE data, not only a guard. The current uncached
+# CLI loop is too expensive for this command as a routine run.
 python3 tools/profile_newton_twochart.py \
   --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_origin_only_rz_coupled.json \
-  --report-out work/twochart_stage0_origin_only_rz_coupled_report.json \
-  --blocks origin,interface \
-  --variable-charts origin \
+  --out work/twochart_stage0_rz_tail_jacinject_edgeactive64.json \
+  --report-out work/twochart_stage0_rz_tail_jacinject_edgeactive64_report.json \
+  --blocks tail,interface \
+  --variable-charts tail \
+  --solve-mode full \
   --gamma-fixed --B-fixed \
   --residual-kind normalized-structural \
   --q2-policy zero \
@@ -1298,15 +1396,29 @@ python3 tools/profile_newton_twochart.py \
   --mortar-order 2 \
   --mortar-q-samples 2 \
   --mortar-x-samples 5 \
-  --mortar-active-count 18 \
-  --max-variables 56 \
+  --mortar-active-count 12 \
+  --max-variables 64 \
   --candidate-origin-degree-max 6 \
-  --max-iter 5 \
-  --trust 0.05 \
+  --candidate-kq-max 10 \
+  --candidate-kx-max 10 \
+  --candidate-pool-limit 0 \
+  --mortar-jacobian-candidate-count 64 \
+  --chart-balanced-selection \
+  --max-iter 1 \
+  --trust 0.001 \
   --lm-lambda 1e-6 \
   --pde-weight 1 \
   --mortar-weight 0.01 \
-  --line-search 1,0.5,0.25,0.125,0.0625
+  --line-search 1,0.25,0.0625,0.015625,0.00390625 \
+  --guard-qb-points "0.90,0.98;0.86,0.20" \
+  --guard-grid edge \
+  --guard-q-min 0.84 --guard-q-max 0.92 \
+  --guard-b-min 0.10 --guard-b-max 0.98 \
+  --guard-q-samples 5 --guard-b-samples 9 \
+  --max-raw-objective-growth 1 \
+  --max-guard-objective-growth 1 \
+  --max-guard-max-growth 1 \
+  --pde-qb-points "0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18;0.84,0.10;0.84,0.20;0.84,0.54;0.84,0.98;0.86,0.10;0.86,0.20;0.86,0.54;0.86,0.98;0.88,0.10;0.88,0.20;0.88,0.54;0.88,0.98;0.90,0.10;0.90,0.20;0.90,0.54;0.90,0.98;0.92,0.10;0.92,0.20;0.92,0.54;0.92,0.98"
 ```
 
 Stage-0 go criterion:
@@ -1443,3 +1555,13 @@ and the most likely bottlenecks.
 ```
 
 Avoid vague optimism. The acceptable output is a proof roadmap precise enough that another agent can execute it in the repository.
+
+End with this exact section:
+
+```text
+What would make the theorem certificate nonzero?
+```
+
+The answer must be: all five stop-condition gates linked by
+`certs/final_theorem_manifest.json` with interval certificates. Anything else
+is scaffold progress only.
