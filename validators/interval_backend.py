@@ -204,3 +204,59 @@ def interval_matrix_inf_norm(matrix: list[list[Interval]]) -> float:
     if rc != STATUS_OK or status.value != STATUS_OK:
         raise RuntimeError(f"interval_matrix_inf_norm failed rc={rc} status={status.value}")
     return float(out.value)
+
+
+def interval_matvec_inf_norm(matrix: list[list[Interval]], vector: Iterable[Interval]) -> float:
+    values = _as_intervals(vector)
+    row_count, column_count, matrix_lo, matrix_hi = _matrix_arrays(matrix)
+    if len(values) != column_count:
+        raise ValueError("matrix/vector dimension mismatch")
+    vector_lo, vector_hi = _arrays(values)
+    out = ctypes.c_double(0.0)
+    status = ctypes.c_int(0)
+    lib = native_c_library()
+    rc = lib.nsproof_interval_matvec_inf_norm(
+        row_count,
+        column_count,
+        matrix_lo,
+        matrix_hi,
+        vector_lo,
+        vector_hi,
+        ctypes.byref(out),
+        ctypes.byref(status),
+    )
+    if rc != STATUS_OK or status.value != STATUS_OK:
+        raise RuntimeError(f"interval_matvec_inf_norm failed rc={rc} status={status.value}")
+    return float(out.value)
+
+
+def interval_left_matmul_identity_defect_inf_norm(
+    left: list[list[Interval]],
+    right: list[list[Interval]],
+) -> float:
+    left_rows, shared_count, left_lo, left_hi = _matrix_arrays(left)
+    right_rows, right_cols, right_lo, right_hi = _matrix_arrays(right)
+    if shared_count != right_rows:
+        raise ValueError("matrix product dimension mismatch")
+    if left_rows != right_cols:
+        raise ValueError("identity defect requires a square product")
+    out = ctypes.c_double(0.0)
+    status = ctypes.c_int(0)
+    lib = native_c_library()
+    rc = lib.nsproof_interval_left_matmul_identity_defect_inf_norm(
+        left_rows,
+        shared_count,
+        right_cols,
+        left_lo,
+        left_hi,
+        right_lo,
+        right_hi,
+        ctypes.byref(out),
+        ctypes.byref(status),
+    )
+    if rc != STATUS_OK or status.value != STATUS_OK:
+        raise RuntimeError(
+            "interval_left_matmul_identity_defect_inf_norm "
+            f"failed rc={rc} status={status.value}"
+        )
+    return float(out.value)

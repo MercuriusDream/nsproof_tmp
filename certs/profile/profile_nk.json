@@ -21,19 +21,26 @@
     "row cache is floating, not interval residual data",
     "approximate inverse is floating ridge-SVD, not validated",
     "Z2 and infinite complement bounds are missing",
+    "profile residual/mortar is far above NK entry scale",
+    "finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+    "best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1",
+    "sweep is floating and sampled, not interval residual validation",
+    "approximate inverses are floating ridge-SVD diagnostics",
+    "Z2 and infinite complement bounds are missing",
     "profile residual/mortar is far above NK entry scale"
   ],
   "certificate_name": "profile_nk",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json"
   ],
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
-    "exact_residual_audit": "19017d7a24501770efb31b67304896b7aff016c84895f8660e09791624b72fba",
-    "finite_nk_bounds": "c214d60db81829e2777e8df80ebaeeb8f6aac2413350f5dc93aae607894b93a2",
-    "interval_backend": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
-    "native_interval_kernel": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
+    "exact_residual_audit": "1cce80e41a21a4ed1bcaa2c0ec41739ecf6590f5b02a4756117d25f8d39e5329",
+    "finite_nk_bounds": "764463de866b761f218a3750b9ff16926fc3207d9ba6059e5ce549ac6f96ce89",
+    "interval_backend": "a87cba36b4870f66b987e3683b99ba1006b389a9422cd75cdee7a9bacedbe0c1",
+    "native_interval_kernel": "47a32dbc6b006611a05ea2d0dde99bee9436abc2ed116da43de56fb718d73ba2",
     "sampled_finite_block_report": "7b82d9a964f8be3876e29b6fcabfee262fa851d65c8ce051cf74f062f207f8f6",
+    "sampled_finite_block_sweep": "cacb9ee4640a87d918abdaebc70c4991cacc46b4037d108d4fa4e96fa7994280",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "exact_residual_audit": {
@@ -47,7 +54,7 @@
     ],
     "certificate_name": "exact_residual_twochart_audit",
     "commands": [
-      "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json"
+      "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json"
     ],
     "dependency_hashes": {},
     "entry_ready_for_interval_nk": false,
@@ -66,7 +73,7 @@
         "cases": 657120,
         "enabled": true,
         "rows": 2430,
-        "seconds": 0.9318028749999989
+        "seconds": 0.9315278750000004
       },
       "orders": "C0-C4",
       "overlap_q_range": [
@@ -446,7 +453,7 @@
     "precision_bits": 53,
     "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
     "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-    "repo_commit": "1c1d406d900ed1bc9871d292695cac0dc136b74a",
+    "repo_commit": "2bf6cf4deb3f373cedc8bad2f0fceda0a4026b38",
     "residual_blocks": {
       "max_abs": 448.91653502849033,
       "scans": {
@@ -656,7 +663,7 @@
         }
       }
     },
-    "residual_map_hash_sha256": "0c43f8524e0aa7ef83df3653b93d44ebf4e6c6ba21e785a9934e5735b9e8f84e",
+    "residual_map_hash_sha256": "f2b28046f8a44ffa41580257015e308032b574a94fdc910902a06da8af871db3",
     "residual_map_statement": "psi = r^2 z q^p F(q,x), Gamma = r^2 q^p G(q,x),\nq = (1+r^2+z^2)^(-1/2), x = z^2/(r^2+z^2).\n\nA = psi_rr - psi_r/r + psi_zz.\n\nE_psi = (1-gamma) r^2 A + gamma r^3 A_r + gamma z r^2 A_z\n        + r(psi_r A_z - psi_z A_r) + 2 psi_z A + (Gamma^2)_z.\n\nE_Gamma = (1-2gamma) Gamma + gamma(r Gamma_r + z Gamma_z)\n          + (psi_r Gamma_z - psi_z Gamma_r)/r.\n\nThe discovery quotient residual divides by the configured compactified\nmechanical factors only.  Physical two-chart mortar is evaluated in R=r^2,\nZ=z^2 derivatives.",
     "rounding_mode": "nearest",
     "schema_version": "nsproof-cert-v1",
@@ -741,13 +748,13 @@
       "nk_entry_residual_max": 1e-08
     }
   },
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=2.670891433969e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=2.670891433969e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
   "finite_nk_backend": {
     "backend": "native-c-outward-rounded-double-interval",
     "input_hashes": {
-      "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
-      "validators/finite_nk_bounds.py": "c214d60db81829e2777e8df80ebaeeb8f6aac2413350f5dc93aae607894b93a2",
-      "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82"
+      "native/c/nsproof_kernel.c": "47a32dbc6b006611a05ea2d0dde99bee9436abc2ed116da43de56fb718d73ba2",
+      "validators/finite_nk_bounds.py": "764463de866b761f218a3750b9ff16926fc3207d9ba6059e5ce549ac6f96ce89",
+      "validators/interval_backend.py": "a87cba36b4870f66b987e3683b99ba1006b389a9422cd75cdee7a9bacedbe0c1"
     },
     "profile_block_status": "floating_profile_block_attached_not_certified",
     "scope": "Computes finite-dimensional Y0=||A r||_inf and Z0=||I-AJ||_inf once a profile residual vector, Jacobian block, and approximate inverse are exported as interval data.",
@@ -793,8 +800,8 @@
   },
   "radii_polynomial_interval": null,
   "radius_interval": null,
-  "repo_commit": "1c1d406d900ed1bc9871d292695cac0dc136b74a",
-  "residual_map_hash_sha256": "0c43f8524e0aa7ef83df3653b93d44ebf4e6c6ba21e785a9934e5735b9e8f84e",
+  "repo_commit": "2bf6cf4deb3f373cedc8bad2f0fceda0a4026b38",
+  "residual_map_hash_sha256": "f2b28046f8a44ffa41580257015e308032b574a94fdc910902a06da8af871db3",
   "rounding_mode": null,
   "sampled_finite_block_report": {
     "approximate_inverse": {
@@ -861,6 +868,178 @@
     },
     "sha256": "7b82d9a964f8be3876e29b6fcabfee262fa851d65c8ce051cf74f062f207f8f6",
     "status": "PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF"
+  },
+  "sampled_finite_block_sweep": {
+    "best_by_cache": {
+      "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json": {
+        "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+        "Z0_infinity_norm_B": 1.1097157772968378,
+        "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+        "coefficient_dimension": 128,
+        "column_count": 128,
+        "condition_estimate": 5.432327882525852e+19,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+          "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+          "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+        },
+        "jacobian_row_sum_inf": 123269672050.79108,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 66,
+        "residual_dimension": 325,
+        "residual_inf": 58337.457692108546,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+        "selected_row_count": 325,
+        "svd_rcond": 1e-10
+      },
+      "work/twochart_stage0_rz_ineqkkt_c4_shiftB256_coupled_tailnative_scaled_rows.json": {
+        "Y0_infinity_norm_A_r": 6.327550925315824e-08,
+        "Z0_infinity_norm_B": 1.3290716054207934,
+        "approximate_inverse_row_sum_inf": 2.0377034961807965e-12,
+        "coefficient_dimension": 256,
+        "column_count": 256,
+        "condition_estimate": 5.566262842829728e+18,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "02ed519e0042479000fb177faf3d37d23431707f53cefda95118200d539f112a",
+          "jacobian_float64": "7965f92b07832b5f103e7be8bbb52aa0093bd75f9d9730f6fbf6c0c7d87f3562",
+          "residual_vector_float64": "64426aad5bee6bd2d56a6a4d4edf521d39a74dd0f2867c93ab8ab43fbdc2fc62"
+        },
+        "jacobian_row_sum_inf": 11232148022837.01,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 126,
+        "residual_dimension": 342,
+        "residual_inf": 58337.457692108546,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB256_coupled_tailnative_scaled_rows.json",
+        "selected_row_count": 342,
+        "svd_rcond": 1e-12
+      },
+      "work/twochart_stage0_rz_ineqkkt_c4_shiftB64_tailnative_scaled_rows.json": {
+        "Y0_infinity_norm_A_r": 7.642484415914418e-05,
+        "Z0_infinity_norm_B": 1.2063731136489195,
+        "approximate_inverse_row_sum_inf": 3.9732850943716846e-09,
+        "coefficient_dimension": 64,
+        "column_count": 64,
+        "condition_estimate": 1.0017957908694248e+16,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "6126be0748c23b0257b0aba89eb31270c830e80c09e37725df12a81190f87f11",
+          "jacobian_float64": "78375d666044ece6b5788cd8402e3ab47481e85f3ab5207f4f755c8d50d21841",
+          "residual_vector_float64": "b391d15ff7744ac822197f3611d54c0570b732739316ed8b770d27f3f6631998"
+        },
+        "jacobian_row_sum_inf": 12740642287.506151,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 45,
+        "residual_dimension": 320,
+        "residual_inf": 58337.457692108546,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB64_tailnative_scaled_rows.json",
+        "selected_row_count": 320,
+        "svd_rcond": 1e-10
+      },
+      "work/twochart_stage0_rz_ineqkkt_shiftA128_tailnative_rows.json": {
+        "Y0_infinity_norm_A_r": 0.001498821531759582,
+        "Z0_infinity_norm_B": 1.8354960955470068,
+        "approximate_inverse_row_sum_inf": 1.565921248763508e-06,
+        "coefficient_dimension": 128,
+        "column_count": 128,
+        "condition_estimate": 6.753857873608171e+16,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "ea5d91f8bb2d295070d1e5e3981e0a581c846cf03b577e1b034401a5b0300622",
+          "jacobian_float64": "0d0862ae3fa6948510f37d1a1e83b5896cba8040b48f923c1261a769c279d74c",
+          "residual_vector_float64": "4655a920f07fa0fd6de314560ceb7db4c9db8dede5c5af863cf565bbe350e89d"
+        },
+        "jacobian_row_sum_inf": 82893454.76935522,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 74,
+        "residual_dimension": 317,
+        "residual_inf": 4136.711157389296,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_shiftA128_tailnative_rows.json",
+        "selected_row_count": 317,
+        "svd_rcond": 1e-10
+      },
+      "work/twochart_stage0_rz_ineqkkt_shiftB128_tailnative_scaled_rows.json": {
+        "Y0_infinity_norm_A_r": 0.001445500756906515,
+        "Z0_infinity_norm_B": 1.828091917020126,
+        "approximate_inverse_row_sum_inf": 1.957330189228044e-06,
+        "coefficient_dimension": 128,
+        "column_count": 128,
+        "condition_estimate": 6.890852819830796e+16,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "e7b1fe10da6ec463af133300f8fce52dc12d2afe97a520e180b79a5b2ccea793",
+          "jacobian_float64": "06f20612e246d3d7981065c2b30a7d3c0c400175d29d429f18e1649ab76dcd1f",
+          "residual_vector_float64": "86529b66fcf5b9c4772d716fda97b2682d7c0d7999371df57ac9ff79381ec2c3"
+        },
+        "jacobian_row_sum_inf": 101274095.93426731,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 84,
+        "residual_dimension": 317,
+        "residual_inf": 4489.165350256774,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_shiftB128_tailnative_scaled_rows.json",
+        "selected_row_count": 317,
+        "svd_rcond": 1e-12
+      },
+      "work/twochart_stage0_rz_ineqkkt_shiftC128_tailnative_scaled_rows.json": {
+        "Y0_infinity_norm_A_r": 0.0014350847586820422,
+        "Z0_infinity_norm_B": 1.8252240065908392,
+        "approximate_inverse_row_sum_inf": 2.0850576165431698e-06,
+        "coefficient_dimension": 128,
+        "column_count": 128,
+        "condition_estimate": 2.494179844083269e+16,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "df0e396e77ae5be903c1351860233d1f8e5f9724a42d461fca12a4a23f7e8ba4",
+          "jacobian_float64": "d19d3b514dfffd2d3a3288bfdd335ac852bb25523ad5c24d21e3ac150753e861",
+          "residual_vector_float64": "8e9ec69d02ea281d1225dae183e0063eb98822fc471ee41b7e4f7993980e65a1"
+        },
+        "jacobian_row_sum_inf": 82893454.76935522,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 78,
+        "residual_dimension": 317,
+        "residual_inf": 4136.711157389296,
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_shiftC128_tailnative_scaled_rows.json",
+        "selected_row_count": 317,
+        "svd_rcond": 1e-12
+      }
+    },
+    "best_overall": {
+      "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+      "Z0_infinity_norm_B": 1.1097157772968378,
+      "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+      "coefficient_dimension": 128,
+      "column_count": 128,
+      "condition_estimate": 5.432327882525852e+19,
+      "finite_block_hashes": {
+        "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+        "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+        "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+      },
+      "jacobian_row_sum_inf": 123269672050.79108,
+      "profile": "work/v117_twochart_init.json",
+      "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+      "rank_after_cutoff": 66,
+      "residual_dimension": 325,
+      "residual_inf": 58337.457692108546,
+      "ridge_relative": 0.0001,
+      "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+      "selected_row_count": 325,
+      "svd_rcond": 1e-10
+    },
+    "diagnostic_vs_proof": "Floating sampled row-cache sweep. Finite Y0/Z0 arithmetic uses the native C interval backend, but row caches and inverses are floating diagnostics and no Z2/tail-complement bound is supplied.",
+    "failure_count": 0,
+    "pass": false,
+    "path": "certs/profile/profile_finite_nk_sweep.json",
+    "sha256": "cacb9ee4640a87d918abdaebc70c4991cacc46b4037d108d4fa4e96fa7994280",
+    "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+    "trial_count": 60
   },
   "schema_version": "nsproof-cert-v1",
   "tail_inverse_bound": null,

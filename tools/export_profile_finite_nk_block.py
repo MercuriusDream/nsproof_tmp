@@ -28,7 +28,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from validators.finite_nk_bounds import finite_nk_bounds  # noqa: E402
+from validators.finite_nk_bounds import finite_nk_bound_summary, finite_nk_bounds  # noqa: E402
 
 
 SCHEMA_VERSION = "nsproof-cert-v1"
@@ -160,7 +160,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     column_count = int(cache["column_count"])
     residual, jacobian = dense_block(rows, column_count)
     approximate_inverse, inverse_report = ridge_svd_inverse(jacobian, args.ridge_relative, args.svd_rcond)
-    finite_bounds = finite_nk_bounds(residual.tolist(), jacobian.tolist(), approximate_inverse.tolist())
+    if args.summary_only:
+        finite_bounds = finite_nk_bound_summary(residual.tolist(), jacobian.tolist(), approximate_inverse.tolist())
+    else:
+        finite_bounds = finite_nk_bounds(residual.tolist(), jacobian.tolist(), approximate_inverse.tolist())
     residual_inf = float(np.max(np.abs(residual)))
     jacobian_inf = float(np.max(np.sum(np.abs(jacobian), axis=1)))
     inverse_inf = float(np.max(np.sum(np.abs(approximate_inverse), axis=1)))
@@ -205,6 +208,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "Y0_infinity_norm_A_r": finite_bounds["Y0_infinity_norm_A_r"],
             "Z0_infinity_norm_B": finite_bounds["Z0_infinity_norm_B"],
         },
+        "finite_nk_payload": "summary_only" if args.summary_only else "full_interval_products",
         "blockers": [
             "row cache is floating, not interval residual data",
             "approximate inverse is floating ridge-SVD, not validated",
@@ -223,6 +227,7 @@ def main() -> None:
     parser.add_argument("--max-rows", type=int)
     parser.add_argument("--ridge-relative", type=float, default=1e-8)
     parser.add_argument("--svd-rcond", type=float, default=1e-12)
+    parser.add_argument("--summary-only", action="store_true")
     args = parser.parse_args()
     if args.max_rows is not None and args.max_rows <= 0:
         parser.error("--max-rows must be positive")

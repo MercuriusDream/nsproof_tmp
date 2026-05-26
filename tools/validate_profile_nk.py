@@ -99,6 +99,21 @@ def finite_block_blockers(report: dict[str, Any] | None) -> list[str]:
     return blockers
 
 
+def finite_sweep_blockers(report: dict[str, Any] | None) -> list[str]:
+    if report is None:
+        return []
+    blockers = [f"finite-block sweep is diagnostic-only: {report.get('status')}"]
+    best = report.get("best_overall") or {}
+    z0 = best.get("Z0_infinity_norm_B")
+    if z0 is None:
+        blockers.append("finite-block sweep does not contain a best Z0")
+    elif float(z0) >= 1.0:
+        blockers.append(f"best sampled finite-block sweep Z0={float(z0):.12e} is >= 1")
+    if not report.get("pass", False):
+        blockers.extend(str(item) for item in report.get("blockers", []))
+    return blockers
+
+
 def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     exact_audit = build_exact_residual_audit(
         profile=args.profile,
@@ -117,6 +132,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
     exact_audit["commands"] = [" ".join(sys.argv)]
 
     finite_block_report = load_optional_json(args.finite_block_report)
+    finite_sweep_report = load_optional_json(args.finite_sweep_report)
     blockers = list(exact_audit.get("blockers", []))
     blockers.extend(
         [
@@ -126,9 +142,10 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         ]
     )
     blockers.extend(finite_block_blockers(finite_block_report))
+    blockers.extend(finite_sweep_blockers(finite_sweep_report))
     toy_radii = manufactured_zero_self_test()
     finite_backend = finite_nk_backend_report()
-    if finite_block_report is not None:
+    if finite_block_report is not None or finite_sweep_report is not None:
         finite_backend["profile_block_status"] = "floating_profile_block_attached_not_certified"
     dependency_hashes = {
         "exact_residual_audit": stable_json_hash(exact_audit),
@@ -140,6 +157,8 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
     }
     if finite_block_report is not None:
         dependency_hashes["sampled_finite_block_report"] = finite_block_report["_sha256"]
+    if finite_sweep_report is not None:
+        dependency_hashes["sampled_finite_block_sweep"] = finite_sweep_report["_sha256"]
     cert = {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "profile_nk",
@@ -179,6 +198,19 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
             "approximate_inverse": finite_block_report.get("approximate_inverse"),
             "finite_nk_bounds": finite_block_report.get("finite_nk_bounds"),
         },
+        "sampled_finite_block_sweep": None
+        if finite_sweep_report is None
+        else {
+            "path": finite_sweep_report["_path"],
+            "sha256": finite_sweep_report["_sha256"],
+            "status": finite_sweep_report.get("status"),
+            "pass": bool(finite_sweep_report.get("pass", False)),
+            "diagnostic_vs_proof": finite_sweep_report.get("diagnostic_vs_proof"),
+            "trial_count": finite_sweep_report.get("trial_count"),
+            "failure_count": finite_sweep_report.get("failure_count"),
+            "best_overall": finite_sweep_report.get("best_overall"),
+            "best_by_cache": finite_sweep_report.get("best_by_cache"),
+        },
         "radius_interval": None,
         "radii_polynomial_interval": None,
         "radii_polynomial_helper_self_test": toy_radii,
@@ -212,6 +244,7 @@ def main() -> None:
     parser.add_argument("--mortar-threshold", type=float, default=1e-8)
     parser.add_argument("--native-c", action="store_true")
     parser.add_argument("--finite-block-report")
+    parser.add_argument("--finite-sweep-report")
     args = parser.parse_args()
 
     cert, exact_audit = build_profile_nk_certificate(args)

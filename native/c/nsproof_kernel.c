@@ -650,6 +650,190 @@ NSPROOF_EXPORT int nsproof_interval_matrix_inf_norm(
     return NSPROOF_KERNEL_OK;
 }
 
+NSPROOF_EXPORT int nsproof_interval_matvec_inf_norm(
+    int row_count,
+    int column_count,
+    const double *matrix_lo,
+    const double *matrix_hi,
+    const double *vector_lo,
+    const double *vector_hi,
+    double *out,
+    int *status
+) {
+    int row;
+    double norm = 0.0;
+
+    if (status == NULL || out == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    *status = NSPROOF_KERNEL_OK;
+    if (row_count < 0 || column_count <= 0) {
+        *status = NSPROOF_KERNEL_BAD_INDEX;
+        return *status;
+    }
+    if (row_count == 0) {
+        *out = 0.0;
+        return NSPROOF_KERNEL_OK;
+    }
+    if (matrix_lo == NULL || matrix_hi == NULL || vector_lo == NULL || vector_hi == NULL) {
+        *status = NSPROOF_KERNEL_NULL_POINTER;
+        return *status;
+    }
+
+    for (row = 0; row < row_count; row++) {
+        double sum_lo = 0.0;
+        double sum_hi = 0.0;
+        double item;
+        int col;
+        int local_status = NSPROOF_KERNEL_OK;
+        for (col = 0; col < column_count; col++) {
+            int index = row * column_count + col;
+            double prod_lo;
+            double prod_hi;
+            local_status = interval_mul_impl(
+                matrix_lo[index],
+                matrix_hi[index],
+                vector_lo[col],
+                vector_hi[col],
+                &prod_lo,
+                &prod_hi
+            );
+            if (local_status != NSPROOF_KERNEL_OK) {
+                *status = local_status;
+                return local_status;
+            }
+            local_status = interval_add_impl(sum_lo, sum_hi, prod_lo, prod_hi, &sum_lo, &sum_hi);
+            if (local_status != NSPROOF_KERNEL_OK) {
+                *status = local_status;
+                return local_status;
+            }
+        }
+        local_status = interval_abs_upper_impl(sum_lo, sum_hi, &item);
+        if (local_status != NSPROOF_KERNEL_OK) {
+            *status = local_status;
+            return local_status;
+        }
+        if (item > norm) {
+            norm = item;
+        }
+    }
+    *out = interval_up(norm);
+    if (!check_finite(*out)) {
+        *status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+        return *status;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+NSPROOF_EXPORT int nsproof_interval_left_matmul_identity_defect_inf_norm(
+    int left_rows,
+    int shared_count,
+    int right_cols,
+    const double *left_lo,
+    const double *left_hi,
+    const double *right_lo,
+    const double *right_hi,
+    double *out,
+    int *status
+) {
+    int row;
+    double norm = 0.0;
+
+    if (status == NULL || out == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    *status = NSPROOF_KERNEL_OK;
+    if (left_rows < 0 || shared_count <= 0 || right_cols <= 0 || left_rows != right_cols) {
+        *status = NSPROOF_KERNEL_BAD_INDEX;
+        return *status;
+    }
+    if (left_rows == 0) {
+        *out = 0.0;
+        return NSPROOF_KERNEL_OK;
+    }
+    if (left_lo == NULL || left_hi == NULL || right_lo == NULL || right_hi == NULL) {
+        *status = NSPROOF_KERNEL_NULL_POINTER;
+        return *status;
+    }
+
+    for (row = 0; row < left_rows; row++) {
+        double row_sum = 0.0;
+        int col;
+        for (col = 0; col < right_cols; col++) {
+            double prod_sum_lo = 0.0;
+            double prod_sum_hi = 0.0;
+            double defect_lo;
+            double defect_hi;
+            double identity_lo = row == col ? 1.0 : 0.0;
+            double identity_hi = identity_lo;
+            double item;
+            int k;
+            int local_status = NSPROOF_KERNEL_OK;
+            for (k = 0; k < shared_count; k++) {
+                int left_index = row * shared_count + k;
+                int right_index = k * right_cols + col;
+                double prod_lo;
+                double prod_hi;
+                local_status = interval_mul_impl(
+                    left_lo[left_index],
+                    left_hi[left_index],
+                    right_lo[right_index],
+                    right_hi[right_index],
+                    &prod_lo,
+                    &prod_hi
+                );
+                if (local_status != NSPROOF_KERNEL_OK) {
+                    *status = local_status;
+                    return local_status;
+                }
+                local_status = interval_add_impl(
+                    prod_sum_lo,
+                    prod_sum_hi,
+                    prod_lo,
+                    prod_hi,
+                    &prod_sum_lo,
+                    &prod_sum_hi
+                );
+                if (local_status != NSPROOF_KERNEL_OK) {
+                    *status = local_status;
+                    return local_status;
+                }
+            }
+            local_status = interval_sub_impl(
+                identity_lo,
+                identity_hi,
+                prod_sum_lo,
+                prod_sum_hi,
+                &defect_lo,
+                &defect_hi
+            );
+            if (local_status != NSPROOF_KERNEL_OK) {
+                *status = local_status;
+                return local_status;
+            }
+            local_status = interval_abs_upper_impl(defect_lo, defect_hi, &item);
+            if (local_status != NSPROOF_KERNEL_OK) {
+                *status = local_status;
+                return local_status;
+            }
+            row_sum = interval_up(row_sum + item);
+            if (!check_finite(row_sum)) {
+                *status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+                return *status;
+            }
+        }
+        if (row_sum > norm) {
+            norm = row_sum;
+        }
+    }
+    *out = interval_up(norm);
+    if (!check_finite(*out)) {
+        *status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+        return *status;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
 static int binom_small(int n, int k) {
     int i;
     int out;

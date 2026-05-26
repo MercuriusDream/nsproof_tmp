@@ -14,8 +14,10 @@ if ROOT_DIR not in sys.path:
 
 from validators.interval_backend import (  # noqa: E402
     Interval,
+    interval_left_matmul_identity_defect_inf_norm,
     interval_matrix_inf_norm,
     interval_matvec,
+    interval_matvec_inf_norm,
     interval_vector_inf_norm,
 )
 
@@ -39,20 +41,34 @@ def validate() -> dict[str, float | int]:
     vector = manufactured_vector()
     product = interval_matvec(matrix, vector)
     vector_norm = interval_vector_inf_norm(product)
+    direct_vector_norm = interval_matvec_inf_norm(matrix, vector)
     matrix_norm = interval_matrix_inf_norm(matrix)
+    identity = [
+        [Interval(1.0, 1.0), Interval(0.0, 0.0)],
+        [Interval(0.0, 0.0), Interval(1.0, 1.0)],
+    ]
+    defect_norm = interval_left_matmul_identity_defect_inf_norm(matrix, identity)
     if not (product[0].lo <= 0.15 <= product[0].hi):
         raise AssertionError(f"first product interval does not contain 0.15: {product[0]}")
     if not (product[1].lo <= -0.0875 <= product[1].hi):
         raise AssertionError(f"second product interval does not contain -0.0875: {product[1]}")
     if vector_norm < 0.15:
         raise AssertionError(f"vector inf norm bound is too small: {vector_norm}")
+    if direct_vector_norm < vector_norm:
+        raise AssertionError(
+            f"direct matvec norm {direct_vector_norm} is smaller than materialized norm {vector_norm}"
+        )
     if matrix_norm < 1.25:
         raise AssertionError(f"matrix inf norm bound is too small: {matrix_norm}")
+    if defect_norm < 0.625:
+        raise AssertionError(f"identity defect norm bound is too small: {defect_norm}")
     return {
         "rows": len(matrix),
         "columns": len(matrix[0]),
         "product_inf_norm": vector_norm,
+        "direct_product_inf_norm": direct_vector_norm,
         "matrix_inf_norm": matrix_norm,
+        "identity_defect_inf_norm": defect_norm,
     }
 
 
@@ -77,11 +93,12 @@ def main() -> None:
     print(
         f"shape={report['rows']}x{report['columns']} "
         f"product_inf_norm={report['product_inf_norm']:.17g} "
-        f"matrix_inf_norm={report['matrix_inf_norm']:.17g}"
+        f"direct_product_inf_norm={report['direct_product_inf_norm']:.17g} "
+        f"matrix_inf_norm={report['matrix_inf_norm']:.17g} "
+        f"identity_defect_inf_norm={report['identity_defect_inf_norm']:.17g}"
     )
     print(f"benchmark: matvec repeats={args.repeats} elapsed={elapsed:.6f}s")
 
 
 if __name__ == "__main__":
     main()
-

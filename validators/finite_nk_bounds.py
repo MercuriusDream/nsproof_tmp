@@ -20,8 +20,10 @@ from typing import Any, Iterable
 
 from validators.interval_backend import (
     Interval,
+    interval_left_matmul_identity_defect_inf_norm,
     interval_matrix_inf_norm,
     interval_matvec,
+    interval_matvec_inf_norm,
     interval_sub,
     interval_vector_inf_norm,
 )
@@ -137,4 +139,31 @@ def finite_nk_bounds(
         "defect_matrix_B_equals_I_minus_AJ": matrix_repr(defect),
         "Y0_infinity_norm_A_r": interval_vector_inf_norm(correction),
         "Z0_infinity_norm_B": interval_matrix_inf_norm(defect),
+    }
+
+
+def finite_nk_bound_summary(
+    residual: Iterable[Interval | float | int | list[float] | tuple[float, float]],
+    jacobian: Iterable[Iterable[Interval | float | int | list[float] | tuple[float, float]]],
+    approximate_inverse: Iterable[Iterable[Interval | float | int | list[float] | tuple[float, float]]],
+) -> dict[str, Any]:
+    """Compute only finite-block NK norms through native C kernels."""
+
+    residual_i = coerce_vector(residual)
+    jacobian_i = coerce_matrix(jacobian)
+    inverse_i = coerce_matrix(approximate_inverse)
+    residual_dimension = len(residual_i)
+    coefficient_dimension = len(jacobian_i[0])
+    if len(jacobian_i) != residual_dimension:
+        raise ValueError("jacobian row count must match residual length")
+    if len(inverse_i) != coefficient_dimension or len(inverse_i[0]) != residual_dimension:
+        raise ValueError(
+            "approximate inverse must have shape coefficient_dimension x residual_dimension"
+        )
+    return {
+        "residual_dimension": residual_dimension,
+        "coefficient_dimension": coefficient_dimension,
+        "backend": "native-c-outward-rounded-double-interval-summary",
+        "Y0_infinity_norm_A_r": interval_matvec_inf_norm(inverse_i, residual_i),
+        "Z0_infinity_norm_B": interval_left_matmul_identity_defect_inf_norm(inverse_i, jacobian_i),
     }
