@@ -542,6 +542,17 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_interval_poly_eval_batch.restype = ctypes.c_int
+    lib.nsproof_bernstein_range_batch.argtypes = [
+        ctypes.c_int,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_bernstein_range_batch.restype = ctypes.c_int
     lib.nsproof_rz_weighted_coeff_partials_batch.argtypes = [
         ctypes.c_int,
         ctypes.c_int,

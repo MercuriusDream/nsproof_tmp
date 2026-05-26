@@ -37,9 +37,13 @@ def build_certificate() -> dict[str, object]:
         "input_hashes": {
             "bernstein_ball": sha256_file(os.path.join(ROOT_DIR, "validators/bernstein_ball.py")),
             "interval_backend": sha256_file(os.path.join(ROOT_DIR, "validators/interval_backend.py")),
+            "native_c_kernel": sha256_file(os.path.join(ROOT_DIR, "native/c/nsproof_kernel.c")),
+            "native_bernstein_validator": sha256_file(
+                os.path.join(ROOT_DIR, "tools/validate_native_bernstein_kernel.py")
+            ),
         },
         "dependency_hashes": {},
-        "backend": "python-bernstein-smoke",
+        "backend": "native-c-bernstein-range+python-subdivision-smoke",
         "precision_bits": 53,
         "rounding_mode": "nearest for smoke; proof path must use directed intervals",
         "mathematical_statement": (
@@ -72,4 +76,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

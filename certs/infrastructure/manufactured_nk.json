@@ -1,0 +1,41 @@
+{
+  "backend": "decimal-scalar-radii-polynomial",
+  "certificate_name": "manufactured_nk",
+  "commands": [
+    "tools/validate_manufactured_nk.py"
+  ],
+  "dependency_hashes": {
+    "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
+  },
+  "final_theorem_manifest_dependency": false,
+  "input_hashes": {
+    "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
+  },
+  "manufactured_scalar_nk": {
+    "Y0": "0",
+    "Z0": "0.1",
+    "Z2": "0.1",
+    "backend": "decimal-scalar-radii-polynomial",
+    "conditions": {
+      "Z0_less_than_one": true,
+      "upper_bound_negative": true
+    },
+    "mathematical_statement": "For p(r)=Y0-(1-Z0)r+Z2*r^2, the supplied radius interval has p(r)<0 throughout it.",
+    "pass": true,
+    "precision_digits": 80,
+    "radii_polynomial_interval": [
+      "-0.8",
+      "-0.00899"
+    ],
+    "radius_interval": [
+      "0.01",
+      "1"
+    ]
+  },
+  "mathematical_statement": "For the manufactured scalar Newton-Kantorovich example with Y0=0, Z0=0.1, Z2=0.1, the scalar radii polynomial p(r)=Y0-(1-Z0)r+Z2*r^2 is strictly negative on the certified radius interval, so the infrastructure acceptance path can record a passing toy certificate.",
+  "pass": true,
+  "precision_digits": 80,
+  "repo_commit": "09e6fc515e2bd30f730a7c67c089f8cd77fde245",
+  "schema_version": "nsproof-cert-v1",
+  "scope": "infrastructure-only manufactured scalar NK positive control"
+}

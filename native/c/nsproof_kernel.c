@@ -402,6 +402,75 @@ NSPROOF_EXPORT int nsproof_interval_poly_eval_batch(
     return first_error;
 }
 
+NSPROOF_EXPORT int nsproof_bernstein_range_batch(
+    int polynomial_count,
+    const int *offsets,
+    const int *counts,
+    const double *coeff_lo,
+    const double *coeff_hi,
+    double *out_lo,
+    double *out_hi,
+    int *statuses
+) {
+    int poly;
+    int first_error = NSPROOF_KERNEL_OK;
+
+    if (polynomial_count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (polynomial_count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        offsets == NULL || counts == NULL || coeff_lo == NULL || coeff_hi == NULL ||
+        out_lo == NULL || out_hi == NULL || statuses == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (poly = 0; poly < polynomial_count; poly++) {
+        int offset = offsets[poly];
+        int count = counts[poly];
+        int i;
+        double lo;
+        double hi;
+        int status = NSPROOF_KERNEL_OK;
+
+        if (offset < 0 || count <= 0) {
+            status = NSPROOF_KERNEL_BAD_INDEX;
+        } else if (!interval_inputs_ok(coeff_lo[offset], coeff_hi[offset])) {
+            status = NSPROOF_KERNEL_NONFINITE_INPUT;
+        } else {
+            lo = coeff_lo[offset];
+            hi = coeff_hi[offset];
+            for (i = 1; i < count; i++) {
+                int idx = offset + i;
+                if (!interval_inputs_ok(coeff_lo[idx], coeff_hi[idx])) {
+                    status = NSPROOF_KERNEL_NONFINITE_INPUT;
+                    break;
+                }
+                if (coeff_lo[idx] < lo) {
+                    lo = coeff_lo[idx];
+                }
+                if (coeff_hi[idx] > hi) {
+                    hi = coeff_hi[idx];
+                }
+            }
+            if (status == NSPROOF_KERNEL_OK) {
+                out_lo[poly] = interval_down(lo);
+                out_hi[poly] = interval_up(hi);
+                if (isnan(out_lo[poly]) || isnan(out_hi[poly]) || out_lo[poly] > out_hi[poly]) {
+                    status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+                }
+            }
+        }
+        statuses[poly] = status;
+        if (status != NSPROOF_KERNEL_OK && first_error == NSPROOF_KERNEL_OK) {
+            first_error = status;
+        }
+    }
+    return first_error;
+}
+
 static int binom_small(int n, int k) {
     int i;
     int out;

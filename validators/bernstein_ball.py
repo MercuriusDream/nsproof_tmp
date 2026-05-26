@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from validators.interval_backend import Interval
+from validators.twochart_mortar_jacobian import native_c_library
 
 
 @dataclass(frozen=True)
@@ -88,6 +89,64 @@ def tensor_coefficient_range(coefficients: list[list[float | Interval]]) -> Bern
     return coefficient_range(flat)
 
 
+def native_coefficient_ranges(polynomials: list[list[float | Interval]]) -> list[BernsteinRange]:
+    if not polynomials:
+        raise ValueError("expected at least one polynomial")
+    offsets: list[int] = []
+    counts: list[int] = []
+    coeff_lo: list[float] = []
+    coeff_hi: list[float] = []
+    for polynomial in polynomials:
+        if not polynomial:
+            raise ValueError("polynomial coefficient list must not be empty")
+        offsets.append(len(coeff_lo))
+        counts.append(len(polynomial))
+        for raw in polynomial:
+            if isinstance(raw, Interval):
+                lo = raw.lo
+                hi = raw.hi
+            else:
+                lo = float(raw)
+                hi = float(raw)
+            if lo > hi:
+                raise ValueError(f"bad coefficient interval [{lo}, {hi}]")
+            coeff_lo.append(lo)
+            coeff_hi.append(hi)
+
+    import ctypes
+
+    poly_count = len(polynomials)
+    coeff_count = len(coeff_lo)
+    int_array = ctypes.c_int * poly_count
+    double_poly_array = ctypes.c_double * poly_count
+    double_coeff_array = ctypes.c_double * coeff_count
+    offsets_arr = int_array(*offsets)
+    counts_arr = int_array(*counts)
+    lo_arr = double_coeff_array(*coeff_lo)
+    hi_arr = double_coeff_array(*coeff_hi)
+    out_lo = double_poly_array()
+    out_hi = double_poly_array()
+    statuses = int_array()
+    lib = native_c_library()
+    rc = lib.nsproof_bernstein_range_batch(
+        poly_count,
+        offsets_arr,
+        counts_arr,
+        lo_arr,
+        hi_arr,
+        out_lo,
+        out_hi,
+        statuses,
+    )
+    if rc != 0:
+        bad = sorted({int(statuses[index]) for index in range(poly_count) if int(statuses[index]) != 0})
+        raise RuntimeError(f"native Bernstein range batch failed rc={rc} statuses={bad}")
+    return [
+        BernsteinRange(float(out_lo[index]), float(out_hi[index]), counts[index])
+        for index in range(poly_count)
+    ]
+
+
 def manufactured_self_test() -> dict[str, object]:
     coeffs = [-1.0, -0.25, 0.5, 2.0]
     rng = coefficient_range(coeffs)
@@ -104,11 +163,38 @@ def manufactured_self_test() -> dict[str, object]:
             [0.5, Interval(1.0, 1.0000000000000002)],
         ]
     )
+    native_ranges = native_coefficient_ranges(
+        [
+            coeffs,
+            [
+                Interval(-1.0, -0.9999999999999998),
+                0.25,
+                0.5,
+                Interval(1.0, 1.0000000000000002),
+            ],
+        ]
+    )
+    native_inside = (
+        native_ranges[0].lower <= rng.lower
+        and native_ranges[0].upper >= rng.upper
+        and native_ranges[1].lower <= tensor_rng.lower
+        and native_ranges[1].upper >= tensor_rng.upper
+    )
     return {
-        "pass": bool(all_inside and split_inside and tensor_rng.lower <= -1.0 and tensor_rng.upper >= 1.0),
+        "pass": bool(
+            all_inside
+            and split_inside
+            and tensor_rng.lower <= -1.0
+            and tensor_rng.upper >= 1.0
+            and native_inside
+        ),
         "range": {**rng.__dict__, "width": rng.width},
         "left_split": left,
         "right_split": right,
         "sample_values": samples,
         "tensor_interval_range": {**tensor_rng.__dict__, "width": tensor_rng.width},
+        "native_ranges": [
+            {**item.__dict__, "width": item.width}
+            for item in native_ranges
+        ],
     }
