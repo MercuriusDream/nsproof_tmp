@@ -36,11 +36,12 @@ from validators.twochart_mortar_jacobian import (  # noqa: E402
     weighted_coeff_rz_jet,
     weighted_cheb_coeff_partial,
 )
-from validators.compactified_equations import qb_to_rz  # noqa: E402
+from validators.compactified_equations import qb_to_rz, residual_with_kind  # noqa: E402
 from validators.compactified_equations_twochart import (  # noqa: E402
     PDE_RESIDUAL_KIND_IDS,
     base_linearization_scalars,
     linearized_residual_with_kind,
+    native_tail_exact_residual_with_kind,
     projection_from_twochart,
 )
 from validators.origin_chart import qx_to_rz  # noqa: E402
@@ -196,6 +197,29 @@ def load_library(path: Path) -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_stage0_prediction_scan_batch.restype = ctypes.c_int
+
+    lib.nsproof_tail_exact_residual.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_tail_exact_residual.restype = ctypes.c_int
 
     return lib
 
@@ -400,9 +424,43 @@ def validate_repeated(lib: ctypes.CDLL, passes: int) -> list[tuple[float, float,
         cases = validate(lib)
         validate_rz_batch(lib)
         validate_pde_tail_batch(lib)
+        validate_tail_exact_residual()
         validate_prediction_scan(lib)
         validate_error_statuses(lib)
     return cases
+
+
+def validate_tail_exact_residual() -> dict[str, float]:
+    profile_path = ROOT / "work" / "v117_twochart_init.json"
+    with profile_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    projection = projection_from_twochart(data)
+    residual_kind = "normalized-structural"
+    point_list = [(0.45, 0.30), (0.61, 0.24), (0.76, 0.20), (0.88, 0.20)]
+    max_abs = 0.0
+    max_rel = 0.0
+    total_cases = 0
+    for q, b in point_list:
+        r0, z0 = qb_to_rz(q, b)
+        expected = residual_with_kind(projection.exact_residual_at(r0, z0), q, b, projection.p, residual_kind)
+        got, stats = native_tail_exact_residual_with_kind(data, projection, q, b, residual_kind)
+        if got is None:
+            raise AssertionError(f"native exact tail residual unexpectedly fell back at q={q} b={b}")
+        total_cases += int(stats.get("cases", 0))
+        for c_value, py_value, component in (
+            (got.e_psi, expected.e_psi, "e_psi"),
+            (got.e_gamma, expected.e_gamma, "e_gamma"),
+        ):
+            diff = abs(c_value - py_value)
+            scale = max(1.0, abs(py_value))
+            max_abs = max(max_abs, diff)
+            max_rel = max(max_rel, diff / scale)
+            if diff > 1e-7 * scale:
+                raise AssertionError(
+                    f"tail exact residual mismatch q={q} b={b} component={component}: "
+                    f"got={c_value!r} expected={py_value!r}"
+                )
+    return {"points": float(len(point_list)), "cases": float(total_cases), "max_abs": max_abs, "max_rel": max_rel}
 
 
 def validate_prediction_scan(lib: ctypes.CDLL) -> None:
@@ -711,12 +769,13 @@ def main() -> int:
         validation_passes = int(os.environ.get("NSPROOF_NATIVE_C_VALIDATION_PASSES", "3"))
         cases = validate_repeated(lib, validation_passes)
         pde_validation = validate_pde_tail_batch(lib)
+        tail_exact_validation = validate_tail_exact_residual()
 
         patch = {"q_interval": (0.5, 2.5), "x_interval": (-1.25, 1.75)}
         scalar_py, scalar_c, scalar_acc = benchmark_scalar(lib, patch, cases, repeats)
         batch_py, batch_c, batch_acc = benchmark_batch(lib, patch, cases, repeats)
 
-    print("native/c Chebyshev+RZ+PDE-tail+prediction kernel validation: ok")
+    print("native/c Chebyshev+RZ+PDE-tail+tail-exact+prediction kernel validation: ok")
     print(f"validation passes: {validation_passes}")
     print(
         "pde tail validation: "
@@ -724,6 +783,13 @@ def main() -> int:
         f"cases={int(pde_validation['cases'])} "
         f"max_abs={pde_validation['max_abs']:.3e} "
         f"max_rel={pde_validation['max_rel']:.3e}"
+    )
+    print(
+        "tail exact validation: "
+        f"points={int(tail_exact_validation['points'])} "
+        f"cases={int(tail_exact_validation['cases'])} "
+        f"max_abs={tail_exact_validation['max_abs']:.3e} "
+        f"max_rel={tail_exact_validation['max_rel']:.3e}"
     )
     print(f"weighted cases: {len(cases)}")
     print(f"repeats: {repeats}")

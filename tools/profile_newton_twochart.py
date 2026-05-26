@@ -549,6 +549,42 @@ def vector_metrics(vec: list[float]) -> dict[str, float]:
     }
 
 
+def _merge_native_stat(total: dict[str, Any], stat: dict[str, Any]) -> None:
+    if not stat.get("enabled"):
+        return
+    total["enabled"] = True
+    if stat.get("used"):
+        total["used"] = int(total.get("used", 0)) + 1
+    total["cases"] = int(total.get("cases", 0)) + int(stat.get("cases", 0))
+    total["seconds"] = float(total.get("seconds", 0.0)) + float(stat.get("seconds", 0.0))
+
+
+def residual_with_optional_native_tail_exact(
+    data: dict[str, Any],
+    projection: Any,
+    q: float,
+    b: float,
+    residual_kind: str,
+    use_native_c: bool,
+) -> tuple[Any, dict[str, Any]]:
+    from validators.compactified_equations import qb_to_rz, residual_with_kind
+
+    if use_native_c:
+        from validators.compactified_equations_twochart import native_tail_exact_residual_with_kind
+
+        residual, stats = native_tail_exact_residual_with_kind(data, projection, q, b, residual_kind)
+        if residual is not None:
+            return residual, stats
+    r, z = qb_to_rz(q, b)
+    raw = projection.exact_residual_at(r, z)
+    return residual_with_kind(raw, q, b, projection.p, residual_kind), {
+        "enabled": bool(use_native_c),
+        "used": False,
+        "cases": 0,
+        "seconds": 0.0,
+    }
+
+
 def native_stage0_prediction_scan(
     system: dict[str, Any],
     delta: list[float],
@@ -631,20 +667,27 @@ def native_stage0_prediction_scan(
 def guard_point_metrics(data: dict[str, Any], args: argparse.Namespace, points: list[tuple[float, float]]) -> dict[str, Any]:
     if not points:
         return {"enabled": False, **vector_metrics([])}
-    from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations import compactified_residual_defined
     from validators.compactified_equations_twochart import projection_from_twochart
 
     projection = projection_from_twochart(data)
     values: list[float] = []
     skipped = 0
     worst: dict[str, Any] = {"abs": -1.0}
+    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": 0, "cases": 0, "seconds": 0.0}
     for q, b in points:
         if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
             skipped += 1
             continue
-        r, z = qb_to_rz(q, b)
-        raw = projection.exact_residual_at(r, z)
-        residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+        residual, point_native = residual_with_optional_native_tail_exact(
+            data,
+            projection,
+            q,
+            b,
+            args.residual_kind,
+            bool(args.native_c),
+        )
+        _merge_native_stat(native_stats, point_native)
         for component, value in (("e_psi", residual.e_psi), ("e_gamma", residual.e_gamma)):
             values.append(value)
             if abs(value) > worst["abs"]:
@@ -654,6 +697,7 @@ def guard_point_metrics(data: dict[str, Any], args: argparse.Namespace, points: 
         "points_requested": len(points),
         "skipped": skipped,
         "worst": worst,
+        "native_c_tail_exact": native_stats,
         **vector_metrics(values),
     }
 
@@ -1236,21 +1280,28 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     }
 
 
-def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespace, system: dict[str, Any]) -> dict[str, float]:
-    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespace, system: dict[str, Any]) -> dict[str, Any]:
+    from validators.compactified_equations import compactified_residual_defined
     from validators.compactified_equations_twochart import projection_from_twochart
     from validators.twochart_mortar_jacobian import residual_for_row
 
     projection = projection_from_twochart(data)
     values: list[float] = []
+    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": 0, "cases": 0, "seconds": 0.0}
     for row in system["objective_pde_rows"]:
         q = float(row["q"])
         b = float(row["b"])
         if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
             continue
-        r, z = qb_to_rz(q, b)
-        raw = projection.exact_residual_at(r, z)
-        residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+        residual, point_native = residual_with_optional_native_tail_exact(
+            data,
+            projection,
+            q,
+            b,
+            args.residual_kind,
+            bool(args.native_c),
+        )
+        _merge_native_stat(native_stats, point_native)
         component = str(row["component"])
         value = residual.e_psi if component == "e_psi" else residual.e_gamma
         values.append(args.pde_weight * value)
@@ -1260,12 +1311,18 @@ def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespac
         for q, b in system["objective_active_guard_points"]:
             if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
                 continue
-            r, z = qb_to_rz(q, b)
-            raw = projection.exact_residual_at(r, z)
-            residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+            residual, point_native = residual_with_optional_native_tail_exact(
+                data,
+                projection,
+                q,
+                b,
+                args.residual_kind,
+                bool(args.native_c),
+            )
+            _merge_native_stat(native_stats, point_native)
             values.append(args.active_guard_weight * residual.e_psi)
             values.append(args.active_guard_weight * residual.e_gamma)
-    return vector_metrics(values)
+    return {**vector_metrics(values), "native_c_tail_exact": native_stats}
 
 
 def normal_step(

@@ -459,6 +459,101 @@ def native_tail_linearized_residuals_with_kind(
     }, {"enabled": True, "cases": count, "seconds": elapsed}
 
 
+def _append_tail_coeff_cases(
+    cases: list[tuple[float, float, float, float, float, float, int, int, int]],
+    patches: list[dict[str, Any]],
+    q: float,
+    x: float,
+    alpha: float,
+    component: int,
+) -> None:
+    for patch in patches:
+        if not point_in_patch(patch, q, x):
+            continue
+        q0, q1, x0, x1 = patch_interval(patch)
+        for kq, row in enumerate(patch.get("coeffs", [])):
+            for kx, raw_coeff in enumerate(row):
+                coeff = float(raw_coeff)
+                if coeff == 0.0:
+                    continue
+                cases.append((coeff, q0, q1, x0, x1, alpha, kq, kx, component))
+        return
+
+
+def native_tail_exact_residual_with_kind(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    q: float,
+    b: float,
+    residual_kind: str,
+) -> tuple[Any, dict[str, Any]]:
+    if residual_kind not in PDE_RESIDUAL_KIND_IDS:
+        raise ValueError(f"unknown residual kind {residual_kind!r}")
+    origin_q_min = min(
+        projection.f_origin.q_min if projection.f_origin.enabled else 2.0,
+        projection.g_origin.q_min if projection.g_origin.enabled else 2.0,
+    )
+    if q >= origin_q_min:
+        return None, {"enabled": True, "used": False, "reason": "origin-chart-point", "cases": 0, "seconds": 0.0}
+    x = b * b
+    blocks = data["tail_chart"]["blocks"]
+    cases: list[tuple[float, float, float, float, float, float, int, int, int]] = []
+    _append_tail_coeff_cases(cases, blocks.get("F_an", []), q, x, 2.0, 0)
+    _append_tail_coeff_cases(cases, blocks.get("G_an", []), q, x, 2.0, 1)
+    for block_index, patches in enumerate(blocks.get("F_frac", []), start=1):
+        _append_tail_coeff_cases(cases, patches, q, x, float(block_index) * float(projection.p), 0)
+    for block_index, patches in enumerate(blocks.get("G_frac", []), start=1):
+        _append_tail_coeff_cases(cases, patches, q, x, float(block_index) * float(projection.p), 1)
+
+    count = len(cases)
+    double_array = ctypes.c_double * max(count, 1)
+    int_array = ctypes.c_int * max(count, 1)
+    coeff_values = double_array(*([case[0] for case in cases] or [0.0]))
+    q0_values = double_array(*([case[1] for case in cases] or [0.0]))
+    q1_values = double_array(*([case[2] for case in cases] or [1.0]))
+    x0_values = double_array(*([case[3] for case in cases] or [0.0]))
+    x1_values = double_array(*([case[4] for case in cases] or [1.0]))
+    alpha_values = double_array(*([case[5] for case in cases] or [0.0]))
+    kq_values = int_array(*([case[6] for case in cases] or [0]))
+    kx_values = int_array(*([case[7] for case in cases] or [0]))
+    component_values = int_array(*([case[8] for case in cases] or [0]))
+    out_e_psi = ctypes.c_double(0.0)
+    out_e_gamma = ctypes.c_double(0.0)
+    status_value = ctypes.c_int(0)
+    lib = native_c_library()
+    start = time.perf_counter()
+    rc = lib.nsproof_tail_exact_residual(
+        count,
+        PDE_RESIDUAL_KIND_IDS[residual_kind],
+        float(projection.gamma),
+        float(projection.p),
+        float(projection.B),
+        float(q),
+        float(b),
+        coeff_values,
+        q0_values,
+        q1_values,
+        x0_values,
+        x1_values,
+        alpha_values,
+        kq_values,
+        kx_values,
+        component_values,
+        ctypes.byref(out_e_psi),
+        ctypes.byref(out_e_gamma),
+        ctypes.byref(status_value),
+    )
+    elapsed = time.perf_counter() - start
+    if rc != 0:
+        raise RuntimeError(f"native C tail exact residual failed rc={rc} status={status_value.value}")
+    return Residual(e_psi=float(out_e_psi.value), e_gamma=float(out_e_gamma.value)), {
+        "enabled": True,
+        "used": True,
+        "cases": count,
+        "seconds": elapsed,
+    }
+
+
 def perturb_variable(data: dict[str, Any], variable: CoefficientVariable, delta: float) -> dict[str, Any]:
     out = json.loads(json.dumps(data))
     set_path(out, variable.path, float(get_path(out, variable.path)) + delta)
