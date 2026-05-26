@@ -6,7 +6,7 @@
   "Y0_interval": null,
   "Z0_interval": null,
   "Z2_interval": null,
-  "backend": "not-started-interval-nk",
+  "backend": "floating-audit+native-finite-block-nk-pending-profile-data",
   "basis_hash_sha256": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
   "blockers": [
     "directed-rounding interval backend is not yet attached",
@@ -15,7 +15,8 @@
     "C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08",
     "interval residual evaluator is not implemented",
     "validated approximate inverse hash is missing",
-    "Y0/Z0/Z2 interval bounds are not available for this profile"
+    "profile finite residual/Jacobian/inverse export is missing; native finite-block Y0/Z0 backend is available but has no profile block to certify",
+    "Z2/tail-complement interval bound is not available for this profile"
   ],
   "certificate_name": "profile_nk",
   "commands": [
@@ -23,7 +24,10 @@
   ],
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
-    "exact_residual_audit": "3c12c1aae642e2524c984ceef3da05f41138fe17085e4daa3c8b0ae833c2f97f",
+    "exact_residual_audit": "7ff93c992c460e4d1af07ccbf99ab5827d5ff8277f06dee328d6e8af05e80ef1",
+    "finite_nk_bounds": "df1ebedee12583cf84d4f3a708ec28883506a21f37ec170741b544119ff5b2ac",
+    "interval_backend": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
+    "native_interval_kernel": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "exact_residual_audit": {
@@ -56,7 +60,7 @@
         "cases": 657120,
         "enabled": true,
         "rows": 2430,
-        "seconds": 0.9901422920000016
+        "seconds": 0.9478924580000019
       },
       "orders": "C0-C4",
       "overlap_q_range": [
@@ -436,7 +440,7 @@
     "precision_bits": 53,
     "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
     "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-    "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+    "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
     "residual_blocks": {
       "max_abs": 448.91653502849033,
       "scans": {
@@ -646,7 +650,7 @@
         }
       }
     },
-    "residual_map_hash_sha256": "6aa1408a3ee671a9def3b4453919c1e4a47d31157a19481c3ad9a1c43108efc7",
+    "residual_map_hash_sha256": "0c43f8524e0aa7ef83df3653b93d44ebf4e6c6ba21e785a9934e5735b9e8f84e",
     "residual_map_statement": "psi = r^2 z q^p F(q,x), Gamma = r^2 q^p G(q,x),\nq = (1+r^2+z^2)^(-1/2), x = z^2/(r^2+z^2).\n\nA = psi_rr - psi_r/r + psi_zz.\n\nE_psi = (1-gamma) r^2 A + gamma r^3 A_r + gamma z r^2 A_z\n        + r(psi_r A_z - psi_z A_r) + 2 psi_z A + (Gamma^2)_z.\n\nE_Gamma = (1-2gamma) Gamma + gamma(r Gamma_r + z Gamma_z)\n          + (psi_r Gamma_z - psi_z Gamma_r)/r.\n\nThe discovery quotient residual divides by the configured compactified\nmechanical factors only.  Physical two-chart mortar is evaluated in R=r^2,\nZ=z^2 derivatives.",
     "rounding_mode": "nearest",
     "schema_version": "nsproof-cert-v1",
@@ -731,7 +735,18 @@
       "nk_entry_residual_max": 1e-08
     }
   },
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; profile finite residual/Jacobian/inverse export is missing; native finite-block Y0/Z0 backend is available but has no profile block to certify; Z2/tail-complement interval bound is not available for this profile",
+  "finite_nk_backend": {
+    "backend": "native-c-outward-rounded-double-interval",
+    "input_hashes": {
+      "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
+      "validators/finite_nk_bounds.py": "df1ebedee12583cf84d4f3a708ec28883506a21f37ec170741b544119ff5b2ac",
+      "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82"
+    },
+    "profile_block_status": "not_available_for_current_profile",
+    "scope": "Computes finite-dimensional Y0=||A r||_inf and Z0=||I-AJ||_inf once a profile residual vector, Jacobian block, and approximate inverse are exported as interval data.",
+    "status": "available_for_finite_blocks"
+  },
   "gamma_interval": [
     "0.45",
     "0.45"
@@ -772,8 +787,8 @@
   },
   "radii_polynomial_interval": null,
   "radius_interval": null,
-  "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
-  "residual_map_hash_sha256": "6aa1408a3ee671a9def3b4453919c1e4a47d31157a19481c3ad9a1c43108efc7",
+  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
+  "residual_map_hash_sha256": "0c43f8524e0aa7ef83df3653b93d44ebf4e6c6ba21e785a9934e5735b9e8f84e",
   "rounding_mode": null,
   "schema_version": "nsproof-cert-v1",
   "tail_inverse_bound": null,

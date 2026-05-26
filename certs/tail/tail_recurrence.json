@@ -11,7 +11,7 @@
   ],
   "certificate_name": "tail_recurrence",
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "dependency_hashes": {},
   "exact_algebraic_subclaims": {
@@ -71,7 +71,7 @@
   "q1_exclusion": "structural",
   "q2_policy": "zero",
   "remainder_bound": null,
-  "repo_commit": "83cd9ab6fc46cafa641d7582add30e27053d9200",
+  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "tail_metadata": {

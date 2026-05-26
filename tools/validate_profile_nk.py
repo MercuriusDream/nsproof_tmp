@@ -25,9 +25,37 @@ from validators.exact_profile_residual import (  # noqa: E402
     build_exact_residual_audit,
     repo_commit,
     save_json,
+    sha256_file,
     stable_json_hash,
 )
 from validators.radii_polynomial import manufactured_zero_self_test  # noqa: E402
+
+
+FINITE_NK_BACKEND = "validators/finite_nk_bounds.py"
+INTERVAL_BACKEND = "validators/interval_backend.py"
+NATIVE_INTERVAL_KERNEL = "native/c/nsproof_kernel.c"
+
+
+def rel_hash(path: str) -> str:
+    return sha256_file(os.path.join(ROOT_DIR, path))
+
+
+def finite_nk_backend_report() -> dict[str, Any]:
+    return {
+        "status": "available_for_finite_blocks",
+        "backend": "native-c-outward-rounded-double-interval",
+        "scope": (
+            "Computes finite-dimensional Y0=||A r||_inf and "
+            "Z0=||I-AJ||_inf once a profile residual vector, Jacobian block, "
+            "and approximate inverse are exported as interval data."
+        ),
+        "profile_block_status": "not_available_for_current_profile",
+        "input_hashes": {
+            FINITE_NK_BACKEND: rel_hash(FINITE_NK_BACKEND),
+            INTERVAL_BACKEND: rel_hash(INTERVAL_BACKEND),
+            NATIVE_INTERVAL_KERNEL: rel_hash(NATIVE_INTERVAL_KERNEL),
+        },
+    }
 
 
 def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -52,10 +80,16 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         [
             "interval residual evaluator is not implemented",
             "validated approximate inverse hash is missing",
-            "Y0/Z0/Z2 interval bounds are not available for this profile",
+            (
+                "profile finite residual/Jacobian/inverse export is missing; "
+                "native finite-block Y0/Z0 backend is available but has no "
+                "profile block to certify"
+            ),
+            "Z2/tail-complement interval bound is not available for this profile",
         ]
     )
     toy_radii = manufactured_zero_self_test()
+    finite_backend = finite_nk_backend_report()
     cert = {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "profile_nk",
@@ -68,13 +102,16 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
             "exact_residual_audit": stable_json_hash(exact_audit),
             "basis": exact_audit["basis_hash_sha256"],
             "tail_policy": exact_audit["tail_policy_hash_sha256"],
+            "finite_nk_bounds": finite_backend["input_hashes"][FINITE_NK_BACKEND],
+            "interval_backend": finite_backend["input_hashes"][INTERVAL_BACKEND],
+            "native_interval_kernel": finite_backend["input_hashes"][NATIVE_INTERVAL_KERNEL],
         },
         "basis_hash_sha256": exact_audit["basis_hash_sha256"],
         "residual_map_hash_sha256": exact_audit["residual_map_hash_sha256"],
         "tail_policy_hash_sha256": exact_audit["tail_policy_hash_sha256"],
         "gamma_interval": [str(exact_audit["parameters"]["gamma"]), str(exact_audit["parameters"]["gamma"])],
         "B_interval": [str(exact_audit["parameters"]["B"]), str(exact_audit["parameters"]["B"])],
-        "backend": "not-started-interval-nk",
+        "backend": "floating-audit+native-finite-block-nk-pending-profile-data",
         "precision_bits": None,
         "rounding_mode": None,
         "mathematical_statement": (
@@ -85,6 +122,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         "Y0_interval": None,
         "Z0_interval": None,
         "Z2_interval": None,
+        "finite_nk_backend": finite_backend,
         "radius_interval": None,
         "radii_polynomial_interval": None,
         "radii_polynomial_helper_self_test": toy_radii,

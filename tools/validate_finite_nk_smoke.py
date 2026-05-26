@@ -23,13 +23,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from validators.interval_backend import (  # noqa: E402
-    Interval,
-    interval_matrix_inf_norm,
-    interval_matvec,
-    interval_sub,
-    interval_vector_inf_norm,
-)
+from validators.finite_nk_bounds import finite_nk_bounds  # noqa: E402
 from validators.radii_polynomial import validate_radii_polynomial  # noqa: E402
 
 
@@ -75,55 +69,6 @@ def save_json(path: str, data: dict[str, Any]) -> None:
         fh.write("\n")
 
 
-def point_interval(value: float) -> Interval:
-    return Interval(float(value), float(value))
-
-
-def interval_repr(value: Interval) -> list[float]:
-    return [value.lo, value.hi]
-
-
-def interval_vector_repr(values: list[Interval]) -> list[list[float]]:
-    return [interval_repr(value) for value in values]
-
-
-def interval_matrix_repr(values: list[list[Interval]]) -> list[list[list[float]]]:
-    return [interval_vector_repr(row) for row in values]
-
-
-def point_interval_matrix(values: list[list[float]]) -> list[list[Interval]]:
-    return [[point_interval(value) for value in row] for row in values]
-
-
-def point_interval_vector(values: list[float]) -> list[Interval]:
-    return [point_interval(value) for value in values]
-
-
-def interval_matmul(lhs: list[list[Interval]], rhs: list[list[Interval]]) -> list[list[Interval]]:
-    if not rhs:
-        raise ValueError("right matrix must not be empty")
-    width = len(rhs[0])
-    if any(len(row) != width for row in rhs):
-        raise ValueError("right matrix rows must have stable width")
-    columns = [[rhs[row][column] for row in range(len(rhs))] for column in range(width)]
-    column_products = [interval_matvec(lhs, column) for column in columns]
-    return [
-        [column_products[column][row] for column in range(width)]
-        for row in range(len(lhs))
-    ]
-
-
-def interval_identity_minus(matrix: list[list[Interval]]) -> list[list[Interval]]:
-    out: list[list[Interval]] = []
-    for row_index, row in enumerate(matrix):
-        out_row = []
-        for column_index, value in enumerate(row):
-            identity = point_interval(1.0 if row_index == column_index else 0.0)
-            out_row.append(interval_sub([identity], [value])[0])
-        out.append(out_row)
-    return out
-
-
 def manufactured_problem() -> dict[str, Any]:
     residual = [1.0e-4, -8.0e-5]
     jacobian = [
@@ -134,31 +79,15 @@ def manufactured_problem() -> dict[str, Any]:
         [0.52, -0.17],
         [-0.09, 0.70],
     ]
-    residual_interval = point_interval_vector(residual)
-    jacobian_interval = point_interval_matrix(jacobian)
-    approximate_inverse_interval = point_interval_matrix(approximate_inverse)
-    product_interval = interval_matmul(approximate_inverse_interval, jacobian_interval)
-    defect_interval = interval_identity_minus(product_interval)
-    correction_interval = interval_matvec(approximate_inverse_interval, residual_interval)
-    Y0 = interval_vector_inf_norm(correction_interval)
-    Z0 = interval_matrix_inf_norm(defect_interval)
+    finite_bounds = finite_nk_bounds(residual, jacobian, approximate_inverse)
     return {
         "dimension": 2,
         "residual_vector_r": residual,
         "jacobian_J": jacobian,
         "approximate_inverse_A": approximate_inverse,
-        "native_interval_inputs": {
-            "residual_vector_r": interval_vector_repr(residual_interval),
-            "jacobian_J": interval_matrix_repr(jacobian_interval),
-            "approximate_inverse_A": interval_matrix_repr(approximate_inverse_interval),
-        },
-        "native_interval_products": {
-            "A_times_J": interval_matrix_repr(product_interval),
-            "defect_matrix_B_equals_I_minus_AJ": interval_matrix_repr(defect_interval),
-            "A_times_r": interval_vector_repr(correction_interval),
-        },
-        "Y0_infinity_norm_A_r": Y0,
-        "Z0_infinity_norm_B": Z0,
+        "native_interval_products": finite_bounds,
+        "Y0_infinity_norm_A_r": finite_bounds["Y0_infinity_norm_A_r"],
+        "Z0_infinity_norm_B": finite_bounds["Z0_infinity_norm_B"],
         "Z2": 0.05,
         "radius_interval": [0.001, 0.01],
     }
@@ -201,12 +130,14 @@ def build_certificate(command: str) -> dict[str, Any]:
             RADIUS_HELPER: helper_hash,
             SCRIPT_PATH: script_hash,
             "validators/interval_backend.py": sha256_file(resolve("validators/interval_backend.py")),
+            "validators/finite_nk_bounds.py": sha256_file(resolve("validators/finite_nk_bounds.py")),
             "native/c/nsproof_kernel.c": sha256_file(resolve("native/c/nsproof_kernel.c")),
         },
         "dependency_hashes": {
             RADIUS_HELPER: helper_hash,
             SCRIPT_PATH: script_hash,
             "validators/interval_backend.py": sha256_file(resolve("validators/interval_backend.py")),
+            "validators/finite_nk_bounds.py": sha256_file(resolve("validators/finite_nk_bounds.py")),
             "native/c/nsproof_kernel.c": sha256_file(resolve("native/c/nsproof_kernel.c")),
         },
         "manufactured_finite_nk": problem,

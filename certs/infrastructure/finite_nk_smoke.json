@@ -6,7 +6,8 @@
   ],
   "dependency_hashes": {
     "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
-    "tools/validate_finite_nk_smoke.py": "a0409336488944591342d5dc83dd7f743814fece5ecdb419f92d6ac58e595010",
+    "tools/validate_finite_nk_smoke.py": "0ae1c925cdf730bbf2f39b3a66812dce54cc885db5add0f64e92a0b2053f69f8",
+    "validators/finite_nk_bounds.py": "df1ebedee12583cf84d4f3a708ec28883506a21f37ec170741b544119ff5b2ac",
     "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
     "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
   },
@@ -14,7 +15,8 @@
   "finite_block_backend": "native-c-outward-rounded-double-interval",
   "input_hashes": {
     "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
-    "tools/validate_finite_nk_smoke.py": "a0409336488944591342d5dc83dd7f743814fece5ecdb419f92d6ac58e595010",
+    "tools/validate_finite_nk_smoke.py": "0ae1c925cdf730bbf2f39b3a66812dce54cc885db5add0f64e92a0b2053f69f8",
+    "validators/finite_nk_bounds.py": "df1ebedee12583cf84d4f3a708ec28883506a21f37ec170741b544119ff5b2ac",
     "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
     "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
   },
@@ -43,62 +45,6 @@
         1.5
       ]
     ],
-    "native_interval_inputs": {
-      "approximate_inverse_A": [
-        [
-          [
-            0.52,
-            0.52
-          ],
-          [
-            -0.17,
-            -0.17
-          ]
-        ],
-        [
-          [
-            -0.09,
-            -0.09
-          ],
-          [
-            0.7,
-            0.7
-          ]
-        ]
-      ],
-      "jacobian_J": [
-        [
-          [
-            2.0,
-            2.0
-          ],
-          [
-            0.5,
-            0.5
-          ]
-        ],
-        [
-          [
-            0.25,
-            0.25
-          ],
-          [
-            1.5,
-            1.5
-          ]
-        ]
-      ],
-      "residual_vector_r": [
-        [
-          0.0001,
-          0.0001
-        ],
-        [
-          -8e-05,
-          -8e-05
-        ]
-      ]
-    },
     "native_interval_products": {
       "A_times_J": [
         [
@@ -132,6 +78,9 @@
           -6.499999999999998e-05
         ]
       ],
+      "Y0_infinity_norm_A_r": 6.560000000000005e-05,
+      "Z0_infinity_norm_B": 0.010000000000000432,
+      "backend": "native-c-outward-rounded-double-interval",
       "defect_matrix_B_equals_I_minus_AJ": [
         [
           [
@@ -153,7 +102,8 @@
             -0.0049999999999994485
           ]
         ]
-      ]
+      ],
+      "dimension": 2
     },
     "radius_interval": [
       0.001,
@@ -190,7 +140,7 @@
       "0.01"
     ]
   },
-  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
+  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
   "schema_version": "nsproof-cert-v1",
   "scope": "infrastructure-only finite-dimensional manufactured NK smoke"
 }

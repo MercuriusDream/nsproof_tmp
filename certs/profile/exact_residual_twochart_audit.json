@@ -28,7 +28,7 @@
       "cases": 657120,
       "enabled": true,
       "rows": 2430,
-      "seconds": 0.9901422920000016
+      "seconds": 0.9478924580000019
     },
     "orders": "C0-C4",
     "overlap_q_range": [
@@ -408,7 +408,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
   "residual_blocks": {
     "max_abs": 448.91653502849033,
     "scans": {
@@ -618,7 +618,7 @@
       }
     }
   },
-  "residual_map_hash_sha256": "6aa1408a3ee671a9def3b4453919c1e4a47d31157a19481c3ad9a1c43108efc7",
+  "residual_map_hash_sha256": "0c43f8524e0aa7ef83df3653b93d44ebf4e6c6ba21e785a9934e5735b9e8f84e",
   "residual_map_statement": "psi = r^2 z q^p F(q,x), Gamma = r^2 q^p G(q,x),\nq = (1+r^2+z^2)^(-1/2), x = z^2/(r^2+z^2).\n\nA = psi_rr - psi_r/r + psi_zz.\n\nE_psi = (1-gamma) r^2 A + gamma r^3 A_r + gamma z r^2 A_z\n        + r(psi_r A_z - psi_z A_r) + 2 psi_z A + (Gamma^2)_z.\n\nE_Gamma = (1-2gamma) Gamma + gamma(r Gamma_r + z Gamma_z)\n          + (psi_r Gamma_z - psi_z Gamma_r)/r.\n\nThe discovery quotient residual divides by the configured compactified\nmechanical factors only.  Physical two-chart mortar is evaluated in R=r^2,\nZ=z^2 derivatives.",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",

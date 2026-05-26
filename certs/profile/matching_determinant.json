@@ -7,22 +7,22 @@
   ],
   "certificate_name": "matching_determinant",
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "dependencies": {
     "profile_nk": {
       "certificate_name": "profile_nk",
       "exists": true,
-      "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+      "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; profile finite residual/Jacobian/inverse export is missing; native finite-block Y0/Z0 backend is available but has no profile block to certify; Z2/tail-complement interval bound is not available for this profile",
       "pass": false,
       "path": "certs/profile/profile_nk.json",
       "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-      "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
+      "sha256": "af5df89be504c9e5ab5b747d4ea51787f024cf15a129863f2cd0ae7333c5dd50"
     }
   },
   "dependency_hashes": {
-    "profile_nk": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921",
-    "tail_recurrence": "3119f88809e24ef9d118238ef9af7063a8cc46a04d3e655ad6ea9c00574bad3f"
+    "profile_nk": "af5df89be504c9e5ab5b747d4ea51787f024cf15a129863f2cd0ae7333c5dd50",
+    "tail_recurrence": "6c96d7134cf2f7d6fe7f90f446dba4de89fc4ff40c4e47ae5fcbe47c9a914cc0"
   },
   "determinant_interval": null,
   "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
@@ -38,7 +38,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "83cd9ab6fc46cafa641d7582add30e27053d9200",
+  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "transversality_margin": null
