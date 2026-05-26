@@ -17,18 +17,28 @@
     "validated approximate inverse hash is missing",
     "Z2/tail-complement interval bound is not available for this profile",
     "finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF",
+    "finite-block report profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
     "finite-block sampled Z0=2.670891433969e+00 is >= 1",
     "row cache is floating, not interval residual data",
     "approximate inverse is floating ridge-SVD, not validated",
     "Z2 and infinite complement bounds are missing",
     "profile residual/mortar is far above NK entry scale",
     "finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+    "finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
     "best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1",
     "sweep is floating and sampled, not interval residual validation",
     "approximate inverses are floating ridge-SVD diagnostics",
     "Z2 and infinite complement bounds are missing",
     "profile residual/mortar is far above NK entry scale",
     "finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+    "finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+    "best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1",
+    "sweep is floating and sampled, not interval residual validation",
+    "approximate inverses are floating ridge-SVD diagnostics",
+    "Z2 and infinite complement bounds are missing",
+    "profile residual/mortar is far above NK entry scale",
+    "finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+    "finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
     "best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1",
     "sweep is floating and sampled, not interval residual validation",
     "approximate inverses are floating ridge-SVD diagnostics",
@@ -37,17 +47,18 @@
   ],
   "certificate_name": "profile_nk",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_row_subset_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_row_subset_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_pseudoinverse_probe.json"
   ],
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
-    "exact_residual_audit": "154ee1c42ed305119c9a35c77dd38823c3ad8d3c8e7097a40787e82d961498cd",
+    "exact_residual_audit": "e4b029dd5d1d51a5bb9795abd04cda35738234169f8aeb037e15def432164bd3",
     "finite_nk_bounds": "764463de866b761f218a3750b9ff16926fc3207d9ba6059e5ce549ac6f96ce89",
     "interval_backend": "a87cba36b4870f66b987e3683b99ba1006b389a9422cd75cdee7a9bacedbe0c1",
     "native_interval_kernel": "47a32dbc6b006611a05ea2d0dde99bee9436abc2ed116da43de56fb718d73ba2",
     "sampled_finite_block_report": "7b82d9a964f8be3876e29b6fcabfee262fa851d65c8ce051cf74f062f207f8f6",
     "sampled_finite_block_sweep_0": "e29f42c3c896c9724becd8eb2985a5003f7b791de47371f90a5ef3b30e35d803",
     "sampled_finite_block_sweep_1": "74386eab29f19f50d32dcc5c4fe31fa626ff16a3d99036cc37bd60b00b7ccff6",
+    "sampled_finite_block_sweep_2": "01e16d0a4848314f7d5fb47cf970a07a1a250b77e6a3f7921712b32c06f6346d",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "exact_residual_audit": {
@@ -61,7 +72,7 @@
     ],
     "certificate_name": "exact_residual_twochart_audit",
     "commands": [
-      "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_row_subset_sweep.json"
+      "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_block.json --finite-sweep-report certs/profile/profile_finite_nk_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_row_subset_sweep.json --finite-sweep-report certs/profile/profile_finite_nk_pseudoinverse_probe.json"
     ],
     "dependency_hashes": {},
     "entry_ready_for_interval_nk": false,
@@ -80,7 +91,7 @@
         "cases": 657120,
         "enabled": true,
         "rows": 2430,
-        "seconds": 0.9524126249999973
+        "seconds": 0.9190000420000004
       },
       "orders": "C0-C4",
       "overlap_q_range": [
@@ -460,7 +471,7 @@
     "precision_bits": 53,
     "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
     "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-    "repo_commit": "d7a5e93fbfd005ed58f360d266f0a20795a2ce55",
+    "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
     "residual_blocks": {
       "max_abs": 448.91653502849033,
       "scans": {
@@ -755,7 +766,7 @@
       "nk_entry_residual_max": 1e-08
     }
   },
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=2.670891433969e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block report profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8; finite-block sampled Z0=2.670891433969e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; finite-block sweep best profile hash does not match profile_nk profile hash: 0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14 != e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
   "finite_nk_backend": {
     "backend": "native-c-outward-rounded-double-interval",
     "input_hashes": {
@@ -807,7 +818,7 @@
   },
   "radii_polynomial_interval": null,
   "radius_interval": null,
-  "repo_commit": "d7a5e93fbfd005ed58f360d266f0a20795a2ce55",
+  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
   "residual_map_hash_sha256": "f2b28046f8a44ffa41580257015e308032b574a94fdc910902a06da8af871db3",
   "rounding_mode": null,
   "sampled_finite_block_report": {
@@ -866,6 +877,7 @@
     },
     "pass": false,
     "path": "certs/profile/profile_finite_nk_block.json",
+    "profile_hash_matches_certificate": false,
     "row_selection": {
       "available_row_count": 326,
       "column_count": 128,
@@ -2059,6 +2071,7 @@
     "failure_count": 0,
     "pass": false,
     "path": "certs/profile/profile_finite_nk_sweep.json",
+    "profile_hash_matches_certificate": false,
     "sha256": "e29f42c3c896c9724becd8eb2985a5003f7b791de47371f90a5ef3b30e35d803",
     "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
     "trial_count": 900
@@ -3247,6 +3260,7 @@
       "failure_count": 0,
       "pass": false,
       "path": "certs/profile/profile_finite_nk_sweep.json",
+      "profile_hash_matches_certificate": false,
       "sha256": "e29f42c3c896c9724becd8eb2985a5003f7b791de47371f90a5ef3b30e35d803",
       "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
       "trial_count": 900
@@ -3719,9 +3733,308 @@
       "failure_count": 0,
       "pass": false,
       "path": "certs/profile/profile_finite_nk_row_subset_sweep.json",
+      "profile_hash_matches_certificate": false,
       "sha256": "74386eab29f19f50d32dcc5c4fe31fa626ff16a3d99036cc37bd60b00b7ccff6",
       "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
       "trial_count": 480
+    },
+    {
+      "best_by_cache": {
+        "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json": {
+          "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+          "Z0_infinity_norm_B": 1.1097157772968378,
+          "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 5.432327882525852e+19,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+            "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+            "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+          },
+          "jacobian_row_sum_inf": 123269672050.79108,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 66,
+          "residual_dimension": 325,
+          "residual_inf": 58337.457692108546,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 1e-10
+        }
+      },
+      "best_by_row_scaling": {
+        "none": {
+          "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+          "Z0_infinity_norm_B": 1.1097157772968378,
+          "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 5.432327882525852e+19,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+            "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+            "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+          },
+          "jacobian_row_sum_inf": 123269672050.79108,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 66,
+          "residual_dimension": 325,
+          "residual_inf": 58337.457692108546,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 1e-10
+        },
+        "residual": {
+          "Y0_infinity_norm_A_r": 4.0901333383952675e-06,
+          "Z0_infinity_norm_B": 1.152024466318383,
+          "approximate_inverse_row_sum_inf": 4.184074133097309e-06,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 1.5980412733709412e+20,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "a249b07234a784433730315299c810dc2a57ae97306ccbb60ae7917056b9cf8b",
+            "jacobian_float64": "e643868c3ea4d9ab0351d00c94b8b0c976dde017321db777de303b4982681b41",
+            "residual_vector_float64": "b4ea9bb1bf099af11091e205891ef4c7f8301452d6f6fb38ac8368fe32605a3a"
+          },
+          "jacobian_row_sum_inf": 22696114.746714532,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 128,
+          "residual_dimension": 325,
+          "residual_inf": 1.0,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "residual",
+            "nontrivial_scale_count": 325,
+            "scale_floor": 1e-30,
+            "scale_max": 1.7038668849244445,
+            "scale_min": 1.714164517209108e-05
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 0.0
+        }
+      },
+      "best_by_scaling": {
+        "none": {
+          "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+          "Z0_infinity_norm_B": 1.1097157772968378,
+          "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 5.432327882525852e+19,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+            "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+            "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+          },
+          "jacobian_row_sum_inf": 123269672050.79108,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 66,
+          "residual_dimension": 325,
+          "residual_inf": 58337.457692108546,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 1e-10
+        }
+      },
+      "best_by_scaling_pair": {
+        "row:none|column:none": {
+          "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+          "Z0_infinity_norm_B": 1.1097157772968378,
+          "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 5.432327882525852e+19,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+            "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+            "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+          },
+          "jacobian_row_sum_inf": 123269672050.79108,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 66,
+          "residual_dimension": 325,
+          "residual_inf": 58337.457692108546,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 1e-10
+        },
+        "row:residual|column:none": {
+          "Y0_infinity_norm_A_r": 4.0901333383952675e-06,
+          "Z0_infinity_norm_B": 1.152024466318383,
+          "approximate_inverse_row_sum_inf": 4.184074133097309e-06,
+          "coefficient_coordinate_scaling": {
+            "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+            "mode": "none",
+            "nontrivial_scale_count": 0,
+            "scale_floor": 1e-30,
+            "scale_max": 1.0,
+            "scale_min": 1.0
+          },
+          "coefficient_dimension": 128,
+          "column_count": 128,
+          "condition_estimate": 1.5980412733709412e+20,
+          "finite_block_hashes": {
+            "approximate_inverse_float64": "a249b07234a784433730315299c810dc2a57ae97306ccbb60ae7917056b9cf8b",
+            "jacobian_float64": "e643868c3ea4d9ab0351d00c94b8b0c976dde017321db777de303b4982681b41",
+            "residual_vector_float64": "b4ea9bb1bf099af11091e205891ef4c7f8301452d6f6fb38ac8368fe32605a3a"
+          },
+          "jacobian_row_sum_inf": 22696114.746714532,
+          "profile": "work/v117_twochart_init.json",
+          "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+          "rank_after_cutoff": 128,
+          "residual_dimension": 325,
+          "residual_inf": 1.0,
+          "residual_row_scaling": {
+            "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+            "mode": "residual",
+            "nontrivial_scale_count": 325,
+            "scale_floor": 1e-30,
+            "scale_max": 1.7038668849244445,
+            "scale_min": 1.714164517209108e-05
+          },
+          "ridge_relative": 0.0001,
+          "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+          "row_labels": "all",
+          "selected_row_count": 325,
+          "svd_rcond": 0.0
+        }
+      },
+      "best_overall": {
+        "Y0_infinity_norm_A_r": 5.71711859031535e-06,
+        "Z0_infinity_norm_B": 1.1097157772968378,
+        "approximate_inverse_row_sum_inf": 3.0724481894323394e-10,
+        "coefficient_coordinate_scaling": {
+          "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+          "mode": "none",
+          "nontrivial_scale_count": 0,
+          "scale_floor": 1e-30,
+          "scale_max": 1.0,
+          "scale_min": 1.0
+        },
+        "coefficient_dimension": 128,
+        "column_count": 128,
+        "condition_estimate": 5.432327882525852e+19,
+        "finite_block_hashes": {
+          "approximate_inverse_float64": "c1f63a7b4447766cc27b03d99988dd35f6f9a2a7daf3b2a5e0a05e8bc79d6f0a",
+          "jacobian_float64": "948f0cc6a7d9ac832039c052f6cf64f76cea0125283fa021d55e8e724d154841",
+          "residual_vector_float64": "bf1ecac4cdea67f30a03723816b020a2352d8f993a1bc77cf4ca614219212f2a"
+        },
+        "jacobian_row_sum_inf": 123269672050.79108,
+        "profile": "work/v117_twochart_init.json",
+        "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+        "rank_after_cutoff": 66,
+        "residual_dimension": 325,
+        "residual_inf": 58337.457692108546,
+        "residual_row_scaling": {
+          "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+          "mode": "none",
+          "nontrivial_scale_count": 0,
+          "scale_floor": 1e-30,
+          "scale_max": 1.0,
+          "scale_min": 1.0
+        },
+        "ridge_relative": 0.0001,
+        "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_tailnative_scaled_rows.json",
+        "row_labels": "all",
+        "selected_row_count": 325,
+        "svd_rcond": 1e-10
+      },
+      "diagnostic_vs_proof": "Floating sampled row-cache sweep. Finite Y0/Z0 arithmetic uses the native C interval backend, but row caches and inverses are floating diagnostics and no Z2/tail-complement bound is supplied.",
+      "failure_count": 0,
+      "pass": false,
+      "path": "certs/profile/profile_finite_nk_pseudoinverse_probe.json",
+      "profile_hash_matches_certificate": false,
+      "sha256": "01e16d0a4848314f7d5fb47cf970a07a1a250b77e6a3f7921712b32c06f6346d",
+      "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
+      "trial_count": 240
     }
   ],
   "schema_version": "nsproof-cert-v1",

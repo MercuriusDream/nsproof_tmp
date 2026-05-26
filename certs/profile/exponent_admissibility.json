@@ -1,0 +1,44 @@
+{
+  "backend": "python-fraction-exact-rational-arithmetic",
+  "blockers": [],
+  "blockers_for_stop_condition_gate": [
+    "profile_nk.json must pass for an admissible profile at this exponent",
+    "tail_recurrence.json must pass for the natural tail linked to this profile"
+  ],
+  "certificate_name": "exponent_admissibility",
+  "commands": [
+    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/exponent_admissibility.json"
+  ],
+  "dependency_hashes": {
+    "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
+  },
+  "exact_subclaims": {
+    "B": "1",
+    "B_decimal": "1",
+    "distance_to_lower_endpoint": "1/20",
+    "distance_to_upper_endpoint": "1/20",
+    "gamma": "9/20",
+    "gamma_decimal": "0.45000000000000001",
+    "gamma_in_open_wedge_2_5_1_2": true,
+    "p_expected": "20/9",
+    "p_expected_decimal": "2.2222222222222223",
+    "p_profile": "22222222222222223/10000000000000000",
+    "p_profile_decimal_error": 0.0,
+    "p_profile_decimal_matches_inverse_gamma": true,
+    "p_profile_decimal_tolerance": 1e-15
+  },
+  "failure_reason": null,
+  "input_hashes": {
+    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+    "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
+  },
+  "mathematical_statement": "The fixed profile parameter gamma is an exact rational number in the open interval (2/5, 1/2), with exact exponent p=1/gamma. The profile's stored decimal p is checked against this exact value.",
+  "pass": true,
+  "precision_bits": "exact",
+  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "profile_linkage_scope": "This certificate links only the exact algebraic exponent subclaim to the supplied profile hash. It does not certify that the profile solves the PDE, that the tail recurrence closes, or that pressure reconstruction is valid.",
+  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
+  "rounding_mode": "not-applicable",
+  "schema_version": "nsproof-cert-v1"
+}

@@ -22,7 +22,7 @@
     ]
   },
   "dependency_hashes": {
-    "tail_recurrence": "efb89746070c7d92546f5bfeae4af99da875a64f6d8f9c66233ea01a78068789"
+    "tail_recurrence": "ff31dcebe8edc575be1564767a2c2c1fffdabee6746ca773ee3f13d5452c8dd0"
   },
   "exterior_exclusion": null,
   "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
@@ -42,7 +42,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "d7a5e93fbfd005ed58f360d266f0a20795a2ce55",
+  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1"
 }

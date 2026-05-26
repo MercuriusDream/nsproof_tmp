@@ -36,6 +36,7 @@ GATES: tuple[dict[str, Any], ...] = (
         "gate_id": "validated_exponent",
         "statement": "Validated exponent 2/5 < gamma < 1/2 linked to an admissible profile",
         "dependencies": [
+            "certs/profile/exponent_admissibility.json",
             "certs/profile/profile_nk.json",
             "certs/tail/tail_recurrence.json",
         ],
@@ -138,18 +139,39 @@ def build_manifest() -> dict[str, Any]:
     passed = 0
     for gate in GATES:
         dependencies = [dependency_status(path) for path in gate["dependencies"]]
-        gate_pass = all(item["exists"] and item["pass"] for item in dependencies)
+        profile_hashes = sorted(
+            {
+                str(item["profile_hash_sha256"])
+                for item in dependencies
+                if item.get("profile_hash_sha256")
+            }
+        )
+        profile_hash_consistent = len(profile_hashes) <= 1
+        gate_pass = (
+            all(item["exists"] and item["pass"] for item in dependencies)
+            and profile_hash_consistent
+        )
         if gate_pass:
             passed += 1
+        failure_reason = None
+        if not gate_pass:
+            reasons = []
+            if not all(item["exists"] and item["pass"] for item in dependencies):
+                reasons.append("one or more required interval/exact certificates are missing or failing")
+            if not profile_hash_consistent:
+                reasons.append("gate dependencies refer to different profile hashes")
+            failure_reason = "; ".join(reasons)
         gate_reports.append(
             {
                 "gate_id": gate["gate_id"],
                 "statement": gate["statement"],
                 "pass": gate_pass,
                 "dependencies": dependencies,
-                "failure_reason": None
-                if gate_pass
-                else "one or more required interval/exact certificates are missing or failing",
+                "profile_hash_consistency": {
+                    "pass": profile_hash_consistent,
+                    "hashes": profile_hashes,
+                },
+                "failure_reason": failure_reason,
             }
         )
 

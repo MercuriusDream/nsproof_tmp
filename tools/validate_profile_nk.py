@@ -84,7 +84,7 @@ def load_optional_jsons(paths: list[str] | None) -> list[dict[str, Any]]:
     return [report for report in (load_optional_json(path) for path in paths) if report is not None]
 
 
-def finite_block_blockers(report: dict[str, Any] | None) -> list[str]:
+def finite_block_blockers(report: dict[str, Any] | None, expected_profile_hash: str | None) -> list[str]:
     if report is None:
         return [
             (
@@ -94,6 +94,12 @@ def finite_block_blockers(report: dict[str, Any] | None) -> list[str]:
             )
         ]
     blockers = [f"finite-block report is diagnostic-only: {report.get('status')}"]
+    report_profile_hash = report.get("profile_hash_sha256")
+    if expected_profile_hash and report_profile_hash and report_profile_hash != expected_profile_hash:
+        blockers.append(
+            "finite-block report profile hash does not match profile_nk profile hash: "
+            f"{report_profile_hash} != {expected_profile_hash}"
+        )
     bounds = report.get("finite_nk_bounds", {})
     z0 = bounds.get("Z0_infinity_norm_B")
     if z0 is None:
@@ -105,11 +111,17 @@ def finite_block_blockers(report: dict[str, Any] | None) -> list[str]:
     return blockers
 
 
-def finite_sweep_blockers(report: dict[str, Any] | None) -> list[str]:
+def finite_sweep_blockers(report: dict[str, Any] | None, expected_profile_hash: str | None) -> list[str]:
     if report is None:
         return []
     blockers = [f"finite-block sweep is diagnostic-only: {report.get('status')}"]
     best = report.get("best_overall") or {}
+    best_profile_hash = best.get("profile_hash_sha256")
+    if expected_profile_hash and best_profile_hash and best_profile_hash != expected_profile_hash:
+        blockers.append(
+            "finite-block sweep best profile hash does not match profile_nk profile hash: "
+            f"{best_profile_hash} != {expected_profile_hash}"
+        )
     z0 = best.get("Z0_infinity_norm_B")
     if z0 is None:
         blockers.append("finite-block sweep does not contain a best Z0")
@@ -139,6 +151,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
 
     finite_block_report = load_optional_json(args.finite_block_report)
     finite_sweep_reports = load_optional_jsons(args.finite_sweep_report)
+    expected_profile_hash = exact_audit["profile_hash_sha256"]
     blockers = list(exact_audit.get("blockers", []))
     blockers.extend(
         [
@@ -147,9 +160,9 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
             "Z2/tail-complement interval bound is not available for this profile",
         ]
     )
-    blockers.extend(finite_block_blockers(finite_block_report))
+    blockers.extend(finite_block_blockers(finite_block_report, expected_profile_hash))
     for finite_sweep_report in finite_sweep_reports:
-        blockers.extend(finite_sweep_blockers(finite_sweep_report))
+        blockers.extend(finite_sweep_blockers(finite_sweep_report, expected_profile_hash))
     toy_radii = manufactured_zero_self_test()
     finite_backend = finite_nk_backend_report()
     if finite_block_report is not None or finite_sweep_reports:
@@ -171,6 +184,10 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         {
             "path": finite_sweep_report["_path"],
             "sha256": finite_sweep_report["_sha256"],
+            "profile_hash_matches_certificate": (
+                (finite_sweep_report.get("best_overall") or {}).get("profile_hash_sha256")
+                == expected_profile_hash
+            ),
             "status": finite_sweep_report.get("status"),
             "pass": bool(finite_sweep_report.get("pass", False)),
             "diagnostic_vs_proof": finite_sweep_report.get("diagnostic_vs_proof"),
@@ -215,6 +232,8 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         else {
             "path": finite_block_report["_path"],
             "sha256": finite_block_report["_sha256"],
+            "profile_hash_matches_certificate": finite_block_report.get("profile_hash_sha256")
+            == expected_profile_hash,
             "status": finite_block_report.get("status"),
             "pass": bool(finite_block_report.get("pass", False)),
             "diagnostic_vs_proof": finite_block_report.get("diagnostic_vs_proof"),

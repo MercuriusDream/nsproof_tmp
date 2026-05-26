@@ -34,6 +34,7 @@ from validators.exact_profile_residual import (  # noqa: E402
 )
 from validators.pressure_exactness import (  # noqa: E402
     PRESSURE_RECONSTRUCTION_STATEMENT,
+    formal_pressure_identity_self_test,
     missing_interval_blockers,
     pressure_obligations,
     pressure_reconstruction_hash,
@@ -180,6 +181,7 @@ def build_pressure_reconstruction_certificate(args: argparse.Namespace) -> dict[
     profile, profile_data, profile_blockers = profile_report(args.profile)
     profile_nk, nk_blockers = profile_nk_report(args.profile_nk, profile.get("sha256"))
     obligations = pressure_obligations()
+    identity_self_test = formal_pressure_identity_self_test()
     hashes = code_hashes()
 
     blockers = []
@@ -233,6 +235,7 @@ def build_pressure_reconstruction_certificate(args: argparse.Namespace) -> dict[
         "tail_policy_hash_sha256": profile.get("tail_policy_hash_sha256"),
         "pressure_reconstruction_hash_sha256": dependency_hashes["pressure_reconstruction_map"],
         "pressure_reconstruction_statement": PRESSURE_RECONSTRUCTION_STATEMENT,
+        "formal_pressure_identity_self_test": identity_self_test,
         "mathematical_statement": (
             "Pressure reconstruction from the pressure-eliminated two-chart profile: "
             "build U from psi/Gamma, validate R^theta=0, validate "

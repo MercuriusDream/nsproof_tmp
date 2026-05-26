@@ -31,8 +31,173 @@
     },
     "gamma": "9/20",
     "gamma_in_open_wedge_2_5_1_2": true,
+    "inequalities": {
+      "2/5 < gamma": true,
+      "gamma < 1/2": true
+    },
     "note": "These are exact algebraic subclaims for the fixed branch only. They do not certify the infinite tail recurrence or the profile.",
     "p": "20/9"
+  },
+  "exact_tail_algebra": {
+    "blockers_for_full_tail_certificate": [
+      "does not prove the infinite tail recurrence",
+      "does not provide a directed-rounding interval recurrence",
+      "does not provide an infinite tail remainder majorant",
+      "does not prove exponent semigroup closure"
+    ],
+    "claim_scope": "fixed_branch_exact_algebra_only",
+    "exact_subclaims": {
+      "B": "1",
+      "fixed_branch_gamma_B": true,
+      "forced_qp_trace_decimal": {
+        "F_x0": 1.9218140929535232,
+        "F_x1": -0.9786773280026654,
+        "G_x0": 0.1111111111111111,
+        "G_x1": -1.1111111111111112
+      },
+      "forced_qp_trace_exact_rational": {
+        "F_x0": "25637/13340",
+        "F_x1": "-5875/6003",
+        "G_x0": "1/9",
+        "G_x1": "-10/9"
+      },
+      "gamma": "9/20",
+      "gamma_in_open_wedge_2_5_1_2": true,
+      "inequalities": {
+        "2/5 < gamma": true,
+        "gamma < 1/2": true
+      },
+      "note": "These are exact algebraic subclaims for the fixed branch only. They do not certify the infinite tail recurrence or the profile.",
+      "p": "20/9"
+    },
+    "floating_profile_link": {
+      "checked": true,
+      "comparisons": [
+        {
+          "abs_error": 0.0,
+          "actual": 0.45,
+          "expected": "9/20",
+          "expected_decimal": 0.45,
+          "name": "gamma",
+          "ok": true,
+          "tolerance": 1e-12
+        },
+        {
+          "abs_error": 0.0,
+          "actual": 1.0,
+          "expected": "1",
+          "expected_decimal": 1.0,
+          "name": "B",
+          "ok": true,
+          "tolerance": 1e-12
+        },
+        {
+          "abs_error": 0.0,
+          "actual": 2.2222222222222223,
+          "expected": "20/9",
+          "expected_decimal": 2.2222222222222223,
+          "name": "p",
+          "ok": true,
+          "tolerance": 1e-12
+        },
+        {
+          "actual": [
+            1.9218140929535197,
+            -0.9786773280026653
+          ],
+          "expected": [
+            "25637/13340",
+            "-5875/6003"
+          ],
+          "max_abs_error": 3.552713678800501e-15,
+          "name": "forced_qp.F_trace_x_coeffs",
+          "ok": true,
+          "per_index": [
+            {
+              "abs_error": 3.552713678800501e-15,
+              "actual": 1.9218140929535197,
+              "expected": "25637/13340",
+              "expected_decimal": 1.9218140929535232,
+              "index": 0,
+              "ok": true
+            },
+            {
+              "abs_error": 1.1102230246251565e-16,
+              "actual": -0.9786773280026653,
+              "expected": "-5875/6003",
+              "expected_decimal": -0.9786773280026654,
+              "index": 1,
+              "ok": true
+            }
+          ],
+          "tolerance": 1e-12
+        },
+        {
+          "actual": [
+            0.11111111111111108,
+            -1.1111111111111112
+          ],
+          "expected": [
+            "1/9",
+            "-10/9"
+          ],
+          "max_abs_error": 2.7755575615628914e-17,
+          "name": "forced_qp.G_trace_x_coeffs",
+          "ok": true,
+          "per_index": [
+            {
+              "abs_error": 2.7755575615628914e-17,
+              "actual": 0.11111111111111108,
+              "expected": "1/9",
+              "expected_decimal": 0.1111111111111111,
+              "index": 0,
+              "ok": true
+            },
+            {
+              "abs_error": 0.0,
+              "actual": -1.1111111111111112,
+              "expected": "-10/9",
+              "expected_decimal": -1.1111111111111112,
+              "index": 1,
+              "ok": true
+            }
+          ],
+          "tolerance": 1e-12
+        }
+      ],
+      "failure_reason": null,
+      "forced_qp_metadata": {
+        "F_trace_x_coeffs": [
+          1.9218140929535197,
+          -0.9786773280026653
+        ],
+        "G_trace_x_coeffs": [
+          0.11111111111111108,
+          -1.1111111111111112
+        ],
+        "formal_origin_cutoff_power": 6,
+        "lifted_from_vanishing_edge": true,
+        "mode": "formal",
+        "note": "Trace is the formal first forced-tail recurrence coefficient.",
+        "seed_lifted_from_vanishing_edge": true,
+        "seed_vanishing_edge_power": 2.2222222222222223
+      },
+      "metadata": {
+        "B": 1.0,
+        "floating_tail_gate_all_ok": true,
+        "forced_qp_coeff_error": 8.881784197001252e-16,
+        "format": "twochart_profile_projection_v1",
+        "gamma": 0.45,
+        "p": 2.2222222222222223,
+        "q2_ok": true,
+        "q2_policy": "zero",
+        "tail_legality_status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+      },
+      "pass": true,
+      "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+      "tolerance": 1e-12
+    },
+    "pass": true
   },
   "exponent_semigroup": null,
   "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
@@ -71,7 +236,7 @@
   "q1_exclusion": "structural",
   "q2_policy": "zero",
   "remainder_bound": null,
-  "repo_commit": "d7a5e93fbfd005ed58f360d266f0a20795a2ce55",
+  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "tail_metadata": {

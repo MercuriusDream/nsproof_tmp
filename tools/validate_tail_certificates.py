@@ -13,7 +13,6 @@ import argparse
 import json
 import os
 import sys
-from fractions import Fraction
 from typing import Any
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -27,6 +26,7 @@ from validators.exact_profile_residual import (  # noqa: E402
     sha256_file,
     stable_json_hash,
 )
+from validators.exact_tail_algebra import exact_tail_algebra_report  # noqa: E402
 
 
 def resolve_path(path: str) -> str:
@@ -134,61 +134,17 @@ def base_certificate(name: str, profile_path: str, data: dict[str, Any]) -> dict
     }
 
 
-def fixed_branch_exact_tail_subclaims(data: dict[str, Any]) -> dict[str, Any]:
-    gamma_value = float(data.get("gamma"))
-    B_value = float(data.get("B"))
-    gamma = Fraction(9, 20)
-    B = Fraction(1, 1)
-    fixed_branch = abs(gamma_value - float(gamma)) <= 1e-15 and abs(B_value - 1.0) <= 1e-15
-    gamma2 = gamma * gamma
-    gamma3 = gamma2 * gamma
-    f_denom_0 = 4 * (35 * gamma3 + 11 * gamma2 - 20 * gamma + 4)
-    f_denom_2 = 4 * gamma * (7 * gamma2 + 5 * gamma - 2)
-    f0 = (
-        28 * B * B * gamma3
-        + 20 * B * B * gamma2
-        - 8 * B * B * gamma
-        + 25 * gamma3
-        + 30 * gamma2
-        - 27 * gamma
-        + 4
-    ) / f_denom_0
-    f2 = (-15 * gamma2 - 2 * gamma + 1) / f_denom_2
-    g0 = B * (1 - 2 * gamma) / (2 * gamma)
-    g2 = -B / (2 * gamma)
-    return {
-        "fixed_branch_gamma_B": fixed_branch,
-        "gamma": str(gamma),
-        "B": str(B),
-        "p": str(Fraction(1, 1) / gamma),
-        "gamma_in_open_wedge_2_5_1_2": bool(Fraction(2, 5) < gamma < Fraction(1, 2)),
-        "forced_qp_trace_exact_rational": {
-            "F_x0": str(f0),
-            "F_x1": str(f2),
-            "G_x0": str(g0),
-            "G_x1": str(g2),
-        },
-        "forced_qp_trace_decimal": {
-            "F_x0": float(f0),
-            "F_x1": float(f2),
-            "G_x0": float(g0),
-            "G_x1": float(g2),
-        },
-        "note": (
-            "These are exact algebraic subclaims for the fixed branch only. "
-            "They do not certify the infinite tail recurrence or the profile."
-        ),
-    }
-
-
 def tail_recurrence_certificate(profile_path: str, data: dict[str, Any]) -> dict[str, Any]:
     tail = profile_tail_metadata(data)
-    exact_subclaims = fixed_branch_exact_tail_subclaims(data)
+    exact_tail = exact_tail_algebra_report(data, profile_path=relpath(profile_path))
+    exact_subclaims = exact_tail["exact_subclaims"]
     blockers = [
         "tail recurrence is not interval-validated with directed rounding",
         "infinite tail remainder majorant is missing",
         "exponent semigroup closure certificate is missing",
     ]
+    if not exact_tail["pass"]:
+        blockers.append("fixed-branch exact tail algebra/profile link failed")
     if not tail.get("floating_tail_gate_all_ok"):
         blockers.append(f"floating tail gate is not clean: {tail.get('floating_tail_gate_status')}")
     if tail.get("q2_policy") != "zero" or not tail.get("q2_ok"):
@@ -204,6 +160,7 @@ def tail_recurrence_certificate(profile_path: str, data: dict[str, Any]) -> dict
             ),
             "tail_metadata": tail,
             "exact_algebraic_subclaims": exact_subclaims,
+            "exact_tail_algebra": exact_tail,
             "gamma_interval": [str(tail.get("gamma")), str(tail.get("gamma"))],
             "B_interval": [str(tail.get("B")), str(tail.get("B"))],
             "q1_exclusion": tail.get("q1_exclusion"),
