@@ -747,9 +747,16 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 
     mortar_rows = []
     mortar_rows_available = 0
+    mortar_rows_unfiltered_max_abs = 0.0
+    mortar_rows_unfiltered_worst: dict[str, Any] = {}
     if "interface" in blocks:
-        mortar_rows = build_mortar_rows(candidate_variables)
-        mortar_rows_available = len(mortar_rows)
+        mortar_rows_all = build_mortar_rows(candidate_variables)
+        mortar_rows_available = len(mortar_rows_all)
+        if mortar_rows_all:
+            worst_mortar = max(mortar_rows_all, key=lambda row: abs(row.residual))
+            mortar_rows_unfiltered_max_abs = abs(worst_mortar.residual)
+            mortar_rows_unfiltered_worst = worst_mortar.as_json()
+        mortar_rows = mortar_rows_all
         if args.mortar_active_count > 0 and len(mortar_rows) > args.mortar_active_count:
             mortar_rows = sorted(mortar_rows, key=lambda row: abs(row.residual), reverse=True)[
                 : args.mortar_active_count
@@ -770,19 +777,34 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     residual_vector: list[float] = []
     jacobian_rows: list[list[float]] = []
     row_labels: list[str] = []
+    row_records: list[dict[str, Any]] = []
     row_groups: dict[str, int] = {"pde": 0, "mortar": 0, "active_guard": 0}
 
     for row in pde_rows:
         q = float(row["q"])
         b = float(row["b"])
         component = str(row["component"])
-        residual_vector.append(args.pde_weight * float(row["residual"]))
+        residual_raw = float(row["residual"])
+        residual_vector.append(args.pde_weight * residual_raw)
         jac_row: list[float] = []
         for variable in selected:
             column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
             jac_row.append(args.pde_weight * (column.e_psi if component == "e_psi" else column.e_gamma))
         jacobian_rows.append(jac_row)
         row_labels.append("pde")
+        row_records.append(
+            {
+                "row_id": f"pde:{len(row_records)}",
+                "label": "pde",
+                "row_type": "pde",
+                "q": q,
+                "b": b,
+                "component": component,
+                "residual_raw": residual_raw,
+                "weight": args.pde_weight,
+                "residual_weighted_before_scaling": args.pde_weight * residual_raw,
+            }
+        )
         row_groups["pde"] += 1
 
     objective_mortar_rows: list[Any] = []
@@ -791,12 +813,31 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         if not active_entries:
             continue
         objective_mortar_rows.append(row)
-        residual_vector.append(args.mortar_weight * row.residual)
+        residual_raw = float(row.residual)
+        residual_vector.append(args.mortar_weight * residual_raw)
         jac_row = [0.0 for _ in selected]
         for column_index, value in active_entries:
             jac_row[column_index] = args.mortar_weight * value
         jacobian_rows.append(jac_row)
         row_labels.append("mortar")
+        row_records.append(
+            {
+                "row_id": f"mortar:{len(row_records)}",
+                "label": "mortar",
+                "row_type": "mortar",
+                "component": row.component,
+                "coordinate": row.coordinate,
+                "q": row.q,
+                "x": row.x,
+                "derivative": row.derivative_label,
+                "dq_order": row.dq_order,
+                "dx_order": row.dx_order,
+                "residual_raw": residual_raw,
+                "weight": args.mortar_weight,
+                "residual_weighted_before_scaling": args.mortar_weight * residual_raw,
+                "jacobian_nnz_active": len(active_entries),
+            }
+        )
         row_groups["mortar"] += 1
 
     active_guard_points = guard_qb_points_from_args(args)["combined"] if args.active_guard_weight > 0.0 else []
@@ -811,6 +852,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             raw = projection.exact_residual_at(r, z)
             residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
             for component, value in (("e_psi", residual.e_psi), ("e_gamma", residual.e_gamma)):
+                residual_raw = float(value)
                 jac_row: list[float] = []
                 for variable in selected:
                     column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
@@ -818,8 +860,21 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
                         args.active_guard_weight * (column.e_psi if component == "e_psi" else column.e_gamma)
                     )
                 jacobian_rows.append(jac_row)
-                residual_vector.append(args.active_guard_weight * value)
+                residual_vector.append(args.active_guard_weight * residual_raw)
                 row_labels.append("active_guard")
+                row_records.append(
+                    {
+                        "row_id": f"active_guard:{len(row_records)}",
+                        "label": "active_guard",
+                        "row_type": "active_guard",
+                        "q": q,
+                        "b": b,
+                        "component": component,
+                        "residual_raw": residual_raw,
+                        "weight": args.active_guard_weight,
+                        "residual_weighted_before_scaling": args.active_guard_weight * residual_raw,
+                    }
+                )
                 active_guard_rows_added += 1
                 row_groups["active_guard"] += 1
     raw_metrics = vector_metrics(residual_vector)
@@ -839,6 +894,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "row_scaling": row_scaling,
         "row_groups": row_groups,
         "row_labels": row_labels,
+        "row_records": row_records,
         "active_guard_rows": active_guard_rows_added,
         "active_guard_points": [[q, b] for q, b in objective_active_guard_points],
         "objective_pde_rows": pde_rows,
@@ -849,6 +905,8 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "mortar_coordinates": args.mortar_coordinates,
         "mortar_rows_available": mortar_rows_available,
         "mortar_rows_active": len(mortar_rows),
+        "mortar_rows_unfiltered_max_abs": mortar_rows_unfiltered_max_abs,
+        "mortar_rows_unfiltered_worst": mortar_rows_unfiltered_worst,
         "pre_score_candidate_count": pre_score_candidate_count,
         "post_pool_candidate_count": len(candidate_variables),
         "injected_mortar_candidates": injected_mortar_candidates,
@@ -1072,6 +1130,71 @@ def restricted_guarded_kkt_step(
     }
 
 
+def guarded_kkt_rank_report(args: argparse.Namespace, system: dict[str, Any], iteration: int) -> dict[str, Any]:
+    primary_labels = parse_label_set(args.guarded_kkt_primary_labels)
+    active_primary_raw_max = 0.0
+    for record in system["row_records"]:
+        if str(record.get("label")) in primary_labels:
+            active_primary_raw_max = max(active_primary_raw_max, abs(float(record.get("residual_raw", 0.0))))
+    try:
+        from validators.guarded_kkt_rank import compute_guarded_kkt_rank_report
+
+        report = compute_guarded_kkt_rank_report(
+            system["residual_vector"],
+            system["jacobian_rows"],
+            system["row_labels"],
+            [variable.label for variable in system["variables"]],
+            primary_labels,
+            parse_label_set(args.guarded_kkt_constraint_labels),
+            heldout_global_mortar_max=system.get("mortar_rows_unfiltered_max_abs", 0.0),
+            active_primary_raw_max=active_primary_raw_max,
+            coverage_min=args.rank_coverage_min,
+        )
+    except Exception as exc:
+        report = {
+            "status": "GUARDED_KKT_RANK_DIAGNOSTIC_UNAVAILABLE_NOT_PROOF",
+            "diagnostic_vs_proof": "rank report failed before interval validation; no proof claim",
+            "error": f"{type(exc).__name__}: {exc}",
+            "coverage": {
+                "active_primary_raw_max": active_primary_raw_max,
+                "heldout_global_mortar_max": system.get("mortar_rows_unfiltered_max_abs", 0.0),
+                "coverage": active_primary_raw_max / max(system.get("mortar_rows_unfiltered_max_abs", 0.0), 1e-300),
+                "coverage_min": args.rank_coverage_min,
+                "coverage_ok": False,
+            },
+        }
+    report["iteration"] = iteration
+    report["mortar_rows_unfiltered_worst"] = system.get("mortar_rows_unfiltered_worst", {})
+    report["mortar_rows_active"] = system.get("mortar_rows_active", 0)
+    report["mortar_rows_available"] = system.get("mortar_rows_available", 0)
+    return report
+
+
+def write_stage0_row_cache(args: argparse.Namespace, system: dict[str, Any], iteration: int) -> None:
+    if not args.row_cache_out:
+        return
+    from validators.twochart_row_cache import build_stage0_row_cache, write_json
+
+    cache = build_stage0_row_cache(
+        profile_path=args.input,
+        variables=system["variables"],
+        row_records=system["row_records"],
+        residual_vector=system["residual_vector"],
+        jacobian_rows=system["jacobian_rows"],
+        row_labels=system["row_labels"],
+        row_scaling=system["row_scaling"],
+        extra={
+            "iteration": iteration,
+            "solve_mode": args.solve_mode,
+            "primary_labels": sorted(parse_label_set(args.guarded_kkt_primary_labels)),
+            "constraint_labels": sorted(parse_label_set(args.guarded_kkt_constraint_labels)),
+            "mortar_rows_unfiltered_max_abs": system.get("mortar_rows_unfiltered_max_abs", 0.0),
+            "mortar_rows_unfiltered_worst": system.get("mortar_rows_unfiltered_worst", {}),
+        },
+    )
+    write_json(args.row_cache_out, cache)
+
+
 def stage0_block_specs(variables: list[Any], solve_mode: str, labels_raw: str = "") -> list[dict[str, Any]]:
     if solve_mode == "full":
         return [{"label": "full", "columns": list(range(len(variables)))}]
@@ -1127,12 +1250,19 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
 
     current = copy.deepcopy(data)
     history: list[dict[str, Any]] = []
+    rank_reports: list[dict[str, Any]] = []
     best_trial: dict[str, Any] | None = None
     best_trial_metrics: dict[str, Any] | None = None
     guard_point_report = guard_qb_points_from_args(args)
     guard_points = guard_point_report["combined"]
     for iteration in range(args.max_iter):
         system = build_stage0_system(current, args, blocks)
+        if iteration == 0:
+            write_stage0_row_cache(args, system, iteration)
+        rank_report: dict[str, Any] | None = None
+        if args.rank_report_out:
+            rank_report = guarded_kkt_rank_report(args, system, iteration)
+            rank_reports.append(rank_report)
         base_vec = system["residual_vector"]
         base_metrics = vector_metrics(base_vec)
         base_raw_metrics = system["raw_residual_metrics"]
@@ -1279,6 +1409,15 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
                 "mortar_rows_active": system["mortar_rows_active"],
+                "mortar_rows_unfiltered_max_abs": system["mortar_rows_unfiltered_max_abs"],
+                "mortar_rows_unfiltered_worst": system["mortar_rows_unfiltered_worst"],
+                "rank_report_summary": {
+                    "coverage": rank_report.get("coverage", {}) if rank_report else {},
+                    "constraint_space": rank_report.get("constraint_space", {}) if rank_report else {},
+                    "angle": rank_report.get("angle", {}) if rank_report else {},
+                }
+                if rank_report
+                else {},
                 "active_guard_weight": args.active_guard_weight,
                 "active_guard_rows": system["active_guard_rows"],
                 "active_guard_points": system["active_guard_points"],
@@ -1355,6 +1494,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
             "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
             "guarded_kkt_max_constraints": args.guarded_kkt_max_constraints,
+            "rank_report_out": args.rank_report_out,
+            "rank_coverage_min": args.rank_coverage_min,
+            "row_cache_out": args.row_cache_out,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -1380,6 +1522,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "q2_tol": args.q2_tol,
         },
         "history": history,
+        "rank_reports": rank_reports,
+        "row_cache_out": args.row_cache_out,
         "candidate": final_data,
         "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
     }
@@ -1443,6 +1587,9 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
             "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
             "guarded_kkt_max_constraints": args.guarded_kkt_max_constraints,
+            "rank_report_out": args.rank_report_out,
+            "rank_coverage_min": args.rank_coverage_min,
+            "row_cache_out": args.row_cache_out,
             "row_normalization": args.row_normalization,
             "line_search_eval": args.line_search_eval,
             "min_objective_decrease_abs": args.min_objective_decrease_abs,
@@ -1488,6 +1635,8 @@ def main() -> None:
     parser.add_argument("--input", required=True, help="Two-chart profile JSON.")
     parser.add_argument("--out", required=True, help="Candidate/profile JSON to write, or dry-run plan with --dry-run.")
     parser.add_argument("--report-out", default="", help="Optional full Stage-0 run report JSON.")
+    parser.add_argument("--rank-report-out", default="", help="Optional guarded-KKT rank/angle diagnostic JSON.")
+    parser.add_argument("--row-cache-out", default="", help="Optional sampled row cache JSON for the first Stage-0 system.")
     parser.add_argument("--dry-run", action="store_true", help="Write the old solver plan without mutating coefficients.")
     parser.add_argument("--blocks", default="origin,interface", help="Comma list: tail,origin,interface.")
     parser.add_argument("--variable-charts", default="tail,origin", help="Comma list of mutable charts: tail,origin.")
@@ -1614,6 +1763,12 @@ def main() -> None:
         default=128,
         help="Keep this many largest-residual constraint rows in guarded KKT; 0 keeps all.",
     )
+    parser.add_argument(
+        "--rank-coverage-min",
+        type=nonnegative_float,
+        default=0.5,
+        help="Minimum active-primary/raw-heldout mortar coverage expected before a rank report can be branch evidence.",
+    )
     parser.add_argument("--include-origin-constants", action="store_true")
     parser.add_argument("--chart-balanced-selection", action="store_true")
     parser.add_argument("--row-normalization", choices=("none", "jacobian", "residual-jacobian"), default="none")
@@ -1674,15 +1829,43 @@ def main() -> None:
             save_json(args.out, candidate)
             if args.report_out:
                 save_json(args.report_out, run_report)
+            if args.rank_report_out:
+                save_json(
+                    args.rank_report_out,
+                    {
+                        "format": "twochart_guarded_kkt_rank_reports_v1",
+                        "status": run_report.get("status", ""),
+                        "input": args.input,
+                        "out": args.out,
+                        "reports": run_report.get("rank_reports", []),
+                        "diagnostic_vs_proof": "floating rank/angle diagnostics only; no interval proof",
+                    },
+                )
         else:
             save_json(args.out, result)
             if args.report_out:
                 save_json(args.report_out, result)
+            if args.rank_report_out:
+                save_json(
+                    args.rank_report_out,
+                    {
+                        "format": "twochart_guarded_kkt_rank_reports_v1",
+                        "status": result.get("status", ""),
+                        "input": args.input,
+                        "out": args.out,
+                        "reports": result.get("rank_reports", []),
+                        "diagnostic_vs_proof": "floating rank/angle diagnostics only; no interval proof",
+                    },
+                )
 
     print(f"input={args.input}")
     print(f"saved={args.out}")
     if args.report_out:
         print(f"report_saved={args.report_out}")
+    if args.rank_report_out:
+        print(f"rank_report_saved={args.rank_report_out}")
+    if args.row_cache_out:
+        print(f"row_cache_saved={args.row_cache_out}")
     print(f"status={result['status']}")
     print(f"newton_executed={result['newton_executed']}")
     print(f"q2_policy={args.q2_policy}")

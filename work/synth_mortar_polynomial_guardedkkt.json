@@ -1,0 +1,94 @@
+{
+  "case": "mortar-polynomial",
+  "guard_final_metrics": {
+    "count": 1.0,
+    "l2": 4.0,
+    "linf": 4.0,
+    "mean_abs": 4.0
+  },
+  "guard_growth_linf": 1.0,
+  "guard_initial_metrics": {
+    "count": 1.0,
+    "l2": 4.0,
+    "linf": 4.0,
+    "mean_abs": 4.0
+  },
+  "inputs": {
+    "degree_origin": 8,
+    "degree_tail": 8,
+    "expect_guard_growth": 1.0,
+    "expect_mortar_factor": 100.0,
+    "guard_grid": "edge",
+    "perturb": ""
+  },
+  "kkt_report": {
+    "constraint_change_metrics": {
+      "count": 1.0,
+      "l2": 0.0,
+      "linf": 0.0,
+      "mean_abs": 0.0
+    },
+    "constraint_rows": 1,
+    "kkt_rank": 5,
+    "lm_lambda": 1e-12,
+    "method": "synthetic-guarded-kkt-equality",
+    "primary_change_metrics": {
+      "count": 4.0,
+      "l2": 6.65206734782293,
+      "linf": 5.499999999998307,
+      "mean_abs": 2.8749999999991345
+    },
+    "primary_rows": 4,
+    "step_metrics": {
+      "count": 4.0,
+      "l2": 3.741657386772687,
+      "linf": 2.999999999998692,
+      "mean_abs": 1.4999999999995577
+    },
+    "variables": 4
+  },
+  "not_proof": true,
+  "pass": true,
+  "primary_final_metrics": {
+    "count": 4.0,
+    "l2": 2.1666815136932128e-12,
+    "linf": 1.6928680679484387e-12,
+    "mean_abs": 8.65529869997772e-13
+  },
+  "primary_initial_metrics": {
+    "count": 4.0,
+    "l2": 6.652067347825035,
+    "linf": 5.5,
+    "mean_abs": 2.875
+  },
+  "reduction_factor_linf": 3248924180290.8877,
+  "rows": [
+    {
+      "label": "mortar",
+      "row_id": "mortar-poly:x=-1"
+    },
+    {
+      "label": "mortar",
+      "row_id": "mortar-poly:x=0"
+    },
+    {
+      "label": "mortar",
+      "row_id": "mortar-poly:x=1"
+    },
+    {
+      "label": "mortar",
+      "row_id": "mortar-poly:blend"
+    },
+    {
+      "label": "active_guard",
+      "row_id": "edge-guard:locks-guard-variable"
+    }
+  ],
+  "status": "SYNTHETIC_GUARDED_KKT_PASS_NOT_PROOF",
+  "step": [
+    -2.999999999998692,
+    1.9999999999996925,
+    -0.9999999999998461,
+    0.0
+  ]
+}

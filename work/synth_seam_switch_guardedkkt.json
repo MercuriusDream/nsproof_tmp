@@ -1,0 +1,32 @@
+{
+  "case": "seam-switch",
+  "expected_q_strings_for_both": [
+    "0.899999999999",
+    "0.900000000001"
+  ],
+  "inputs": {
+    "guard_seam_eps": 1e-12,
+    "guard_seam_q": 0.9,
+    "guard_seam_sides": "both"
+  },
+  "not_proof": true,
+  "pass": true,
+  "row_count": 2,
+  "rows": [
+    {
+      "chart_side": "below",
+      "label": "seam_limit",
+      "q": 0.899999999999,
+      "q_string": "0.899999999999",
+      "row_id": "seam-limit:below:q=0.899999999999"
+    },
+    {
+      "chart_side": "above",
+      "label": "seam_limit",
+      "q": 0.900000000001,
+      "q_string": "0.900000000001",
+      "row_id": "seam-limit:above:q=0.900000000001"
+    }
+  ],
+  "status": "SYNTHETIC_GUARDED_KKT_PASS_NOT_PROOF"
+}

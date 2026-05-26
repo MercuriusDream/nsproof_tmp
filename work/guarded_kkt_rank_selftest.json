@@ -1,0 +1,122 @@
+{
+  "angle": {
+    "best_feasible_step_metrics": {
+      "count": 2,
+      "l2": 10.0,
+      "max_abs": 10.0,
+      "rms": 7.071067811865475
+    },
+    "predicted_best_factor_inf": 0.0,
+    "projected_change_metrics": {
+      "count": 1,
+      "l2": 10.0,
+      "max_abs": 10.0,
+      "rms": 10.0
+    },
+    "rho_grad": 0.7071067811865475,
+    "rho_range": 1.0
+  },
+  "columns": 2,
+  "constraint_labels": [
+    "active_guard"
+  ],
+  "constraint_space": {
+    "nullity": 1,
+    "rank": 1,
+    "residual_metrics": {
+      "count": 1,
+      "l2": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "singular_values": [
+      1.0
+    ]
+  },
+  "coverage": {
+    "active_primary_raw_max": 10.0,
+    "coverage": 1.0,
+    "coverage_min": 0.5,
+    "coverage_ok": true,
+    "heldout_global_mortar_max": 10.0,
+    "note": "coverage uses unweighted raw residual metadata when provided"
+  },
+  "diagnostic_vs_proof": "floating guarded-KKT rank/angle diagnostic only; no interval proof",
+  "linear_algebra_backend": "numpy_svd_lstsq",
+  "primary_labels": [
+    "mortar"
+  ],
+  "primary_space": {
+    "rank": 1,
+    "rank_projected": 1,
+    "residual_metrics": {
+      "count": 1,
+      "l2": 10.0,
+      "max_abs": 10.0,
+      "rms": 10.0
+    },
+    "singular_values": [
+      1.4142135623730951
+    ],
+    "singular_values_projected": [
+      1.0
+    ]
+  },
+  "provided_step": {
+    "constraint_change_metrics": {
+      "count": 0,
+      "l2": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "max_signed_constraint_growth": 0.0,
+    "metrics": {
+      "count": 0,
+      "l2": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "positive_signed_constraint_growth_count": 0,
+    "predicted_constraint_metrics": {
+      "count": 0,
+      "l2": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "present": false,
+    "signed_constraint_growth_metrics": {
+      "count": 0,
+      "l2": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0
+    }
+  },
+  "rank_obstruction": false,
+  "row_space_note": "uses the residual/Jacobian rows supplied by the caller, typically post row-scaling",
+  "rows": {
+    "constraints": 1,
+    "primary": 1,
+    "total": 2
+  },
+  "status": "GUARDED_KKT_RANK_DIAGNOSTIC_NOT_PROOF",
+  "top_variables": [
+    {
+      "column": 0,
+      "gradient": 10.0,
+      "leverage": 1.0,
+      "projected_gradient": 10.0,
+      "score": 10.0,
+      "step": 0.0,
+      "variable": "x0"
+    },
+    {
+      "column": 1,
+      "gradient": 10.0,
+      "leverage": 1.0,
+      "projected_gradient": 0.0,
+      "score": 10.0,
+      "step": 0.0,
+      "variable": "x1"
+    }
+  ]
+}

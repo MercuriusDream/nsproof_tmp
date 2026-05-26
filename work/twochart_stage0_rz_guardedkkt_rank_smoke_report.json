@@ -1,0 +1,4046 @@
+{
+  "accepted_any_step": false,
+  "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+  "format": "twochart_newton_stage0_run_v1",
+  "history": [
+    {
+      "accepted": false,
+      "accepted_alpha": 0.0,
+      "accepted_block": "",
+      "active_guard_points": [
+        [
+          0.76,
+          0.1
+        ],
+        [
+          0.76,
+          0.54
+        ],
+        [
+          0.76,
+          0.98
+        ],
+        [
+          0.8400000000000001,
+          0.1
+        ],
+        [
+          0.8400000000000001,
+          0.54
+        ],
+        [
+          0.8400000000000001,
+          0.98
+        ],
+        [
+          0.92,
+          0.1
+        ],
+        [
+          0.92,
+          0.54
+        ],
+        [
+          0.92,
+          0.98
+        ],
+        [
+          0.899999999999,
+          0.1
+        ],
+        [
+          0.899999999999,
+          0.54
+        ],
+        [
+          0.899999999999,
+          0.98
+        ],
+        [
+          0.900000000001,
+          0.1
+        ],
+        [
+          0.900000000001,
+          0.54
+        ],
+        [
+          0.900000000001,
+          0.98
+        ]
+      ],
+      "active_guard_rows": 30,
+      "active_guard_weight": 10.0,
+      "base": {
+        "count": 49.0,
+        "max_abs": 4489.16535025682,
+        "objective": 23901169.504793987,
+        "rms": 987.7033658802541
+      },
+      "base_guard_metrics": {
+        "count": 30.0,
+        "enabled": true,
+        "max_abs": 448.916535025682,
+        "objective": 238460.08650847088,
+        "points_requested": 15,
+        "rms": 126.0846505351255,
+        "skipped": 0,
+        "worst": {
+          "abs": 448.916535025682,
+          "b": 0.98,
+          "component": "e_psi",
+          "q": 0.899999999999,
+          "value": 448.916535025682
+        }
+      },
+      "block_candidate_previews": [
+        {
+          "active_columns": 16,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 0.051251815491735804
+        },
+        {
+          "active_columns": 9,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 0.051251815456539306
+        },
+        {
+          "active_columns": 7,
+          "block": "chart:origin",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 2.919557339024429e-10
+        },
+        {
+          "active_columns": 16,
+          "block": "component:F",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 0.051251815491735804
+        },
+        {
+          "active_columns": 9,
+          "block": "tail.F",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 0.051251815456539306
+        },
+        {
+          "active_columns": 7,
+          "block": "origin.F",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 2.919557339024429e-10
+        },
+        {
+          "active_columns": 7,
+          "block": "block:F_an",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5827.488832948979,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 1.5033596734669655e-12,
+              "objective": 1.8942648703416327e-24,
+              "rms": 7.356755632636737e-13
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2838561315292508e-17,
+              "rms": 1.194364606311774e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.2746693054108469e-10,
+              "objective": 8.153466921544673e-21,
+              "rms": 3.850257824081318e-11
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 1.946414586023046e-12
+        },
+        {
+          "active_columns": 2,
+          "block": "block:F_frac",
+          "column_scaling": {
+            "active_columns": 2,
+            "column_norm_max": 9052.266771833214,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 0.00017412413616975234,
+            "column_scale_min": 0.00011046956803256977,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 2.0,
+              "max_abs": 7.25434100802498e-16,
+              "objective": 4.17654901327128e-31,
+              "rms": 6.462622542955205e-16
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.6824169606474723e-12,
+              "objective": 2.8342574688528637e-24,
+              "rms": 5.611751032781186e-13
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 2.835276992551938e-17,
+              "objective": 1.2058193436741541e-33,
+              "rms": 1.4806751185456858e-17
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 9.13952844874535e-16
+        },
+        {
+          "active_columns": 7,
+          "block": "block:F_origin_taylor",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "delta_norm": 2.919557339024429e-10
+        }
+      ],
+      "injected_mortar_candidates": [],
+      "iteration": 0,
+      "line_trials": [
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 1.0,
+          "alpha_applied": 0.019511503941967615,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350980153,
+            "objective": 238460.086158573,
+            "points_requested": 15,
+            "rms": 126.08465044262208,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350980153,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350980153
+            }
+          },
+          "max_abs": 4489.165350980153,
+          "max_abs_update": 0.0007143229341376805,
+          "objective": 23901169.4663664,
+          "objective_decrease": 0.03842758759856224,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350980153,
+          "raw_objective": 23901169.4663664,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033650862542,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 0.25,
+          "alpha_applied": 0.004877875985491904,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653503020393,
+            "objective": 238460.08644018165,
+            "points_requested": 15,
+            "rms": 126.08465051707171,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653503020393,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653503020393
+            }
+          },
+          "max_abs": 4489.165350302039,
+          "max_abs_update": 0.00017858073353442012,
+          "objective": 23901169.497105606,
+          "objective_decrease": 0.007688380777835846,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350302039,
+          "raw_objective": 23901169.497105606,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033657213949,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 0.0625,
+          "alpha_applied": 0.001219468996372976,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350259651,
+            "objective": 238460.08649259753,
+            "points_requested": 15,
+            "rms": 126.08465053092903,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350259651,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350259651
+            }
+          },
+          "max_abs": 4489.165350259651,
+          "max_abs_update": 4.464518338360503e-05,
+          "objective": 23901169.502991788,
+          "objective_decrease": 0.001802198588848114,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350259651,
+          "raw_objective": 23901169.502991788,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658430166,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 1.0,
+          "alpha_applied": 0.01951150395536688,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350980107,
+            "objective": 238460.08615844048,
+            "points_requested": 15,
+            "rms": 126.08465044258705,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350980107,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350980107
+            }
+          },
+          "max_abs": 4489.165350980107,
+          "max_abs_update": 0.0007143229317046107,
+          "objective": 23901169.466353133,
+          "objective_decrease": 0.038440853357315063,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350980107,
+          "raw_objective": 23901169.466353133,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033650859801,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 0.25,
+          "alpha_applied": 0.00487787598884172,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653503020257,
+            "objective": 238460.08644014824,
+            "points_requested": 15,
+            "rms": 126.08465051706287,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653503020257,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653503020257
+            }
+          },
+          "max_abs": 4489.165350302026,
+          "max_abs_update": 0.00017858073292615267,
+          "objective": 23901169.497102268,
+          "objective_decrease": 0.007691718637943268,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350302026,
+          "raw_objective": 23901169.497102268,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.703365721326,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 0.0625,
+          "alpha_applied": 0.00121946899721043,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350259646,
+            "objective": 238460.08649258933,
+            "points_requested": 15,
+            "rms": 126.08465053092687,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350259646,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350259646
+            }
+          },
+          "max_abs": 4489.165350259646,
+          "max_abs_update": 4.464518323153817e-05,
+          "objective": 23901169.50299097,
+          "objective_decrease": 0.0018030181527137756,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350259646,
+          "raw_objective": 23901169.50299097,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658429997,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "chart:origin",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847094,
+            "points_requested": 15,
+            "rms": 126.08465053512553,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 2.629036798657417e-10,
+          "objective": 23901169.504794,
+          "objective_decrease": -1.4901161193847656e-08,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504794,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802544,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "chart:origin",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847082,
+            "points_requested": 15,
+            "rms": 126.08465053512549,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 6.572591996643543e-11,
+          "objective": 23901169.50479399,
+          "objective_decrease": -3.725290298461914e-09,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.50479399,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802542,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "chart:origin",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847085,
+            "points_requested": 15,
+            "rms": 126.0846505351255,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 1.6431479991608857e-11,
+          "objective": 23901169.504793987,
+          "objective_decrease": 0.0,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504793987,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802541,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 1.0,
+          "alpha_applied": 0.019511503941967615,
+          "block": "component:F",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350980153,
+            "objective": 238460.086158573,
+            "points_requested": 15,
+            "rms": 126.08465044262208,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350980153,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350980153
+            }
+          },
+          "max_abs": 4489.165350980153,
+          "max_abs_update": 0.0007143229341376805,
+          "objective": 23901169.4663664,
+          "objective_decrease": 0.03842758759856224,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350980153,
+          "raw_objective": 23901169.4663664,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033650862542,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 0.25,
+          "alpha_applied": 0.004877875985491904,
+          "block": "component:F",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653503020393,
+            "objective": 238460.08644018165,
+            "points_requested": 15,
+            "rms": 126.08465051707171,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653503020393,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653503020393
+            }
+          },
+          "max_abs": 4489.165350302039,
+          "max_abs_update": 0.00017858073353442012,
+          "objective": 23901169.497105606,
+          "objective_decrease": 0.007688380777835846,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350302039,
+          "raw_objective": 23901169.497105606,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033657213949,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 0.0625,
+          "alpha_applied": 0.001219468996372976,
+          "block": "component:F",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 0.036610347221939746,
+              "objective": 0.0013133742955994652,
+              "rms": 0.012812953872933951
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.4529810939337156e-08,
+              "objective": 1.851275577484517e-16,
+              "rms": 4.535386272272391e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547273630608344,
+              "objective": 0.00012834353653271596,
+              "rms": 0.004830650935484141
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815491735804,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350259651,
+            "objective": 238460.08649259753,
+            "points_requested": 15,
+            "rms": 126.08465053092903,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350259651,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350259651
+            }
+          },
+          "max_abs": 4489.165350259651,
+          "max_abs_update": 4.464518338360503e-05,
+          "objective": 23901169.502991788,
+          "objective_decrease": 0.001802198588848114,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350259651,
+          "raw_objective": 23901169.502991788,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658430166,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 1.0,
+          "alpha_applied": 0.01951150395536688,
+          "block": "tail.F",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350980107,
+            "objective": 238460.08615844048,
+            "points_requested": 15,
+            "rms": 126.08465044258705,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350980107,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350980107
+            }
+          },
+          "max_abs": 4489.165350980107,
+          "max_abs_update": 0.0007143229317046107,
+          "objective": 23901169.466353133,
+          "objective_decrease": 0.038440853357315063,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350980107,
+          "raw_objective": 23901169.466353133,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033650859801,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 0.25,
+          "alpha_applied": 0.00487787598884172,
+          "block": "tail.F",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653503020257,
+            "objective": 238460.08644014824,
+            "points_requested": 15,
+            "rms": 126.08465051706287,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653503020257,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653503020257
+            }
+          },
+          "max_abs": 4489.165350302026,
+          "max_abs_update": 0.00017858073292615267,
+          "objective": 23901169.497102268,
+          "objective_decrease": 0.007691718637943268,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350302026,
+          "raw_objective": 23901169.497102268,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.703365721326,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 9,
+          "alpha": 0.0625,
+          "alpha_applied": 0.00121946899721043,
+          "block": "tail.F",
+          "column_scaling": {
+            "active_columns": 9,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 9.0,
+              "max_abs": 0.036610347072098835,
+              "objective": 0.0013133742937955807,
+              "rms": 0.017083938485513102
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2854738617667578e-17,
+              "rms": 1.19511685238388e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 0.015547271169675672,
+              "objective": 0.0001283434957691229,
+              "rms": 0.004830650168344985
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 0.051251815456539306,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350259646,
+            "objective": 238460.08649258933,
+            "points_requested": 15,
+            "rms": 126.08465053092687,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350259646,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350259646
+            }
+          },
+          "max_abs": 4489.165350259646,
+          "max_abs_update": 4.464518323153817e-05,
+          "objective": 23901169.50299097,
+          "objective_decrease": 0.0018030181527137756,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350259646,
+          "raw_objective": 23901169.50299097,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658429997,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "origin.F",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847094,
+            "points_requested": 15,
+            "rms": 126.08465053512553,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 2.629036798657417e-10,
+          "objective": 23901169.504794,
+          "objective_decrease": -1.4901161193847656e-08,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504794,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802544,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "origin.F",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847082,
+            "points_requested": 15,
+            "rms": 126.08465053512549,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 6.572591996643543e-11,
+          "objective": 23901169.50479399,
+          "objective_decrease": -3.725290298461914e-09,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.50479399,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802542,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "origin.F",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847085,
+            "points_requested": 15,
+            "rms": 126.0846505351255,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 1.6431479991608857e-11,
+          "objective": 23901169.504793987,
+          "objective_decrease": 0.0,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504793987,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802541,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "block:F_an",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5827.488832948979,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 1.5033596734669655e-12,
+              "objective": 1.8942648703416327e-24,
+              "rms": 7.356755632636737e-13
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2838561315292508e-17,
+              "rms": 1.194364606311774e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.2746693054108469e-10,
+              "objective": 8.153466921544673e-21,
+              "rms": 3.850257824081318e-11
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 1.946414586023046e-12,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653502571853,
+            "objective": 238460.0865084697,
+            "points_requested": 15,
+            "rms": 126.0846505351252,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653502571853,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653502571853
+            }
+          },
+          "max_abs": 4489.165350257185,
+          "max_abs_update": 1.5033596734669655e-12,
+          "objective": 23901169.504793875,
+          "objective_decrease": 1.1175870895385742e-07,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350257185,
+          "raw_objective": 23901169.504793875,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802518,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "block:F_an",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5827.488832948979,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 1.5033596734669655e-12,
+              "objective": 1.8942648703416327e-24,
+              "rms": 7.356755632636737e-13
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2838561315292508e-17,
+              "rms": 1.194364606311774e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.2746693054108469e-10,
+              "objective": 8.153466921544673e-21,
+              "rms": 3.850257824081318e-11
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 1.946414586023046e-12,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653502569153,
+            "objective": 238460.08650847076,
+            "points_requested": 15,
+            "rms": 126.08465053512548,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653502569153,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653502569153
+            }
+          },
+          "max_abs": 4489.165350256915,
+          "max_abs_update": 3.758399183667414e-13,
+          "objective": 23901169.50479398,
+          "objective_decrease": 7.450580596923828e-09,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350256915,
+          "raw_objective": 23901169.50479398,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.703365880254,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "block:F_an",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 100351.5926266699,
+            "column_norm_min": 5827.488832948979,
+            "column_scale_max": 1.0,
+            "column_scale_min": 9.964963921601334e-06,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 1.5033596734669655e-12,
+              "objective": 1.8942648703416327e-24,
+              "rms": 7.356755632636737e-13
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 4.721887138636749e-09,
+              "objective": 1.2838561315292508e-17,
+              "rms": 1.194364606311774e-09
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.2746693054108469e-10,
+              "objective": 8.153466921544673e-21,
+              "rms": 3.850257824081318e-11
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 1.946414586023046e-12,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350256843,
+            "objective": 238460.08650847085,
+            "points_requested": 15,
+            "rms": 126.0846505351255,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350256843,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350256843
+            }
+          },
+          "max_abs": 4489.165350256843,
+          "max_abs_update": 9.395997959168534e-14,
+          "objective": 23901169.504793987,
+          "objective_decrease": 0.0,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.165350256843,
+          "raw_objective": 23901169.504793987,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802541,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 2,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "block:F_frac",
+          "column_scaling": {
+            "active_columns": 2,
+            "column_norm_max": 9052.266771833214,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 0.00017412413616975234,
+            "column_scale_min": 0.00011046956803256977,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 2.0,
+              "max_abs": 7.25434100802498e-16,
+              "objective": 4.17654901327128e-31,
+              "rms": 6.462622542955205e-16
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.6824169606474723e-12,
+              "objective": 2.8342574688528637e-24,
+              "rms": 5.611751032781186e-13
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 2.835276992551938e-17,
+              "objective": 1.2058193436741541e-33,
+              "rms": 1.4806751185456858e-17
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 9.13952844874535e-16,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.9165350256822,
+            "objective": 238460.08650847094,
+            "points_requested": 15,
+            "rms": 126.08465053512553,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.9165350256822,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.9165350256822
+            }
+          },
+          "max_abs": 4489.165350256822,
+          "max_abs_update": 7.25434100802498e-16,
+          "objective": 23901169.504794,
+          "objective_decrease": -1.4901161193847656e-08,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.165350256822,
+          "raw_objective": 23901169.504794,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802544,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 2,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "block:F_frac",
+          "column_scaling": {
+            "active_columns": 2,
+            "column_norm_max": 9052.266771833214,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 0.00017412413616975234,
+            "column_scale_min": 0.00011046956803256977,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 2.0,
+              "max_abs": 7.25434100802498e-16,
+              "objective": 4.17654901327128e-31,
+              "rms": 6.462622542955205e-16
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.6824169606474723e-12,
+              "objective": 2.8342574688528637e-24,
+              "rms": 5.611751032781186e-13
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 2.835276992551938e-17,
+              "objective": 1.2058193436741541e-33,
+              "rms": 1.4806751185456858e-17
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 9.13952844874535e-16,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653502568215,
+            "objective": 238460.08650847094,
+            "points_requested": 15,
+            "rms": 126.08465053512553,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653502568215,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653502568215
+            }
+          },
+          "max_abs": 4489.1653502568215,
+          "max_abs_update": 1.813585252006245e-16,
+          "objective": 23901169.504793994,
+          "objective_decrease": -7.450580596923828e-09,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.1653502568215,
+          "raw_objective": 23901169.504793994,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802543,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 2,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "block:F_frac",
+          "column_scaling": {
+            "active_columns": 2,
+            "column_norm_max": 9052.266771833214,
+            "column_norm_min": 5743.029208915112,
+            "column_scale_max": 0.00017412413616975234,
+            "column_scale_min": 0.00011046956803256977,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 2.0,
+              "max_abs": 7.25434100802498e-16,
+              "objective": 4.17654901327128e-31,
+              "rms": 6.462622542955205e-16
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 1.6824169606474723e-12,
+              "objective": 2.8342574688528637e-24,
+              "rms": 5.611751032781186e-13
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 2.835276992551938e-17,
+              "objective": 1.2058193436741541e-33,
+              "rms": 1.4806751185456858e-17
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 9.13952844874535e-16,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.91653502568204,
+            "objective": 238460.08650847088,
+            "points_requested": 15,
+            "rms": 126.0846505351255,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.91653502568204,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.91653502568204
+            }
+          },
+          "max_abs": 4489.165350256821,
+          "max_abs_update": 4.5339631300156127e-17,
+          "objective": 23901169.504793994,
+          "objective_decrease": -7.450580596923828e-09,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.165350256821,
+          "raw_objective": 23901169.504793994,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802543,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "block:F_origin_taylor",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847094,
+            "points_requested": 15,
+            "rms": 126.08465053512553,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 2.629036798657417e-10,
+          "objective": 23901169.504794,
+          "objective_decrease": -1.4901161193847656e-08,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504794,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802544,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "block:F_origin_taylor",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847082,
+            "points_requested": 15,
+            "rms": 126.08465053512549,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 6.572591996643543e-11,
+          "objective": 23901169.50479399,
+          "objective_decrease": -3.725290298461914e-09,
+          "raw_growth_ok": false,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.50479399,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802542,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 7,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "block:F_origin_taylor",
+          "column_scaling": {
+            "active_columns": 7,
+            "column_norm_max": 3066.4988815193506,
+            "column_norm_min": 141.23605233667294,
+            "column_scale_max": 0.007080345162977505,
+            "column_scale_min": 0.00032610479854619496,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 18.0,
+              "max_abs": 4489.16535025682,
+              "objective": 23845645.85223199,
+              "rms": 1627.7334566210632
+            },
+            "constraint_rows": 18,
+            "constraint_rows_available": 30,
+            "delta_metrics": {
+              "count": 7.0,
+              "max_abs": 2.629036798657417e-10,
+              "objective": 4.261907527925702e-20,
+              "rms": 1.1034889510645901e-10
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 18.0,
+              "max_abs": 3.2153321764060565e-11,
+              "objective": 1.1480902412052486e-21,
+              "rms": 1.1294493452835268e-11
+            },
+            "predicted_primary_change": {
+              "count": 11.0,
+              "max_abs": 1.5796008055667642e-13,
+              "objective": 1.9910260716349626e-26,
+              "rms": 6.01668297567078e-14
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 11.0,
+              "max_abs": 42.14529161145142,
+              "objective": 1569.5194138321508,
+              "rms": 16.89281403885392
+            },
+            "primary_rows": 11,
+            "total_columns": 16
+          },
+          "count": 49.0,
+          "delta_norm": 2.919557339024429e-10,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 30.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 238460.08650847085,
+            "points_requested": 15,
+            "rms": 126.0846505351255,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 4489.16535025682,
+          "max_abs_update": 1.6431479991608857e-11,
+          "objective": 23901169.504793987,
+          "objective_decrease": 0.0,
+          "raw_growth_ok": true,
+          "raw_max_abs": 4489.16535025682,
+          "raw_objective": 23901169.504793987,
+          "required_objective_decrease": 0.0023901169504793986,
+          "rms": 987.7033658802541,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 120,
+      "mortar_rows_unfiltered_max_abs": 4214.529161145142,
+      "mortar_rows_unfiltered_worst": {
+        "abs_residual": 4214.529161145142,
+        "component": "F",
+        "coordinate": "RZ",
+        "derivative": "dZZ",
+        "dq_order": 0,
+        "dx_order": 2,
+        "jacobian": [
+          {
+            "value": -2.0,
+            "var_index": 26139
+          },
+          {
+            "value": -2.5034013605442187,
+            "var_index": 26142
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3509
+          },
+          {
+            "value": 0.7927157246407697,
+            "var_index": 7865
+          },
+          {
+            "value": -2.089006123991548,
+            "var_index": 26146
+          },
+          {
+            "value": -1.4526724369404573,
+            "var_index": 26151
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3510
+          },
+          {
+            "value": 1.6425689635292957,
+            "var_index": 12221
+          },
+          {
+            "value": -0.9091555387654566,
+            "var_index": 26157
+          },
+          {
+            "value": 5.972066537471996,
+            "var_index": 3520
+          },
+          {
+            "value": 0.7927157246407697,
+            "var_index": 7866
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3511
+          },
+          {
+            "value": 1.6425689635292957,
+            "var_index": 12222
+          },
+          {
+            "value": 5.972066537471996,
+            "var_index": 3521
+          },
+          {
+            "value": 6.134507125246374,
+            "var_index": 7876
+          }
+        ],
+        "jacobian_nnz": 15,
+        "origin_value": -4217.252841530577,
+        "q": 0.84,
+        "residual_tail_minus_origin": 4214.529161145142,
+        "row_index": 27,
+        "tail_value": -2.7236803854347396,
+        "total_order": 2,
+        "x": 1.0
+      },
+      "post_pool_candidate_count": 256,
+      "pre_score_candidate_count": 5400,
+      "rank_report_summary": {
+        "angle": {
+          "best_feasible_step_metrics": {
+            "count": 16,
+            "l2": 743092217886710.9,
+            "max_abs": 743092217886710.9,
+            "rms": 185773054471677.72
+          },
+          "predicted_best_factor_inf": 1.001655284853447,
+          "projected_change_metrics": {
+            "count": 11,
+            "l2": 11.791303939722654,
+            "max_abs": 10.507641615858832,
+            "rms": 3.555211905190859
+          },
+          "rho_grad": 3.5518083441951045e-17,
+          "rho_range": 0.21045705570509313
+        },
+        "constraint_space": {
+          "nullity": 1,
+          "rank": 15,
+          "residual_metrics": {
+            "count": 30,
+            "l2": 6905.940725324405,
+            "max_abs": 4489.16535025682,
+            "rms": 1260.846505351255
+          },
+          "singular_values": [
+            100356.06700621762,
+            20124.44133571693,
+            16308.862932406673,
+            4452.087196654082,
+            4298.801794853364,
+            2807.958532176723,
+            1355.7586868073568,
+            617.4840846655662,
+            103.1807313867756,
+            13.995463404122056,
+            4.317503945035473,
+            2.185978290490074,
+            0.17191072712393796,
+            0.027692283330730198,
+            0.0008451456481440713,
+            3.6621966801525283e-14
+          ]
+        },
+        "coverage": {
+          "active_primary_raw_max": 4214.529161145142,
+          "coverage": 1.0,
+          "coverage_min": 0.5,
+          "coverage_ok": true,
+          "heldout_global_mortar_max": 4214.529161145142,
+          "note": "coverage uses unweighted raw residual metadata when provided"
+        }
+      },
+      "raw_residual_metrics": {
+        "count": 49.0,
+        "max_abs": 4489.16535025682,
+        "objective": 23901169.504793987,
+        "rms": 987.7033658802541
+      },
+      "row_groups": {
+        "active_guard": 30,
+        "mortar": 11,
+        "pde": 8
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 7,
+        "tail.F_an": 7,
+        "tail.F_frac": 2
+      },
+      "selected_by_chart": {
+        "origin": 7,
+        "tail": 9
+      },
+      "selected_variables": 16,
+      "solve_mode": "guarded-kkt",
+      "variable_score_preview": [
+        {
+          "score": 67723184.465716,
+          "variable": "origin.F_origin_taylor[6,0]"
+        },
+        {
+          "score": 10645175.786618954,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "score": 7525298.163569072,
+          "variable": "origin.F_origin_taylor[5,1]"
+        },
+        {
+          "score": 1444536.5800508359,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 1339811.433899483,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "score": 1338504.1212846846,
+          "variable": "origin.F_origin_taylor[4,2]"
+        },
+        {
+          "score": 768568.2553005163,
+          "variable": "tail.F_an[p32].c[0,2]"
+        },
+        {
+          "score": 575341.2320019158,
+          "variable": "tail.F_an[p35].c[0,2]"
+        },
+        {
+          "score": 500740.8281954294,
+          "variable": "tail.F_an[p24].c[0,2]"
+        },
+        {
+          "score": 432542.568117043,
+          "variable": "tail.F_an[p29].c[0,2]"
+        },
+        {
+          "score": 323875.82668620313,
+          "variable": "tail.F_an[p29].c[1,0]"
+        },
+        {
+          "score": 316083.8071204162,
+          "variable": "tail.F_frac[f1][p29].c[1,0]"
+        }
+      ]
+    }
+  ],
+  "input": "work/v117_twochart_init.json",
+  "newton_executed": true,
+  "optimization_faked": false,
+  "out": "work/twochart_stage0_rz_guardedkkt_rank_smoke.json",
+  "rank_reports": [
+    {
+      "angle": {
+        "best_feasible_step_metrics": {
+          "count": 16,
+          "l2": 743092217886710.9,
+          "max_abs": 743092217886710.9,
+          "rms": 185773054471677.72
+        },
+        "predicted_best_factor_inf": 1.001655284853447,
+        "projected_change_metrics": {
+          "count": 11,
+          "l2": 11.791303939722654,
+          "max_abs": 10.507641615858832,
+          "rms": 3.555211905190859
+        },
+        "rho_grad": 3.5518083441951045e-17,
+        "rho_range": 0.21045705570509313
+      },
+      "columns": 16,
+      "constraint_labels": [
+        "active_guard"
+      ],
+      "constraint_space": {
+        "nullity": 1,
+        "rank": 15,
+        "residual_metrics": {
+          "count": 30,
+          "l2": 6905.940725324405,
+          "max_abs": 4489.16535025682,
+          "rms": 1260.846505351255
+        },
+        "singular_values": [
+          100356.06700621762,
+          20124.44133571693,
+          16308.862932406673,
+          4452.087196654082,
+          4298.801794853364,
+          2807.958532176723,
+          1355.7586868073568,
+          617.4840846655662,
+          103.1807313867756,
+          13.995463404122056,
+          4.317503945035473,
+          2.185978290490074,
+          0.17191072712393796,
+          0.027692283330730198,
+          0.0008451456481440713,
+          3.6621966801525283e-14
+        ]
+      },
+      "coverage": {
+        "active_primary_raw_max": 4214.529161145142,
+        "coverage": 1.0,
+        "coverage_min": 0.5,
+        "coverage_ok": true,
+        "heldout_global_mortar_max": 4214.529161145142,
+        "note": "coverage uses unweighted raw residual metadata when provided"
+      },
+      "diagnostic_vs_proof": "floating guarded-KKT rank/angle diagnostic only; no interval proof",
+      "iteration": 0,
+      "linear_algebra_backend": "numpy_svd_lstsq",
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 120,
+      "mortar_rows_unfiltered_worst": {
+        "abs_residual": 4214.529161145142,
+        "component": "F",
+        "coordinate": "RZ",
+        "derivative": "dZZ",
+        "dq_order": 0,
+        "dx_order": 2,
+        "jacobian": [
+          {
+            "value": -2.0,
+            "var_index": 26139
+          },
+          {
+            "value": -2.5034013605442187,
+            "var_index": 26142
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3509
+          },
+          {
+            "value": 0.7927157246407697,
+            "var_index": 7865
+          },
+          {
+            "value": -2.089006123991548,
+            "var_index": 26146
+          },
+          {
+            "value": -1.4526724369404573,
+            "var_index": 26151
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3510
+          },
+          {
+            "value": 1.6425689635292957,
+            "var_index": 12221
+          },
+          {
+            "value": -0.9091555387654566,
+            "var_index": 26157
+          },
+          {
+            "value": 5.972066537471996,
+            "var_index": 3520
+          },
+          {
+            "value": 0.7927157246407697,
+            "var_index": 7866
+          },
+          {
+            "value": 0.7025960632319997,
+            "var_index": 3511
+          },
+          {
+            "value": 1.6425689635292957,
+            "var_index": 12222
+          },
+          {
+            "value": 5.972066537471996,
+            "var_index": 3521
+          },
+          {
+            "value": 6.134507125246374,
+            "var_index": 7876
+          }
+        ],
+        "jacobian_nnz": 15,
+        "origin_value": -4217.252841530577,
+        "q": 0.84,
+        "residual_tail_minus_origin": 4214.529161145142,
+        "row_index": 27,
+        "tail_value": -2.7236803854347396,
+        "total_order": 2,
+        "x": 1.0
+      },
+      "primary_labels": [
+        "mortar"
+      ],
+      "primary_space": {
+        "rank": 11,
+        "rank_projected": 1,
+        "residual_metrics": {
+          "count": 11,
+          "l2": 56.02712582012664,
+          "max_abs": 42.14529161145142,
+          "rms": 16.89281403885392
+        },
+        "singular_values": [
+          426.44419347632083,
+          84.78076769518351,
+          14.138049766414225,
+          0.10710987763340608,
+          0.01477480548264445,
+          0.0035903618480108523,
+          0.0013449209729358028,
+          0.0007935252065325983,
+          0.00010613224995723397,
+          7.76611152623724e-05,
+          2.0705662031528792e-05
+        ],
+        "singular_values_projected": [
+          1.586788780167297e-14
+        ]
+      },
+      "provided_step": {
+        "constraint_change_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "max_signed_constraint_growth": 0.0,
+        "metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "positive_signed_constraint_growth_count": 0,
+        "predicted_constraint_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "present": false,
+        "signed_constraint_growth_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        }
+      },
+      "rank_obstruction": false,
+      "row_space_note": "uses the residual/Jacobian rows supplied by the caller, typically post row-scaling",
+      "rows": {
+        "constraints": 30,
+        "primary": 11,
+        "total": 49
+      },
+      "status": "GUARDED_KKT_RANK_DIAGNOSTIC_NOT_PROOF",
+      "top_variables": [
+        {
+          "column": 8,
+          "gradient": -5007.408281954294,
+          "leverage": 426.4441934734101,
+          "projected_gradient": -1.7558431626336038e-31,
+          "score": 5007.408281954294,
+          "step": 0.0,
+          "variable": "tail.F_an[p24].c[0,2]"
+        },
+        {
+          "column": 7,
+          "gradient": -1624.0785666939178,
+          "leverage": 84.78076682784913,
+          "projected_gradient": 1.6651003715077347e-30,
+          "score": 1624.0785666939178,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[0,2]"
+        },
+        {
+          "column": 9,
+          "gradient": -195.49970552579023,
+          "leverage": 14.137665891980593,
+          "projected_gradient": -1.9136110829242626e-28,
+          "score": 195.49970552579023,
+          "step": 0.0,
+          "variable": "tail.F_an[p29].c[0,2]"
+        },
+        {
+          "column": 11,
+          "gradient": 1.2264602494314119,
+          "leverage": 0.10625278020320014,
+          "projected_gradient": -2.7279594818424485e-26,
+          "score": 1.2264602494314119,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p29].c[1,0]"
+        },
+        {
+          "column": 10,
+          "gradient": 1.193983814123408,
+          "leverage": 0.10343922669083438,
+          "projected_gradient": 3.958208868130925e-26,
+          "score": 1.193983814123408,
+          "step": 0.0,
+          "variable": "tail.F_an[p29].c[1,0]"
+        },
+        {
+          "column": 13,
+          "gradient": -0.23230933107506915,
+          "leverage": 0.012127100026880002,
+          "projected_gradient": 5.7504650483151844e-30,
+          "score": 0.23230933107506915,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[0,0]"
+        },
+        {
+          "column": 3,
+          "gradient": 0.18477145226495312,
+          "leverage": 0.012925065966878185,
+          "projected_gradient": 9.964242736499104e-29,
+          "score": 0.18477145226495312,
+          "step": 0.0,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "column": 15,
+          "gradient": 0.15848613515663232,
+          "leverage": 0.01373023911036593,
+          "projected_gradient": -5.781712302240874e-25,
+          "score": 0.15848613515663232,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p29].c[0,0]"
+        },
+        {
+          "column": 12,
+          "gradient": 0.14046868401451867,
+          "leverage": 0.012169320787156991,
+          "projected_gradient": 5.517584697298731e-25,
+          "score": 0.14046868401451867,
+          "step": 0.0,
+          "variable": "tail.F_an[p29].c[0,0]"
+        },
+        {
+          "column": 1,
+          "gradient": 0.08253780996836566,
+          "leverage": 0.0063958456364919865,
+          "projected_gradient": 1.3027119522720282e-27,
+          "score": 0.08253780996836566,
+          "step": 0.0,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "column": 4,
+          "gradient": 0.07855485410550773,
+          "leverage": 0.0035960405725710483,
+          "projected_gradient": -5.6706968347926794e-27,
+          "score": 0.07855485410550773,
+          "step": 0.0,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "column": 14,
+          "gradient": 0.04729068950686171,
+          "leverage": 0.0019678006877420664,
+          "projected_gradient": 3.7782214956128824e-26,
+          "score": 0.04729068950686171,
+          "step": 0.0,
+          "variable": "origin.F_origin_taylor[3,2]"
+        }
+      ]
+    }
+  ],
+  "requested_solver": {
+    "active_guard_weight": 10.0,
+    "block_search_labels": "",
+    "blocks": [
+      "tail",
+      "origin",
+      "interface"
+    ],
+    "candidate_kq_max": 8,
+    "candidate_kx_max": 8,
+    "candidate_origin_degree_max": 8,
+    "candidate_pool_limit": 256,
+    "chart_balanced_selection": false,
+    "forced_tol": 1e-12,
+    "guard_grid": "edge",
+    "guard_grid_b_range": [
+      0.1,
+      0.98
+    ],
+    "guard_grid_q_range": [
+      0.76,
+      0.92
+    ],
+    "guard_grid_samples": [
+      3,
+      3
+    ],
+    "guard_qb_points": [
+      [
+        0.76,
+        0.1
+      ],
+      [
+        0.76,
+        0.54
+      ],
+      [
+        0.76,
+        0.98
+      ],
+      [
+        0.8400000000000001,
+        0.1
+      ],
+      [
+        0.8400000000000001,
+        0.54
+      ],
+      [
+        0.8400000000000001,
+        0.98
+      ],
+      [
+        0.92,
+        0.1
+      ],
+      [
+        0.92,
+        0.54
+      ],
+      [
+        0.92,
+        0.98
+      ],
+      [
+        0.899999999999,
+        0.1
+      ],
+      [
+        0.899999999999,
+        0.54
+      ],
+      [
+        0.899999999999,
+        0.98
+      ],
+      [
+        0.900000000001,
+        0.1
+      ],
+      [
+        0.900000000001,
+        0.54
+      ],
+      [
+        0.900000000001,
+        0.98
+      ]
+    ],
+    "guard_qb_points_explicit": [],
+    "guard_qb_points_generated": [
+      [
+        0.76,
+        0.1
+      ],
+      [
+        0.76,
+        0.54
+      ],
+      [
+        0.76,
+        0.98
+      ],
+      [
+        0.8400000000000001,
+        0.1
+      ],
+      [
+        0.8400000000000001,
+        0.54
+      ],
+      [
+        0.8400000000000001,
+        0.98
+      ],
+      [
+        0.92,
+        0.1
+      ],
+      [
+        0.92,
+        0.54
+      ],
+      [
+        0.92,
+        0.98
+      ]
+    ],
+    "guard_qb_points_seam": [
+      [
+        0.899999999999,
+        0.1
+      ],
+      [
+        0.899999999999,
+        0.54
+      ],
+      [
+        0.899999999999,
+        0.98
+      ],
+      [
+        0.900000000001,
+        0.1
+      ],
+      [
+        0.900000000001,
+        0.54
+      ],
+      [
+        0.900000000001,
+        0.98
+      ]
+    ],
+    "guard_seam_b_points": [],
+    "guard_seam_eps": 1e-12,
+    "guard_seam_q": 0.9,
+    "guard_seam_sides": "both",
+    "guarded_kkt_constraint_damping": 1e-08,
+    "guarded_kkt_constraint_labels": "active_guard",
+    "guarded_kkt_max_constraints": 18,
+    "guarded_kkt_primary_labels": "mortar",
+    "include_origin_constants": false,
+    "line_search": [
+      1.0,
+      0.25,
+      0.0625
+    ],
+    "line_search_eval": "objective-only",
+    "lm_lambda": 1e-06,
+    "max_guard_max_growth": 1.0,
+    "max_guard_objective_growth": 1.0,
+    "max_iter": 1,
+    "max_raw_objective_growth": 1.0,
+    "max_variables": 16,
+    "min_objective_decrease_abs": 0.0,
+    "min_objective_decrease_rel": 1e-10,
+    "mortar_active_count": 12,
+    "mortar_coordinates": "RZ",
+    "mortar_jacobian_candidate_count": 0,
+    "mortar_order": 2,
+    "mortar_q_samples": 2,
+    "mortar_weight": 0.01,
+    "mortar_x_samples": 5,
+    "overlap_q_range": [
+      0.84,
+      0.92
+    ],
+    "pde_qb_points": [
+      [
+        0.45,
+        0.3
+      ],
+      [
+        0.61,
+        0.24
+      ],
+      [
+        0.93,
+        0.35
+      ],
+      [
+        0.9,
+        0.95
+      ]
+    ],
+    "pde_weight": 1.0,
+    "q2_policy": "zero",
+    "q2_tol": 1e-12,
+    "rank_coverage_min": 0.5,
+    "rank_report_out": "work/twochart_stage0_rz_guardedkkt_rank_smoke_rank.json",
+    "residual_kind": "normalized-structural",
+    "row_cache_out": "work/twochart_stage0_rz_guardedkkt_rank_smoke_rows.json",
+    "row_normalization": "none",
+    "row_normalization_floor": 1e-12,
+    "row_scale_max": 1000000.0,
+    "row_scale_min": 0.0,
+    "solve_mode": "guarded-kkt",
+    "tail_gate_samples_per_patch": 9,
+    "trust": 0.001,
+    "variable_charts": [
+      "tail",
+      "origin"
+    ]
+  },
+  "row_cache_out": "work/twochart_stage0_rz_guardedkkt_rank_smoke_rows.json",
+  "status": "TWOCHART_NEWTON_STAGE0_NO_IMPROVEMENT_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_coeff_error": 0.0,
+    "gamma": 0.45,
+    "note": "Formal tail recurrence gate only: q1-zero, first forced q^(1/gamma), and zero ordinary q^2 trace are checked. This is not an interval proof.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}

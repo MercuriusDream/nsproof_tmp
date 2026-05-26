@@ -1,0 +1,51 @@
+{
+  "cache_schema": "twochart-row-cache-v1",
+  "column_count": 2,
+  "diagnostic_vs_proof": "floating sampled row cache only; no interval proof",
+  "extra": {
+    "self_test": true
+  },
+  "profile": "",
+  "profile_hash_sha256": "",
+  "row_count": 2,
+  "row_scaling": {},
+  "rows": [
+    {
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          1.0
+        ]
+      ],
+      "label": "mortar",
+      "residual_after_scaling": 10.0,
+      "residual_raw": 10.0,
+      "row_id": "mortar:0",
+      "row_index": 0
+    },
+    {
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          1.0
+        ]
+      ],
+      "label": "active_guard",
+      "residual_after_scaling": 2.0,
+      "residual_raw": 2.0,
+      "row_id": "active_guard:0",
+      "row_index": 1
+    }
+  ],
+  "status": "TWOCHART_ROW_CACHE_FLOATING_NOT_PROOF",
+  "variables": [
+    {
+      "label": "x0",
+      "local_column": 0
+    },
+    {
+      "label": "x1",
+      "local_column": 1
+    }
+  ]
+}
