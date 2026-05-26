@@ -1,0 +1,48 @@
+{
+  "backend": "floating-formal-ledger",
+  "blockers": [
+    "tail recurrence certificate is not passing",
+    "interval Pluecker/Evans box cover is not implemented",
+    "large-Im(delta) exterior exclusion is missing",
+    "delta=1 geometric/removable factorization is not interval-linked to the profile ball"
+  ],
+  "box_cover": null,
+  "certificate_name": "indicial_pluecker_cover",
+  "commands": [
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json"
+  ],
+  "delta_domain": {
+    "im": [
+      0.0,
+      4.0
+    ],
+    "re": [
+      0.0,
+      1.1
+    ]
+  },
+  "dependency_hashes": {
+    "tail_recurrence": "3bd422e6e040af1df01bb158a512266bc82cf346d8adbf2b4b26c88895b982de"
+  },
+  "exterior_exclusion": null,
+  "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
+  "input_hashes": {
+    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8"
+  },
+  "interval_widths": {
+    "max": null,
+    "median": null
+  },
+  "local_factorization_delta1": {
+    "floating_classification": "Psi=r^2, G=0, a=0 geometric/removable",
+    "interval_validated": false
+  },
+  "mathematical_statement": "Only the geometric/removable delta=1 indicial root is admissible in the dangerous domain, and all non-geometric dangerous roots are excluded by an interval Pluecker/Evans cover plus exterior estimates.",
+  "pass": false,
+  "precision_bits": 53,
+  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "repo_commit": "9849821464d62c0130783726f252c4f9c02ce442",
+  "rounding_mode": "nearest",
+  "schema_version": "nsproof-cert-v1"
+}

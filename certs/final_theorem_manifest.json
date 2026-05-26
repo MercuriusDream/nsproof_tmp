@@ -49,12 +49,14 @@
           "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
         },
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "tail_recurrence",
+          "exists": true,
+          "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
           "pass": false,
           "path": "certs/tail/tail_recurrence.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "1cbb3bdebb33f5e5af742f04d6943859805af6f561151db8b9bde33b7e7f7d8d"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -65,28 +67,34 @@
     {
       "dependencies": [
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "tail_recurrence",
+          "exists": true,
+          "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
           "pass": false,
           "path": "certs/tail/tail_recurrence.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "1cbb3bdebb33f5e5af742f04d6943859805af6f561151db8b9bde33b7e7f7d8d"
         },
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "indicial_pluecker_cover",
+          "exists": true,
+          "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
           "pass": false,
           "path": "certs/tail/indicial_pluecker_cover.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "d652ef0c4abc66cac01cc038a90fb2a7e00829fe1447e98cc539fabde856b3e6"
         },
         {
-          "certificate_name": null,
-          "exists": false,
-          "failure_reason": "missing certificate file",
+          "certificate_name": "matching_determinant",
+          "exists": true,
+          "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
           "pass": false,
           "path": "certs/profile/matching_determinant.json",
-          "sha256": null
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "6226e2e423753d9a081104b9c969bc5965271dcde853a95a314af3c32a2c7684"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -137,6 +145,6 @@
   ],
   "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
   "pass": false,
-  "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+  "repo_commit": "9849821464d62c0130783726f252c4f9c02ce442",
   "schema_version": "nsproof-cert-v1"
 }

@@ -1,0 +1,45 @@
+{
+  "backend": "floating-formal-ledger",
+  "blockers": [
+    "profile NK certificate is not passing",
+    "tail recurrence certificate is not passing",
+    "interval matching determinant/transversality calculation is missing"
+  ],
+  "certificate_name": "matching_determinant",
+  "commands": [
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json"
+  ],
+  "dependencies": {
+    "profile_nk": {
+      "certificate_name": "profile_nk",
+      "exists": true,
+      "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+      "pass": false,
+      "path": "certs/profile/profile_nk.json",
+      "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+      "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
+    }
+  },
+  "dependency_hashes": {
+    "profile_nk": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921",
+    "tail_recurrence": "3bd422e6e040af1df01bb158a512266bc82cf346d8adbf2b4b26c88895b982de"
+  },
+  "determinant_interval": null,
+  "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
+  "input_hashes": {
+    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8"
+  },
+  "interval_widths": {
+    "max": null,
+    "median": null
+  },
+  "mathematical_statement": "The profile matching and admissibility equations are transverse, so the certified profile is isolated modulo gauges and compatible with the certified tail class.",
+  "pass": false,
+  "precision_bits": 53,
+  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "repo_commit": "9849821464d62c0130783726f252c4f9c02ce442",
+  "rounding_mode": "nearest",
+  "schema_version": "nsproof-cert-v1",
+  "transversality_margin": null
+}
