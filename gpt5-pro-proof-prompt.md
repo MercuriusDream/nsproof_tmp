@@ -347,6 +347,8 @@ The first two-chart scaffolds now exist:
 validators/origin_chart.py
 tools/profile_project_twochart.py
 validators/twochart_mortar.py
+validators/compactified_equations_twochart.py
+tools/profile_newton_twochart.py
 ```
 
 `validators/origin_chart.py` passes a derivative-order-4 self-test and rejects
@@ -364,6 +366,24 @@ Interpretation: this is not a proof that the branch is absent. It is proof-path
 evidence that the old origin splice cannot be polished into a certificate; the
 next solver must solve the tail chart, origin chart, and C3/C4 interface rows
 as one hard system.
+
+The current two-chart residual baseline is diagnostic and still forwards the
+old exact projected evaluator. It does, however, enforce q2-zero tail legality
+and gives the current obstruction scale:
+
+```text
+focused/standard normalized structural max = 1.016228983517e+01
+secondary normalized structural max = 1.422825475247e+01
+origin normalized structural max = 9.132494634431e+01
+edge normalized structural max = 4.489165350285e+02
+overlap normalized structural max = 3.239718884452e+02
+C0-C4 R,Z mortar max = 5.833745769211e+06
+```
+
+`tools/profile_newton_twochart.py` currently performs only a dry run and
+refuses coefficient updates until
+`validators.compactified_equations_twochart.eval_residual_and_jacobian` exists.
+That refusal is intentional.
 
 ## 6. Current Repository Tooling
 

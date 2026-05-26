@@ -2831,6 +2831,125 @@ one-chart/origin-splice candidate is not even close to a smooth two-chart proof
 object and that the next solver must impose C3/C4 interface equations as hard
 rows with an analytic coefficient Jacobian.
 
+The Stage-0 Newton entry point now exists as a dry-run guard:
+
+```text
+tools/profile_newton_twochart.py
+```
+
+The command
+
+```text
+python3 tools/profile_newton_twochart.py \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_newton_stage0_dryrun.json \
+  --blocks origin,interface \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-order 4 \
+  --max-iter 20
+```
+
+does not fake Newton.  It checks that the input is a two-chart profile, enforces
+
+```text
+tail_legality.all_ok=True,
+q2_policy=zero,
+gamma,B fixed,
+```
+
+and then refuses real coefficient updates until
+
+```text
+validators.compactified_equations_twochart.eval_residual_and_jacobian
+```
+
+exists.  The current dry-run status is
+
+```text
+status=TWOCHART_NEWTON_STAGE0_DRY_RUN_ONLY,
+newton_executed=False,
+refusal_status=REFUSED_REAL_NEWTON_MISSING_TWOCHART_RESIDUAL_JACOBIAN_HOOKS,
+missing_hooks=eval_residual_and_jacobian.
+```
+
+The analytic Jacobian design for the missing hook is:
+
+```text
+Do not port the old coefficient finite-difference loop.
+
+For a coefficient variation, write
+u = delta psi,
+v = delta Gamma,
+delta A = u_rr - u_r/r + u_zz.
+```
+
+Then
+
+```text
+delta E_psi =
+(1-gamma) r^2 deltaA
++ gamma r^3 deltaA_r
++ gamma z r^2 deltaA_z
++ r*(u_r*A_z + psi_r*deltaA_z - u_z*A_r - psi_z*deltaA_r)
++ 2*u_z*A + 2*psi_z*deltaA
++ 2*(Gamma_z*v + Gamma*v_z).
+```
+
+and
+
+```text
+delta E_Gamma =
+(1-2gamma)*v
++ gamma*(r*v_r + z*v_z)
++ (u_r*Gamma_z + psi_r*v_z - u_z*Gamma_r - psi_z*v_r)/r.
+```
+
+PDE rows need base and variation `psi` jets through spatial order 3, and
+`Gamma` jets through spatial order 1.  A single order-3 physical jet path is
+enough.  Mortar rows do not need physical derivatives, but need exact `(q,x)`
+partials of `F,G` through total order 4.  The first acceptance test for the
+analytic Jacobian is central finite-difference comparison on a few random
+columns only as a test, with target relative error `1e-6` and absolute floor
+`1e-9`; the production Newton matrix itself must be analytic.
+
+The initial two-chart residual baseline is also implemented in
+
+```text
+validators/compactified_equations_twochart.py
+```
+
+The command
+
+```text
+python3 -m validators.compactified_equations_twochart \
+  --profile work/v117_twochart_init.json \
+  --residual-kind normalized-structural \
+  --scan standard,focused,secondary,origin,edge \
+  --out work/v117_twochart_baseline_residual.json \
+  --mortar-out work/v117_twochart_mortar_baseline.json
+```
+
+enforces the q2-zero tail gate and forwards the existing exact Taylor-jet
+profile evaluator.  The source-forward comparison is exactly zero on all
+sampled scans, so the baseline is a schema/evaluator check, not a new solve.
+The current maxima are:
+
+```text
+focused/standard max = 1.016228983517e+01,
+secondary max = 1.422825475247e+01,
+origin max = 9.132494634431e+01,
+edge max = 4.489165350285e+02,
+overlap max = 3.239718884452e+02,
+overall max = 4.489165350285e+02 at the edge scan,
+C0-C4 R,Z mortar max = 5.833745769211e+06.
+```
+
+All these numbers are finite and diagnostic.  They are still far from a
+Newton-Kantorovich center and mostly quantify how much work the actual
+two-chart residual/Jacobian Newton solve must do.
+
 The profile validation gates are:
 
 ```text

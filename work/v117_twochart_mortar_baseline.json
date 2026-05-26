@@ -1,0 +1,90 @@
+{
+  "coordinate_derivatives": "R,Z",
+  "diagnostic_vs_proof": "sampled floating mortar metadata only; no interval smoothness proof",
+  "orders": "C0-C4",
+  "overlap_q_range": [
+    0.84,
+    0.92
+  ],
+  "rz_mortar": {
+    "components": {
+      "F": {
+        "evaluation_failures": [],
+        "max_abs_diff": 5833745.769210855,
+        "ok": false,
+        "rms_diff": 238532.57158372446,
+        "sampled_rows": 1215,
+        "worst": {
+          "R": 0.0,
+          "Z": 0.1814744801512287,
+          "abs_diff": 5833745.769210855,
+          "component": "F",
+          "dR": 4,
+          "dZ": 0,
+          "diff": 5833745.769210855,
+          "origin": -88261.27901893514,
+          "q": 0.92,
+          "rectangular": -5922007.048229789,
+          "x": 1.0
+        }
+      },
+      "G": {
+        "evaluation_failures": [],
+        "max_abs_diff": 543131.1633134717,
+        "ok": false,
+        "rms_diff": 39279.862348662355,
+        "sampled_rows": 1215,
+        "worst": {
+          "R": 0.1814744801512287,
+          "Z": 0.0,
+          "abs_diff": 543131.1633134717,
+          "component": "G",
+          "dR": 0,
+          "dZ": 4,
+          "diff": 543131.1633134717,
+          "origin": 20081.88056972231,
+          "q": 0.92,
+          "rectangular": -523049.28274374944,
+          "x": 0.0
+        }
+      }
+    },
+    "derivative_order": 4,
+    "gate_status": "DIAGNOSTIC_ONLY_NO_INTERVAL_OR_PROOF_CLAIM",
+    "max_abs_diff": 5833745.769210855,
+    "q_values": [
+      0.84,
+      0.85,
+      0.86,
+      0.87,
+      0.88,
+      0.89,
+      0.9,
+      0.91,
+      0.92
+    ],
+    "status": "RECT_ORIGIN_CONSISTENCY_FAIL_NOT_INTERVAL",
+    "tolerance": 1e-08,
+    "x_values": [
+      0.0,
+      0.125,
+      0.25,
+      0.375,
+      0.5,
+      0.625,
+      0.75,
+      0.875,
+      1.0
+    ]
+  },
+  "sample_shape": {
+    "q_samples": 9,
+    "x_samples": 9
+  },
+  "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+  "status": "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF",
+  "x_range": [
+    0.0,
+    1.0
+  ]
+}

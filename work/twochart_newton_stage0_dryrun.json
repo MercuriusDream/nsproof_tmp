@@ -1,0 +1,178 @@
+{
+  "diagnostic_vs_proof": "dry-run solver plan only; no interval proof and no coefficient update",
+  "dry_run": true,
+  "format": "twochart_newton_stage0_dryrun_v1",
+  "hard_constraints": {
+    "gamma_B_policy": "fixed_until_twochart_solver_is_implemented",
+    "interface_policy": "hard rows, not hidden penalties",
+    "no_coefficient_finite_difference_jacobian": true,
+    "q2_policy": "zero",
+    "tail_legality_all_ok": true,
+    "tail_legality_status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  },
+  "input": "work/v117_twochart_init.json",
+  "newton_executed": false,
+  "optimization_faked": false,
+  "out": "work/twochart_newton_stage0_dryrun.json",
+  "planned_residual_blocks": [
+    {
+      "chart": "tail",
+      "domain_q": [
+        0.0,
+        0.92
+      ],
+      "name": "tail_equation_residual"
+    },
+    {
+      "chart": "origin",
+      "domain_q": [
+        0.84,
+        1.0
+      ],
+      "name": "origin_equation_residual"
+    },
+    {
+      "chart_pair": [
+        "tail",
+        "origin"
+      ],
+      "domain_q": [
+        0.84,
+        0.92
+      ],
+      "name": "overlap_value_mortar"
+    },
+    {
+      "chart_pair": [
+        "tail",
+        "origin"
+      ],
+      "domain_q": [
+        0.84,
+        0.92
+      ],
+      "name": "overlap_derivative_mortar",
+      "orders": [
+        "dq",
+        "dx",
+        "dqq",
+        "dqx",
+        "dxx"
+      ]
+    },
+    {
+      "chart": "tail",
+      "name": "tail_patch_internal_mortar"
+    }
+  ],
+  "planned_stages": [
+    {
+      "active_blocks": [
+        "origin",
+        "interface"
+      ],
+      "execution": "blocked_until_residual_jacobian_hooks_exist",
+      "goal": "assemble hard-constrained origin/interface Newton system",
+      "name": "stage0"
+    }
+  ],
+  "planned_unknown_blocks": [
+    {
+      "chart": "tail",
+      "component": "F",
+      "layout": "patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.F_an",
+      "source_block": "blocks.F_an"
+    },
+    {
+      "chart": "tail",
+      "component": "G",
+      "layout": "patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.G_an",
+      "source_block": "blocks.G_an"
+    },
+    {
+      "chart": "tail",
+      "component": "F",
+      "layout": "fractional_block -> patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.F_frac",
+      "source_block": "blocks.F_frac"
+    },
+    {
+      "chart": "tail",
+      "component": "G",
+      "layout": "fractional_block -> patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.G_frac",
+      "source_block": "blocks.G_frac"
+    },
+    {
+      "chart": "origin",
+      "component": "F",
+      "degree": 6,
+      "layout": "monomial entries in R=rho2*(1-x), Z=rho2*x",
+      "name": "origin.F_origin_taylor",
+      "source_block": "blocks.F_origin_taylor.basis"
+    },
+    {
+      "chart": "origin",
+      "component": "G",
+      "degree": 6,
+      "layout": "monomial entries in R=rho2*(1-x), Z=rho2*x",
+      "name": "origin.G_origin_taylor",
+      "source_block": "blocks.G_origin_taylor.basis"
+    }
+  ],
+  "refusal_reason": "Real Newton is disabled until validators/compactified_equations_twochart.py provides callable residual/Jacobian hooks.",
+  "refusal_status": "REFUSED_REAL_NEWTON_MISSING_TWOCHART_RESIDUAL_JACOBIAN_HOOKS",
+  "requested_solver": {
+    "B_fixed": true,
+    "blocks": [
+      "origin",
+      "interface"
+    ],
+    "gamma_fixed": true,
+    "lm_lambda": 1e-08,
+    "max_iter": 20,
+    "mortar_order": 4,
+    "q2_policy": "zero",
+    "residual_kind": "normalized-structural",
+    "scan": "standard,focused,secondary,origin,edge",
+    "trust": 0.05
+  },
+  "required_validator_hooks": {
+    "available": false,
+    "import_error": "",
+    "missing_hooks": [
+      "eval_residual_and_jacobian"
+    ],
+    "module": "validators.compactified_equations_twochart",
+    "required_hooks": [
+      "eval_residual_and_jacobian"
+    ]
+  },
+  "source_profile": {
+    "B": 1.0,
+    "format": "twochart_profile_projection_v1",
+    "gamma": 0.45,
+    "p": 2.2222222222222223,
+    "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "status": "diagnostic_twochart_projection_not_validated"
+  },
+  "status": "TWOCHART_NEWTON_STAGE0_DRY_RUN_ONLY",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_coeff_error": 0.0,
+    "gamma": 0.45,
+    "note": "Formal tail recurrence gate only: q1-zero, first forced q^(1/gamma), and zero ordinary q^2 trace are checked. This is not an interval proof.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}
