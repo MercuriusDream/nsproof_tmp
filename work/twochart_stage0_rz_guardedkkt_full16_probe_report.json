@@ -1,0 +1,1100 @@
+{
+  "accepted_any_step": true,
+  "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+  "format": "twochart_newton_stage0_run_v1",
+  "history": [
+    {
+      "accepted": true,
+      "accepted_alpha": 1.0,
+      "accepted_block": "full",
+      "active_guard_points": [
+        [
+          0.78,
+          0.2
+        ],
+        [
+          0.78,
+          0.395
+        ],
+        [
+          0.78,
+          0.5900000000000001
+        ],
+        [
+          0.78,
+          0.7849999999999999
+        ],
+        [
+          0.78,
+          0.98
+        ],
+        [
+          0.8200000000000001,
+          0.2
+        ],
+        [
+          0.8200000000000001,
+          0.395
+        ],
+        [
+          0.8200000000000001,
+          0.5900000000000001
+        ],
+        [
+          0.8200000000000001,
+          0.7849999999999999
+        ],
+        [
+          0.8200000000000001,
+          0.98
+        ],
+        [
+          0.86,
+          0.2
+        ],
+        [
+          0.86,
+          0.395
+        ],
+        [
+          0.86,
+          0.5900000000000001
+        ],
+        [
+          0.86,
+          0.7849999999999999
+        ],
+        [
+          0.86,
+          0.98
+        ],
+        [
+          0.9,
+          0.2
+        ],
+        [
+          0.9,
+          0.395
+        ],
+        [
+          0.9,
+          0.5900000000000001
+        ],
+        [
+          0.9,
+          0.7849999999999999
+        ],
+        [
+          0.9,
+          0.98
+        ],
+        [
+          0.899999999999,
+          0.2
+        ],
+        [
+          0.899999999999,
+          0.54
+        ],
+        [
+          0.899999999999,
+          0.98
+        ],
+        [
+          0.900000000001,
+          0.2
+        ],
+        [
+          0.900000000001,
+          0.54
+        ],
+        [
+          0.900000000001,
+          0.98
+        ]
+      ],
+      "active_guard_rows": 52,
+      "active_guard_weight": 1.0,
+      "base": {
+        "count": 68.0,
+        "max_abs": 448.916535025682,
+        "objective": 424551.89403122227,
+        "rms": 111.74444242414478
+      },
+      "base_guard_metrics": {
+        "count": 52.0,
+        "enabled": true,
+        "max_abs": 448.916535025682,
+        "objective": 367150.2914972403,
+        "points_requested": 26,
+        "rms": 118.83250842082803,
+        "skipped": 0,
+        "worst": {
+          "abs": 448.916535025682,
+          "b": 0.98,
+          "component": "e_psi",
+          "q": 0.899999999999,
+          "value": 448.916535025682
+        }
+      },
+      "block_candidate_previews": [
+        {
+          "active_columns": 16,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 784480185.8084639,
+            "column_norm_min": 18.896562712523124,
+            "column_scale_max": 0.05291967725629171,
+            "column_scale_min": 1.274729455364672e-09,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 24.0,
+              "max_abs": 448.916535025682,
+              "objective": 367133.87860964873,
+              "rms": 174.91280651838332
+            },
+            "constraint_rows": 24,
+            "constraint_rows_available": 52,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 2.335227790089976e-07,
+              "objective": 1.1925610808019013e-13,
+              "rms": 1.2209428123390452e-07
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 24.0,
+              "max_abs": 8.257363783168586e-10,
+              "objective": 1.0532846862073602e-18,
+              "rms": 2.962663056282529e-10
+            },
+            "predicted_primary_change": {
+              "count": 8.0,
+              "max_abs": 0.007796744244925536,
+              "objective": 3.0394676077414183e-05,
+              "rms": 0.0027565683411360483
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 8.0,
+              "max_abs": 19.156214639951024,
+              "objective": 597.9760013431655,
+              "rms": 12.22677391366142
+            },
+            "primary_rows": 8,
+            "total_columns": 16
+          },
+          "delta_norm": 4.883771249356181e-07
+        }
+      ],
+      "injected_mortar_candidates": [
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 383372492.4882907,
+          "score": 383690900.6080547,
+          "var_index": 2914,
+          "variable": "tail.F_an[p24].c[0,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 379781832.6247485,
+          "score": 379865488.82895076,
+          "var_index": 2969,
+          "variable": "tail.F_an[p24].c[5,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 369076285.9905813,
+          "score": 369689028.9599716,
+          "var_index": 3024,
+          "variable": "tail.F_an[p24].c[10,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 368817327.9308591,
+          "score": 369131377.1833622,
+          "var_index": 7270,
+          "variable": "tail.F_frac[f1][p24].c[0,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 365363005.3328685,
+          "score": 365451157.62083864,
+          "var_index": 7325,
+          "variable": "tail.F_frac[f1][p24].c[5,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 355063947.83169234,
+          "score": 355645927.303046,
+          "var_index": 7380,
+          "variable": "tail.F_frac[f1][p24].c[10,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 351813151.90187216,
+          "score": 353274641.63477623,
+          "var_index": 3002,
+          "variable": "tail.F_an[p24].c[8,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 338456102.5653993,
+          "score": 339869124.2990569,
+          "var_index": 7358,
+          "variable": "tail.F_frac[f1][p24].c[8,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 327638355.52285963,
+          "score": 328472210.25838715,
+          "var_index": 2947,
+          "variable": "tail.F_an[p24].c[3,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 315199165.92608607,
+          "score": 316007932.7863744,
+          "var_index": 7303,
+          "variable": "tail.F_frac[f1][p24].c[3,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 297328264.2207076,
+          "score": 297531673.74388313,
+          "var_index": 2936,
+          "variable": "tail.F_an[p24].c[2,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 286039891.8607341,
+          "score": 286229555.09926367,
+          "var_index": 7292,
+          "variable": "tail.F_frac[f1][p24].c[2,10]"
+        }
+      ],
+      "iteration": 0,
+      "line_trials": [
+        {
+          "accepted": true,
+          "active_columns": 16,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 784480185.8084639,
+            "column_norm_min": 18.896562712523124,
+            "column_scale_max": 0.05291967725629171,
+            "column_scale_min": 1.274729455364672e-09,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 24.0,
+              "max_abs": 448.916535025682,
+              "objective": 367133.87860964873,
+              "rms": 174.91280651838332
+            },
+            "constraint_rows": 24,
+            "constraint_rows_available": 52,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 2.335227790089976e-07,
+              "objective": 1.1925610808019013e-13,
+              "rms": 1.2209428123390452e-07
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 24.0,
+              "max_abs": 8.257363783168586e-10,
+              "objective": 1.0532846862073602e-18,
+              "rms": 2.962663056282529e-10
+            },
+            "predicted_primary_change": {
+              "count": 8.0,
+              "max_abs": 0.007796744244925536,
+              "objective": 3.0394676077414183e-05,
+              "rms": 0.0027565683411360483
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 8.0,
+              "max_abs": 19.156214639951024,
+              "objective": 597.9760013431655,
+              "rms": 12.22677391366142
+            },
+            "primary_rows": 8,
+            "total_columns": 16
+          },
+          "count": 68.0,
+          "delta_norm": 4.883771249356181e-07,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 52.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 367150.2914889526,
+            "points_requested": 26,
+            "rms": 118.83250841948683,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 448.916535025682,
+          "max_abs_update": 2.335227790089976e-07,
+          "objective": 424551.8046662271,
+          "objective_decrease": 0.08936499519040808,
+          "raw_growth_ok": true,
+          "raw_max_abs": 448.916535025682,
+          "raw_objective": 424551.8046662271,
+          "required_objective_decrease": 4.245518940312223e-05,
+          "rms": 111.7444306634599,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 16,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 784480185.8084639,
+            "column_norm_min": 18.896562712523124,
+            "column_scale_max": 0.05291967725629171,
+            "column_scale_min": 1.274729455364672e-09,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 24.0,
+              "max_abs": 448.916535025682,
+              "objective": 367133.87860964873,
+              "rms": 174.91280651838332
+            },
+            "constraint_rows": 24,
+            "constraint_rows_available": 52,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 2.335227790089976e-07,
+              "objective": 1.1925610808019013e-13,
+              "rms": 1.2209428123390452e-07
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 24.0,
+              "max_abs": 8.257363783168586e-10,
+              "objective": 1.0532846862073602e-18,
+              "rms": 2.962663056282529e-10
+            },
+            "predicted_primary_change": {
+              "count": 8.0,
+              "max_abs": 0.007796744244925536,
+              "objective": 3.0394676077414183e-05,
+              "rms": 0.0027565683411360483
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 8.0,
+              "max_abs": 19.156214639951024,
+              "objective": 597.9760013431655,
+              "rms": 12.22677391366142
+            },
+            "primary_rows": 8,
+            "total_columns": 16
+          },
+          "count": 68.0,
+          "delta_norm": 4.883771249356181e-07,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 52.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 367150.29149677115,
+            "points_requested": 26,
+            "rms": 118.8325084207521,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 448.916535025682,
+          "max_abs_update": 5.83806947522494e-08,
+          "objective": 424551.8716858777,
+          "objective_decrease": 0.02234534459421411,
+          "raw_growth_ok": true,
+          "raw_max_abs": 448.916535025682,
+          "raw_objective": 424551.8716858777,
+          "required_objective_decrease": 4.245518940312223e-05,
+          "rms": 111.74443948343465,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 16,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 784480185.8084639,
+            "column_norm_min": 18.896562712523124,
+            "column_scale_max": 0.05291967725629171,
+            "column_scale_min": 1.274729455364672e-09,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 24.0,
+              "max_abs": 448.916535025682,
+              "objective": 367133.87860964873,
+              "rms": 174.91280651838332
+            },
+            "constraint_rows": 24,
+            "constraint_rows_available": 52,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 2.335227790089976e-07,
+              "objective": 1.1925610808019013e-13,
+              "rms": 1.2209428123390452e-07
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 24.0,
+              "max_abs": 8.257363783168586e-10,
+              "objective": 1.0532846862073602e-18,
+              "rms": 2.962663056282529e-10
+            },
+            "predicted_primary_change": {
+              "count": 8.0,
+              "max_abs": 0.007796744244925536,
+              "objective": 3.0394676077414183e-05,
+              "rms": 0.0027565683411360483
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 8.0,
+              "max_abs": 19.156214639951024,
+              "objective": 597.9760013431655,
+              "rms": 12.22677391366142
+            },
+            "primary_rows": 8,
+            "total_columns": 16
+          },
+          "count": 68.0,
+          "delta_norm": 4.883771249356181e-07,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 52.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 367150.291497224,
+            "points_requested": 26,
+            "rms": 118.83250842082539,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 448.916535025682,
+          "max_abs_update": 1.459517368806235e-08,
+          "objective": 424551.88844463136,
+          "objective_decrease": 0.005586590908933431,
+          "raw_growth_ok": true,
+          "raw_max_abs": 448.916535025682,
+          "raw_objective": 424551.88844463136,
+          "required_objective_decrease": 4.245518940312223e-05,
+          "rms": 111.74444168893373,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": false,
+          "active_columns": 16,
+          "alpha": 0.015625,
+          "alpha_applied": 0.015625,
+          "block": "full",
+          "column_scaling": {
+            "active_columns": 16,
+            "column_norm_max": 784480185.8084639,
+            "column_norm_min": 18.896562712523124,
+            "column_scale_max": 0.05291967725629171,
+            "column_scale_min": 1.274729455364672e-09,
+            "constraint_damping": 1e-08,
+            "constraint_labels": [
+              "active_guard"
+            ],
+            "constraint_residual_metrics": {
+              "count": 24.0,
+              "max_abs": 448.916535025682,
+              "objective": 367133.87860964873,
+              "rms": 174.91280651838332
+            },
+            "constraint_rows": 24,
+            "constraint_rows_available": 52,
+            "delta_metrics": {
+              "count": 16.0,
+              "max_abs": 2.335227790089976e-07,
+              "objective": 1.1925610808019013e-13,
+              "rms": 1.2209428123390452e-07
+            },
+            "method": "guarded-kkt-damped",
+            "predicted_constraint_change": {
+              "count": 24.0,
+              "max_abs": 8.257363783168586e-10,
+              "objective": 1.0532846862073602e-18,
+              "rms": 2.962663056282529e-10
+            },
+            "predicted_primary_change": {
+              "count": 8.0,
+              "max_abs": 0.007796744244925536,
+              "objective": 3.0394676077414183e-05,
+              "rms": 0.0027565683411360483
+            },
+            "primary_labels": [
+              "mortar"
+            ],
+            "primary_residual_metrics": {
+              "count": 8.0,
+              "max_abs": 19.156214639951024,
+              "objective": 597.9760013431655,
+              "rms": 12.22677391366142
+            },
+            "primary_rows": 8,
+            "total_columns": 16
+          },
+          "count": 68.0,
+          "delta_norm": 4.883771249356181e-07,
+          "guard_growth_ok": false,
+          "guard_metrics": {
+            "count": 52.0,
+            "enabled": true,
+            "max_abs": 448.916535025682,
+            "objective": 367150.2914972422,
+            "points_requested": 26,
+            "rms": 118.83250842082833,
+            "skipped": 0,
+            "worst": {
+              "abs": 448.916535025682,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.899999999999,
+              "value": 448.916535025682
+            }
+          },
+          "max_abs": 448.916535025682,
+          "max_abs_update": 3.6487934220155874e-09,
+          "objective": 424551.8926345583,
+          "objective_decrease": 0.0013966639526188374,
+          "raw_growth_ok": true,
+          "raw_max_abs": 448.916535025682,
+          "raw_objective": 424551.8926345583,
+          "required_objective_decrease": 4.245518940312223e-05,
+          "rms": 111.74444224033988,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 10,
+      "mortar_rows_available": 120,
+      "post_pool_candidate_count": 112,
+      "pre_score_candidate_count": 4914,
+      "raw_residual_metrics": {
+        "count": 68.0,
+        "max_abs": 448.916535025682,
+        "objective": 424551.89403122227,
+        "rms": 111.74444242414478
+      },
+      "row_groups": {
+        "active_guard": 52,
+        "mortar": 8,
+        "pde": 8
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 8,
+        "tail.F_an": 4,
+        "tail.F_frac": 4
+      },
+      "selected_by_chart": {
+        "origin": 8,
+        "tail": 8
+      },
+      "selected_variables": 16,
+      "solve_mode": "guarded-kkt",
+      "variable_score_preview": [
+        {
+          "score": 383690900.6080547,
+          "variable": "tail.F_an[p24].c[0,10]"
+        },
+        {
+          "score": 718699.4041715732,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 379865488.82895076,
+          "variable": "tail.F_an[p24].c[5,10]"
+        },
+        {
+          "score": 104225.36467327201,
+          "variable": "origin.F_origin_taylor[3,1]"
+        },
+        {
+          "score": 369689028.9599716,
+          "variable": "tail.F_an[p24].c[10,10]"
+        },
+        {
+          "score": 86342.7063203634,
+          "variable": "origin.F_origin_taylor[3,0]"
+        },
+        {
+          "score": 369131377.1833622,
+          "variable": "tail.F_frac[f1][p24].c[0,10]"
+        },
+        {
+          "score": 56629.68365023367,
+          "variable": "origin.F_origin_taylor[0,1]"
+        },
+        {
+          "score": 365451157.62083864,
+          "variable": "tail.F_frac[f1][p24].c[5,10]"
+        },
+        {
+          "score": 26539.238339425418,
+          "variable": "origin.F_origin_taylor[2,1]"
+        },
+        {
+          "score": 355645927.303046,
+          "variable": "tail.F_frac[f1][p24].c[10,10]"
+        },
+        {
+          "score": 14860.861742438392,
+          "variable": "origin.F_origin_taylor[1,0]"
+        }
+      ]
+    }
+  ],
+  "input": "work/v117_twochart_init.json",
+  "newton_executed": true,
+  "optimization_faked": false,
+  "out": "work/twochart_stage0_rz_guardedkkt_full16_probe.json",
+  "requested_solver": {
+    "active_guard_weight": 1.0,
+    "block_search_labels": "full",
+    "blocks": [
+      "origin",
+      "interface"
+    ],
+    "candidate_kq_max": 8,
+    "candidate_kx_max": 8,
+    "candidate_origin_degree_max": 8,
+    "candidate_pool_limit": 96,
+    "chart_balanced_selection": true,
+    "forced_tol": 1e-12,
+    "guard_grid": "edge",
+    "guard_grid_b_range": [
+      0.2,
+      0.98
+    ],
+    "guard_grid_q_range": [
+      0.78,
+      0.9
+    ],
+    "guard_grid_samples": [
+      4,
+      5
+    ],
+    "guard_qb_points": [
+      [
+        0.78,
+        0.2
+      ],
+      [
+        0.78,
+        0.395
+      ],
+      [
+        0.78,
+        0.5900000000000001
+      ],
+      [
+        0.78,
+        0.7849999999999999
+      ],
+      [
+        0.78,
+        0.98
+      ],
+      [
+        0.8200000000000001,
+        0.2
+      ],
+      [
+        0.8200000000000001,
+        0.395
+      ],
+      [
+        0.8200000000000001,
+        0.5900000000000001
+      ],
+      [
+        0.8200000000000001,
+        0.7849999999999999
+      ],
+      [
+        0.8200000000000001,
+        0.98
+      ],
+      [
+        0.86,
+        0.2
+      ],
+      [
+        0.86,
+        0.395
+      ],
+      [
+        0.86,
+        0.5900000000000001
+      ],
+      [
+        0.86,
+        0.7849999999999999
+      ],
+      [
+        0.86,
+        0.98
+      ],
+      [
+        0.9,
+        0.2
+      ],
+      [
+        0.9,
+        0.395
+      ],
+      [
+        0.9,
+        0.5900000000000001
+      ],
+      [
+        0.9,
+        0.7849999999999999
+      ],
+      [
+        0.9,
+        0.98
+      ],
+      [
+        0.899999999999,
+        0.2
+      ],
+      [
+        0.899999999999,
+        0.54
+      ],
+      [
+        0.899999999999,
+        0.98
+      ],
+      [
+        0.900000000001,
+        0.2
+      ],
+      [
+        0.900000000001,
+        0.54
+      ],
+      [
+        0.900000000001,
+        0.98
+      ]
+    ],
+    "guard_qb_points_explicit": [],
+    "guard_qb_points_generated": [
+      [
+        0.78,
+        0.2
+      ],
+      [
+        0.78,
+        0.395
+      ],
+      [
+        0.78,
+        0.5900000000000001
+      ],
+      [
+        0.78,
+        0.7849999999999999
+      ],
+      [
+        0.78,
+        0.98
+      ],
+      [
+        0.8200000000000001,
+        0.2
+      ],
+      [
+        0.8200000000000001,
+        0.395
+      ],
+      [
+        0.8200000000000001,
+        0.5900000000000001
+      ],
+      [
+        0.8200000000000001,
+        0.7849999999999999
+      ],
+      [
+        0.8200000000000001,
+        0.98
+      ],
+      [
+        0.86,
+        0.2
+      ],
+      [
+        0.86,
+        0.395
+      ],
+      [
+        0.86,
+        0.5900000000000001
+      ],
+      [
+        0.86,
+        0.7849999999999999
+      ],
+      [
+        0.86,
+        0.98
+      ],
+      [
+        0.9,
+        0.2
+      ],
+      [
+        0.9,
+        0.395
+      ],
+      [
+        0.9,
+        0.5900000000000001
+      ],
+      [
+        0.9,
+        0.7849999999999999
+      ],
+      [
+        0.9,
+        0.98
+      ]
+    ],
+    "guard_qb_points_seam": [
+      [
+        0.899999999999,
+        0.2
+      ],
+      [
+        0.899999999999,
+        0.54
+      ],
+      [
+        0.899999999999,
+        0.98
+      ],
+      [
+        0.900000000001,
+        0.2
+      ],
+      [
+        0.900000000001,
+        0.54
+      ],
+      [
+        0.900000000001,
+        0.98
+      ]
+    ],
+    "guard_seam_b_points": [
+      0.2,
+      0.54,
+      0.98
+    ],
+    "guard_seam_eps": 1e-12,
+    "guard_seam_q": 0.9,
+    "guard_seam_sides": "both",
+    "guarded_kkt_constraint_damping": 1e-08,
+    "guarded_kkt_constraint_labels": "active_guard",
+    "guarded_kkt_max_constraints": 24,
+    "guarded_kkt_primary_labels": "mortar",
+    "include_origin_constants": false,
+    "line_search": [
+      1.0,
+      0.25,
+      0.0625,
+      0.015625
+    ],
+    "line_search_eval": "objective-only",
+    "lm_lambda": 1e-06,
+    "max_guard_max_growth": 1.0,
+    "max_guard_objective_growth": 1.0,
+    "max_iter": 1,
+    "max_raw_objective_growth": 1.0,
+    "max_variables": 16,
+    "min_objective_decrease_abs": 0.0,
+    "min_objective_decrease_rel": 1e-10,
+    "mortar_active_count": 10,
+    "mortar_coordinates": "RZ",
+    "mortar_jacobian_candidate_count": 16,
+    "mortar_order": 2,
+    "mortar_q_samples": 2,
+    "mortar_weight": 0.01,
+    "mortar_x_samples": 5,
+    "overlap_q_range": [
+      0.84,
+      0.92
+    ],
+    "pde_qb_points": [
+      [
+        0.9,
+        0.95
+      ],
+      [
+        0.9625,
+        0.05
+      ],
+      [
+        0.64,
+        0.20583333333333334
+      ],
+      [
+        0.495,
+        0.18
+      ]
+    ],
+    "pde_weight": 1.0,
+    "q2_policy": "zero",
+    "q2_tol": 1e-12,
+    "residual_kind": "normalized-structural",
+    "row_normalization": "none",
+    "row_normalization_floor": 1e-12,
+    "row_scale_max": 1000000.0,
+    "row_scale_min": 0.0,
+    "solve_mode": "guarded-kkt",
+    "tail_gate_samples_per_patch": 9,
+    "trust": 0.001,
+    "variable_charts": [
+      "tail",
+      "origin"
+    ]
+  },
+  "status": "TWOCHART_NEWTON_STAGE0_ANALYTIC_GN_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_coeff_error": 0.0,
+    "gamma": 0.45,
+    "note": "Formal tail recurrence gate only: q1-zero, first forced q^(1/gamma), and zero ordinary q^2 trace are checked. This is not an interval proof.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}

@@ -4196,6 +4196,58 @@ The interrupted expensive run produced no artifact and should not be counted as
 an accepted Stage-0 result.  The next real implementation step is still cached
 row/column evaluation and a guarded KKT/Schur solve mode.
 
+A first guarded-KKT diagnostic mode has now been added directly to
+`tools/profile_newton_twochart.py`. It supports:
+
+```text
+--solve-mode guarded-kkt
+--guarded-kkt-primary-labels
+--guarded-kkt-constraint-labels
+--guarded-kkt-constraint-damping
+--guarded-kkt-max-constraints
+--min-objective-decrease-abs
+--min-objective-decrease-rel
+```
+
+The first KKT smoke exposed why the minimum-decrease guard is necessary:
+without it, roundoff-sized objective changes could be marked as accepted. With
+`--min-objective-decrease-rel 1e-10`, the tail-only smoke correctly reports:
+
+```text
+work/twochart_stage0_rz_guardedkkt_smoke_min_report.json
+status: TWOCHART_NEWTON_STAGE0_NO_IMPROVEMENT_NOT_PROOF
+```
+
+A bounded 16-variable full-block KKT probe then ran successfully:
+
+```text
+work/twochart_stage0_rz_guardedkkt_full16_probe_report.json
+selected variables: 16, split tail/origin = 8/8
+active guard constraints used in KKT: 24
+base objective: 4.245518940312e5
+accepted objective decrease: 8.936499519041e-2
+max coefficient update: 2.335227790090e-7
+predicted primary row change max: 7.796744244926e-3
+predicted constraint row change max: 8.257363783169e-10
+```
+
+The held-out scan shows this is infrastructure, not profile progress:
+
+```text
+work/twochart_stage0_rz_guardedkkt_full16_probe_residual.json
+standard max: 1.016228983517e1
+secondary max: 1.422825475247e1
+origin max: 9.132494634460e1
+overlap max: 3.239718884456e2
+edge max: 4.489165350285e2
+C0-C2 R/Z mortar max: 4.214529161145e3
+```
+
+So the guarded-KKT path is now executable, but the first bounded tangent space
+is nearly null once active edge/seam constraints are imposed. The next step is
+to turn this into a deterministic rank/angle report and add row/column caching
+so larger spaces can be tested without repeated rebuild cost.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4216,8 +4268,8 @@ improve origin/overlap while preserving the guard, broad guard grids catch the
 nonlocal hidden-edge damage from high-degree tail seam variables, and active
 guard rows make that conflict cheap enough to test. The sampled system still
 cannot reduce the worst seam row and guarded edge simultaneously. The next
-solver step is not to weaken the guard; it is to implement a true constrained
-Schur-style solve with cached row/column evaluation, using the new two-sided
-seam-limit guards as active constraints. Row normalization alone is not enough.
-It is too early to free `(gamma,B)`, pivot to radial matching, or start spectral
-validation as a theorem dependency.
+solver step is not to weaken the guard; it is to add rank/angle diagnostics and
+cached row/column evaluation to the constrained KKT path, using the new
+two-sided seam-limit guards as active constraints. Row normalization alone is
+not enough. It is too early to free `(gamma,B)`, pivot to radial matching, or
+start spectral validation as a theorem dependency.

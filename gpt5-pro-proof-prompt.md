@@ -877,6 +877,59 @@ mortar max `4.214529161145e3`. Therefore active guard rows are useful
 infrastructure, but not the missing solver. The next implementation must add
 two-sided seam-limit guard generation and a cached guarded KKT/Schur correction.
 
+Latest guarded-KKT update: a first `--solve-mode guarded-kkt` diagnostic path
+has been added. It solves a damped equality-constrained KKT system with
+configurable primary row labels and constraint row labels. The current diagnostic
+configuration uses mortar rows as the primary objective and active guard rows as
+first-order no-change constraints. This is not yet a full row-cache/Schur
+implementation, but it is enough to detect whether the selected tangent space
+has a guarded seam-reduction direction.
+
+```text
+New flags:
+  --solve-mode guarded-kkt
+  --guarded-kkt-primary-labels
+  --guarded-kkt-constraint-labels
+  --guarded-kkt-constraint-damping
+  --guarded-kkt-max-constraints
+  --min-objective-decrease-abs
+  --min-objective-decrease-rel
+```
+
+Current guarded-KKT evidence:
+
+```text
+work/twochart_stage0_rz_guardedkkt_smoke_min_report.json
+  tail-only smoke, 8 variables, 12 active guard constraints
+  status = TWOCHART_NEWTON_STAGE0_NO_IMPROVEMENT_NOT_PROOF
+  purpose = verifies roundoff-sized objective drift is no longer counted as accepted
+
+work/twochart_stage0_rz_guardedkkt_full16_probe_report.json
+  full tail+origin block, 16 variables, 24 active guard constraints
+  accepted_any_step = true, but the accepted step is tiny
+  base objective = 4.245518940312e5
+  objective decrease = 8.936499519041e-2
+  max coefficient update = 2.335227790090e-7
+  primary mortar max in sampled system = 1.915621463995e1
+  active guard max in sampled system = 4.489165350257e2
+  predicted primary row change max = 7.796744244926e-3
+  predicted constraint row change max = 8.257363783169e-10
+
+work/twochart_stage0_rz_guardedkkt_full16_probe_residual.json
+  held-out standard max = 1.016228983517e1
+  held-out secondary max = 1.422825475247e1
+  held-out origin max = 9.132494634460e1
+  held-out overlap max = 3.239718884456e2
+  held-out edge max = 4.489165350285e2
+  C0-C2 R/Z mortar max = 4.214529161145e3
+```
+
+Interpretation: the first guarded-KKT path is implemented and runs quickly on
+bounded systems. At 16 variables it finds only a nearly null edge-feasible
+seam direction; held-out residuals and the worst R/Z mortar are unchanged. This
+is evidence to expand the KKT/rank diagnostic and add row/column caching, not
+evidence to free `(gamma,B)` yet.
+
 ## 6. Current Repository Tooling
 
 The repository has these relevant tools and validators:
@@ -939,7 +992,8 @@ tools/profile_newton_twochart.py:
   broad guard grids,
   active guard rows,
   objective-only line-search scoring,
-  two-sided seam-limit guard generation.
+  two-sided seam-limit guard generation,
+  first guarded-KKT diagnostic mode.
 
 validators/compactified_equations_twochart.py and validators/twochart_mortar_jacobian.py:
   provide floating two-chart residual and R/Z mortar Jacobian diagnostics.
@@ -1527,7 +1581,7 @@ implementation work is:
 2. NEXT: cache row/column evaluations for selected variables and selected q,b/mortar
    rows so active guard rows can be used without repeated full system rebuilds.
 
-3. NEXT: add a guarded KKT/Schur solve mode:
+3. PARTIAL: add a guarded KKT/Schur solve mode:
    - primary equation: reduce active R/Z seam mortar rows;
    - constraints: no growth in broad edge/seam-limit PDE rows and no tail-gate
      damage;
@@ -1535,9 +1589,12 @@ implementation work is:
      oscillation;
    - fallback: if the KKT system is singular, return a certificate of rank
      deficiency and the offending row/column subspace.
+   Current implementation has a damped equality-constrained KKT diagnostic in
+   `tools/profile_newton_twochart.py`, but no standalone row cache and no
+   singular-value/rank-angle certificate yet.
 
-4. Only after cached active rows and guarded KKT exist, run a new Stage-0
-   diagnostic of the following form.
+4. NEXT: add deterministic rank/angle reporting and row caching, then rerun a
+   larger Stage-0 diagnostic of the following form.
 ```
 
 ```bash
@@ -1583,9 +1640,10 @@ python3 tools/profile_newton_twochart.py \
   --line-search 1,0.25,0.0625,0.015625,0.00390625
 ```
 
-The flags `--guard-seam-sides`, `--guard-seam-q`, `--guard-seam-eps`, and
-`--guard-seam-b-points` are implemented. The flag
-`--solve-mode guarded-kkt` is not yet implemented as of this prompt update.
+The flags `--guard-seam-sides`, `--guard-seam-q`, `--guard-seam-eps`,
+`--guard-seam-b-points`, and `--solve-mode guarded-kkt` are implemented.
+The missing pieces are standalone row caching, synthetic guarded-KKT tests, and
+rank/angle reporting for infeasible seam descent.
 
 Stage-0 go criterion:
 

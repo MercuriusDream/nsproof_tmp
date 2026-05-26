@@ -838,6 +838,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "raw_residual_metrics": raw_metrics,
         "row_scaling": row_scaling,
         "row_groups": row_groups,
+        "row_labels": row_labels,
         "active_guard_rows": active_guard_rows_added,
         "active_guard_points": [[q, b] for q, b in objective_active_guard_points],
         "objective_pde_rows": pde_rows,
@@ -949,6 +950,128 @@ def restricted_normal_step(
     }
 
 
+def parse_label_set(raw: str) -> set[str]:
+    return {item.strip() for item in raw.split(",") if item.strip()}
+
+
+def restricted_guarded_kkt_step(
+    jacobian_rows: list[list[float]],
+    residual_vector: list[float],
+    row_labels: list[str],
+    active_columns: list[int],
+    total_columns: int,
+    lm_lambda: float,
+    primary_labels: set[str],
+    constraint_labels: set[str],
+    constraint_damping: float,
+    max_constraints: int,
+) -> tuple[list[float], dict[str, Any]]:
+    if not active_columns:
+        raise ValueError("empty active column set")
+    primary_indexes = [index for index, label in enumerate(row_labels) if label in primary_labels]
+    constraint_indexes = [index for index, label in enumerate(row_labels) if label in constraint_labels]
+    if not primary_indexes:
+        primary_indexes = [index for index, label in enumerate(row_labels) if label not in constraint_labels]
+    if not primary_indexes:
+        raise ValueError("guarded KKT has no primary rows")
+    if max_constraints > 0 and len(constraint_indexes) > max_constraints:
+        constraint_indexes = sorted(constraint_indexes, key=lambda index: abs(residual_vector[index]), reverse=True)[
+            :max_constraints
+        ]
+    restricted_primary = [[jacobian_rows[index][column] for column in active_columns] for index in primary_indexes]
+    primary_residuals = [residual_vector[index] for index in primary_indexes]
+    if not constraint_indexes:
+        delta, report = normal_step(restricted_primary, primary_residuals, lm_lambda)
+        full_delta = [0.0 for _ in range(total_columns)]
+        for local_index, column in enumerate(active_columns):
+            full_delta[column] = delta[local_index]
+        return full_delta, {
+            **report,
+            "method": "guarded-kkt-fallback-unconstrained",
+            "active_columns": len(active_columns),
+            "total_columns": total_columns,
+            "primary_rows": len(primary_indexes),
+            "constraint_rows": 0,
+        }
+
+    restricted_constraints = [
+        [jacobian_rows[index][column] for column in active_columns] for index in constraint_indexes
+    ]
+    n = len(active_columns)
+    m = len(restricted_constraints)
+    column_norms = []
+    all_rows = restricted_primary + restricted_constraints
+    for column in range(n):
+        norm = math.sqrt(sum(row[column] * row[column] for row in all_rows))
+        column_norms.append(norm)
+    scales = [1.0 / norm if norm > 1e-14 else 1.0 for norm in column_norms]
+    primary_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_primary]
+    constraint_rows = [[value * scales[index] for index, value in enumerate(row)] for row in restricted_constraints]
+    hessian = [[0.0 for _ in range(n)] for _ in range(n)]
+    gradient = [0.0 for _ in range(n)]
+    for row, residual in zip(primary_rows, primary_residuals):
+        for i, ji in enumerate(row):
+            gradient[i] += ji * residual
+            if ji == 0.0:
+                continue
+            for j in range(i, n):
+                hessian[i][j] += ji * row[j]
+    for i in range(n):
+        for j in range(i):
+            hessian[i][j] = hessian[j][i]
+        hessian[i][i] += lm_lambda
+
+    size = n + m
+    matrix = [[0.0 for _ in range(size)] for _ in range(size)]
+    rhs = [0.0 for _ in range(size)]
+    for i in range(n):
+        rhs[i] = -gradient[i]
+        for j in range(n):
+            matrix[i][j] = hessian[i][j]
+    for constraint_index, row in enumerate(constraint_rows):
+        kkt_row = n + constraint_index
+        rhs[kkt_row] = 0.0
+        for column, value in enumerate(row):
+            matrix[column][kkt_row] = value
+            matrix[kkt_row][column] = value
+        matrix[kkt_row][kkt_row] = -constraint_damping
+    solution = solve_linear(matrix, rhs)
+    scaled_delta = solution[:n]
+    delta = [value * scales[index] for index, value in enumerate(scaled_delta)]
+    full_delta = [0.0 for _ in range(total_columns)]
+    for local_index, column in enumerate(active_columns):
+        full_delta[column] = delta[local_index]
+    primary_change = [
+        sum(jacobian_rows[index][column] * full_delta[column] for column in active_columns)
+        for index in primary_indexes
+    ]
+    constraint_change = [
+        sum(jacobian_rows[index][column] * full_delta[column] for column in active_columns)
+        for index in constraint_indexes
+    ]
+    nonzero_norms = [value for value in column_norms if value > 0.0]
+    return full_delta, {
+        "method": "guarded-kkt-damped",
+        "active_columns": len(active_columns),
+        "total_columns": total_columns,
+        "primary_rows": len(primary_indexes),
+        "constraint_rows": len(constraint_indexes),
+        "constraint_rows_available": len([index for index, label in enumerate(row_labels) if label in constraint_labels]),
+        "constraint_damping": constraint_damping,
+        "primary_labels": sorted(primary_labels),
+        "constraint_labels": sorted(constraint_labels),
+        "column_norm_min": min(nonzero_norms) if nonzero_norms else 0.0,
+        "column_norm_max": max(column_norms) if column_norms else 0.0,
+        "column_scale_min": min(scales) if scales else 0.0,
+        "column_scale_max": max(scales) if scales else 0.0,
+        "primary_residual_metrics": vector_metrics([residual_vector[index] for index in primary_indexes]),
+        "constraint_residual_metrics": vector_metrics([residual_vector[index] for index in constraint_indexes]),
+        "delta_metrics": vector_metrics(delta),
+        "predicted_primary_change": vector_metrics(primary_change),
+        "predicted_constraint_change": vector_metrics(constraint_change),
+    }
+
+
 def stage0_block_specs(variables: list[Any], solve_mode: str, labels_raw: str = "") -> list[dict[str, Any]]:
     if solve_mode == "full":
         return [{"label": "full", "columns": list(range(len(variables)))}]
@@ -1021,13 +1144,27 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         accepted = False
         for block_spec in block_specs:
             try:
-                delta, scaling_report = restricted_normal_step(
-                    system["jacobian_rows"],
-                    base_vec,
-                    list(block_spec["columns"]),
-                    len(system["variables"]),
-                    args.lm_lambda,
-                )
+                if args.solve_mode == "guarded-kkt":
+                    delta, scaling_report = restricted_guarded_kkt_step(
+                        system["jacobian_rows"],
+                        base_vec,
+                        system["row_labels"],
+                        list(block_spec["columns"]),
+                        len(system["variables"]),
+                        args.lm_lambda,
+                        parse_label_set(args.guarded_kkt_primary_labels),
+                        parse_label_set(args.guarded_kkt_constraint_labels),
+                        args.guarded_kkt_constraint_damping,
+                        args.guarded_kkt_max_constraints,
+                    )
+                else:
+                    delta, scaling_report = restricted_normal_step(
+                        system["jacobian_rows"],
+                        base_vec,
+                        list(block_spec["columns"]),
+                        len(system["variables"]),
+                        args.lm_lambda,
+                    )
             except ValueError as exc:
                 line_trials.append(
                     {
@@ -1085,12 +1222,19 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         and trial_guard_metrics["max_abs"]
                         <= args.max_guard_max_growth * max(base_guard_metrics["max_abs"], 1e-300)
                     )
-                improved = trial_metrics["objective"] < base_metrics["objective"]
+                objective_decrease = base_metrics["objective"] - trial_metrics["objective"]
+                required_decrease = max(
+                    args.min_objective_decrease_abs,
+                    args.min_objective_decrease_rel * max(base_metrics["objective"], 1e-300),
+                )
+                improved = objective_decrease > required_decrease
                 accepted_here = improved and raw_growth_ok and guard_growth_ok
                 line_trials.append(
                     {
                         **trial_record,
                         **trial_metrics,
+                        "objective_decrease": objective_decrease,
+                        "required_objective_decrease": required_decrease,
                         "raw_objective": trial_raw_metrics["objective"],
                         "raw_max_abs": trial_raw_metrics["max_abs"],
                         "raw_growth_ok": raw_growth_ok,
@@ -1205,6 +1349,12 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "max_guard_objective_growth": args.max_guard_objective_growth,
             "max_guard_max_growth": args.max_guard_max_growth,
             "active_guard_weight": args.active_guard_weight,
+            "min_objective_decrease_abs": args.min_objective_decrease_abs,
+            "min_objective_decrease_rel": args.min_objective_decrease_rel,
+            "guarded_kkt_primary_labels": args.guarded_kkt_primary_labels,
+            "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
+            "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
+            "guarded_kkt_max_constraints": args.guarded_kkt_max_constraints,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -1289,8 +1439,14 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             if args.guard_seam_b_points.strip()
             else [],
             "active_guard_weight": args.active_guard_weight,
+            "guarded_kkt_primary_labels": args.guarded_kkt_primary_labels,
+            "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
+            "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
+            "guarded_kkt_max_constraints": args.guarded_kkt_max_constraints,
             "row_normalization": args.row_normalization,
             "line_search_eval": args.line_search_eval,
+            "min_objective_decrease_abs": args.min_objective_decrease_abs,
+            "min_objective_decrease_rel": args.min_objective_decrease_rel,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -1382,6 +1538,18 @@ def main() -> None:
     parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
     parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
     parser.add_argument(
+        "--min-objective-decrease-abs",
+        type=nonnegative_float,
+        default=0.0,
+        help="Require at least this absolute sampled-objective decrease for line-search acceptance.",
+    )
+    parser.add_argument(
+        "--min-objective-decrease-rel",
+        type=nonnegative_float,
+        default=0.0,
+        help="Require at least this relative sampled-objective decrease for line-search acceptance.",
+    )
+    parser.add_argument(
         "--active-guard-weight",
         type=nonnegative_float,
         default=0.0,
@@ -1391,7 +1559,7 @@ def main() -> None:
             "without using the guard grid for expensive candidate scoring."
         ),
     )
-    parser.add_argument("--solve-mode", choices=("full", "block-search"), default="full")
+    parser.add_argument("--solve-mode", choices=("full", "block-search", "guarded-kkt"), default="full")
     parser.add_argument(
         "--block-search-labels",
         default="",
@@ -1423,6 +1591,28 @@ def main() -> None:
             "row set without rebuilding candidate selection/Jacobians. Requires "
             "--row-normalization none."
         ),
+    )
+    parser.add_argument(
+        "--guarded-kkt-primary-labels",
+        default="mortar",
+        help="Comma-separated row labels used as the primary objective in --solve-mode guarded-kkt.",
+    )
+    parser.add_argument(
+        "--guarded-kkt-constraint-labels",
+        default="active_guard",
+        help="Comma-separated row labels treated as first-order constraints in --solve-mode guarded-kkt.",
+    )
+    parser.add_argument(
+        "--guarded-kkt-constraint-damping",
+        type=positive_float,
+        default=1e-8,
+        help="Positive damping on KKT multipliers for rank-deficient guarded constraints.",
+    )
+    parser.add_argument(
+        "--guarded-kkt-max-constraints",
+        type=nonnegative_int,
+        default=128,
+        help="Keep this many largest-residual constraint rows in guarded KKT; 0 keeps all.",
     )
     parser.add_argument("--include-origin-constants", action="store_true")
     parser.add_argument("--chart-balanced-selection", action="store_true")
