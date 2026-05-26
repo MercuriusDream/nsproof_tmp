@@ -781,6 +781,58 @@ Before writing the final answer, reason through at least these competing possibi
 
 Your final output must distinguish these cases and give the decisive test for each.
 
+Do not re-explain general Navier-Stokes background. Use the repo's current
+numbers and artifacts. Your answer should force a binary execution tree:
+
+```text
+1. Fix the coupled two-chart solve.
+2. If fixed (gamma,B) fails after that solve is real, free (gamma,B).
+3. If the parameter funnel fails with legal tail constraints, pivot to radial
+   core-tail matching.
+4. If radial matching also fails with interval certificates, reject the current
+   ansatz class.
+```
+
+The current near-term decision is:
+
+```text
+Can the two-chart (q,x)/(R,Z) solver satisfy the normalized PDE equations and
+physical R/Z seam smoothness simultaneously?
+```
+
+Use the latest evidence explicitly:
+
+```text
+origin-only degree-8 R/Z refit: C2 mortar 4.214e3 -> 2.20e1,
+but origin/edge PDE holdouts become about 2.27e3;
+coupled origin-only Stage-0: preserves PDE scale, but C2 mortar only
+4.214529e3 -> 4.214512e3.
+```
+
+You must decide whether this indicates bad conditioning/incomplete coupled
+solver, wrong fixed `(gamma,B)`, illegal tail channel such as unresolved `q^2`,
+or a dead branch.
+
+Required certificate outputs should be named explicitly. At minimum:
+
+```text
+certs/profile_nk.json
+certs/tail_recurrence.json
+certs/indicial_pluecker_cover.json
+certs/pressure_reconstruction.json
+certs/matching_determinant.json
+certs/projected_spectrum.json
+certs/high_frequency_exclusion.json
+certs/stable_semigroup.json
+certs/lyapunov_perron_constants.json
+certs/final_theorem_manifest.json
+```
+
+The theorem certificate may move above 0% only when all five stop-condition
+gates have certificates linked by `certs/final_theorem_manifest.json`. Scaffold
+progress, low residuals, or floating diagnostics do not change the theorem
+percentage.
+
 ### A. Executive Verdict
 
 State whether the present branch is still worth pursuing, under what conditions it should be killed, and what must be done next.

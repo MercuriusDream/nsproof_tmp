@@ -270,6 +270,8 @@ def main() -> None:
     parser.add_argument("--ridge", type=float, default=1e-12)
     args = parser.parse_args()
 
+    if args.degree < -1:
+        raise ValueError("--degree must be -1 or nonnegative")
     if args.match_order < 0 or args.match_order > 4:
         raise ValueError("--match-order must be between 0 and 4")
     if args.x_samples <= 0:
@@ -278,11 +280,16 @@ def main() -> None:
         raise ValueError("require 0 <= --x-min <= --x-max <= 1")
     if args.ridge < 0.0:
         raise ValueError("--ridge must be nonnegative")
+    weights = (args.value_weight, args.d1_weight, args.d2_weight, args.d3_weight, args.d4_weight)
+    if any(weight < 0.0 for weight in weights):
+        raise ValueError("derivative weights must be nonnegative")
 
     data = load_json(args.input)
     q_values = parse_float_list(args.q_values)
     if not q_values:
         raise ValueError("--q-values must contain at least one value")
+    if min(q_values) <= 0.0 or max(q_values) >= 1.0:
+        raise ValueError("q values must lie strictly inside (0,1)")
     x_values = sample_x_values(args)
 
     out = copy.deepcopy(data)
