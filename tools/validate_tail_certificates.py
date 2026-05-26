@@ -26,7 +26,7 @@ from validators.exact_profile_residual import (  # noqa: E402
     sha256_file,
     stable_json_hash,
 )
-from validators.exact_tail_algebra import exact_tail_algebra_report  # noqa: E402
+from validators.exact_tail_algebra import exact_tail_algebra_report, module_code_hashes  # noqa: E402
 
 
 def resolve_path(path: str) -> str:
@@ -112,6 +112,7 @@ def profile_tail_metadata(data: dict[str, Any]) -> dict[str, Any]:
 
 def base_certificate(name: str, profile_path: str, data: dict[str, Any]) -> dict[str, Any]:
     profile_hash = sha256_file(profile_path)
+    tool_rel = "tools/validate_tail_certificates.py"
     return {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": name,
@@ -121,6 +122,10 @@ def base_certificate(name: str, profile_path: str, data: dict[str, Any]) -> dict
         "profile_hash_sha256": profile_hash,
         "input_hashes": {
             "profile": profile_hash,
+        },
+        "code_hashes": {
+            tool_rel: sha256_file(resolve_path(tool_rel)),
+            **module_code_hashes(),
         },
         "dependency_hashes": {},
         "backend": "floating-formal-ledger",
@@ -138,6 +143,7 @@ def tail_recurrence_certificate(profile_path: str, data: dict[str, Any]) -> dict
     tail = profile_tail_metadata(data)
     exact_tail = exact_tail_algebra_report(data, profile_path=relpath(profile_path))
     exact_subclaims = exact_tail["exact_subclaims"]
+    exact_tail_hash = stable_json_hash(exact_tail)
     blockers = [
         "tail recurrence is not interval-validated with directed rounding",
         "infinite tail remainder majorant is missing",
@@ -161,6 +167,15 @@ def tail_recurrence_certificate(profile_path: str, data: dict[str, Any]) -> dict
             "tail_metadata": tail,
             "exact_algebraic_subclaims": exact_subclaims,
             "exact_tail_algebra": exact_tail,
+            "exact_tail_algebra_hash_sha256": exact_tail_hash,
+            "exact_tail_algebra_code_hashes": exact_tail.get("code_hashes", {}),
+            "dependency_hashes": {
+                "exact_tail_algebra": exact_tail_hash,
+                **{
+                    f"code:{path}": digest
+                    for path, digest in exact_tail.get("code_hashes", {}).items()
+                },
+            },
             "gamma_interval": [str(tail.get("gamma")), str(tail.get("gamma"))],
             "B_interval": [str(tail.get("B")), str(tail.get("B"))],
             "q1_exclusion": tail.get("q1_exclusion"),

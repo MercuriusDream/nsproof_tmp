@@ -134,22 +134,89 @@ def dependency_status(path: str) -> dict[str, Any]:
     }
 
 
+def profile_hashes(dependencies: list[dict[str, Any]]) -> list[str]:
+    return sorted(
+        {
+            str(item["profile_hash_sha256"])
+            for item in dependencies
+            if item.get("profile_hash_sha256")
+        }
+    )
+
+
+def profile_hash_consistency(dependencies: list[dict[str, Any]]) -> dict[str, Any]:
+    hashes = profile_hashes(dependencies)
+    return {
+        "pass": len(hashes) <= 1,
+        "hashes": hashes,
+    }
+
+
+def short_failure_reason(item: dict[str, Any], fallback: str) -> str:
+    reason = item.get("failure_reason") or fallback
+    if not isinstance(reason, str):
+        reason = str(reason)
+    first_clause = reason.split("; ", 1)[0].strip()
+    if len(first_clause) <= 180:
+        return first_clause
+    return first_clause[:177].rstrip() + "..."
+
+
+def blocking_certificates(
+    gate_reports: list[dict[str, Any]],
+    global_hash_consistent: bool,
+) -> list[dict[str, Any]]:
+    blockers: dict[str, dict[str, Any]] = {}
+
+    def add(item: dict[str, Any], gate_id: str, reason: str) -> None:
+        path = str(item["path"])
+        blocker = blockers.setdefault(
+            path,
+            {
+                "path": path,
+                "certificate_name": item.get("certificate_name"),
+                "pass": bool(item.get("pass", False)),
+                "failure_reason": reason,
+                "gate_ids": [],
+            },
+        )
+        if gate_id not in blocker["gate_ids"]:
+            blocker["gate_ids"].append(gate_id)
+        if not blocker["failure_reason"]:
+            blocker["failure_reason"] = reason
+
+    for gate in gate_reports:
+        gate_id = str(gate["gate_id"])
+        for item in gate["dependencies"]:
+            if not item.get("exists"):
+                add(item, gate_id, "missing certificate file")
+            elif not item.get("pass"):
+                add(item, gate_id, short_failure_reason(item, "certificate pass=false"))
+            elif (
+                not gate["profile_hash_consistency"]["pass"]
+                and item.get("profile_hash_sha256")
+            ):
+                add(item, gate_id, f"profile hash mismatch within gate {gate_id}")
+
+    if not global_hash_consistent:
+        for gate in gate_reports:
+            gate_id = str(gate["gate_id"])
+            for item in gate["dependencies"]:
+                if item.get("profile_hash_sha256"):
+                    add(item, gate_id, "profile hash mismatch across theorem dependencies")
+
+    return [blockers[path] for path in sorted(blockers)]
+
+
 def build_manifest() -> dict[str, Any]:
     gate_reports = []
     passed = 0
     for gate in GATES:
         dependencies = [dependency_status(path) for path in gate["dependencies"]]
-        profile_hashes = sorted(
-            {
-                str(item["profile_hash_sha256"])
-                for item in dependencies
-                if item.get("profile_hash_sha256")
-            }
-        )
-        profile_hash_consistent = len(profile_hashes) <= 1
+        gate_profile_hash_consistency = profile_hash_consistency(dependencies)
         gate_pass = (
             all(item["exists"] and item["pass"] for item in dependencies)
-            and profile_hash_consistent
+            and gate_profile_hash_consistency["pass"]
         )
         if gate_pass:
             passed += 1
@@ -158,7 +225,7 @@ def build_manifest() -> dict[str, Any]:
             reasons = []
             if not all(item["exists"] and item["pass"] for item in dependencies):
                 reasons.append("one or more required interval/exact certificates are missing or failing")
-            if not profile_hash_consistent:
+            if not gate_profile_hash_consistency["pass"]:
                 reasons.append("gate dependencies refer to different profile hashes")
             failure_reason = "; ".join(reasons)
         gate_reports.append(
@@ -167,26 +234,43 @@ def build_manifest() -> dict[str, Any]:
                 "statement": gate["statement"],
                 "pass": gate_pass,
                 "dependencies": dependencies,
-                "profile_hash_consistency": {
-                    "pass": profile_hash_consistent,
-                    "hashes": profile_hashes,
-                },
+                "profile_hash_consistency": gate_profile_hash_consistency,
                 "failure_reason": failure_reason,
             }
         )
 
     total = len(GATES)
+    global_dependencies_by_path = {
+        item["path"]: item
+        for gate in gate_reports
+        for item in gate["dependencies"]
+    }
+    global_profile_hash_consistency = profile_hash_consistency(
+        list(global_dependencies_by_path.values())
+    )
+    all_gates_pass = passed == total
+    manifest_pass = all_gates_pass and global_profile_hash_consistency["pass"]
+    failure_reasons = []
+    if not all_gates_pass:
+        failure_reasons.append(f"{passed}/{total} stop-condition gates are certified")
+    if not global_profile_hash_consistency["pass"]:
+        failure_reasons.append("theorem dependencies refer to different profile hashes")
     infrastructure = [dependency_status(path) for path in INFRASTRUCTURE_CERTIFICATES]
     return {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "final_theorem_manifest",
-        "pass": passed == total,
+        "pass": manifest_pass,
         "repo_commit": repo_commit(),
         "certified_stop_condition_gates": {
             "passed": passed,
             "total": total,
         },
         "final_theorem_certificate_percent": 100.0 * passed / max(total, 1),
+        "profile_hash_consistency": global_profile_hash_consistency,
+        "blocking_certificates": blocking_certificates(
+            gate_reports,
+            bool(global_profile_hash_consistency["pass"]),
+        ),
         "gates": gate_reports,
         "infrastructure_certificates": {
             "note": (
@@ -201,9 +285,7 @@ def build_manifest() -> dict[str, Any]:
             "All stop-condition gates for the final theorem are hash-linked to "
             "passing interval/exact certificates."
         ),
-        "failure_reason": None
-        if passed == total
-        else f"{passed}/{total} stop-condition gates are certified",
+        "failure_reason": None if manifest_pass else "; ".join(failure_reasons),
         "commands": [" ".join(sys.argv)],
     }
 

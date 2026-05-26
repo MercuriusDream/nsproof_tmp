@@ -10,10 +10,17 @@
     "exponent semigroup closure certificate is missing"
   ],
   "certificate_name": "tail_recurrence",
+  "code_hashes": {
+    "tools/validate_tail_certificates.py": "1505f6595d654293423aee7352a347592e760ce49bf936ada6441c9a569311c0",
+    "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
+  },
   "commands": [
     "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
-  "dependency_hashes": {},
+  "dependency_hashes": {
+    "code:validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8",
+    "exact_tail_algebra": "92d6a5ce4e271766709f7cbaf022ded01fba4e1cb2292cd145a3b244461851e3"
+  },
   "exact_algebraic_subclaims": {
     "B": "1",
     "fixed_branch_gamma_B": true,
@@ -22,6 +29,36 @@
       "F_x1": -0.9786773280026654,
       "G_x0": 0.1111111111111111,
       "G_x1": -1.1111111111111112
+    },
+    "forced_qp_trace_exact_components": {
+      "F_x0": {
+        "denominator": "13340",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "25637",
+        "value": "25637/13340"
+      },
+      "F_x1": {
+        "denominator": "6003",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "-5875",
+        "value": "-5875/6003"
+      },
+      "G_x0": {
+        "denominator": "9",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "1",
+        "value": "1/9"
+      },
+      "G_x1": {
+        "denominator": "9",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "-10",
+        "value": "-10/9"
+      }
     },
     "forced_qp_trace_exact_rational": {
       "F_x0": "25637/13340",
@@ -36,7 +73,64 @@
       "gamma < 1/2": true
     },
     "note": "These are exact algebraic subclaims for the fixed branch only. They do not certify the infinite tail recurrence or the profile.",
-    "p": "20/9"
+    "p": "20/9",
+    "pass_conditions": {
+      "fixed_branch_gamma_B": true,
+      "gamma_in_open_wedge_2_5_1_2": true,
+      "rational_denominators_nonzero": true
+    },
+    "rational_denominator_nonzero_checks": {
+      "B": {
+        "denominator": "1",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "1",
+        "value": "1"
+      },
+      "F_x0_formula_denominator": {
+        "denominator": "400",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "667",
+        "value": "667/400"
+      },
+      "F_x1_formula_denominator": {
+        "denominator": "2000",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "6003",
+        "value": "6003/2000"
+      },
+      "G_x0_formula_denominator": {
+        "denominator": "10",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "9",
+        "value": "9/10"
+      },
+      "G_x1_formula_denominator": {
+        "denominator": "10",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "9",
+        "value": "9/10"
+      },
+      "gamma": {
+        "denominator": "20",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "9",
+        "value": "9/20"
+      },
+      "p": {
+        "denominator": "9",
+        "denominator_nonzero": true,
+        "nonzero": true,
+        "numerator": "20",
+        "value": "20/9"
+      }
+    },
+    "rational_denominator_nonzero_pass": true
   },
   "exact_tail_algebra": {
     "blockers_for_full_tail_certificate": [
@@ -46,6 +140,9 @@
       "does not prove exponent semigroup closure"
     ],
     "claim_scope": "fixed_branch_exact_algebra_only",
+    "code_hashes": {
+      "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
+    },
     "exact_subclaims": {
       "B": "1",
       "fixed_branch_gamma_B": true,
@@ -54,6 +151,36 @@
         "F_x1": -0.9786773280026654,
         "G_x0": 0.1111111111111111,
         "G_x1": -1.1111111111111112
+      },
+      "forced_qp_trace_exact_components": {
+        "F_x0": {
+          "denominator": "13340",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "25637",
+          "value": "25637/13340"
+        },
+        "F_x1": {
+          "denominator": "6003",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "-5875",
+          "value": "-5875/6003"
+        },
+        "G_x0": {
+          "denominator": "9",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "1",
+          "value": "1/9"
+        },
+        "G_x1": {
+          "denominator": "9",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "-10",
+          "value": "-10/9"
+        }
       },
       "forced_qp_trace_exact_rational": {
         "F_x0": "25637/13340",
@@ -68,7 +195,64 @@
         "gamma < 1/2": true
       },
       "note": "These are exact algebraic subclaims for the fixed branch only. They do not certify the infinite tail recurrence or the profile.",
-      "p": "20/9"
+      "p": "20/9",
+      "pass_conditions": {
+        "fixed_branch_gamma_B": true,
+        "gamma_in_open_wedge_2_5_1_2": true,
+        "rational_denominators_nonzero": true
+      },
+      "rational_denominator_nonzero_checks": {
+        "B": {
+          "denominator": "1",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "1",
+          "value": "1"
+        },
+        "F_x0_formula_denominator": {
+          "denominator": "400",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "667",
+          "value": "667/400"
+        },
+        "F_x1_formula_denominator": {
+          "denominator": "2000",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "6003",
+          "value": "6003/2000"
+        },
+        "G_x0_formula_denominator": {
+          "denominator": "10",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "9",
+          "value": "9/10"
+        },
+        "G_x1_formula_denominator": {
+          "denominator": "10",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "9",
+          "value": "9/10"
+        },
+        "gamma": {
+          "denominator": "20",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "9",
+          "value": "9/20"
+        },
+        "p": {
+          "denominator": "9",
+          "denominator_nonzero": true,
+          "nonzero": true,
+          "numerator": "20",
+          "value": "20/9"
+        }
+      },
+      "rational_denominator_nonzero_pass": true
     },
     "floating_profile_link": {
       "checked": true,
@@ -194,11 +378,33 @@
         "tail_legality_status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
       },
       "pass": true,
+      "pass_conditions": {
+        "B_matches_fixed_branch": true,
+        "forced_qp_F_trace_matches_exact": true,
+        "forced_qp_G_trace_matches_exact": true,
+        "forced_qp_metadata_present": true,
+        "gamma_matches_fixed_branch": true,
+        "p_matches_reciprocal_gamma": true,
+        "profile_format_supported": true,
+        "profile_supplied": true
+      },
       "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
       "tolerance": 1e-12
     },
-    "pass": true
+    "infinite_tail_recurrence_pass": false,
+    "not_certified_conditions": {
+      "infinite_tail_recurrence": false
+    },
+    "pass": true,
+    "pass_conditions": {
+      "fixed_branch_exact_algebra": true,
+      "profile_link": true
+    }
   },
+  "exact_tail_algebra_code_hashes": {
+    "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
+  },
+  "exact_tail_algebra_hash_sha256": "92d6a5ce4e271766709f7cbaf022ded01fba4e1cb2292cd145a3b244461851e3",
   "exponent_semigroup": null,
   "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
   "forced_qp_coefficients": {
@@ -236,7 +442,7 @@
   "q1_exclusion": "structural",
   "q2_policy": "zero",
   "remainder_bound": null,
-  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
+  "repo_commit": "0b3785e784d2111ce83ce1fcdc4320de24a33c04",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "tail_metadata": {

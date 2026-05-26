@@ -8,6 +8,10 @@
   ],
   "box_cover": null,
   "certificate_name": "indicial_pluecker_cover",
+  "code_hashes": {
+    "tools/validate_tail_certificates.py": "1505f6595d654293423aee7352a347592e760ce49bf936ada6441c9a569311c0",
+    "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
+  },
   "commands": [
     "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
@@ -22,7 +26,7 @@
     ]
   },
   "dependency_hashes": {
-    "tail_recurrence": "ff31dcebe8edc575be1564767a2c2c1fffdabee6746ca773ee3f13d5452c8dd0"
+    "tail_recurrence": "548a6a3cbe0cc5f417ac9719101b42c2fe81ecedf057013de38d57fd7d254eb9"
   },
   "exterior_exclusion": null,
   "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
@@ -42,7 +46,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "7f6f0f91bd2b731333b411f119637d750407e7f0",
+  "repo_commit": "0b3785e784d2111ce83ce1fcdc4320de24a33c04",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1"
 }
