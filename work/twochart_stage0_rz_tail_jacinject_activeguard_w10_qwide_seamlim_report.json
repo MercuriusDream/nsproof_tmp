@@ -1,0 +1,1642 @@
+{
+  "accepted_any_step": true,
+  "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+  "format": "twochart_newton_stage0_run_v1",
+  "history": [
+    {
+      "accepted": true,
+      "accepted_alpha": 1.0,
+      "accepted_block": "chart:tail",
+      "active_guard_points": [
+        [
+          0.9,
+          0.98
+        ],
+        [
+          0.86,
+          0.2
+        ],
+        [
+          0.9,
+          0.2
+        ],
+        [
+          0.82,
+          0.2
+        ],
+        [
+          0.76,
+          0.1
+        ],
+        [
+          0.76,
+          0.21000000000000002
+        ],
+        [
+          0.76,
+          0.32
+        ],
+        [
+          0.76,
+          0.43000000000000005
+        ],
+        [
+          0.76,
+          0.54
+        ],
+        [
+          0.76,
+          0.65
+        ],
+        [
+          0.76,
+          0.76
+        ],
+        [
+          0.76,
+          0.87
+        ],
+        [
+          0.76,
+          0.98
+        ],
+        [
+          0.78,
+          0.1
+        ],
+        [
+          0.78,
+          0.21000000000000002
+        ],
+        [
+          0.78,
+          0.32
+        ],
+        [
+          0.78,
+          0.43000000000000005
+        ],
+        [
+          0.78,
+          0.54
+        ],
+        [
+          0.78,
+          0.65
+        ],
+        [
+          0.78,
+          0.76
+        ],
+        [
+          0.78,
+          0.87
+        ],
+        [
+          0.78,
+          0.98
+        ],
+        [
+          0.8,
+          0.1
+        ],
+        [
+          0.8,
+          0.21000000000000002
+        ],
+        [
+          0.8,
+          0.32
+        ],
+        [
+          0.8,
+          0.43000000000000005
+        ],
+        [
+          0.8,
+          0.54
+        ],
+        [
+          0.8,
+          0.65
+        ],
+        [
+          0.8,
+          0.76
+        ],
+        [
+          0.8,
+          0.87
+        ],
+        [
+          0.8,
+          0.98
+        ],
+        [
+          0.8200000000000001,
+          0.1
+        ],
+        [
+          0.8200000000000001,
+          0.21000000000000002
+        ],
+        [
+          0.8200000000000001,
+          0.32
+        ],
+        [
+          0.8200000000000001,
+          0.43000000000000005
+        ],
+        [
+          0.8200000000000001,
+          0.54
+        ],
+        [
+          0.8200000000000001,
+          0.65
+        ],
+        [
+          0.8200000000000001,
+          0.76
+        ],
+        [
+          0.8200000000000001,
+          0.87
+        ],
+        [
+          0.8200000000000001,
+          0.98
+        ],
+        [
+          0.8400000000000001,
+          0.1
+        ],
+        [
+          0.8400000000000001,
+          0.21000000000000002
+        ],
+        [
+          0.8400000000000001,
+          0.32
+        ],
+        [
+          0.8400000000000001,
+          0.43000000000000005
+        ],
+        [
+          0.8400000000000001,
+          0.54
+        ],
+        [
+          0.8400000000000001,
+          0.65
+        ],
+        [
+          0.8400000000000001,
+          0.76
+        ],
+        [
+          0.8400000000000001,
+          0.87
+        ],
+        [
+          0.8400000000000001,
+          0.98
+        ],
+        [
+          0.86,
+          0.1
+        ],
+        [
+          0.86,
+          0.21000000000000002
+        ],
+        [
+          0.86,
+          0.32
+        ],
+        [
+          0.86,
+          0.43000000000000005
+        ],
+        [
+          0.86,
+          0.54
+        ],
+        [
+          0.86,
+          0.65
+        ],
+        [
+          0.86,
+          0.76
+        ],
+        [
+          0.86,
+          0.87
+        ],
+        [
+          0.86,
+          0.98
+        ],
+        [
+          0.88,
+          0.1
+        ],
+        [
+          0.88,
+          0.21000000000000002
+        ],
+        [
+          0.88,
+          0.32
+        ],
+        [
+          0.88,
+          0.43000000000000005
+        ],
+        [
+          0.88,
+          0.54
+        ],
+        [
+          0.88,
+          0.65
+        ],
+        [
+          0.88,
+          0.76
+        ],
+        [
+          0.88,
+          0.87
+        ],
+        [
+          0.88,
+          0.98
+        ],
+        [
+          0.9,
+          0.1
+        ],
+        [
+          0.9,
+          0.21000000000000002
+        ],
+        [
+          0.9,
+          0.32
+        ],
+        [
+          0.9,
+          0.43000000000000005
+        ],
+        [
+          0.9,
+          0.54
+        ],
+        [
+          0.9,
+          0.65
+        ],
+        [
+          0.9,
+          0.76
+        ],
+        [
+          0.9,
+          0.87
+        ],
+        [
+          0.92,
+          0.1
+        ],
+        [
+          0.92,
+          0.21000000000000002
+        ],
+        [
+          0.92,
+          0.32
+        ],
+        [
+          0.92,
+          0.43000000000000005
+        ],
+        [
+          0.92,
+          0.54
+        ],
+        [
+          0.92,
+          0.65
+        ],
+        [
+          0.92,
+          0.76
+        ],
+        [
+          0.92,
+          0.87
+        ],
+        [
+          0.92,
+          0.98
+        ]
+      ],
+      "active_guard_rows": 168,
+      "active_guard_weight": 10.0,
+      "base": {
+        "count": 190.0,
+        "max_abs": 3891.7366197470437,
+        "objective": 41242061.677448295,
+        "rms": 658.8831193965827
+      },
+      "base_guard_metrics": {
+        "count": 168.0,
+        "enabled": true,
+        "max_abs": 389.1736619747044,
+        "objective": 411810.2069869245,
+        "points_requested": 84,
+        "rms": 70.01787246217964,
+        "skipped": 0,
+        "worst": {
+          "abs": 389.1736619747044,
+          "b": 0.98,
+          "component": "e_psi",
+          "q": 0.88,
+          "value": 389.1736619747044
+        }
+      },
+      "block_candidate_previews": [
+        {
+          "active_columns": 12,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "delta_norm": 6.969472011354437e-05
+        }
+      ],
+      "injected_mortar_candidates": [
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 383372492.4882907,
+          "score": 383690900.6080547,
+          "var_index": 2914,
+          "variable": "tail.F_an[p24].c[0,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 379781832.6247485,
+          "score": 379865488.82895076,
+          "var_index": 2969,
+          "variable": "tail.F_an[p24].c[5,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 369076285.9905813,
+          "score": 369689028.9599716,
+          "var_index": 3024,
+          "variable": "tail.F_an[p24].c[10,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 368817327.9308591,
+          "score": 369131377.1833622,
+          "var_index": 7270,
+          "variable": "tail.F_frac[f1][p24].c[0,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 365363005.3328685,
+          "score": 365451157.62083864,
+          "var_index": 7325,
+          "variable": "tail.F_frac[f1][p24].c[5,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 355063947.83169234,
+          "score": 355645927.303046,
+          "var_index": 7380,
+          "variable": "tail.F_frac[f1][p24].c[10,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 351813151.90187216,
+          "score": 353274641.63477623,
+          "var_index": 3002,
+          "variable": "tail.F_an[p24].c[8,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 338456102.5653993,
+          "score": 339869124.2990569,
+          "var_index": 7358,
+          "variable": "tail.F_frac[f1][p24].c[8,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 327638355.52285963,
+          "score": 328472210.25838715,
+          "var_index": 2947,
+          "variable": "tail.F_an[p24].c[3,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 315199165.92608607,
+          "score": 316007932.7863744,
+          "var_index": 7303,
+          "variable": "tail.F_frac[f1][p24].c[3,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 297328264.2207076,
+          "score": 297531673.74388313,
+          "var_index": 2936,
+          "variable": "tail.F_an[p24].c[2,10]"
+        },
+        {
+          "best_row_derivative": "dZZ",
+          "best_row_score": 286039891.8607341,
+          "score": 286229555.09926367,
+          "var_index": 7292,
+          "variable": "tail.F_frac[f1][p24].c[2,10]"
+        }
+      ],
+      "iteration": 0,
+      "line_trials": [
+        {
+          "accepted": true,
+          "active_columns": 12,
+          "alpha": 1.0,
+          "alpha_applied": 1.0,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "count": 190.0,
+          "delta_norm": 6.969472011354437e-05,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 168.0,
+            "enabled": true,
+            "max_abs": 389.1736619747044,
+            "objective": 410974.26818779565,
+            "points_requested": 84,
+            "rms": 69.94677127473055,
+            "skipped": 0,
+            "worst": {
+              "abs": 389.1736619747044,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.88,
+              "value": 389.1736619747044
+            }
+          },
+          "max_abs": 3891.7366197470437,
+          "max_abs_update": 2.9413217894159883e-05,
+          "objective": 41158534.19465901,
+          "raw_growth_ok": true,
+          "raw_max_abs": 3891.7366197470437,
+          "raw_objective": 41158534.19465901,
+          "rms": 658.2155637515963,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 12,
+          "alpha": 0.25,
+          "alpha_applied": 0.25,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "count": 190.0,
+          "delta_norm": 6.969472011354437e-05,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 168.0,
+            "enabled": true,
+            "max_abs": 389.1736619747044,
+            "objective": 411417.9458538452,
+            "points_requested": 84,
+            "rms": 69.9845174930588,
+            "skipped": 0,
+            "worst": {
+              "abs": 389.1736619747044,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.88,
+              "value": 389.1736619747044
+            }
+          },
+          "max_abs": 3891.7366197470437,
+          "max_abs_update": 7.353304473539971e-06,
+          "objective": 41202850.02882051,
+          "raw_growth_ok": true,
+          "raw_max_abs": 3891.7366197470437,
+          "raw_objective": 41202850.02882051,
+          "rms": 658.5698222889428,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 12,
+          "alpha": 0.0625,
+          "alpha_applied": 0.0625,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "count": 190.0,
+          "delta_norm": 6.969472011354437e-05,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 168.0,
+            "enabled": true,
+            "max_abs": 389.1736619747044,
+            "objective": 411700.8150781325,
+            "points_requested": 84,
+            "rms": 70.00857218585148,
+            "skipped": 0,
+            "worst": {
+              "abs": 389.1736619747044,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.88,
+              "value": 389.1736619747044
+            }
+          },
+          "max_abs": 3891.7366197470437,
+          "max_abs_update": 1.8383261183849927e-06,
+          "objective": 41231125.96932658,
+          "raw_growth_ok": true,
+          "raw_max_abs": 3891.7366197470437,
+          "raw_objective": 41231125.96932658,
+          "rms": 658.7957591763178,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 12,
+          "alpha": 0.015625,
+          "alpha_applied": 0.015625,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "count": 190.0,
+          "delta_norm": 6.969472011354437e-05,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 168.0,
+            "enabled": true,
+            "max_abs": 389.1736619747044,
+            "objective": 411782.1530701491,
+            "points_requested": 84,
+            "rms": 70.01548749334212,
+            "skipped": 0,
+            "worst": {
+              "abs": 389.1736619747044,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.88,
+              "value": 389.1736619747044
+            }
+          },
+          "max_abs": 3891.7366197470437,
+          "max_abs_update": 4.595815295962482e-07,
+          "objective": 41239257.148121834,
+          "raw_growth_ok": true,
+          "raw_max_abs": 3891.7366197470437,
+          "raw_objective": 41239257.148121834,
+          "rms": 658.8607164374276,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        },
+        {
+          "accepted": true,
+          "active_columns": 12,
+          "alpha": 0.00390625,
+          "alpha_applied": 0.00390625,
+          "block": "chart:tail",
+          "column_scaling": {
+            "active_columns": 12,
+            "column_norm_max": 5203321116.000837,
+            "column_norm_min": 1614063567.3242483,
+            "column_scale_max": 6.195542853728948e-10,
+            "column_scale_min": 1.9218494836401312e-10,
+            "total_columns": 24
+          },
+          "count": 190.0,
+          "delta_norm": 6.969472011354437e-05,
+          "guard_growth_ok": true,
+          "guard_metrics": {
+            "count": 168.0,
+            "enabled": true,
+            "max_abs": 389.1736619747044,
+            "objective": 411803.1494172501,
+            "points_requested": 84,
+            "rms": 70.0172724793208,
+            "skipped": 0,
+            "worst": {
+              "abs": 389.1736619747044,
+              "b": 0.98,
+              "component": "e_psi",
+              "q": 0.88,
+              "value": 389.1736619747044
+            }
+          },
+          "max_abs": 3891.7366197470437,
+          "max_abs_update": 1.1489538239906204e-07,
+          "objective": 41241356.13554748,
+          "raw_growth_ok": true,
+          "raw_max_abs": 3891.7366197470437,
+          "raw_objective": 41241356.13554748,
+          "rms": 658.8774835042709,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 120,
+      "post_pool_candidate_count": 184,
+      "pre_score_candidate_count": 2994,
+      "raw_residual_metrics": {
+        "count": 190.0,
+        "max_abs": 3891.7366197470437,
+        "objective": 41242061.677448295,
+        "rms": 658.8831193965827
+      },
+      "row_groups": {
+        "active_guard": 168,
+        "mortar": 10,
+        "pde": 12
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 11,
+        "origin.G_origin_taylor": 1,
+        "tail.F_an": 6,
+        "tail.F_frac": 6
+      },
+      "selected_by_chart": {
+        "origin": 12,
+        "tail": 12
+      },
+      "selected_variables": 24,
+      "solve_mode": "block-search",
+      "variable_score_preview": [
+        {
+          "score": 383690900.6080547,
+          "variable": "tail.F_an[p24].c[0,10]"
+        },
+        {
+          "score": 23328889.47089305,
+          "variable": "origin.F_origin_taylor[6,0]"
+        },
+        {
+          "score": 379865488.82895076,
+          "variable": "tail.F_an[p24].c[5,10]"
+        },
+        {
+          "score": 4414821.775329276,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "score": 369689028.9599716,
+          "variable": "tail.F_an[p24].c[10,10]"
+        },
+        {
+          "score": 1664506.536351017,
+          "variable": "origin.F_origin_taylor[5,1]"
+        },
+        {
+          "score": 369131377.1833622,
+          "variable": "tail.F_frac[f1][p24].c[0,10]"
+        },
+        {
+          "score": 718701.2782211334,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 365451157.62083864,
+          "variable": "tail.F_frac[f1][p24].c[5,10]"
+        },
+        {
+          "score": 416364.6732065436,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "score": 355645927.303046,
+          "variable": "tail.F_frac[f1][p24].c[10,10]"
+        },
+        {
+          "score": 146492.21660493826,
+          "variable": "origin.F_origin_taylor[4,2]"
+        }
+      ]
+    }
+  ],
+  "input": "work/v117_twochart_init.json",
+  "newton_executed": true,
+  "optimization_faked": false,
+  "out": "work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim.json",
+  "requested_solver": {
+    "active_guard_weight": 10.0,
+    "block_search_labels": "chart:tail",
+    "blocks": [
+      "origin",
+      "interface"
+    ],
+    "candidate_kq_max": 6,
+    "candidate_kx_max": 6,
+    "candidate_origin_degree_max": 6,
+    "candidate_pool_limit": 160,
+    "chart_balanced_selection": true,
+    "forced_tol": 1e-12,
+    "guard_grid": "edge",
+    "guard_grid_b_range": [
+      0.1,
+      0.98
+    ],
+    "guard_grid_q_range": [
+      0.76,
+      0.92
+    ],
+    "guard_grid_samples": [
+      9,
+      9
+    ],
+    "guard_qb_points": [
+      [
+        0.9,
+        0.98
+      ],
+      [
+        0.86,
+        0.2
+      ],
+      [
+        0.9,
+        0.2
+      ],
+      [
+        0.82,
+        0.2
+      ],
+      [
+        0.76,
+        0.1
+      ],
+      [
+        0.76,
+        0.21000000000000002
+      ],
+      [
+        0.76,
+        0.32
+      ],
+      [
+        0.76,
+        0.43000000000000005
+      ],
+      [
+        0.76,
+        0.54
+      ],
+      [
+        0.76,
+        0.65
+      ],
+      [
+        0.76,
+        0.76
+      ],
+      [
+        0.76,
+        0.87
+      ],
+      [
+        0.76,
+        0.98
+      ],
+      [
+        0.78,
+        0.1
+      ],
+      [
+        0.78,
+        0.21000000000000002
+      ],
+      [
+        0.78,
+        0.32
+      ],
+      [
+        0.78,
+        0.43000000000000005
+      ],
+      [
+        0.78,
+        0.54
+      ],
+      [
+        0.78,
+        0.65
+      ],
+      [
+        0.78,
+        0.76
+      ],
+      [
+        0.78,
+        0.87
+      ],
+      [
+        0.78,
+        0.98
+      ],
+      [
+        0.8,
+        0.1
+      ],
+      [
+        0.8,
+        0.21000000000000002
+      ],
+      [
+        0.8,
+        0.32
+      ],
+      [
+        0.8,
+        0.43000000000000005
+      ],
+      [
+        0.8,
+        0.54
+      ],
+      [
+        0.8,
+        0.65
+      ],
+      [
+        0.8,
+        0.76
+      ],
+      [
+        0.8,
+        0.87
+      ],
+      [
+        0.8,
+        0.98
+      ],
+      [
+        0.8200000000000001,
+        0.1
+      ],
+      [
+        0.8200000000000001,
+        0.21000000000000002
+      ],
+      [
+        0.8200000000000001,
+        0.32
+      ],
+      [
+        0.8200000000000001,
+        0.43000000000000005
+      ],
+      [
+        0.8200000000000001,
+        0.54
+      ],
+      [
+        0.8200000000000001,
+        0.65
+      ],
+      [
+        0.8200000000000001,
+        0.76
+      ],
+      [
+        0.8200000000000001,
+        0.87
+      ],
+      [
+        0.8200000000000001,
+        0.98
+      ],
+      [
+        0.8400000000000001,
+        0.1
+      ],
+      [
+        0.8400000000000001,
+        0.21000000000000002
+      ],
+      [
+        0.8400000000000001,
+        0.32
+      ],
+      [
+        0.8400000000000001,
+        0.43000000000000005
+      ],
+      [
+        0.8400000000000001,
+        0.54
+      ],
+      [
+        0.8400000000000001,
+        0.65
+      ],
+      [
+        0.8400000000000001,
+        0.76
+      ],
+      [
+        0.8400000000000001,
+        0.87
+      ],
+      [
+        0.8400000000000001,
+        0.98
+      ],
+      [
+        0.86,
+        0.1
+      ],
+      [
+        0.86,
+        0.21000000000000002
+      ],
+      [
+        0.86,
+        0.32
+      ],
+      [
+        0.86,
+        0.43000000000000005
+      ],
+      [
+        0.86,
+        0.54
+      ],
+      [
+        0.86,
+        0.65
+      ],
+      [
+        0.86,
+        0.76
+      ],
+      [
+        0.86,
+        0.87
+      ],
+      [
+        0.86,
+        0.98
+      ],
+      [
+        0.88,
+        0.1
+      ],
+      [
+        0.88,
+        0.21000000000000002
+      ],
+      [
+        0.88,
+        0.32
+      ],
+      [
+        0.88,
+        0.43000000000000005
+      ],
+      [
+        0.88,
+        0.54
+      ],
+      [
+        0.88,
+        0.65
+      ],
+      [
+        0.88,
+        0.76
+      ],
+      [
+        0.88,
+        0.87
+      ],
+      [
+        0.88,
+        0.98
+      ],
+      [
+        0.9,
+        0.1
+      ],
+      [
+        0.9,
+        0.21000000000000002
+      ],
+      [
+        0.9,
+        0.32
+      ],
+      [
+        0.9,
+        0.43000000000000005
+      ],
+      [
+        0.9,
+        0.54
+      ],
+      [
+        0.9,
+        0.65
+      ],
+      [
+        0.9,
+        0.76
+      ],
+      [
+        0.9,
+        0.87
+      ],
+      [
+        0.92,
+        0.1
+      ],
+      [
+        0.92,
+        0.21000000000000002
+      ],
+      [
+        0.92,
+        0.32
+      ],
+      [
+        0.92,
+        0.43000000000000005
+      ],
+      [
+        0.92,
+        0.54
+      ],
+      [
+        0.92,
+        0.65
+      ],
+      [
+        0.92,
+        0.76
+      ],
+      [
+        0.92,
+        0.87
+      ],
+      [
+        0.92,
+        0.98
+      ]
+    ],
+    "guard_qb_points_explicit": [
+      [
+        0.9,
+        0.98
+      ],
+      [
+        0.86,
+        0.2
+      ],
+      [
+        0.9,
+        0.2
+      ],
+      [
+        0.8999999999999999,
+        0.2
+      ],
+      [
+        0.82,
+        0.2
+      ]
+    ],
+    "guard_qb_points_generated": [
+      [
+        0.76,
+        0.1
+      ],
+      [
+        0.76,
+        0.21000000000000002
+      ],
+      [
+        0.76,
+        0.32
+      ],
+      [
+        0.76,
+        0.43000000000000005
+      ],
+      [
+        0.76,
+        0.54
+      ],
+      [
+        0.76,
+        0.65
+      ],
+      [
+        0.76,
+        0.76
+      ],
+      [
+        0.76,
+        0.87
+      ],
+      [
+        0.76,
+        0.98
+      ],
+      [
+        0.78,
+        0.1
+      ],
+      [
+        0.78,
+        0.21000000000000002
+      ],
+      [
+        0.78,
+        0.32
+      ],
+      [
+        0.78,
+        0.43000000000000005
+      ],
+      [
+        0.78,
+        0.54
+      ],
+      [
+        0.78,
+        0.65
+      ],
+      [
+        0.78,
+        0.76
+      ],
+      [
+        0.78,
+        0.87
+      ],
+      [
+        0.78,
+        0.98
+      ],
+      [
+        0.8,
+        0.1
+      ],
+      [
+        0.8,
+        0.21000000000000002
+      ],
+      [
+        0.8,
+        0.32
+      ],
+      [
+        0.8,
+        0.43000000000000005
+      ],
+      [
+        0.8,
+        0.54
+      ],
+      [
+        0.8,
+        0.65
+      ],
+      [
+        0.8,
+        0.76
+      ],
+      [
+        0.8,
+        0.87
+      ],
+      [
+        0.8,
+        0.98
+      ],
+      [
+        0.8200000000000001,
+        0.1
+      ],
+      [
+        0.8200000000000001,
+        0.21000000000000002
+      ],
+      [
+        0.8200000000000001,
+        0.32
+      ],
+      [
+        0.8200000000000001,
+        0.43000000000000005
+      ],
+      [
+        0.8200000000000001,
+        0.54
+      ],
+      [
+        0.8200000000000001,
+        0.65
+      ],
+      [
+        0.8200000000000001,
+        0.76
+      ],
+      [
+        0.8200000000000001,
+        0.87
+      ],
+      [
+        0.8200000000000001,
+        0.98
+      ],
+      [
+        0.8400000000000001,
+        0.1
+      ],
+      [
+        0.8400000000000001,
+        0.21000000000000002
+      ],
+      [
+        0.8400000000000001,
+        0.32
+      ],
+      [
+        0.8400000000000001,
+        0.43000000000000005
+      ],
+      [
+        0.8400000000000001,
+        0.54
+      ],
+      [
+        0.8400000000000001,
+        0.65
+      ],
+      [
+        0.8400000000000001,
+        0.76
+      ],
+      [
+        0.8400000000000001,
+        0.87
+      ],
+      [
+        0.8400000000000001,
+        0.98
+      ],
+      [
+        0.86,
+        0.1
+      ],
+      [
+        0.86,
+        0.21000000000000002
+      ],
+      [
+        0.86,
+        0.32
+      ],
+      [
+        0.86,
+        0.43000000000000005
+      ],
+      [
+        0.86,
+        0.54
+      ],
+      [
+        0.86,
+        0.65
+      ],
+      [
+        0.86,
+        0.76
+      ],
+      [
+        0.86,
+        0.87
+      ],
+      [
+        0.86,
+        0.98
+      ],
+      [
+        0.88,
+        0.1
+      ],
+      [
+        0.88,
+        0.21000000000000002
+      ],
+      [
+        0.88,
+        0.32
+      ],
+      [
+        0.88,
+        0.43000000000000005
+      ],
+      [
+        0.88,
+        0.54
+      ],
+      [
+        0.88,
+        0.65
+      ],
+      [
+        0.88,
+        0.76
+      ],
+      [
+        0.88,
+        0.87
+      ],
+      [
+        0.88,
+        0.98
+      ],
+      [
+        0.9,
+        0.1
+      ],
+      [
+        0.9,
+        0.21000000000000002
+      ],
+      [
+        0.9,
+        0.32
+      ],
+      [
+        0.9,
+        0.43000000000000005
+      ],
+      [
+        0.9,
+        0.54
+      ],
+      [
+        0.9,
+        0.65
+      ],
+      [
+        0.9,
+        0.76
+      ],
+      [
+        0.9,
+        0.87
+      ],
+      [
+        0.9,
+        0.98
+      ],
+      [
+        0.92,
+        0.1
+      ],
+      [
+        0.92,
+        0.21000000000000002
+      ],
+      [
+        0.92,
+        0.32
+      ],
+      [
+        0.92,
+        0.43000000000000005
+      ],
+      [
+        0.92,
+        0.54
+      ],
+      [
+        0.92,
+        0.65
+      ],
+      [
+        0.92,
+        0.76
+      ],
+      [
+        0.92,
+        0.87
+      ],
+      [
+        0.92,
+        0.98
+      ]
+    ],
+    "include_origin_constants": false,
+    "line_search": [
+      1.0,
+      0.25,
+      0.0625,
+      0.015625,
+      0.00390625
+    ],
+    "line_search_eval": "objective-only",
+    "lm_lambda": 1e-06,
+    "max_guard_max_growth": 1.0,
+    "max_guard_objective_growth": 1.0,
+    "max_iter": 1,
+    "max_raw_objective_growth": 1.0,
+    "max_variables": 24,
+    "mortar_active_count": 12,
+    "mortar_coordinates": "RZ",
+    "mortar_jacobian_candidate_count": 24,
+    "mortar_order": 2,
+    "mortar_q_samples": 2,
+    "mortar_weight": 0.01,
+    "mortar_x_samples": 5,
+    "overlap_q_range": [
+      0.84,
+      0.92
+    ],
+    "pde_qb_points": [
+      [
+        0.9,
+        0.95
+      ],
+      [
+        0.9625,
+        0.05
+      ],
+      [
+        0.98,
+        0.02
+      ],
+      [
+        0.98,
+        0.92
+      ],
+      [
+        0.64,
+        0.20583333333333334
+      ],
+      [
+        0.495,
+        0.18
+      ]
+    ],
+    "pde_weight": 1.0,
+    "q2_policy": "zero",
+    "q2_tol": 1e-12,
+    "residual_kind": "normalized-structural",
+    "row_normalization": "none",
+    "row_normalization_floor": 1e-12,
+    "row_scale_max": 1000000.0,
+    "row_scale_min": 0.0,
+    "solve_mode": "block-search",
+    "tail_gate_samples_per_patch": 9,
+    "trust": 0.001,
+    "variable_charts": [
+      "tail",
+      "origin"
+    ]
+  },
+  "status": "TWOCHART_NEWTON_STAGE0_ANALYTIC_GN_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_coeff_error": 0.0,
+    "gamma": 0.45,
+    "note": "Formal tail recurrence gate only: q1-zero, first forced q^(1/gamma), and zero ordinary q^2 trace are checked. This is not an interval proof.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}

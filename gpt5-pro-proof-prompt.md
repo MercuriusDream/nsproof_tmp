@@ -12,6 +12,12 @@ https://github.com/MercuriusDream/nsproof_tmp
 
 If you cannot access the repository directly, ask me to provide the current files. The required context is also inlined below, so you should still be able to produce a complete response.
 
+This prompt is intended to be the canonical self-contained handoff. Every time
+the repository gains a meaningful diagnostic result, solver feature, certificate
+attempt, or branch-kill decision, update this prompt before sending it to
+ChatGPT/GPT-5 Pro. Do not rely on hidden chat history. Inline the latest
+artifacts, numerical results, branch interpretation, and next commands here.
+
 ## 1. Objective
 
 The final objective is not a low residual, not a plausible numerical profile, and not a conditional theorem. The final objective is a complete proof package for a finite-energy Navier-Stokes blow-up construction through an unstable self-similar saddle profile.
@@ -115,6 +121,10 @@ uses column-scaled damped normal equations,
 uses a trust/line search,
 locks all q=0 tail coefficients so q1/forced-qp/q2-zero gates cannot be silently damaged,
 rechecks the floating tail gate on every trial.
+supports chart/component/block restricted line-search via --solve-mode block-search,
+supports broad generated guard grids via --guard-grid edge|box,
+supports opt-in active guard PDE rows via --active-guard-weight,
+supports objective-only line-search scoring via --line-search-eval objective-only.
 ```
 
 `validators/twochart_mortar_jacobian.py` now supports both old q/x rows and
@@ -151,6 +161,10 @@ work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_mortar_rows.json
 work/twochart_stage0_rz_blocksearch24_tail_jacinject_guardedge_report.json
 work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
 work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_report.json
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_residual.json
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_report.json
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
@@ -220,6 +234,24 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
     hidden edge q=0.86,b=0.20 remains worst guard
     guard max is still 1.241904721621e3 at alpha=0.00390625
     baseline broad-guard max is 3.891736619747e2
+  active guard rows plus objective-only line-search:
+    active guard rows are now added after variable selection, so the edge grid
+    constrains the least-squares direction without entering expensive candidate scoring.
+    objective-only line-search avoids rebuilding candidate/Jacobian selection on each trial.
+    This made the active-edge experiment feasible, but it did not produce profile progress.
+    w1 active guard accepted a tail step; held-out edge max = 5.516786077531e4 at q=0.90,b=0.20.
+    w1 low-b explicit guard accepted; held-out edge max = 3.162227861431e4 at q=0.90,b=0.20.
+    w1 widened-q guard accepted; held-out edge max = 1.778391689505e3 at q=0.82,b=0.20.
+    w10 widened-q guard accepted; held-out edge max = 1.255394972997e3 at q=0.90,b=0.20.
+    w10 seam-limit guard accepted using q=0.8999999999999999,b=0.20 as an explicit tail-side guard.
+    w10 seam-limit sampled objective = 4.124206167745e7 -> 4.115853419466e7.
+    w10 seam-limit active guard rows = 168.
+    w10 seam-limit held-out edge max = 3.119540552543e4 at q=0.78,b=0.20.
+    w10 seam-limit origin max = 9.132494634431e1.
+    w10 seam-limit overlap max = 3.239718884452e2.
+    w10 seam-limit C0-C2 R,Z mortar max remains 4.214529161145e3.
+    The pathology is mobile: guarding q=0.90,b=0.20 or the tail-side
+    q=0.8999999999999999,b=0.20 shifts the damage to another low-b edge point.
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -229,7 +261,8 @@ standard = 1.016228983517e1
 secondary = 1.422825475247e1
 origin = 9.132492825929e1
 overlap = 3.239719410176e2
-edge = 4.489150149273e2
+edge baseline = 4.489150149273e2
+edge after latest accepted active-guard seam-limit tail step = 3.119540552543e4
 C0-C2 R,Z mortar max = 4.214529161145e3
 ```
 
@@ -251,10 +284,16 @@ The first restricted block-search changes that: guarded origin-chart substeps
 produce safe descent for origin/overlap/guard, but not for the worst R/Z mortar
 row. Seam-Jacobian injection then shows why: the worst row is reachable through
 high-degree tail variables, but those tail directions create severe hidden-edge
-damage. A broad guard grid now catches the same conflict down to tiny line-search
-steps, so the next viable solver fork is to make those broad edge rows active in
-the linear system or implement a guarded KKT/Schur correction. This is safe
-Stage-0 progress, not a Newton basin.
+damage. A broad guard grid catches the same conflict down to tiny line-search
+steps. Opt-in active guard rows make the active-edge experiment computationally
+feasible, but the accepted tail steps still leave mobile hidden-edge spikes and
+do not reduce the worst C0-C2 R/Z mortar row. The q=0.90 versus
+q=0.8999999999999999 tests also show a one-sided seam-switch sensitivity: the
+origin-side sample can look moderate while the tail-side seam-limit sample is
+large. The next viable solver fork is explicit two-sided seam-limit guard
+generation plus a cached KKT/Schur-style correction that computes seam descent
+inside the edge-feasible tangent space. This is safe Stage-0 infrastructure
+progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -271,7 +310,8 @@ evidence explicitly. The next proposed computation must target that diagnosis.
 The immediate solver fork is:
 
 ```text
-broad edge guard / regularized tail variables / Schur-complement coupled seam solve.
+two-sided seam-limit guard generation / cached active-row evaluation /
+guarded KKT-Schur coupled seam solve.
 ```
 
 Do not propose more sparse bumps, origin-only refits, or one-chart polishing as
@@ -779,6 +819,19 @@ next active-edge attempt should first cache row/column evaluations or introduce
 a dedicated guarded KKT/Schur mode; otherwise the experiment is too expensive
 for the current CLI loop.
 
+Latest active-guard update: `--active-guard-weight` and
+`--line-search-eval objective-only` were added to make the active-edge
+experiment cheaper. The resulting active-guard tail steps are still not profile
+progress. The best documented seam-limit variant,
+`work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_report.json`,
+uses 168 active guard rows and accepts a tiny objective reduction
+`4.124206167745e7 -> 4.115853419466e7`, but its held-out residual scan
+`work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json`
+has edge max `3.119540552543e4` at `q=0.78,b=0.20` and unchanged C0-C2 R/Z
+mortar max `4.214529161145e3`. Therefore active guard rows are useful
+infrastructure, but not the missing solver. The next implementation must add
+two-sided seam-limit guard generation and a cached guarded KKT/Schur correction.
+
 ## 6. Current Repository Tooling
 
 The repository has these relevant tools and validators:
@@ -786,6 +839,7 @@ The repository has these relevant tools and validators:
 ```text
 tools/profile_project_cheb.py
 tools/profile_newton_cheb.py
+tools/profile_newton_twochart.py
 tools/profile_newton_adaptive.py
 tools/profile_projected_hardpoints.py
 tools/validate_tail.py
@@ -795,6 +849,8 @@ tools/profile_zero_q2_trace.py
 tools/validate_indicial_evans.py
 tools/linearized_spectrum_probe.py
 validators/compactified_equations.py
+validators/compactified_equations_twochart.py
+validators/twochart_mortar_jacobian.py
 validators/tail_transseries.py
 validators/tail_formal_recurrence.py
 validators/pluecker.py
@@ -828,6 +884,19 @@ validators/compactified_equations.py:
 validators/tail_formal_recurrence.py:
   conservatively accepts only currently derived tail facts and flags ordinary
   q^2 as unvalidated by default.
+
+tools/profile_newton_twochart.py:
+  supports q2-zero locked Stage-0 two-chart diagnostics,
+  physical R/Z mortar rows,
+  analytic sampled PDE Jacobian rows,
+  chart-balanced variable selection,
+  block-search line-search,
+  broad guard grids,
+  active guard rows,
+  objective-only line-search scoring.
+
+validators/compactified_equations_twochart.py and validators/twochart_mortar_jacobian.py:
+  provide floating two-chart residual and R/Z mortar Jacobian diagnostics.
 ```
 
 The current tools are discovery/proof-scaffold tools. They are not yet interval proof tools.
@@ -1333,93 +1402,80 @@ python3 tools/profile_newton_twochart.py \
   --line-search 1,0.5,0.25,0.125,0.0625
 ```
 
-Given the latest origin-only R/Z refit evidence, the next commands should not
-be more isolated origin refits. They should test coupled conditioning and
-variable blocking:
+Given the latest active-guard evidence, the next work should not be more
+isolated origin refits, more sparse bumps, or another one-sided guard sample.
+The broad guard and active-guard probes already show that the seam damage is
+mobile across low-`b` edge points and that `q=0.90` versus
+`q=0.8999999999999999` can change which chart side is sampled. The immediate
+implementation work is:
+
+```text
+1. Add explicit two-sided seam-limit guard generation, e.g.
+   q=q_switch-eps and q=q_switch+eps for the same b grid, with eps recorded
+   in the report. Do not rely on decimal q=0.90 as a chart-side proxy.
+
+2. Cache row/column evaluations for selected variables and selected q,b/mortar
+   rows so active guard rows can be used without repeated full system rebuilds.
+
+3. Add a guarded KKT/Schur solve mode:
+   - primary equation: reduce active R/Z seam mortar rows;
+   - constraints: no growth in broad edge/seam-limit PDE rows and no tail-gate
+     damage;
+   - regularization: penalize high-degree tail coefficients that create edge
+     oscillation;
+   - fallback: if the KKT system is singular, return a certificate of rank
+     deficiency and the offending row/column subspace.
+
+4. Only after that implementation exists, run a new Stage-0 diagnostic of the
+   following form.
+```
 
 ```bash
-# Branch A: canonical broad-grid guarded seam-Jacobian injection. This is a
-# diagnostic rejection test, not a proof candidate.
 python3 tools/profile_newton_twochart.py \
   --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_rz_tail_jacinject_guardgrid_edge.json \
-  --report-out work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json \
-  --blocks origin,interface \
+  --out work/twochart_stage0_rz_kkt_seamlimit.json \
+  --report-out work/twochart_stage0_rz_kkt_seamlimit_report.json \
+  --blocks tail,origin,interface \
   --variable-charts tail,origin \
-  --solve-mode block-search \
-  --block-search-labels chart:tail \
-  --chart-balanced-selection \
-  --max-raw-objective-growth 1 \
-  --guard-qb-points "0.90,0.98;0.86,0.20" \
+  --solve-mode guarded-kkt \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-coordinates RZ \
+  --mortar-order 2 \
+  --mortar-q-samples 2 \
+  --mortar-x-samples 5 \
+  --mortar-active-count 12 \
+  --mortar-jacobian-candidate-count 64 \
   --guard-grid edge \
-  --guard-q-min 0.84 --guard-q-max 0.92 \
+  --guard-q-min 0.76 --guard-q-max 0.92 \
   --guard-b-min 0.10 --guard-b-max 0.98 \
-  --guard-q-samples 5 --guard-b-samples 9 \
+  --guard-q-samples 9 --guard-b-samples 9 \
+  --guard-seam-sides both \
+  --guard-seam-q 0.90 \
+  --guard-seam-eps 1e-12 \
+  --active-guard-weight 10 \
+  --line-search-eval objective-only \
+  --row-normalization none \
+  --max-raw-objective-growth 1 \
   --max-guard-objective-growth 1 \
   --max-guard-max-growth 1 \
-  --gamma-fixed --B-fixed \
-  --residual-kind normalized-structural \
-  --q2-policy zero \
-  --mortar-coordinates RZ \
-  --mortar-order 2 \
-  --mortar-q-samples 2 \
-  --mortar-x-samples 5 \
-  --mortar-active-count 12 \
-  --max-variables 24 \
-  --candidate-origin-degree-max 6 \
-  --candidate-kq-max 6 \
-  --candidate-kx-max 6 \
-  --candidate-pool-limit 160 \
-  --mortar-jacobian-candidate-count 24 \
-  --max-iter 1 \
-  --trust 0.001 \
-  --lm-lambda 1e-6 \
-  --pde-weight 1 \
-  --mortar-weight 0.01 \
-  --line-search 1,0.25,0.0625,0.015625,0.00390625 \
-  --pde-qb-points "0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18"
-
-# Branch B: only after adding row/column caching or guarded-KKT support, make
-# the broad edge grid active PDE data, not only a guard. The current uncached
-# CLI loop is too expensive for this command as a routine run.
-python3 tools/profile_newton_twochart.py \
-  --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_rz_tail_jacinject_edgeactive64.json \
-  --report-out work/twochart_stage0_rz_tail_jacinject_edgeactive64_report.json \
-  --blocks tail,interface \
-  --variable-charts tail \
-  --solve-mode full \
-  --gamma-fixed --B-fixed \
-  --residual-kind normalized-structural \
-  --q2-policy zero \
-  --mortar-coordinates RZ \
-  --mortar-order 2 \
-  --mortar-q-samples 2 \
-  --mortar-x-samples 5 \
-  --mortar-active-count 12 \
   --max-variables 64 \
-  --candidate-origin-degree-max 6 \
+  --candidate-origin-degree-max 8 \
   --candidate-kq-max 10 \
   --candidate-kx-max 10 \
   --candidate-pool-limit 0 \
-  --mortar-jacobian-candidate-count 64 \
-  --chart-balanced-selection \
-  --max-iter 1 \
+  --max-iter 3 \
   --trust 0.001 \
   --lm-lambda 1e-6 \
   --pde-weight 1 \
   --mortar-weight 0.01 \
-  --line-search 1,0.25,0.0625,0.015625,0.00390625 \
-  --guard-qb-points "0.90,0.98;0.86,0.20" \
-  --guard-grid edge \
-  --guard-q-min 0.84 --guard-q-max 0.92 \
-  --guard-b-min 0.10 --guard-b-max 0.98 \
-  --guard-q-samples 5 --guard-b-samples 9 \
-  --max-raw-objective-growth 1 \
-  --max-guard-objective-growth 1 \
-  --max-guard-max-growth 1 \
-  --pde-qb-points "0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18;0.84,0.10;0.84,0.20;0.84,0.54;0.84,0.98;0.86,0.10;0.86,0.20;0.86,0.54;0.86,0.98;0.88,0.10;0.88,0.20;0.88,0.54;0.88,0.98;0.90,0.10;0.90,0.20;0.90,0.54;0.90,0.98;0.92,0.10;0.92,0.20;0.92,0.54;0.92,0.98"
+  --line-search 1,0.25,0.0625,0.015625,0.00390625
 ```
+
+The flags `--solve-mode guarded-kkt`, `--guard-seam-sides`,
+`--guard-seam-q`, and `--guard-seam-eps` are not yet implemented as of this
+prompt update. They are the requested next interface, not current CLI facts.
 
 Stage-0 go criterion:
 

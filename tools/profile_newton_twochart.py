@@ -160,6 +160,13 @@ def positive_float(value: str) -> float:
     return parsed
 
 
+def nonnegative_float(value: str) -> float:
+    parsed = float(value)
+    if parsed < 0.0:
+        raise argparse.ArgumentTypeError("must be nonnegative")
+    return parsed
+
+
 def parse_float_list(raw: str) -> list[float]:
     return [float(item.strip()) for item in raw.split(",") if item.strip()]
 
@@ -745,7 +752,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     residual_vector: list[float] = []
     jacobian_rows: list[list[float]] = []
     row_labels: list[str] = []
-    row_groups: dict[str, int] = {"pde": 0, "mortar": 0}
+    row_groups: dict[str, int] = {"pde": 0, "mortar": 0, "active_guard": 0}
 
     for row in pde_rows:
         q = float(row["q"])
@@ -760,10 +767,12 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         row_labels.append("pde")
         row_groups["pde"] += 1
 
+    objective_mortar_rows: list[Any] = []
     for row in mortar_rows:
         active_entries = [(selected_index[var_index], value) for var_index, value in row.jacobian if var_index in selected_index]
         if not active_entries:
             continue
+        objective_mortar_rows.append(row)
         residual_vector.append(args.mortar_weight * row.residual)
         jac_row = [0.0 for _ in selected]
         for column_index, value in active_entries:
@@ -772,6 +781,29 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         row_labels.append("mortar")
         row_groups["mortar"] += 1
 
+    active_guard_points = guard_qb_points_from_args(args)["combined"] if args.active_guard_weight > 0.0 else []
+    objective_active_guard_points: list[tuple[float, float]] = []
+    active_guard_rows_added = 0
+    if active_guard_points:
+        for q, b in active_guard_points:
+            if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+                continue
+            objective_active_guard_points.append((q, b))
+            r, z = qb_to_rz(q, b)
+            raw = projection.exact_residual_at(r, z)
+            residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+            for component, value in (("e_psi", residual.e_psi), ("e_gamma", residual.e_gamma)):
+                jac_row: list[float] = []
+                for variable in selected:
+                    column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
+                    jac_row.append(
+                        args.active_guard_weight * (column.e_psi if component == "e_psi" else column.e_gamma)
+                    )
+                jacobian_rows.append(jac_row)
+                residual_vector.append(args.active_guard_weight * value)
+                row_labels.append("active_guard")
+                active_guard_rows_added += 1
+                row_groups["active_guard"] += 1
     raw_metrics = vector_metrics(residual_vector)
     jacobian_rows, residual_vector, row_scaling = stage0_row_scaling(jacobian_rows, residual_vector, row_labels, args)
     selected_by_chart: dict[str, int] = {}
@@ -788,6 +820,11 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "raw_residual_metrics": raw_metrics,
         "row_scaling": row_scaling,
         "row_groups": row_groups,
+        "active_guard_rows": active_guard_rows_added,
+        "active_guard_points": [[q, b] for q, b in objective_active_guard_points],
+        "objective_pde_rows": pde_rows,
+        "objective_mortar_rows": objective_mortar_rows,
+        "objective_active_guard_points": objective_active_guard_points,
         "selected_by_chart": selected_by_chart,
         "selected_by_block": selected_by_block,
         "mortar_coordinates": args.mortar_coordinates,
@@ -801,6 +838,38 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             for variable in selected[:12]
         ],
     }
+
+
+def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespace, system: dict[str, Any]) -> dict[str, float]:
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import projection_from_twochart
+    from validators.twochart_mortar_jacobian import residual_for_row
+
+    projection = projection_from_twochart(data)
+    values: list[float] = []
+    for row in system["objective_pde_rows"]:
+        q = float(row["q"])
+        b = float(row["b"])
+        if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+            continue
+        r, z = qb_to_rz(q, b)
+        raw = projection.exact_residual_at(r, z)
+        residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+        component = str(row["component"])
+        value = residual.e_psi if component == "e_psi" else residual.e_gamma
+        values.append(args.pde_weight * value)
+    for row in system["objective_mortar_rows"]:
+        values.append(args.mortar_weight * residual_for_row(data, row))
+    if args.active_guard_weight > 0.0:
+        for q, b in system["objective_active_guard_points"]:
+            if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+                continue
+            r, z = qb_to_rz(q, b)
+            raw = projection.exact_residual_at(r, z)
+            residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+            values.append(args.active_guard_weight * residual.e_psi)
+            values.append(args.active_guard_weight * residual.e_gamma)
+    return vector_metrics(values)
 
 
 def normal_step(
@@ -979,9 +1048,13 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         }
                     )
                     continue
-                trial_system = build_stage0_system(trial_data, args, blocks)
-                trial_metrics = vector_metrics(trial_system["residual_vector"])
-                trial_raw_metrics = trial_system["raw_residual_metrics"]
+                if args.line_search_eval == "objective-only":
+                    trial_metrics = evaluate_stage0_objective_only(trial_data, args, system)
+                    trial_raw_metrics = trial_metrics
+                else:
+                    trial_system = build_stage0_system(trial_data, args, blocks)
+                    trial_metrics = vector_metrics(trial_system["residual_vector"])
+                    trial_raw_metrics = trial_system["raw_residual_metrics"]
                 trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
                 raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
                     base_raw_metrics["objective"], 1e-300
@@ -1044,6 +1117,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
                 "mortar_rows_active": system["mortar_rows_active"],
+                "active_guard_weight": args.active_guard_weight,
+                "active_guard_rows": system["active_guard_rows"],
+                "active_guard_points": system["active_guard_points"],
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
@@ -1103,6 +1179,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "block_search_labels": args.block_search_labels,
             "max_guard_objective_growth": args.max_guard_objective_growth,
             "max_guard_max_growth": args.max_guard_max_growth,
+            "active_guard_weight": args.active_guard_weight,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -1115,6 +1192,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "pde_weight": args.pde_weight,
             "mortar_weight": args.mortar_weight,
             "line_search": args.line_search,
+            "line_search_eval": args.line_search_eval,
             "include_origin_constants": args.include_origin_constants,
             "chart_balanced_selection": args.chart_balanced_selection,
             "row_normalization": args.row_normalization,
@@ -1178,7 +1256,9 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guard_grid_q_range": [args.guard_q_min, args.guard_q_max],
             "guard_grid_b_range": [args.guard_b_min, args.guard_b_max],
             "guard_grid_samples": [args.guard_q_samples, args.guard_b_samples],
+            "active_guard_weight": args.active_guard_weight,
             "row_normalization": args.row_normalization,
+            "line_search_eval": args.line_search_eval,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -1253,6 +1333,16 @@ def main() -> None:
     parser.add_argument("--guard-b-samples", type=positive_int, default=7)
     parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
     parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
+    parser.add_argument(
+        "--active-guard-weight",
+        type=nonnegative_float,
+        default=0.0,
+        help=(
+            "When positive, add the effective guard q,b points as weighted PDE "
+            "rows after variable selection. This constrains trial directions "
+            "without using the guard grid for expensive candidate scoring."
+        ),
+    )
     parser.add_argument("--solve-mode", choices=("full", "block-search"), default="full")
     parser.add_argument(
         "--block-search-labels",
@@ -1276,6 +1366,16 @@ def main() -> None:
         help="Inject this many extra variables by largest active mortar-row Jacobian score, ignoring degree caps.",
     )
     parser.add_argument("--line-search", type=parse_float_list, default=parse_float_list("1,0.5,0.25,0.125"))
+    parser.add_argument(
+        "--line-search-eval",
+        choices=("full", "objective-only"),
+        default="full",
+        help=(
+            "Use 'objective-only' to score line-search trials on the same sampled "
+            "row set without rebuilding candidate selection/Jacobians. Requires "
+            "--row-normalization none."
+        ),
+    )
     parser.add_argument("--include-origin-constants", action="store_true")
     parser.add_argument("--chart-balanced-selection", action="store_true")
     parser.add_argument("--row-normalization", choices=("none", "jacobian", "residual-jacobian"), default="none")
@@ -1305,6 +1405,8 @@ def main() -> None:
         parser.error("--row-scale-min must be nonnegative")
     if args.row_scale_min > args.row_scale_max:
         parser.error("--row-scale-min must be <= --row-scale-max")
+    if args.line_search_eval == "objective-only" and args.row_normalization != "none":
+        parser.error("--line-search-eval objective-only requires --row-normalization none")
     if args.guard_q_max <= args.guard_q_min:
         parser.error("--guard-q-max must be greater than --guard-q-min")
     if args.guard_b_max <= args.guard_b_min:

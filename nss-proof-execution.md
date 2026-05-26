@@ -4116,6 +4116,62 @@ they were stopped.  This is not evidence that active edge rows fail; it says
 the current Stage-0 implementation is too expensive for that experiment without
 caching row/column evaluations or adding a dedicated guarded KKT/Schur mode.
 
+The next implementation pass added a cheaper version of that experiment:
+`--active-guard-weight` inserts the effective guard grid as weighted PDE rows
+after variable selection, and `--line-search-eval objective-only` scores trial
+steps on the same sampled row set without rebuilding the whole Stage-0 system.
+This is a diagnostic shortcut, not a proof-grade solve, but it made active edge
+rows practical enough to test.
+
+The active-guard sequence shows that the guarded tail direction is still not a
+viable Stage-0 correction:
+
+```text
+work/twochart_stage0_rz_tail_jacinject_activeguard_w1_report.json
+accepted tail step, but held-out edge max = 5.516786077531e4
+worst held-out point = q=0.90, b=0.20
+
+work/twochart_stage0_rz_tail_jacinject_activeguard_w1_lowb_report.json
+explicit q=0.90,b=0.20 guard, accepted tail step
+held-out edge max = 3.162227861431e4
+
+work/twochart_stage0_rz_tail_jacinject_activeguard_w1_qwide_report.json
+widened q guard to 0.76..0.92, accepted tail step
+held-out edge max = 1.778391689505e3 at q=0.82,b=0.20
+
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_report.json
+active guard weight 10, accepted tail step
+held-out edge max = 1.255394972997e3 at q=0.90,b=0.20
+```
+
+The seam switch itself is numerically delicate: `q=0.90` can be evaluated on
+the origin side, while `q=0.8999999999999999` samples the tail-side seam limit.
+Adding that one-sided seam-limit point as an explicit guard did not fix the
+problem:
+
+```text
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_report.json
+active guard rows: 168
+sampled objective: 4.124206167745e7 -> 4.115853419466e7
+accepted block: chart:tail
+
+work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json
+standard max: 1.016228983517e1
+secondary max: 1.422825475247e1
+origin max: 9.132494634431e1
+overlap max: 3.239718884452e2
+edge max: 3.119540552543e4 at q=0.78,b=0.20
+C0-C2 R/Z mortar max: 4.214529161145e3
+```
+
+This resolves the prior ambiguity.  The broad active guard does regularize some
+tail directions, but the seam damage is mobile across low-`b` edge points and
+the worst R/Z mortar row remains unchanged.  The next solver step is explicit
+two-sided seam-limit guard generation plus cached row/column evaluation, then a
+guarded KKT/Schur-style correction that reduces the seam inside the edge-feasible
+tangent space.  Weakening the guard, freeing `(gamma,B)`, or pivoting to radial
+matching now would skip the still-unresolved Stage-0 linear algebra obstruction.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4132,11 +4188,12 @@ linear system and interface/PDE balance. The new R/Z rows are the right
 coordinate language, and the origin chart has enough algebraic freedom to match
 the seam alone. Balanced tail+origin variables are now active, held-out guards
 prevent accepting edge-damaging steps, restricted origin-block descent can
-improve origin/overlap while preserving the guard, and broad guard grids now
-catch the nonlocal hidden-edge damage from high-degree tail seam variables. The
-sampled system still cannot reduce the worst seam row and guarded edge
-simultaneously. The next solver step is not to weaken the guard; it is to make
-edge rows active in the linear system or implement a true constrained
-Schur-style solve with cached row/column evaluation. Row normalization alone is
-not enough. It is too early to free `(gamma,B)`, pivot to radial matching, or
-start spectral validation as a theorem dependency.
+improve origin/overlap while preserving the guard, broad guard grids catch the
+nonlocal hidden-edge damage from high-degree tail seam variables, and active
+guard rows make that conflict cheap enough to test. The sampled system still
+cannot reduce the worst seam row and guarded edge simultaneously. The next
+solver step is not to weaken the guard; it is to add two-sided seam-limit guard
+generation and implement a true constrained Schur-style solve with cached
+row/column evaluation. Row normalization alone is not enough. It is too early
+to free `(gamma,B)`, pivot to radial matching, or start spectral validation as
+a theorem dependency.
