@@ -125,7 +125,14 @@ not substitute narrative confidence for the evidence type.
 
 ## 1C. Latest Repository Update
 
-The repo now contains a bounded Stage-0 two-chart Newton diagnostic, but not a proof-grade solver.
+Latest pushed commit:
+
+```text
+a2460f1 Add guarded KKT Stage-0 diagnostic
+```
+
+The repo now contains a bounded Stage-0 two-chart Newton diagnostic plus a
+first guarded-KKT diagnostic path, but not a proof-grade solver.
 
 Current progress ledger:
 
@@ -134,6 +141,16 @@ Final theorem certificate: 0%
 Certified stop-condition gates: 0/5
 Proof-engineering scaffold: about 35%
 ```
+
+Current stop-condition ledger:
+
+| Gate | Current artifact | Evidence type | Status | Blocking certificate |
+| --- | --- | --- | --- | --- |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | `work/v117_twochart_init.json`; guarded Stage-0 reports including `work/twochart_stage0_rz_guardedkkt_full16_probe_report.json` | Floating diagnostic only | Not certified; normalized structural residuals remain `O(10)` to `O(10^2)` on held-out PDE scans and C0-C2 physical R/Z mortar remains `4.214529161145e3` | `certs/profile/profile_nk.json` plus `certs/profile/pressure_reconstruction.json` |
+| Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile | Not certified as a theorem gate because no interval-certified admissible profile is linked to it | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and manifest linkage |
+| Natural tail, transseries, indicial certification | q1/forced-`q^p`/q2-zero diagnostics and floating Pluecker/Evans probes | Formal/floating; no interval box cover | Not certified; q1 exclusion and forced `q^p` are enforced in current seed, but recurrence and indicial exclusion are not interval-certified | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json` |
+| Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not true Leray-projected operator | Not certified; geometric modes and Riesz projection are not validated | `certs/spectrum/projected_spectrum.json` |
+| Stable-complement spectral gap | No proof-grade artifact | Floating/incomplete | Not certified; no high-frequency or large-`m` exclusion and no semigroup bound | `certs/spectrum/high_frequency_exclusion.json`, `certs/spectrum/stable_semigroup.json` |
 
 The current two-chart seed is:
 
@@ -164,6 +181,8 @@ supports opt-in active guard PDE rows via --active-guard-weight,
 supports objective-only line-search scoring via --line-search-eval objective-only.
 supports two-sided seam-limit guard generation via --guard-seam-sides,
   --guard-seam-q, --guard-seam-eps, and --guard-seam-b-points.
+supports first guarded-KKT diagnostic mode via --solve-mode guarded-kkt.
+supports meaningful acceptance thresholds via --min-objective-decrease-abs/rel.
 ```
 
 `validators/twochart_mortar_jacobian.py` now supports both old q/x rows and
@@ -204,6 +223,9 @@ work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_report.json
 work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_residual.json
 work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_report.json
 work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json
+work/twochart_stage0_rz_guardedkkt_smoke_min_report.json
+work/twochart_stage0_rz_guardedkkt_full16_probe_report.json
+work/twochart_stage0_rz_guardedkkt_full16_probe_residual.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
@@ -296,7 +318,8 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
     dry-run confirms generated guard_qb_points_seam contains
       q=0.899999999999 and q=0.900000000001
       at requested b values.
-    no expensive post-interface Stage-0 diagnostic has been accepted yet.
+    a later guarded-KKT full16 diagnostic accepts only a tiny constrained step,
+      so this interface is infrastructure, not profile progress.
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -308,7 +331,9 @@ origin = 9.132492825929e1
 overlap = 3.239719410176e2
 edge baseline = 4.489150149273e2
 edge after latest accepted active-guard seam-limit tail step = 3.119540552543e4
+latest guarded-KKT full16 held-out edge = 4.489165350285e2
 C0-C2 R,Z mortar max = 4.214529161145e3
+latest guarded-KKT full16 C0-C2 R,Z mortar max = 4.214529161145e3
 ```
 
 Important interpretation:
@@ -851,11 +876,12 @@ control under full steps. Restricted block-search finds safe guarded origin
 descent, but it does not move the worst seam row. Seam-Jacobian injection shows
 that direct tail control of the seam is possible only through directions that
 create hidden-edge explosions. The broad guard-grid run confirms this is not a
-narrow-guard artifact or coarse line-search issue. The next implementation
-should make the broad edge set active in the least-squares rows, or else
-implement a true guarded KKT/Schur solve that combines safe origin descent with
-regularized seam reduction. Do not weaken the guard to accept the injected tail
-direction.
+narrow-guard artifact or coarse line-search issue. Broad edge active rows,
+two-sided seam-limit guards, and the first guarded-KKT diagnostic path now
+exist. The next implementation should add deterministic row/column caching plus
+rank/angle reporting so larger guarded-KKT spaces can be tested without
+confusing nearly-null constrained steps for profile progress. Do not weaken the
+guard to accept the injected tail direction.
 
 Implementation caution: direct active-edge-row retries with an uncapped
 64-variable tail pool and with a bounded 24-variable pool both spent multiple
@@ -874,8 +900,10 @@ uses 168 active guard rows and accepts a tiny objective reduction
 `work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json`
 has edge max `3.119540552543e4` at `q=0.78,b=0.20` and unchanged C0-C2 R/Z
 mortar max `4.214529161145e3`. Therefore active guard rows are useful
-infrastructure, but not the missing solver. The next implementation must add
-two-sided seam-limit guard generation and a cached guarded KKT/Schur correction.
+infrastructure, but not the missing solver. Two-sided seam-limit guard
+generation and a first guarded-KKT diagnostic path are now implemented. The next
+implementation must add cached row/column evaluation, synthetic guarded-KKT
+tests, and rank/angle reports for infeasible or nearly-null seam descent.
 
 Latest guarded-KKT update: a first `--solve-mode guarded-kkt` diagnostic path
 has been added. It solves a damped equality-constrained KKT system with
