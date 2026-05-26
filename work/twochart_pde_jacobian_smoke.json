@@ -1,0 +1,200 @@
+{
+  "checks": [
+    {
+      "abs_e_gamma": 1.8111276367527296e-11,
+      "abs_e_psi": 2.7400592905735266e-10,
+      "analytic_e_gamma": -0.03418294245847921,
+      "analytic_e_psi": 1.869084749365421,
+      "b": 0.3,
+      "fd_e_gamma": -0.03418294247659048,
+      "fd_e_psi": 1.869084749639427,
+      "q": 0.45,
+      "relative": 1.4659898602799113e-10,
+      "variable": {
+        "alpha": 2.0,
+        "block": "F_an",
+        "chart": "tail",
+        "component": "F",
+        "index": 1573,
+        "kq": 0,
+        "kx": 0,
+        "label": "tail.F_an[p13].c[0,0]",
+        "patch_index": 13,
+        "path": [
+          "tail_chart",
+          "blocks",
+          "F_an",
+          13,
+          "coeffs",
+          0,
+          0
+        ],
+        "value": -0.4363460192754826
+      }
+    },
+    {
+      "abs_e_gamma": 1.826759923884147e-11,
+      "abs_e_psi": 2.3670345683513005e-09,
+      "analytic_e_gamma": -0.029292924326689274,
+      "analytic_e_psi": 2.399252135929469,
+      "b": 0.3,
+      "fd_e_gamma": -0.029292924308421675,
+      "fd_e_psi": 2.3992521382965037,
+      "q": 0.45,
+      "relative": 9.865718291563853e-10,
+      "variable": {
+        "alpha": 2.2222222222222223,
+        "block": "F_frac",
+        "chart": "tail",
+        "component": "F",
+        "frac_index": 1,
+        "index": 5929,
+        "kq": 0,
+        "kx": 0,
+        "label": "tail.F_frac[f1][p13].c[0,0]",
+        "patch_index": 13,
+        "path": [
+          "tail_chart",
+          "blocks",
+          "F_frac",
+          0,
+          13,
+          "coeffs",
+          0,
+          0
+        ],
+        "value": 0.5635303566914639
+      }
+    },
+    {
+      "abs_e_gamma": 6.189720958005296e-11,
+      "abs_e_psi": 7.050693362486982e-12,
+      "analytic_e_gamma": -0.45270279252412665,
+      "analytic_e_psi": -0.9290814642141662,
+      "b": 0.3,
+      "fd_e_gamma": -0.45270279258602386,
+      "fd_e_psi": -0.9290814642071155,
+      "q": 0.45,
+      "relative": 6.189720958005296e-11,
+      "variable": {
+        "alpha": 2.0,
+        "block": "G_an",
+        "chart": "tail",
+        "component": "G",
+        "index": 14641,
+        "kq": 0,
+        "kx": 0,
+        "label": "tail.G_an[p13].c[0,0]",
+        "patch_index": 13,
+        "path": [
+          "tail_chart",
+          "blocks",
+          "G_an",
+          13,
+          "coeffs",
+          0,
+          0
+        ],
+        "value": -1.068515780531882
+      }
+    },
+    {
+      "abs_e_gamma": 1.301111440810132e-10,
+      "abs_e_psi": 2.4896962269593814e-10,
+      "analytic_e_gamma": -0.4370162649900492,
+      "analytic_e_psi": -0.82941952259191,
+      "b": 0.3,
+      "fd_e_gamma": -0.43701626512016034,
+      "fd_e_psi": -0.8294195228408796,
+      "q": 0.45,
+      "relative": 2.4896962269593814e-10,
+      "variable": {
+        "alpha": 2.2222222222222223,
+        "block": "G_frac",
+        "chart": "tail",
+        "component": "G",
+        "frac_index": 1,
+        "index": 18997,
+        "kq": 0,
+        "kx": 0,
+        "label": "tail.G_frac[f1][p13].c[0,0]",
+        "patch_index": 13,
+        "path": [
+          "tail_chart",
+          "blocks",
+          "G_frac",
+          0,
+          13,
+          "coeffs",
+          0,
+          0
+        ],
+        "value": 0.010135583832847538
+      }
+    },
+    {
+      "abs_e_gamma": 6.295325372107641e-12,
+      "abs_e_psi": 3.7099088245895473e-09,
+      "analytic_e_gamma": -0.11612707977929312,
+      "analytic_e_psi": 11.815302999253584,
+      "b": 0.7,
+      "fd_e_gamma": -0.11612707978558845,
+      "fd_e_psi": 11.815302995543675,
+      "q": 0.96,
+      "relative": 3.1399184809936026e-10,
+      "variable": {
+        "block": "F_origin_taylor",
+        "chart": "origin",
+        "component": "F",
+        "index": 26137,
+        "label": "origin.F_origin_taylor[0,1]",
+        "path": [
+          "origin_chart",
+          "blocks",
+          "F_origin_taylor",
+          "basis",
+          1,
+          "coeff"
+        ],
+        "r_power": 0,
+        "value": 0.041105184456074376,
+        "z_power": 1
+      }
+    },
+    {
+      "abs_e_gamma": 2.7097074584148118e-12,
+      "abs_e_psi": 2.6851378898129497e-09,
+      "analytic_e_gamma": 0.09137994166636888,
+      "analytic_e_psi": 2.9740502353952567,
+      "b": 0.7,
+      "fd_e_gamma": 0.09137994166907859,
+      "fd_e_psi": 2.9740502380803946,
+      "q": 0.96,
+      "relative": 9.028555933104774e-10,
+      "variable": {
+        "block": "G_origin_taylor",
+        "chart": "origin",
+        "component": "G",
+        "index": 26165,
+        "label": "origin.G_origin_taylor[0,1]",
+        "path": [
+          "origin_chart",
+          "blocks",
+          "G_origin_taylor",
+          "basis",
+          1,
+          "coeff"
+        ],
+        "r_power": 0,
+        "value": 5.577838074980624,
+        "z_power": 1
+      }
+    }
+  ],
+  "diagnostic_vs_proof": "floating PDE Jacobian smoke only; no Newton solve or interval proof",
+  "epsilon": 1e-06,
+  "max_abs_diff": 3.7099088245895473e-09,
+  "max_relative_diff": 9.865718291563853e-10,
+  "residual_kind": "normalized-structural",
+  "status": "DIAGNOSTIC_TWOCHART_PDE_JACOBIAN_SMOKE_NOT_PROOF"
+}

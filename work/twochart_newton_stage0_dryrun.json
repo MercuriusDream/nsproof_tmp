@@ -122,8 +122,8 @@
       "source_block": "blocks.G_origin_taylor.basis"
     }
   ],
-  "refusal_reason": "Real Newton is disabled until validators/compactified_equations_twochart.py provides callable residual/Jacobian hooks.",
-  "refusal_status": "REFUSED_REAL_NEWTON_MISSING_TWOCHART_RESIDUAL_JACOBIAN_HOOKS",
+  "refusal_reason": "",
+  "refusal_status": "",
   "requested_solver": {
     "B_fixed": true,
     "blocks": [
@@ -140,11 +140,9 @@
     "trust": 0.05
   },
   "required_validator_hooks": {
-    "available": false,
+    "available": true,
     "import_error": "",
-    "missing_hooks": [
-      "eval_residual_and_jacobian"
-    ],
+    "missing_hooks": [],
     "module": "validators.compactified_equations_twochart",
     "required_hooks": [
       "eval_residual_and_jacobian"

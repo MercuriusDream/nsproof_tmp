@@ -404,6 +404,22 @@ spatial Jet2 derivatives through order 3. For origin Taylor coefficient
 variations in PDE rows, use direct spatial monomials `R=r^2`, `Z=z^2` rather
 than the singular angular ratio `x=z^2/(r^2+z^2)`.
 
+Update after the latest commit: the first PDE Jacobian smoke hook now exists as
+`validators.compactified_equations_twochart.eval_residual_and_jacobian`. It is
+not the production Newton matrix, but it verifies six representative analytic
+PDE columns against central coefficient finite differences:
+
+```text
+max_abs_diff = 3.709908824590e-09
+max_relative_diff = 9.865718291564e-10
+```
+
+`tools/profile_newton_twochart.py` now sees the hook as available but still
+performs a dry run. The next implementation step is the actual Stage-0/Stage-1
+Newton assembly and update loop: combine PDE rows, C0-C4 mortar rows, q2-zero
+tail constraints, LM/trust-region solving, and post-step audits without
+reintroducing coefficient finite-difference Jacobians.
+
 ## 6. Current Repository Tooling
 
 The repository has these relevant tools and validators:

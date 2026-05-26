@@ -3001,12 +3001,57 @@ finite-difference smoke max abs diff = 1.529406290501e-08.
 ```
 
 This gives a tested analytic mortar-Jacobian block for the future Newton
-system.  It still does not include the PDE residual Jacobian, which remains the
-main missing hook:
+system.
+
+The first PDE residual Jacobian hook is now callable:
 
 ```text
 validators.compactified_equations_twochart.eval_residual_and_jacobian.
 ```
+
+It is still a smoke hook, not the production Newton matrix.  The command
+
+```text
+python3 -m validators.compactified_equations_twochart \
+  --profile work/v117_twochart_init.json \
+  --residual-kind normalized-structural \
+  --scan standard \
+  --out /tmp/twochart_residual_smoke.json \
+  --pde-jacobian-smoke-out work/twochart_pde_jacobian_smoke.json
+```
+
+checks six representative coefficient families:
+
+```text
+tail.F_an,
+tail.F_frac,
+tail.G_an,
+tail.G_frac,
+origin.F_origin_taylor,
+origin.G_origin_taylor.
+```
+
+The analytic linearized PDE columns agree with central coefficient finite
+differences:
+
+```text
+max_abs_diff = 3.709908824590e-09,
+max_relative_diff = 9.865718291564e-10.
+```
+
+After this hook landed, the Stage-0 Newton dry run reports
+
+```text
+hook_available=True,
+missing_hooks=[],
+newton_executed=False.
+```
+
+So the next missing implementation is no longer the local PDE derivative
+formula.  It is the production row/variable assembly and update loop in
+`tools/profile_newton_twochart.py`: combine PDE rows, C0-C4 interface rows,
+tail legality constraints, trust-region/LM solving, and strict post-step audits
+without reintroducing coefficient finite-difference Jacobians.
 
 The profile validation gates are:
 

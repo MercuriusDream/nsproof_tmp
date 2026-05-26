@@ -21,13 +21,23 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from validators.compactified_equations import (  # noqa: E402
+    Jet2,
     RESIDUAL_KINDS,
     OriginTaylor,
     ProjectedProfile,
+    Residual,
+    cheb_eval_tensor_jet,
     compactified_residual_defined,
     qb_to_rz,
     residual_with_kind,
     scan_qb_exact,
+)
+from validators.twochart_mortar_jacobian import (  # noqa: E402
+    CoefficientVariable,
+    enumerate_coefficients,
+    get_path,
+    patch_interval,
+    set_path,
 )
 from validators.origin_chart import (  # noqa: E402
     RectangularProjection,
@@ -38,6 +48,7 @@ from validators.origin_chart import (  # noqa: E402
 
 STATUS = "DIAGNOSTIC_TWOCHART_RESIDUAL_BASELINE_NOT_PROOF"
 MORTAR_STATUS = "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF"
+PDE_JACOBIAN_STATUS = "DIAGNOSTIC_TWOCHART_PDE_JACOBIAN_SMOKE_NOT_PROOF"
 TWOCHART_FORMAT = "twochart_profile_projection_v1"
 
 
@@ -198,6 +209,272 @@ def projection_from_twochart(data: dict[str, Any]) -> ProjectedProfile:
         f_origin=OriginTaylor.load(origin_blocks.get("F_origin_taylor")),
         g_origin=OriginTaylor.load(origin_blocks.get("G_origin_taylor")),
     )
+
+
+def point_in_patch(patch: dict[str, Any], q: float, x: float) -> bool:
+    q0, q1, x0, x1 = patch_interval(patch)
+    return q0 - 1e-14 <= q <= q1 + 1e-14 and x0 - 1e-14 <= x <= x1 + 1e-14
+
+
+def one_hot_coeffs(patch: dict[str, Any], kq: int, kx: int) -> list[list[float]]:
+    coeffs = patch["coeffs"]
+    return [
+        [1.0 if iq == kq and ix == kx else 0.0 for ix, _value in enumerate(row)]
+        for iq, row in enumerate(coeffs)
+    ]
+
+
+def variable_tail_patch(data: dict[str, Any], variable: CoefficientVariable) -> dict[str, Any]:
+    blocks = data["tail_chart"]["blocks"]
+    if variable.frac_index is None:
+        return blocks[variable.block][variable.patch_index]
+    return blocks[variable.block][variable.frac_index - 1][variable.patch_index]
+
+
+def delta_total_jet(
+    data: dict[str, Any],
+    variable: CoefficientVariable,
+    component: str,
+    r: Jet2,
+    z: Jet2,
+    q: Jet2,
+    x: Jet2,
+) -> Jet2:
+    if variable.component != component:
+        return Jet2.const(0.0)
+    if variable.chart == "tail":
+        patch = variable_tail_patch(data, variable)
+        if not point_in_patch(patch, q.value(), x.value()):
+            return Jet2.const(0.0)
+        q0, q1, x0, x1 = patch_interval(patch)
+        basis = cheb_eval_tensor_jet(
+            one_hot_coeffs(patch, int(variable.kq), int(variable.kx)),
+            q,
+            x,
+            q0,
+            q1,
+            x0,
+            x1,
+        )
+        return q.pow(float(variable.alpha)) * basis
+    if variable.chart == "origin":
+        R = r * r
+        Z = z * z
+        return (R ** int(variable.r_power)) * (Z ** int(variable.z_power))
+    return Jet2.const(0.0)
+
+
+def delta_field_jets(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    variable: CoefficientVariable,
+    r0: float,
+    z0: float,
+) -> tuple[Jet2, Jet2]:
+    r = Jet2.var_r(r0)
+    z = Jet2.var_z(z0)
+    rho2 = r * r + z * z
+    if rho2.value() <= 0.0:
+        raise ValueError("PDE Jacobian rows are undefined at the physical origin")
+    q = (1.0 + rho2).pow(-0.5)
+    x = (z * z) / rho2
+    dF = delta_total_jet(data, variable, "F", r, z, q, x)
+    dG = delta_total_jet(data, variable, "G", r, z, q, x)
+    dpsi = r * r * z * q.pow(projection.p) * dF
+    dgamma = r * r * q.pow(projection.p) * dG
+    return dpsi, dgamma
+
+
+def linearized_raw_residual_at(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    variable: CoefficientVariable,
+    r0: float,
+    z0: float,
+) -> Residual:
+    if r0 <= 0.0:
+        raise ValueError("PDE Jacobian rows are undefined on the axis r=0")
+    r = Jet2.var_r(r0)
+    z = Jet2.var_z(z0)
+    psi = projection.psi_jet(r0, z0)
+    gamma_field = projection.swirl_jet(r0, z0)
+    dpsi, dgamma = delta_field_jets(data, projection, variable, r0, z0)
+
+    psi_r = psi.dr()
+    psi_z = psi.dz()
+    gamma_r = gamma_field.dr()
+    gamma_z = gamma_field.dz()
+    dpsi_r = dpsi.dr()
+    dpsi_z = dpsi.dz()
+    dgamma_r = dgamma.dr()
+    dgamma_z = dgamma.dz()
+
+    a = psi.dr().dr() - psi.dr() / r + psi.dz().dz()
+    da = dpsi.dr().dr() - dpsi.dr() / r + dpsi.dz().dz()
+    a_r = a.dr()
+    a_z = a.dz()
+    da_r = da.dr()
+    da_z = da.dz()
+
+    e_psi = (
+        (1.0 - projection.gamma) * r * r * da
+        + projection.gamma * r * r * r * da_r
+        + projection.gamma * z * r * r * da_z
+        + r * (dpsi_r * a_z + psi_r * da_z - dpsi_z * a_r - psi_z * da_r)
+        + 2.0 * dpsi_z * a
+        + 2.0 * psi_z * da
+        + (2.0 * gamma_field * dgamma).dz()
+    )
+    e_gamma = (
+        (1.0 - 2.0 * projection.gamma) * dgamma
+        + projection.gamma * (r * dgamma_r + z * dgamma_z)
+        + (dpsi_r * gamma_z + psi_r * dgamma_z - dpsi_z * gamma_r - psi_z * dgamma_r) / r
+    )
+    return Residual(e_psi=e_psi.value(), e_gamma=e_gamma.value())
+
+
+def linearized_residual_with_kind(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    variable: CoefficientVariable,
+    q: float,
+    b: float,
+    residual_kind: str,
+) -> Residual:
+    r, z = qb_to_rz(q, b)
+    raw = linearized_raw_residual_at(data, projection, variable, r, z)
+    return residual_with_kind(raw, q, b, projection.p, residual_kind)
+
+
+def perturb_variable(data: dict[str, Any], variable: CoefficientVariable, delta: float) -> dict[str, Any]:
+    out = json.loads(json.dumps(data))
+    set_path(out, variable.path, float(get_path(out, variable.path)) + delta)
+    return out
+
+
+def finite_difference_column(
+    data: dict[str, Any],
+    variable: CoefficientVariable,
+    q: float,
+    b: float,
+    residual_kind: str,
+    epsilon: float,
+) -> Residual:
+    plus = perturb_variable(data, variable, epsilon)
+    minus = perturb_variable(data, variable, -epsilon)
+    plus_projection = projection_from_twochart(plus)
+    minus_projection = projection_from_twochart(minus)
+    r, z = qb_to_rz(q, b)
+    plus_residual = residual_with_kind(
+        plus_projection.exact_residual_at(r, z),
+        q,
+        b,
+        plus_projection.p,
+        residual_kind,
+    )
+    minus_residual = residual_with_kind(
+        minus_projection.exact_residual_at(r, z),
+        q,
+        b,
+        minus_projection.p,
+        residual_kind,
+    )
+    scale = 1.0 / (2.0 * epsilon)
+    return Residual(
+        e_psi=(plus_residual.e_psi - minus_residual.e_psi) * scale,
+        e_gamma=(plus_residual.e_gamma - minus_residual.e_gamma) * scale,
+    )
+
+
+def choose_smoke_variables(data: dict[str, Any], projection: ProjectedProfile) -> list[CoefficientVariable]:
+    variables = enumerate_coefficients(data)
+    wanted = {
+        ("tail", "F", "F_an"),
+        ("tail", "G", "G_an"),
+        ("tail", "F", "F_frac"),
+        ("tail", "G", "G_frac"),
+        ("origin", "F", "F_origin_taylor"),
+        ("origin", "G", "G_origin_taylor"),
+    }
+    chosen: list[CoefficientVariable] = []
+    safe_points = [(0.45, 0.30), (0.61, 0.24), (0.93, 0.35), (0.96, 0.70)]
+    for variable in variables:
+        key = (variable.chart, variable.component, variable.block)
+        if key not in wanted:
+            continue
+        if variable.chart == "origin" and int(variable.r_power) + int(variable.z_power) == 0:
+            continue
+        active = False
+        for q, b in safe_points:
+            if not compactified_residual_defined(q, b, projection.p, "normalized-structural"):
+                continue
+            value = linearized_residual_with_kind(data, projection, variable, q, b, "normalized-structural")
+            if max(abs(value.e_psi), abs(value.e_gamma)) > 1e-12:
+                active = True
+                break
+        if active:
+            chosen.append(variable)
+            wanted.remove(key)
+        if not wanted:
+            break
+    if wanted:
+        raise RuntimeError(f"could not choose active smoke variables for {sorted(wanted)}")
+    return chosen
+
+
+def eval_residual_and_jacobian(
+    profile: str | dict[str, Any],
+    residual_kind: str = "normalized-structural",
+    epsilon: float = 1e-6,
+) -> dict[str, Any]:
+    """Small diagnostic PDE residual/Jacobian smoke hook.
+
+    This is intentionally not the production Newton matrix.  It verifies the
+    analytic linearized PDE columns on representative variables and points.
+    """
+
+    data = load_json(profile) if isinstance(profile, str) else profile
+    enforce_twochart_gate(data, profile if isinstance(profile, str) else "<dict>")
+    projection = projection_from_twochart(data)
+    variables = choose_smoke_variables(data, projection)
+    points = [(0.45, 0.30), (0.61, 0.24), (0.93, 0.35), (0.96, 0.70)]
+    checks: list[dict[str, Any]] = []
+    for variable in variables:
+        best: dict[str, Any] | None = None
+        for q, b in points:
+            analytic = linearized_residual_with_kind(data, projection, variable, q, b, residual_kind)
+            if max(abs(analytic.e_psi), abs(analytic.e_gamma)) <= 1e-12:
+                continue
+            fd = finite_difference_column(data, variable, q, b, residual_kind, epsilon)
+            abs_e_psi = abs(analytic.e_psi - fd.e_psi)
+            abs_e_gamma = abs(analytic.e_gamma - fd.e_gamma)
+            rel = max(abs_e_psi, abs_e_gamma) / max(1.0, abs(analytic.e_psi), abs(analytic.e_gamma))
+            candidate = {
+                "variable": variable.as_json(),
+                "q": q,
+                "b": b,
+                "analytic_e_psi": analytic.e_psi,
+                "analytic_e_gamma": analytic.e_gamma,
+                "fd_e_psi": fd.e_psi,
+                "fd_e_gamma": fd.e_gamma,
+                "abs_e_psi": abs_e_psi,
+                "abs_e_gamma": abs_e_gamma,
+                "relative": rel,
+            }
+            if best is None or candidate["relative"] < best["relative"]:
+                best = candidate
+        if best is None:
+            raise RuntimeError(f"selected variable {variable.label} was inactive on all smoke points")
+        checks.append(best)
+    return {
+        "status": PDE_JACOBIAN_STATUS,
+        "diagnostic_vs_proof": "floating PDE Jacobian smoke only; no Newton solve or interval proof",
+        "residual_kind": residual_kind,
+        "epsilon": epsilon,
+        "checks": checks,
+        "max_abs_diff": max(max(item["abs_e_psi"], item["abs_e_gamma"]) for item in checks),
+        "max_relative_diff": max(item["relative"] for item in checks),
+    }
 
 
 def parse_scan_names(raw: str) -> list[str]:
@@ -468,6 +745,8 @@ def main() -> None:
     parser.add_argument("--mortar-x-samples", type=int, default=9)
     parser.add_argument("--mortar-order", type=int, default=4)
     parser.add_argument("--mortar-tolerance", type=float, default=1e-8)
+    parser.add_argument("--pde-jacobian-smoke-out", default="", help="Optional PDE Jacobian smoke JSON output")
+    parser.add_argument("--pde-jacobian-epsilon", type=float, default=1e-6)
     args = parser.parse_args()
 
     if args.h <= 0.0:
@@ -478,6 +757,8 @@ def main() -> None:
         raise ValueError("mortar sample counts must be positive")
     if args.mortar_order < 0 or args.mortar_order > 4:
         raise ValueError("--mortar-order must be between 0 and 4")
+    if args.pde_jacobian_epsilon <= 0.0:
+        raise ValueError("--pde-jacobian-epsilon must be positive")
 
     report, mortar = build_report(args)
     print_summary(report)
@@ -487,6 +768,19 @@ def main() -> None:
     if args.mortar_out:
         save_json(args.mortar_out, mortar)
         print(f"mortar_saved={args.mortar_out}")
+    if args.pde_jacobian_smoke_out:
+        smoke = eval_residual_and_jacobian(
+            resolve_profile_path(args.profile),
+            residual_kind=args.residual_kind,
+            epsilon=args.pde_jacobian_epsilon,
+        )
+        save_json(args.pde_jacobian_smoke_out, smoke)
+        print(
+            "pde_jacobian_smoke="
+            f"max_abs_diff={float(smoke['max_abs_diff']):.12e} "
+            f"max_relative_diff={float(smoke['max_relative_diff']):.12e}"
+        )
+        print(f"pde_jacobian_smoke_saved={args.pde_jacobian_smoke_out}")
 
 
 if __name__ == "__main__":
