@@ -2470,6 +2470,78 @@ tail fixed.  It does not change the proof status: the profile remains many
 orders of magnitude from an NK center, and the origin chart remains the
 dominant obstruction.
 
+The finite-difference mortar rows have now been replaced by exact
+Chebyshev/Taylor partial derivative rows through total order 2 inside
+`tools/profile_newton_cheb.py`.  The C2 row set includes
+
+```text
+(dq,dx)=(2,0), (1,1), (0,2),
+```
+
+so the audit no longer misses mixed chart-interface jumps.  Two read-only
+tools were added:
+
+```text
+tools/profile_mortar_audit.py
+tools/audit_profile_structure.py
+```
+
+The first reports exact patch and origin mortar defects.  The second bundles
+tail metadata, exact mortar, and normalized residual topology.  It is still not
+an interval validator, but it is a better gate before spending more solver
+time.
+
+Running
+
+```text
+python3 tools/audit_profile_structure.py \
+  --profile work/v117_transcheb_formal_c1_highb_probe.json \
+  --continuity-samples 2 \
+  --origin-match-x-samples 4 \
+  --q-min 0.88 --q-max 0.98 \
+  --b-min 0.05 --b-max 0.92 \
+  --n-q 21 --n-b 21 \
+  --top 8 \
+  --json-out work/v117_transcheb_formal_c1_highb_structure_audit.json
+```
+
+gives:
+
+```text
+tail_ok=True,
+projection_ok=True,
+origin_ok=False,
+q1_F=q1_G=0,
+forced_qp_coeff_error=0,
+origin_F_fit_error=6.488671574113e-01,
+origin_G_fit_error=3.169194550836e-01,
+exact C2 mortar max=6.372865880897e+03,
+origin-band normalized-structural max=2.444892773927e+04,
+top_at_switch=8/8.
+```
+
+The worst exact mortar row is
+
+```text
+kind=origin-match,
+component=F,
+q=0.9,
+x=0,
+(dq,dx)=(2,0),
+diff=6.372865880897e+03.
+```
+
+Thus the next profile-representation question is now concrete:
+
+```text
+Is the O(1e4) origin-band normalized residual a chart/mortar artifact caused
+by the hard q=0.9 switch, or does it persist after an exact C2-compatible
+origin/rectangle representation?
+```
+
+Until this is answered, more Newton steps are mainly measuring chart mismatch,
+not a proof-native PDE residual.
+
 The profile validation gates are:
 
 ```text

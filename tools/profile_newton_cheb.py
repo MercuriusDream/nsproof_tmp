@@ -77,6 +77,8 @@ class ContinuityConstraint:
     derivative_direction: str = ""
     derivative_order: int = 0
     derivative_step: float = 0.0
+    dq_order: int = 0
+    dx_order: int = 0
 
 
 @dataclass(frozen=True)
@@ -204,6 +206,305 @@ def eval_origin_total(data: dict[str, object], component: str, q: float, x: floa
     )
 
 
+def cheb_basis_values(count: int, t: float, order: int) -> list[float]:
+    if order not in (0, 1, 2):
+        raise ValueError("only derivative orders 0, 1, and 2 are supported")
+    if count <= 0:
+        return []
+    values = [0.0 for _ in range(count)]
+    first = [0.0 for _ in range(count)]
+    second = [0.0 for _ in range(count)]
+    values[0] = 1.0
+    if count > 1:
+        values[1] = t
+        first[1] = 1.0
+    for n in range(2, count):
+        values[n] = 2.0 * t * values[n - 1] - values[n - 2]
+        first[n] = 2.0 * values[n - 1] + 2.0 * t * first[n - 1] - first[n - 2]
+        second[n] = 4.0 * first[n - 1] + 2.0 * t * second[n - 1] - second[n - 2]
+    if order == 0:
+        return values
+    if order == 1:
+        return first
+    return second
+
+
+def cheb_eval_tensor_derivative(
+    coeffs: list[list[float]],
+    q: float,
+    x: float,
+    q0: float,
+    q1: float,
+    x0: float,
+    x1: float,
+    direction: str,
+    order: int,
+) -> float:
+    dq_order = order if direction == "q" else 0
+    dx_order = order if direction == "x" else 0
+    return cheb_eval_tensor_partial(coeffs, q, x, q0, q1, x0, x1, dq_order, dx_order)
+
+
+def cheb_eval_tensor_partial(
+    coeffs: list[list[float]],
+    q: float,
+    x: float,
+    q0: float,
+    q1: float,
+    x0: float,
+    x1: float,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    if dq_order < 0 or dx_order < 0 or dq_order + dx_order > 2:
+        raise ValueError("only partial derivatives through total order 2 are supported")
+    if dq_order == 0 and dx_order == 0:
+        return cheb_eval_tensor(coeffs, q, x, q0, q1, x0, x1)
+    if q1 == q0 or x1 == x0:
+        raise ValueError("cannot differentiate degenerate Chebyshev patch")
+    tq = 0.0 if q1 == q0 else (2.0 * q - q0 - q1) / (q1 - q0)
+    tx = 0.0 if x1 == x0 else (2.0 * x - x0 - x1) / (x1 - x0)
+    q_count = len(coeffs)
+    x_count = len(coeffs[0]) if q_count else 0
+    q_values = cheb_basis_values(q_count, tq, dq_order)
+    x_values = cheb_basis_values(x_count, tx, dx_order)
+    total = 0.0
+    for iq, row in enumerate(coeffs):
+        for ix, coeff in enumerate(row):
+            total += float(coeff) * q_values[iq] * x_values[ix]
+    total *= (2.0 / (q1 - q0)) ** dq_order
+    total *= (2.0 / (x1 - x0)) ** dx_order
+    return total
+
+
+def eval_patch_item_derivative(
+    patch: dict[str, object],
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+) -> float:
+    q0, q1, x0, x1 = patch_interval(patch)
+    return cheb_eval_tensor_derivative(
+        patch["coeffs"],  # type: ignore[arg-type,index]
+        q,
+        x,
+        q0,
+        q1,
+        x0,
+        x1,
+        direction,
+        order,
+    )
+
+
+def eval_patch_item_partial(
+    patch: dict[str, object],
+    q: float,
+    x: float,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    q0, q1, x0, x1 = patch_interval(patch)
+    return cheb_eval_tensor_partial(
+        patch["coeffs"],  # type: ignore[arg-type,index]
+        q,
+        x,
+        q0,
+        q1,
+        x0,
+        x1,
+        dq_order,
+        dx_order,
+    )
+
+
+def origin_x_factor_derivative(a: int, b: int, x: float, order: int) -> float:
+    if order == 0:
+        return ((1.0 - x) ** a) * (x**b)
+    if order == 1:
+        value = 0.0
+        if a > 0:
+            value -= a * ((1.0 - x) ** (a - 1)) * (x**b)
+        if b > 0:
+            value += b * ((1.0 - x) ** a) * (x ** (b - 1))
+        return value
+    if order == 2:
+        value = 0.0
+        if a > 1:
+            value += a * (a - 1) * ((1.0 - x) ** (a - 2)) * (x**b)
+        if a > 0 and b > 0:
+            value -= 2.0 * a * b * ((1.0 - x) ** (a - 1)) * (x ** (b - 1))
+        if b > 1:
+            value += b * (b - 1) * ((1.0 - x) ** a) * (x ** (b - 2))
+        return value
+    raise ValueError("only derivative orders 0, 1, and 2 are supported")
+
+
+def origin_h_derivative(power: int, q: float, order: int) -> float:
+    h = 1.0 / (q * q) - 1.0
+    if order == 0:
+        return h**power
+    if power == 0:
+        return 0.0
+    h1 = -2.0 * q**-3
+    if order == 1:
+        return power * (h ** (power - 1)) * h1
+    if order == 2:
+        h2 = 6.0 * q**-4
+        value = power * (h ** (power - 1)) * h2
+        if power > 1:
+            value += power * (power - 1) * (h ** (power - 2)) * h1 * h1
+        return value
+    raise ValueError("only derivative orders 0, 1, and 2 are supported")
+
+
+def eval_origin_total_derivative(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+) -> float:
+    if order == 0:
+        return eval_origin_total(data, component, q, x)
+    if direction not in ("q", "x"):
+        raise ValueError("derivative direction must be q or x")
+    key = "F_origin_taylor" if component == "F" else "G_origin_taylor"
+    origin = data["blocks"][key]  # type: ignore[index]
+    total = 0.0
+    for entry in origin.get("basis", []):  # type: ignore[union-attr]
+        a = int(entry["R_power"])
+        b = int(entry["Z_power"])
+        coeff = float(entry["coeff"])
+        power = a + b
+        if direction == "q":
+            total += coeff * origin_h_derivative(power, q, order) * origin_x_factor_derivative(a, b, x, 0)
+        else:
+            total += coeff * origin_h_derivative(power, q, 0) * origin_x_factor_derivative(a, b, x, order)
+    return total
+
+
+def eval_origin_total_partial(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    if dq_order < 0 or dx_order < 0 or dq_order + dx_order > 2:
+        raise ValueError("only partial derivatives through total order 2 are supported")
+    if dq_order == 0 and dx_order == 0:
+        return eval_origin_total(data, component, q, x)
+    key = "F_origin_taylor" if component == "F" else "G_origin_taylor"
+    origin = data["blocks"][key]  # type: ignore[index]
+    total = 0.0
+    for entry in origin.get("basis", []):  # type: ignore[union-attr]
+        a = int(entry["R_power"])
+        b = int(entry["Z_power"])
+        coeff = float(entry["coeff"])
+        power = a + b
+        total += (
+            coeff
+            * origin_h_derivative(power, q, dq_order)
+            * origin_x_factor_derivative(a, b, x, dx_order)
+        )
+    return total
+
+
+def eval_rect_total_derivative(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    direction: str,
+    order: int,
+) -> float:
+    if order == 0:
+        return eval_rect_total(data, component, q, x)
+    if direction not in ("q", "x"):
+        raise ValueError("derivative direction must be q or x")
+    p = float(data["p"])
+    if component == "F":
+        constant = 0.5
+        analytic_block = "F_an"
+        frac_key = "F_frac"
+    else:
+        constant = float(data["B"])
+        analytic_block = "G_an"
+        frac_key = "G_frac"
+    total = 0.0 if order > 0 else constant
+
+    def add_weighted_patch(alpha: float, patch: dict[str, object]) -> float:
+        p0 = eval_patch_item_derivative(patch, q, x, direction, 0)
+        if direction == "x":
+            return (q**alpha) * eval_patch_item_derivative(patch, q, x, direction, order)
+        if order == 1:
+            p1 = eval_patch_item_derivative(patch, q, x, "q", 1)
+            return alpha * (q ** (alpha - 1.0)) * p0 + (q**alpha) * p1
+        p1 = eval_patch_item_derivative(patch, q, x, "q", 1)
+        p2 = eval_patch_item_derivative(patch, q, x, "q", 2)
+        return (
+            alpha * (alpha - 1.0) * (q ** (alpha - 2.0)) * p0
+            + 2.0 * alpha * (q ** (alpha - 1.0)) * p1
+            + (q**alpha) * p2
+        )
+
+    analytic_patches = as_patch_items(data, analytic_block)
+    analytic_patch = analytic_patches[find_patch_index(analytic_patches, q, x)]
+    total += add_weighted_patch(2.0, analytic_patch)
+    for k, block in enumerate(data["blocks"][frac_key], start=1):  # type: ignore[index]
+        patch_index = find_patch_index(block, q, x)
+        total += add_weighted_patch(k * p, block[patch_index])
+    return total
+
+
+def eval_rect_total_partial(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    if dq_order < 0 or dx_order < 0 or dq_order + dx_order > 2:
+        raise ValueError("only partial derivatives through total order 2 are supported")
+    if dq_order == 0 and dx_order == 0:
+        return eval_rect_total(data, component, q, x)
+    p = float(data["p"])
+    if component == "F":
+        analytic_block = "F_an"
+        frac_key = "F_frac"
+    else:
+        analytic_block = "G_an"
+        frac_key = "G_frac"
+    total = 0.0
+
+    def add_weighted_patch(alpha: float, patch: dict[str, object]) -> float:
+        p0 = eval_patch_item_partial(patch, q, x, 0, dx_order)
+        if dq_order == 0:
+            return (q**alpha) * p0
+        p1 = eval_patch_item_partial(patch, q, x, 1, dx_order)
+        if dq_order == 1:
+            return alpha * (q ** (alpha - 1.0)) * p0 + (q**alpha) * p1
+        p2 = eval_patch_item_partial(patch, q, x, 2, dx_order)
+        return (
+            alpha * (alpha - 1.0) * (q ** (alpha - 2.0)) * p0
+            + 2.0 * alpha * (q ** (alpha - 1.0)) * p1
+            + (q**alpha) * p2
+        )
+
+    analytic_patches = as_patch_items(data, analytic_block)
+    analytic_patch = analytic_patches[find_patch_index(analytic_patches, q, x)]
+    total += add_weighted_patch(2.0, analytic_patch)
+    for k, block in enumerate(data["blocks"][frac_key], start=1):  # type: ignore[index]
+        patch_index = find_patch_index(block, q, x)
+        total += add_weighted_patch(k * p, block[patch_index])
+    return total
+
+
 def finite_derivative_1d(
     func: object,
     q: float,
@@ -259,30 +560,18 @@ def patch_derivative_value(
     step: float,
     normal_side: int,
 ) -> float:
-    if order == 0:
-        return eval_patch_item(patch, q, x)
-    q0, q1, x0, x1 = patch_interval(patch)
-    if direction == "q":
-        lower, upper = q0, q1
-    elif direction == "x":
-        lower, upper = x0, x1
-    else:
-        raise ValueError("derivative direction must be q or x")
+    del step, normal_side
+    return eval_patch_item_derivative(patch, q, x, direction, order)
 
-    def value(offset: float) -> float:
-        if direction == "q":
-            return eval_patch_item(patch, q + offset, x)
-        return eval_patch_item(patch, q, x + offset)
 
-    if normal_side < 0:
-        if order == 1:
-            return (value(0.0) - value(-step)) / step
-        return (value(0.0) - 2.0 * value(-step) + value(-2.0 * step)) / (step * step)
-    if normal_side > 0:
-        if order == 1:
-            return (value(step) - value(0.0)) / step
-        return (value(2.0 * step) - 2.0 * value(step) + value(0.0)) / (step * step)
-    return finite_derivative_1d(lambda qq, xx: eval_patch_item(patch, qq, xx), q, x, direction, order, step, lower, upper)
+def patch_partial_value(
+    patch: dict[str, object],
+    q: float,
+    x: float,
+    dq_order: int,
+    dx_order: int,
+) -> float:
+    return eval_patch_item_partial(patch, q, x, dq_order, dx_order)
 
 
 def total_derivative_value(
@@ -296,24 +585,49 @@ def total_derivative_value(
     source: str,
 ) -> float:
     if source == "rect":
-        func = lambda qq, xx: eval_rect_total(data, component, qq, xx)
+        return eval_rect_total_derivative(data, component, q, x, direction, order)
     elif source == "origin":
-        func = lambda qq, xx: eval_origin_total(data, component, qq, xx)
+        return eval_origin_total_derivative(data, component, q, x, direction, order)
     else:
         raise ValueError("source must be rect or origin")
-    lower, upper = (0.0, 1.0)
-    return finite_derivative_1d(func, q, x, direction, order, step, lower, upper)
 
 
-def derivative_constraint_specs(max_order: int, weight: float, derivative_weight: float, step: float) -> list[tuple[str, int, float, float]]:
-    specs: list[tuple[str, int, float, float]] = [("", 0, weight, 0.0)]
+def total_partial_value(
+    data: dict[str, object],
+    component: str,
+    q: float,
+    x: float,
+    dq_order: int,
+    dx_order: int,
+    source: str,
+) -> float:
+    if source == "rect":
+        return eval_rect_total_partial(data, component, q, x, dq_order, dx_order)
+    if source == "origin":
+        return eval_origin_total_partial(data, component, q, x, dq_order, dx_order)
+    raise ValueError("source must be rect or origin")
+
+
+def derivative_constraint_specs(max_order: int, weight: float, derivative_weight: float, step: float) -> list[tuple[str, int, int, int, float, float]]:
+    specs: list[tuple[str, int, int, int, float, float]] = [("", 0, 0, 0, weight, 0.0)]
     if max_order <= 0:
         return specs
     if derivative_weight <= 0.0:
         return specs
-    for order in range(1, min(max_order, 2) + 1):
-        for direction in ("q", "x"):
-            specs.append((direction, order, weight * derivative_weight, step))
+    specs.extend(
+        [
+            ("q", 1, 1, 0, weight * derivative_weight, step),
+            ("x", 1, 0, 1, weight * derivative_weight, step),
+        ]
+    )
+    if max_order >= 2:
+        specs.extend(
+            [
+                ("q", 2, 2, 0, weight * derivative_weight, step),
+                ("qx", 2, 1, 1, weight * derivative_weight, step),
+                ("x", 2, 0, 2, weight * derivative_weight, step),
+            ]
+        )
     return specs
 
 
@@ -343,7 +657,7 @@ def build_patch_continuity_constraints(
                     x1 = min(lx1, rx1)
                     if x1 > x0 + 1e-14:
                         for x in grid(x0, x1, samples):
-                            for direction, order, constraint_weight, step in specs:
+                            for direction, order, dq_order, dx_order, constraint_weight, step in specs:
                                 constraints.append(
                                     ContinuityConstraint(
                                         block,
@@ -356,6 +670,8 @@ def build_patch_continuity_constraints(
                                         direction,
                                         order,
                                         step,
+                                        dq_order,
+                                        dx_order,
                                     )
                                 )
                 if abs(lx1 - rx0) <= 1e-14:
@@ -363,7 +679,7 @@ def build_patch_continuity_constraints(
                     q1 = min(lq1, rq1)
                     if q1 > q0 + 1e-14:
                         for q in grid(q0, q1, samples):
-                            for direction, order, constraint_weight, step in specs:
+                            for direction, order, dq_order, dx_order, constraint_weight, step in specs:
                                 constraints.append(
                                     ContinuityConstraint(
                                         block,
@@ -376,6 +692,8 @@ def build_patch_continuity_constraints(
                                         direction,
                                         order,
                                         step,
+                                        dq_order,
+                                        dx_order,
                                     )
                                 )
     return constraints
@@ -397,7 +715,7 @@ def build_origin_matching_constraints(
     for component in ("F", "G"):
         for q in q_values:
             for x in grid(0.0, 1.0, x_samples):
-                for direction, order, constraint_weight, step in specs:
+                for direction, order, dq_order, dx_order, constraint_weight, step in specs:
                     constraints.append(
                         ContinuityConstraint(
                             component,
@@ -410,6 +728,8 @@ def build_origin_matching_constraints(
                             direction,
                             order,
                             step,
+                            dq_order,
+                            dx_order,
                         )
                     )
     return constraints
@@ -719,49 +1039,37 @@ def residual_vector(
     for constraint in constraints:
         scale = math.sqrt(constraint.weight)
         if constraint.kind == "origin-match":
-            diff = total_derivative_value(
+            diff = total_partial_value(
                 data,
                 constraint.component,
                 constraint.q,
                 constraint.x,
-                constraint.derivative_direction,
-                constraint.derivative_order,
-                constraint.derivative_step,
+                constraint.dq_order,
+                constraint.dx_order,
                 "rect",
-            ) - total_derivative_value(
+            ) - total_partial_value(
                 data,
                 constraint.component,
                 constraint.q,
                 constraint.x,
-                constraint.derivative_direction,
-                constraint.derivative_order,
-                constraint.derivative_step,
+                constraint.dq_order,
+                constraint.dx_order,
                 "origin",
             )
         else:
             patches = as_patch_items(data, constraint.component)
-            normal_direction = (
-                (constraint.kind == "q-seam" and constraint.derivative_direction == "q")
-                or (constraint.kind == "x-seam" and constraint.derivative_direction == "x")
-            )
-            left_side = -1 if normal_direction else 0
-            right_side = 1 if normal_direction else 0
-            diff = patch_derivative_value(
+            diff = patch_partial_value(
                 patches[constraint.left],
                 constraint.q,
                 constraint.x,
-                constraint.derivative_direction,
-                constraint.derivative_order,
-                constraint.derivative_step,
-                left_side,
-            ) - patch_derivative_value(
+                constraint.dq_order,
+                constraint.dx_order,
+            ) - patch_partial_value(
                 patches[constraint.right],
                 constraint.q,
                 constraint.x,
-                constraint.derivative_direction,
-                constraint.derivative_order,
-                constraint.derivative_step,
-                right_side,
+                constraint.dq_order,
+                constraint.dx_order,
             )
         value = scale * diff
         values.append(value)
@@ -779,6 +1087,8 @@ def residual_vector(
                 "max_abs": abs(value),
                 "derivative_direction": constraint.derivative_direction,
                 "derivative_order": constraint.derivative_order,
+                "dq_order": constraint.dq_order,
+                "dx_order": constraint.dx_order,
             }
     return values, {"max_abs": worst_abs, "rms": math.sqrt(total / max(count, 1)), "worst": worst_item}
 
@@ -1052,6 +1362,8 @@ def main() -> None:
                 "derivative_direction": constraint.derivative_direction,
                 "derivative_order": constraint.derivative_order,
                 "derivative_step": constraint.derivative_step,
+                "dq_order": constraint.dq_order,
+                "dx_order": constraint.dx_order,
             }
             for constraint in constraints
         ],
