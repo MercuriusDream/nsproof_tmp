@@ -192,6 +192,19 @@ G_p(x) = 0.11111111111111108 - 1.1111111111111112 x.
 
 Any candidate profile whose `q^p` trace disagrees with this recurrence is not in the current admissible branch.
 
+Important latest update: the ordinary `q^2` analytic trace is not yet proved
+legal. Since `2 < p = 20/9`, a nonzero `F_an(0,x), G_an(0,x)` becomes the
+first nonzero audited tail correction before the forced `q^p` term. Until a
+formal recurrence theorem proves this channel admissible, require
+
+```text
+F_an(0,x) = 0,
+G_an(0,x) = 0.
+```
+
+Do not let a new solver reduce residual by escaping through an unvalidated
+ordinary `q^2` channel.
+
 Origin regularity is non-negotiable. Near `q=1`, use
 
 ```text
@@ -269,6 +282,89 @@ broad high-|b| structural: 4.897717856780e+1
 
 This is still far from a Newton-Kantorovich center. A profile proof likely needs coefficient residual around `1e-8` to `1e-10`, depending on the inverse bound.
 
+Latest hard-route correction from `gpt-pro-thing`:
+
+```text
+The one-chart compactified Chebyshev plus origin Taylor splice is diagnostic
+only. Do not keep stretching it into the final proof solver.
+
+The next proof-native representation is a hard two-chart system:
+  tail chart:   (q,x), q <= about 0.86;
+  origin chart: (R,Z)=(r^2,z^2), q >= about 0.88;
+  overlap/mortar band: q in about [0.84,0.92];
+  interface matching: C3 minimum, C4 preferred;
+  Jacobian: analytic coefficient Jacobian, not finite-difference penalties.
+
+Do not pivot to radial core-tail matching until the two-chart origin self-tests,
+tail recurrence gate, analytic-Jacobian two-chart Newton solver, and then
+(gamma,B) parameter search fail.
+```
+
+New q2 legality diagnostics:
+
+```text
+tools/validate_tail_recurrence.py
+tools/tail_leading_exponent.py
+tools/profile_zero_q2_trace.py
+validators/tail_formal_recurrence.py
+```
+
+On both `work/v117_transcheb_formal_forced.json` and
+`work/v117_transcheb_formal_origin_refit_c2_d6_a.json`, the conservative
+tail recurrence gate reports
+
+```text
+ordinary_q1_F_max = 0
+ordinary_q1_G_max = 0
+forced_qp_coeff_error = 0
+ordinary_q2_F_trace_max = 1.190284161850e+00
+ordinary_q2_G_trace_max = 5.381997768582e+00
+status = UNVALIDATED_Q2_TRACE_PRESENT
+```
+
+The q2-zero diagnostic profiles
+
+```text
+work/v117_transcheb_formal_forced_q2zero.json
+work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json
+```
+
+keep q1 zero and forced `q^p` exact while reducing the q2 trace to roundoff:
+
+```text
+ordinary_q2_F_trace_max = 1.804112415016e-16
+ordinary_q2_G_trace_max = 7.771561172376e-16
+status = TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL
+```
+
+At sampled gates, zeroing q2 did not worsen the focused or strict-tail residuals.
+Therefore the next two-chart solver should start from q2-free data unless you
+derive and validate a recurrence permitting ordinary `q^2`.
+
+The first two-chart scaffolds now exist:
+
+```text
+validators/origin_chart.py
+tools/profile_project_twochart.py
+validators/twochart_mortar.py
+```
+
+`validators/origin_chart.py` passes a derivative-order-4 self-test and rejects
+the fake-smooth artifact `x=Z/(R+Z)`. The q2-free projection
+`work/v117_twochart_init.json` has the strict tail gate passing. However, the
+old one-chart-derived overlap is extremely non-smooth:
+
+```text
+C2 sampled mortar max = 5.076810111338e+04
+C3 sampled mortar max = 2.810512623453e+06
+worst location = q=0.84, x=1.0, component F, pure q derivatives
+```
+
+Interpretation: this is not a proof that the branch is absent. It is proof-path
+evidence that the old origin splice cannot be polished into a certificate; the
+next solver must solve the tail chart, origin chart, and C3/C4 interface rows
+as one hard system.
+
 ## 6. Current Repository Tooling
 
 The repository has these relevant tools and validators:
@@ -279,10 +375,14 @@ tools/profile_newton_cheb.py
 tools/profile_newton_adaptive.py
 tools/profile_projected_hardpoints.py
 tools/validate_tail.py
+tools/validate_tail_recurrence.py
+tools/tail_leading_exponent.py
+tools/profile_zero_q2_trace.py
 tools/validate_indicial_evans.py
 tools/linearized_spectrum_probe.py
 validators/compactified_equations.py
 validators/tail_transseries.py
+validators/tail_formal_recurrence.py
 validators/pluecker.py
 ```
 
@@ -310,6 +410,10 @@ tools/profile_newton_adaptive.py:
 
 validators/compactified_equations.py:
   contains normalized structural residual diagnostics and origin-patch evaluation.
+
+validators/tail_formal_recurrence.py:
+  conservatively accepts only currently derived tail facts and flags ordinary
+  q^2 as unvalidated by default.
 ```
 
 The current tools are discovery/proof-scaffold tools. They are not yet interval proof tools.
@@ -617,23 +721,142 @@ tools/profile_newton_cheb.py
 tools/profile_newton_adaptive.py
 tools/profile_projected_hardpoints.py
 tools/validate_tail.py
+tools/validate_tail_recurrence.py
+tools/tail_leading_exponent.py
+tools/profile_zero_q2_trace.py
 validators/compactified_equations.py
+validators/tail_formal_recurrence.py
 tools/validate_indicial_evans.py
 tools/linearized_spectrum_probe.py
 ```
 
+But treat `profile_newton_cheb.py` as a diagnostic predecessor only. The next
+proof-path solver must be a hard-constrained two-chart solver, not another
+penalty extension of the old one-chart origin splice.
+
 Also state which new modules must be created, for example:
 
 ```text
+tools/profile_project_twochart.py
+tools/profile_newton_twochart.py
 tools/validate_profile_nk.py
 tools/validate_pressure_reconstruction.py
 tools/spectrum_projected_galerkin.py
 tools/validate_spectrum_evans.py
+validators/origin_chart.py
+validators/twochart_mortar.py
+validators/compactified_equations_twochart.py
 validators/radii_polynomial.py
 validators/essential_spectrum.py
 validators/bernstein_ball.py
 validators/arb_backend.py
 ```
+
+For the next three commits, explicitly evaluate this sequence:
+
+```text
+Commit 1: tail-legal two-chart projection
+  - validate q1=0, forced q^p exact, q2 trace zero under --q2-policy zero;
+  - create `work/v117_twochart_init.json`;
+  - run origin-chart self-tests including fake-smooth rejection.
+
+Commit 2: two-chart residual/Jacobian baseline
+  - implement `validators/compactified_equations_twochart.py`;
+  - evaluate normalized structural residuals separately on tail, origin, and
+    overlap regions;
+  - report C0/C1/C2/C3/C4 mortar defects as hard rows, not hidden penalties.
+
+Commit 3: hard-constrained two-chart Newton stage 0/1
+  - implement `tools/profile_newton_twochart.py`;
+  - default to `--q2-policy zero`;
+  - keep `(gamma,B)=(9/20,1)` fixed until the two-chart solver is real;
+  - only then run a parameter funnel if fixed parameters stall.
+```
+
+Recommended first commands:
+
+```bash
+python3 tools/validate_tail_recurrence.py \
+  --profile work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json \
+  --gamma 9/20 --B 1 --q2-policy zero --strict
+
+python3 tools/profile_project_twochart.py \
+  --input work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json \
+  --gamma 9/20 --B 1 \
+  --origin-chart RZ \
+  --q2-policy zero \
+  --forced-qp formal \
+  --out work/v117_twochart_init.json
+
+python3 -m validators.origin_chart \
+  --self-test \
+  --out work/origin_chart_selftest.json
+```
+
+Then baseline the two-chart residual:
+
+```bash
+python3 -m validators.compactified_equations_twochart \
+  --profile work/v117_twochart_init.json \
+  --residual-kind normalized-structural \
+  --scan standard,focused,secondary,origin,edge \
+  --q2-policy zero \
+  --out work/v117_twochart_baseline_residual.json
+
+python3 -m validators.compactified_equations_twochart \
+  --profile work/v117_twochart_init.json \
+  --mortar-order 4 \
+  --scan seam \
+  --out work/v117_twochart_mortar_baseline.json
+```
+
+Then run the first hard-constrained Newton stage:
+
+```bash
+python3 tools/profile_newton_twochart.py \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_stage0_origin.json \
+  --blocks origin,interface \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-order 4 \
+  --max-iter 20
+
+python3 tools/profile_newton_twochart.py \
+  --input work/twochart_stage0_origin.json \
+  --out work/twochart_stage1_global.json \
+  --blocks tail,origin,interface \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --mortar-order 4 \
+  --trust 0.05 \
+  --max-iter 40
+```
+
+Stage-0 go criterion:
+
+```text
+origin structural max drops from the current q2-zero origin-refit scale
+~2.11e2 to < 1e2 without increasing focused/secondary residuals by >25%.
+```
+
+Stage-1 go criterion:
+
+```text
+standard/focused/secondary/origin/high-|b| structural max < 1.
+```
+
+Fixed `(9/20,1)` stop criterion after degree refinement:
+
+```text
+global structural residual stalls above 1e-4,
+or origin quotient above 1e-5,
+or seam derivative residual above 1e-5.
+```
+
+If this stop criterion triggers, run the `(gamma,B)` parameter funnel. Do not
+return to sparse bumps or one-chart polishing.
 
 For every command, say what result decides "continue", "refine", or "abandon".
 
@@ -712,13 +935,16 @@ Follow these constraints:
 1. Do not claim a proof from an O(1) residual.
 2. Do not accept small ordinary q1 leakage; q1 must be structurally forbidden.
 3. Do not accept a fractional q^p block unless it matches the formal recurrence.
-4. Do not use sparse bumps as the proof representation.
-5. Do not validate finite differences as a proof object; use exact symbolic/AD residuals.
-6. Do not proceed to spectrum before pressure reconstruction is certified.
-7. Do not interpret residual-Jacobian eigenvalues as the true spectrum.
-8. Do not count geometric modes as non-geometric codimension.
-9. Do not claim finite-energy Navier-Stokes closure without moving truncation and divergence repair.
-10. If the branch is likely dead, state the next mathematical pivot, not just "try more optimization".
+4. Do not accept ordinary q^2 unless a formal recurrence/indicial theorem proves it legal; default two-chart Newton must enforce q2 zero.
+5. Do not use sparse bumps as the proof representation.
+6. Do not use the old one-chart origin splice as the final proof solver; build the hard two-chart `(q,x)`/`(R,Z)` solver first.
+7. Do not pivot to radial core-tail matching until the two-chart solver, tail recurrence gate, analytic Jacobian, and parameter funnel have failed.
+8. Do not validate finite differences as a proof object; use exact symbolic/AD residuals.
+9. Do not proceed to spectrum before pressure reconstruction is certified.
+10. Do not interpret residual-Jacobian eigenvalues as the true spectrum.
+11. Do not count geometric modes as non-geometric codimension.
+12. Do not claim finite-energy Navier-Stokes closure without moving truncation and divergence repair.
+13. If the branch is likely dead, state the next mathematical pivot, not just "try more optimization".
 ```
 
 ## 12. Desired Final Answer Style

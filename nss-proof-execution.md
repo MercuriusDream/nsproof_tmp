@@ -2725,6 +2725,112 @@ formal tail recurrence validator later proves the ordinary `q^2` channel is
 admissible.  This is still not a proof certificate; it is a stricter ansatz
 gate that prevents the solver from using an unvalidated escape channel.
 
+The first two-chart scaffolds are now present:
+
+```text
+validators/origin_chart.py
+tools/profile_project_twochart.py
+validators/twochart_mortar.py
+```
+
+The origin chart self-test
+
+```text
+python3 -m validators.origin_chart \
+  --self-test \
+  --derivative-order 4 \
+  --tolerance 1e-10 \
+  --out work/origin_chart_selftest.json
+```
+
+passes as a floating diagnostic:
+
+```text
+status=ORIGIN_CHART_SELFTEST_OK_NOT_INTERVAL,
+chart_consistency_max_abs_diff=9.625424538260e-13,
+fake_smooth_rejected=True,
+ray_spread=1.
+```
+
+The fake-smooth rejection matters because a function such as
+
+```text
+x=Z/(R+Z)
+```
+
+looks harmless in the compactified angular variable but has ray-dependent
+origin limit and derivative blow-up in `(R,Z)`.
+
+The q2-free two-chart projection command
+
+```text
+python3 tools/profile_project_twochart.py \
+  --input work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json \
+  --gamma 9/20 --B 1 \
+  --origin-chart RZ \
+  --q2-policy zero \
+  --forced-qp formal \
+  --out work/v117_twochart_init.json
+```
+
+creates a diagnostic object with the strict tail gate passing:
+
+```text
+tail_legality_status=TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL,
+ordinary_q1_F_max=0,
+ordinary_q1_G_max=0,
+ordinary_q2_F_trace_max=1.804112415016e-16,
+ordinary_q2_G_trace_max=7.771561172376e-16,
+forced_qp_coeff_error=0.
+```
+
+The sampled overlap mismatch is still huge:
+
+```text
+overlap q band=[0.84,0.92],
+C0/C1/C2 overlap max_abs=5.076810111338e+04,
+overlap_rms=2.771085838459e+03,
+worst=F:dqq at q=0.84, x=1.
+```
+
+The read-only mortar audit confirms the same obstruction on a denser grid:
+
+```text
+python3 validators/twochart_mortar.py \
+  --profile work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json \
+  --json-out work/twochart_mortar_audit_v1_q2zero.json
+```
+
+gives
+
+```text
+C2 max_abs=5.076810111338e+04,
+worst component=F, dq_order=2, dx_order=0, q=0.84, x=1.
+```
+
+and the C3 smoke audit
+
+```text
+python3 validators/twochart_mortar.py \
+  --profile work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json \
+  --max-order 3 \
+  --q-samples 9 \
+  --x-samples 9 \
+  --json-out work/twochart_mortar_audit_v1_q2zero_c3_smoke.json
+```
+
+gives
+
+```text
+C3 max_abs=2.810512623453e+06,
+worst component=F, dq_order=3, dx_order=0, q=0.84, x=1.
+```
+
+These numbers do not prove the branch is dead.  They prove that the old
+one-chart/origin-splice candidate is not even close to a smooth two-chart proof
+object and that the next solver must impose C3/C4 interface equations as hard
+rows with an analytic coefficient Jacobian.
+
 The profile validation gates are:
 
 ```text

@@ -1,0 +1,47 @@
+{
+  "gate_status": "DIAGNOSTIC_ONLY_NO_INTERVAL_OR_PROOF_CLAIM",
+  "self_test": {
+    "derivative_order": 4,
+    "fake_smooth_rejection": {
+      "dR_abs_at_rho2_1e_minus_6_x_1_2": 500000.0,
+      "dR_abs_at_rho2_1e_minus_7_x_1_2": 5000000.0,
+      "derivative_growth": 10.0,
+      "function": "H(q,x)=x=Z/(R+Z)",
+      "ok": true,
+      "ray_spread": 1.0,
+      "ray_values_at_rho2_1e_minus_8": [
+        0.0,
+        0.25,
+        0.5,
+        0.7500000000000001,
+        1.0
+      ],
+      "ray_x": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "rejection_reason": "ray-dependent origin limit and derivative growth in R,Z"
+    },
+    "gate_status": "SELFTEST_ONLY_NO_INTERVAL_OR_PROOF_CLAIM",
+    "status": "ORIGIN_CHART_SELFTEST_OK_NOT_INTERVAL",
+    "tolerance": 1e-10,
+    "triangular_polynomial_chart_consistency": {
+      "max_abs_diff": 9.625424538260062e-13,
+      "ok": true,
+      "worst": {
+        "R": 0.009073724007561443,
+        "Z": 0.17240075614366726,
+        "abs_diff": 9.625424538260062e-13,
+        "dR": 2,
+        "dZ": 2,
+        "diff": -9.625424538260062e-13,
+        "q": 0.92,
+        "x": 0.95
+      }
+    }
+  },
+  "status": "ORIGIN_CHART_DIAGNOSTICS_NOT_INTERVAL_VALIDATION"
+}
