@@ -8,6 +8,7 @@ library only. The compiled shared library is written to a temporary directory.
 from __future__ import annotations
 
 import ctypes
+import json
 import math
 import os
 import platform
@@ -26,10 +27,21 @@ if str(ROOT) not in sys.path:
 from validators.twochart_mortar_jacobian import (  # noqa: E402
     cheb_basis_partial,
     cheb_basis_values,
+    enumerate_coefficients,
+    patch_interval,
+    point_in_patch,
     rz_coordinate_jets,
     rz_derivative_indices,
+    variable_tail_patch,
     weighted_coeff_rz_jet,
     weighted_cheb_coeff_partial,
+)
+from validators.compactified_equations import qb_to_rz  # noqa: E402
+from validators.compactified_equations_twochart import (  # noqa: E402
+    PDE_RESIDUAL_KIND_IDS,
+    base_linearization_scalars,
+    linearized_residual_with_kind,
+    projection_from_twochart,
 )
 from validators.origin_chart import qx_to_rz  # noqa: E402
 
@@ -140,6 +152,35 @@ def load_library(path: Path) -> ctypes.CDLL:
         ctypes.POINTER(ctypes.c_int),
     ]
     lib.nsproof_rz_weighted_coeff_partials_batch.restype = ctypes.c_int
+
+    lib.nsproof_pde_tail_coeff_columns_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_pde_tail_coeff_columns_batch.restype = ctypes.c_int
 
     return lib
 
@@ -343,8 +384,105 @@ def validate_repeated(lib: ctypes.CDLL, passes: int) -> list[tuple[float, float,
     for _index in range(passes):
         cases = validate(lib)
         validate_rz_batch(lib)
+        validate_pde_tail_batch(lib)
         validate_error_statuses(lib)
     return cases
+
+
+def validate_pde_tail_batch(lib: ctypes.CDLL) -> dict[str, float]:
+    profile_path = ROOT / "work" / "v117_twochart_init.json"
+    with profile_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+
+    projection = projection_from_twochart(data)
+    variables = enumerate_coefficients(data)
+    residual_kind = "normalized-structural"
+    point_list = [(0.45, 0.30), (0.61, 0.24), (0.88, 0.20), (0.90, 0.95)]
+    max_abs = 0.0
+    max_rel = 0.0
+    total_cases = 0
+
+    for q, b in point_list:
+        x = b * b
+        active = []
+        for variable in variables:
+            if variable.chart != "tail":
+                continue
+            patch = variable_tail_patch(data, variable)
+            if point_in_patch(patch, q, x):
+                active.append((variable, patch_interval(patch)))
+            if len(active) >= 80:
+                break
+        if not active:
+            raise AssertionError(f"no active tail variables at q={q} b={b}")
+
+        count = len(active)
+        total_cases += count
+        double_array = ctypes.c_double * count
+        int_array = ctypes.c_int * count
+        q0_values = double_array(*[interval[0] for _variable, interval in active])
+        q1_values = double_array(*[interval[1] for _variable, interval in active])
+        x0_values = double_array(*[interval[2] for _variable, interval in active])
+        x1_values = double_array(*[interval[3] for _variable, interval in active])
+        alpha_values = double_array(*[float(variable.alpha) for variable, _interval in active])
+        kq_values = int_array(*[int(variable.kq) for variable, _interval in active])
+        kx_values = int_array(*[int(variable.kx) for variable, _interval in active])
+        component_values = int_array(*[0 if variable.component == "F" else 1 for variable, _interval in active])
+        out_e_psi = double_array()
+        out_e_gamma = double_array()
+        statuses = int_array()
+        r0, z0 = qb_to_rz(q, b)
+        scalars = base_linearization_scalars(projection, r0, z0)
+
+        status = lib.nsproof_pde_tail_coeff_columns_batch(
+            count,
+            PDE_RESIDUAL_KIND_IDS[residual_kind],
+            float(projection.gamma),
+            float(projection.p),
+            float(q),
+            float(b),
+            float(scalars["psi_r"]),
+            float(scalars["psi_z"]),
+            float(scalars["swirl"]),
+            float(scalars["swirl_r"]),
+            float(scalars["swirl_z"]),
+            float(scalars["a"]),
+            float(scalars["a_r"]),
+            float(scalars["a_z"]),
+            q0_values,
+            q1_values,
+            x0_values,
+            x1_values,
+            alpha_values,
+            kq_values,
+            kx_values,
+            component_values,
+            out_e_psi,
+            out_e_gamma,
+            statuses,
+        )
+        if status != 0:
+            bad_statuses = sorted({int(statuses[index]) for index in range(count)})
+            raise AssertionError(f"PDE tail batch status {status}, statuses={bad_statuses}")
+
+        for row, (variable, _interval) in enumerate(active):
+            expected = linearized_residual_with_kind(data, projection, variable, q, b, residual_kind)
+            for got, py_value, component in (
+                (float(out_e_psi[row]), expected.e_psi, "e_psi"),
+                (float(out_e_gamma[row]), expected.e_gamma, "e_gamma"),
+            ):
+                diff = abs(got - py_value)
+                scale = max(1.0, abs(py_value))
+                max_abs = max(max_abs, diff)
+                max_rel = max(max_rel, diff / scale)
+                if diff > 1e-7 * scale:
+                    raise AssertionError(
+                        "PDE tail mismatch "
+                        f"q={q} b={b} variable={variable.name} component={component}: "
+                        f"got={got!r} expected={py_value!r}"
+                    )
+
+    return {"points": float(len(point_list)), "cases": float(total_cases), "max_abs": max_abs, "max_rel": max_rel}
 
 
 def validate_rz_batch(lib: ctypes.CDLL) -> None:
@@ -491,13 +629,21 @@ def main() -> int:
         lib = load_library(lib_path)
         validation_passes = int(os.environ.get("NSPROOF_NATIVE_C_VALIDATION_PASSES", "3"))
         cases = validate_repeated(lib, validation_passes)
+        pde_validation = validate_pde_tail_batch(lib)
 
         patch = {"q_interval": (0.5, 2.5), "x_interval": (-1.25, 1.75)}
         scalar_py, scalar_c, scalar_acc = benchmark_scalar(lib, patch, cases, repeats)
         batch_py, batch_c, batch_acc = benchmark_batch(lib, patch, cases, repeats)
 
-    print("native/c Chebyshev+RZ kernel validation: ok")
+    print("native/c Chebyshev+RZ+PDE-tail kernel validation: ok")
     print(f"validation passes: {validation_passes}")
+    print(
+        "pde tail validation: "
+        f"points={int(pde_validation['points'])} "
+        f"cases={int(pde_validation['cases'])} "
+        f"max_abs={pde_validation['max_abs']:.3e} "
+        f"max_rel={pde_validation['max_rel']:.3e}"
+    )
     print(f"weighted cases: {len(cases)}")
     print(f"repeats: {repeats}")
     print(f"scalar Python: {scalar_py:.6f}s")

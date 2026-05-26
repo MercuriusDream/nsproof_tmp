@@ -10,10 +10,12 @@ Newton-Kantorovich, or proof claim.
 from __future__ import annotations
 
 import argparse
+import ctypes
 import json
 import math
 import os
 import sys
+import time
 from typing import Any
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -37,6 +39,7 @@ from validators.twochart_mortar_jacobian import (  # noqa: E402
     build_rz_rows,
     enumerate_coefficients,
     get_path,
+    native_c_library,
     patch_interval,
     set_path,
     summarize_rows,
@@ -50,6 +53,12 @@ STATUS = "DIAGNOSTIC_TWOCHART_RESIDUAL_BASELINE_NOT_PROOF"
 MORTAR_STATUS = "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF"
 PDE_JACOBIAN_STATUS = "DIAGNOSTIC_TWOCHART_PDE_JACOBIAN_SMOKE_NOT_PROOF"
 TWOCHART_FORMAT = "twochart_profile_projection_v1"
+PDE_RESIDUAL_KIND_IDS = {
+    "raw": 0,
+    "geometric-normalized": 1,
+    "normalized-structural": 2,
+    "normalized-strict-tail": 3,
+}
 
 
 SCAN_PRESETS: dict[str, dict[str, object]] = {
@@ -347,6 +356,107 @@ def linearized_residual_with_kind(
     # If a future quotient depends on the profile itself, this linearization
     # must include the derivative of that normalization factor.
     return residual_with_kind(raw, q, b, projection.p, residual_kind)
+
+
+def base_linearization_scalars(projection: ProjectedProfile, r0: float, z0: float) -> dict[str, float]:
+    r = Jet2.var_r(r0)
+    psi = projection.psi_jet(r0, z0)
+    gamma_field = projection.swirl_jet(r0, z0)
+    psi_r = psi.dr()
+    psi_z = psi.dz()
+    gamma_r = gamma_field.dr()
+    gamma_z = gamma_field.dz()
+    a = psi.dr().dr() - psi.dr() / r + psi.dz().dz()
+    return {
+        "psi_r": psi_r.value(),
+        "psi_z": psi_z.value(),
+        "swirl": gamma_field.value(),
+        "swirl_r": gamma_r.value(),
+        "swirl_z": gamma_z.value(),
+        "a": a.value(),
+        "a_r": a.dr().value(),
+        "a_z": a.dz().value(),
+    }
+
+
+def native_tail_linearized_residuals_with_kind(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    variables: list[CoefficientVariable],
+    q: float,
+    b: float,
+    residual_kind: str,
+) -> tuple[dict[int, Residual], dict[str, Any]]:
+    if residual_kind not in PDE_RESIDUAL_KIND_IDS:
+        raise ValueError(f"unknown residual kind {residual_kind!r}")
+    r0, z0 = qb_to_rz(q, b)
+    if r0 <= 0.0:
+        raise ValueError("native PDE rows are undefined on the axis r=0")
+    x = b * b
+    cases: list[tuple[CoefficientVariable, tuple[float, float, float, float]]] = []
+    for variable in variables:
+        if variable.chart != "tail":
+            continue
+        patch = variable_tail_patch(data, variable)
+        if point_in_patch(patch, q, x):
+            cases.append((variable, patch_interval(patch)))
+    if not cases:
+        return {}, {"enabled": True, "cases": 0, "seconds": 0.0}
+
+    scalars = base_linearization_scalars(projection, r0, z0)
+    lib = native_c_library()
+    count = len(cases)
+    double_array = ctypes.c_double * count
+    int_array = ctypes.c_int * count
+    q0_values = double_array(*[interval[0] for _variable, interval in cases])
+    q1_values = double_array(*[interval[1] for _variable, interval in cases])
+    x0_values = double_array(*[interval[2] for _variable, interval in cases])
+    x1_values = double_array(*[interval[3] for _variable, interval in cases])
+    alpha_values = double_array(*[float(variable.alpha) for variable, _interval in cases])
+    kq_values = int_array(*[int(variable.kq) for variable, _interval in cases])
+    kx_values = int_array(*[int(variable.kx) for variable, _interval in cases])
+    component_values = int_array(*[0 if variable.component == "F" else 1 for variable, _interval in cases])
+    out_e_psi = double_array()
+    out_e_gamma = double_array()
+    statuses = int_array()
+
+    start = time.perf_counter()
+    rc = lib.nsproof_pde_tail_coeff_columns_batch(
+        count,
+        PDE_RESIDUAL_KIND_IDS[residual_kind],
+        float(projection.gamma),
+        float(projection.p),
+        float(q),
+        float(b),
+        float(scalars["psi_r"]),
+        float(scalars["psi_z"]),
+        float(scalars["swirl"]),
+        float(scalars["swirl_r"]),
+        float(scalars["swirl_z"]),
+        float(scalars["a"]),
+        float(scalars["a_r"]),
+        float(scalars["a_z"]),
+        q0_values,
+        q1_values,
+        x0_values,
+        x1_values,
+        alpha_values,
+        kq_values,
+        kx_values,
+        component_values,
+        out_e_psi,
+        out_e_gamma,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(count)))
+        raise RuntimeError(f"native C PDE tail batch failed rc={rc} statuses={bad_statuses}")
+
+    return {
+        variable.index: Residual(e_psi=float(out_e_psi[row]), e_gamma=float(out_e_gamma[row]))
+        for row, (variable, _interval) in enumerate(cases)
+    }, {"enabled": True, "cases": count, "seconds": elapsed}
 
 
 def perturb_variable(data: dict[str, Any], variable: CoefficientVariable, delta: float) -> dict[str, Any]:

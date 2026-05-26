@@ -525,10 +525,42 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_rz_weighted_coeff_partials_batch.restype = ctypes.c_int
+    lib.nsproof_pde_tail_coeff_columns_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_pde_tail_coeff_columns_batch.restype = ctypes.c_int
     _NATIVE_C_LIB = lib
     _NATIVE_C_RZ_STATS["available"] = True
     _NATIVE_C_RZ_STATS["compile_seconds"] += time.perf_counter() - start
     return lib
+
+
+def native_c_library() -> ctypes.CDLL:
+    return _native_c_library()
 
 
 def native_c_rz_stats() -> dict[str, Any]:

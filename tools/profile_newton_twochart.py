@@ -43,6 +43,7 @@ _STAGE0_WORKER_DATA: dict[str, Any] | None = None
 _STAGE0_WORKER_PROJECTION: Any = None
 _STAGE0_WORKER_VARIABLES: list[Any] = []
 _STAGE0_WORKER_RESIDUAL_KIND = "normalized-structural"
+_STAGE0_WORKER_NATIVE_C = False
 
 
 class NewtonNoImprovement(RuntimeError):
@@ -549,7 +550,7 @@ def vector_metrics(vec: list[float]) -> dict[str, float]:
 def guard_point_metrics(data: dict[str, Any], args: argparse.Namespace, points: list[tuple[float, float]]) -> dict[str, Any]:
     if not points:
         return {"enabled": False, **vector_metrics([])}
-    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import projection_from_twochart
 
     projection = projection_from_twochart(data)
@@ -654,24 +655,29 @@ def stage0_row_scaling(
     }
 
 
-def _init_stage0_point_worker(data: dict[str, Any], variables: list[Any], residual_kind: str) -> None:
+def _init_stage0_point_worker(data: dict[str, Any], variables: list[Any], residual_kind: str, native_c: bool) -> None:
     global _STAGE0_WORKER_DATA
     global _STAGE0_WORKER_PROJECTION
     global _STAGE0_WORKER_VARIABLES
     global _STAGE0_WORKER_RESIDUAL_KIND
+    global _STAGE0_WORKER_NATIVE_C
     from validators.compactified_equations_twochart import projection_from_twochart
 
     _STAGE0_WORKER_DATA = data
     _STAGE0_WORKER_PROJECTION = projection_from_twochart(data)
     _STAGE0_WORKER_VARIABLES = variables
     _STAGE0_WORKER_RESIDUAL_KIND = residual_kind
+    _STAGE0_WORKER_NATIVE_C = native_c
 
 
 def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str, Any]:
     if _STAGE0_WORKER_DATA is None or _STAGE0_WORKER_PROJECTION is None:
         raise RuntimeError("stage-0 point worker was not initialized")
-    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
-    from validators.compactified_equations_twochart import linearized_residual_with_kind
+    from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import (
+        linearized_residual_with_kind,
+        native_tail_linearized_residuals_with_kind,
+    )
 
     q, b, weight, label, row_type = task
     projection = _STAGE0_WORKER_PROJECTION
@@ -680,17 +686,32 @@ def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str
     r, z = qb_to_rz(q, b)
     raw = projection.exact_residual_at(r, z)
     residual = residual_with_kind(raw, q, b, projection.p, _STAGE0_WORKER_RESIDUAL_KIND)
-    columns = [
-        linearized_residual_with_kind(
+    native_tail_columns: dict[int, Any] = {}
+    native_stats: dict[str, Any] = {"enabled": False, "cases": 0, "seconds": 0.0}
+    if _STAGE0_WORKER_NATIVE_C:
+        native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
             _STAGE0_WORKER_DATA,
             projection,
-            variable,
+            _STAGE0_WORKER_VARIABLES,
             q,
             b,
             _STAGE0_WORKER_RESIDUAL_KIND,
         )
-        for variable in _STAGE0_WORKER_VARIABLES
-    ]
+    columns = []
+    for variable in _STAGE0_WORKER_VARIABLES:
+        if _STAGE0_WORKER_NATIVE_C and variable.chart == "tail":
+            columns.append(native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
+        else:
+            columns.append(
+                linearized_residual_with_kind(
+                    _STAGE0_WORKER_DATA,
+                    projection,
+                    variable,
+                    q,
+                    b,
+                    _STAGE0_WORKER_RESIDUAL_KIND,
+                )
+            )
     return {
         "skipped": False,
         "q": q,
@@ -703,6 +724,7 @@ def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str
             "e_psi": [weight * column.e_psi for column in columns],
             "e_gamma": [weight * column.e_gamma for column in columns],
         },
+        "native_c_pde": native_stats,
     }
 
 
@@ -716,8 +738,9 @@ def build_stage0_point_rows(
     label: str,
     row_type: str,
     workers: int,
+    use_native_c: bool = False,
 ) -> list[dict[str, Any]]:
-    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import linearized_residual_with_kind
 
     if not points:
@@ -728,7 +751,7 @@ def build_stage0_point_rows(
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=workers,
                 initializer=_init_stage0_point_worker,
-                initargs=(data, selected, residual_kind),
+                initargs=(data, selected, residual_kind, use_native_c),
             ) as pool:
                 return [item for item in pool.map(_stage0_point_worker, tasks) if not item.get("skipped")]
         except Exception as exc:  # noqa: BLE001 - fall back to serial diagnostics.
@@ -751,6 +774,7 @@ def build_stage0_point_rows(
                 label,
                 row_type,
                 workers=1,
+                use_native_c=use_native_c,
             )
 
     rows: list[dict[str, Any]] = []
@@ -762,10 +786,25 @@ def build_stage0_point_rows(
         r, z = qb_to_rz(q, b)
         raw = projection.exact_residual_at(r, z)
         residual = residual_with_kind(raw, q, b, projection.p, residual_kind)
-        columns = [
-            linearized_residual_with_kind(data, projection, variable, q, b, residual_kind)
-            for variable in selected
-        ]
+        native_tail_columns: dict[int, Any] = {}
+        native_stats: dict[str, Any] = {"enabled": False, "cases": 0, "seconds": 0.0}
+        if use_native_c:
+            from validators.compactified_equations_twochart import native_tail_linearized_residuals_with_kind
+
+            native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+                data,
+                projection,
+                selected,
+                q,
+                b,
+                residual_kind,
+            )
+        columns = []
+        for variable in selected:
+            if use_native_c and variable.chart == "tail":
+                columns.append(native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
+            else:
+                columns.append(linearized_residual_with_kind(data, projection, variable, q, b, residual_kind))
         rows.append(
             {
                 "skipped": False,
@@ -779,6 +818,7 @@ def build_stage0_point_rows(
                     "e_psi": [weight * column.e_psi for column in columns],
                     "e_gamma": [weight * column.e_gamma for column in columns],
                 },
+                "native_c_pde": native_stats,
             }
         )
     return rows
@@ -788,6 +828,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
         linearized_residual_with_kind,
+        native_tail_linearized_residuals_with_kind,
         projection_from_twochart,
     )
     from validators.twochart_mortar_jacobian import (
@@ -877,6 +918,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 
     pde_rows: list[dict[str, Any]] = []
     variable_scores = {variable.index: 0.0 for variable in candidate_variables}
+    native_c_pde_prescore = {"enabled": False, "cases": 0, "seconds": 0.0}
     for q, b in pde_points:
         if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
             continue
@@ -885,8 +927,25 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
         pde_rows.append({"q": q, "b": b, "component": "e_psi", "residual": residual.e_psi})
         pde_rows.append({"q": q, "b": b, "component": "e_gamma", "residual": residual.e_gamma})
+        native_tail_columns: dict[int, Any] = {}
+        if args.native_c:
+            native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+                data,
+                projection,
+                candidate_variables,
+                q,
+                b,
+                args.residual_kind,
+            )
+            if native_stats.get("enabled"):
+                native_c_pde_prescore["enabled"] = True
+                native_c_pde_prescore["cases"] += int(native_stats.get("cases", 0))
+                native_c_pde_prescore["seconds"] += float(native_stats.get("seconds", 0.0))
         for variable in candidate_variables:
-            column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
+            if args.native_c and variable.chart == "tail":
+                column = native_tail_columns.get(variable.index, residual.__class__(e_psi=0.0, e_gamma=0.0))
+            else:
+                column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
             variable_scores[variable.index] += abs(column.e_psi * residual.e_psi) + abs(column.e_gamma * residual.e_gamma)
 
     mortar_rows = []
@@ -924,6 +983,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     row_records: list[dict[str, Any]] = []
     row_groups: dict[str, int] = {"pde": 0, "mortar": 0, "active_guard": 0}
     parallel_fallbacks: list[dict[str, Any]] = []
+    native_c_pde = dict(native_c_pde_prescore)
 
     pde_point_rows = build_stage0_point_rows(
         data,
@@ -935,12 +995,18 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "pde",
         "pde",
         args.stage0_workers,
+        use_native_c=args.native_c,
     )
     for point_row in pde_point_rows:
         if point_row.get("skipped"):
             if point_row.get("fallback_reason"):
                 parallel_fallbacks.append(point_row)
             continue
+        point_native = point_row.get("native_c_pde", {})
+        if point_native.get("enabled"):
+            native_c_pde["enabled"] = True
+            native_c_pde["cases"] += int(point_native.get("cases", 0))
+            native_c_pde["seconds"] += float(point_native.get("seconds", 0.0))
         q = float(point_row["q"])
         b = float(point_row["b"])
         for component in ("e_psi", "e_gamma"):
@@ -1010,12 +1076,18 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             "active_guard",
             "active_guard",
             args.stage0_workers,
+            use_native_c=args.native_c,
         )
         for point_row in guard_point_rows:
             if point_row.get("skipped"):
                 if point_row.get("fallback_reason"):
                     parallel_fallbacks.append(point_row)
                 continue
+            point_native = point_row.get("native_c_pde", {})
+            if point_native.get("enabled"):
+                native_c_pde["enabled"] = True
+                native_c_pde["cases"] += int(point_native.get("cases", 0))
+                native_c_pde["seconds"] += float(point_native.get("seconds", 0.0))
             q = float(point_row["q"])
             b = float(point_row["b"])
             objective_active_guard_points.append((q, b))
@@ -1062,6 +1134,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "stage0_workers": args.stage0_workers,
         "parallel_fallbacks": parallel_fallbacks,
         "native_c_rz": native_c_rz_stats(),
+        "native_c_pde": native_c_pde,
         "objective_pde_rows": pde_rows,
         "objective_mortar_rows": objective_mortar_rows,
         "objective_active_guard_points": objective_active_guard_points,
@@ -1832,6 +1905,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "stage0_workers": system.get("stage0_workers", 1),
                 "parallel_fallbacks": system.get("parallel_fallbacks", []),
                 "native_c_rz": system.get("native_c_rz", {}),
+                "native_c_pde": system.get("native_c_pde", {}),
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
@@ -2449,6 +2523,13 @@ def main() -> None:
                     f"cases:{native_c_rz.get('cases', 0)} "
                     f"calls:{native_c_rz.get('calls', 0)} "
                     f"seconds:{float(native_c_rz.get('seconds', 0.0)):.6f}"
+                )
+            native_c_pde = last.get("native_c_pde", {})
+            if native_c_pde.get("enabled"):
+                print(
+                    "native_c_pde="
+                    f"cases:{native_c_pde.get('cases', 0)} "
+                    f"seconds:{float(native_c_pde.get('seconds', 0.0)):.6f}"
                 )
             print(f"base_objective_first={first['base']['objective']:.12e}")
             final_metrics = result["candidate"]["twochart_newton_stage0_summary"].get("final_metrics", {})

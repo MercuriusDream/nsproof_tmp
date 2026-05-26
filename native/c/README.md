@@ -1,9 +1,10 @@
 # NSProof C Kernel Prototype
 
-This directory contains a small C ABI prototype for moving the hottest scalar
-Chebyshev helpers in `validators/twochart_mortar_jacobian.py` out of Python.
-The scalar Chebyshev helpers are still a benchmark/probe boundary. The R/Z
-tail-coefficient mortar Jacobian batch path is now wired into Stage-0 behind
+This directory contains a small C ABI prototype for moving hot row/Jacobian
+kernels out of Python while keeping Python as the solver orchestration and
+artifact/report layer. The scalar Chebyshev helpers are still a benchmark/probe
+boundary. The R/Z tail-coefficient mortar Jacobian batch path and the first
+PDE/guard tail-coefficient column batch path are wired into Stage-0 behind
 `--native-c`.
 
 ## Implemented Boundary
@@ -34,6 +35,14 @@ tail-coefficient mortar Jacobian batch path is now wired into Stage-0 behind
     Chebyshev tensor basis up to total order 4.
   - Returns the partials in the same order as
     `validators.origin_chart.derivative_indices(max_order)`.
+- `nsproof_pde_tail_coeff_columns_batch(...)`
+  - Batched physical-space PDE linearized residual columns for active tail
+    coefficients at one `(q,b)` point.
+  - Reconstructs `q(r,z)`, `x(r,z)`, the coefficient jet, and the mechanical
+    profile variation in C, then evaluates the same normalized residual-kind
+    quotients as the Python path.
+  - Uses caller-provided base profile scalars so Python can still own profile
+    evaluation while the repeated tail-column work moves to C.
 
 All exported functions use only plain C types and caller-owned buffers. Error
 status values are:
@@ -117,62 +126,74 @@ current_128_exact_c_accelerable_without_solver_changes = false
 ```
 
 That probe is now historical for the q/x inner-kernel boundary. The current C
-ABI also includes the R/Z chain-rule kernel below, so the remaining large
-non-native slice in the 128 run is PDE/active-guard residual Jacobian assembly
-and prediction/line-search bookkeeping.
+ABI also includes the R/Z chain-rule kernel and a PDE/guard tail-column kernel,
+so the remaining large non-native slice in the 128 run is mostly origin-column
+PDE work, base profile evaluation, active-set linear algebra, and
+prediction/line-search bookkeeping.
 
-## Stage-0 R/Z Native Path
+## Stage-0 Native Paths
 
-The R/Z tail coefficient Jacobian slice is now available in the solver:
+The R/Z mortar and PDE/guard tail-column slices are now available in the solver:
 
 ```bash
 python3 tools/profile_newton_twochart.py ... --mortar-coordinates RZ --native-c
 ```
 
-The latest 128-variable scaled inequality diagnostic using this path is:
+The latest 128-variable scaled inequality diagnostic using both native paths is:
 
 ```text
-work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_report.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_report.json
 ```
 
 It records:
 
 ```text
-native_c_rz calls = 42
-native_c_rz cases = 804
-native_c_rz seconds = 0.000700
+real time = 37.06s
+native_c_rz calls = 42, cases = 804, seconds = 0.000598
+native_c_pde cases = 1222, seconds = 0.004336
+selected variables = 128 = 101 tail + 27 origin
+accepted block = full
+held-out edge = 4.489165334070e2
+C0-C4 R/Z mortar = 5.833745908165e6
 ```
 
 The C4 mortar audit:
 
 ```text
-work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_mortar_c4.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_mortar_c4.json
 ```
 
 uses the same native path for `43560` R/Z tail cases.
 
-Validation against the Python R/Z jet path:
+Validation against the Python R/Z jet and PDE tail-column paths:
 
 ```text
-max_abs = 4.628673195839e-7
-max_rel = 4.105836156138e-12
-finite-difference smoke max_abs = 4.351176130513e-8
+R/Z max_abs = 4.628673195839e-7
+R/Z max_rel = 4.105836156138e-12
+R/Z finite-difference smoke max_abs = 4.351176130513e-8
+PDE tail validation points = 4
+PDE tail validation cases = 320
+PDE tail max_abs = 1.997e-6
+PDE tail max_rel = 2.239e-13
 ```
 
 `tools/benchmark_native_c_kernel.py` now validates both the Chebyshev
-microkernel and the R/Z batch kernel. Latest local run:
+microkernel, the R/Z batch kernel, and the PDE tail-column batch kernel. Latest
+local run:
 
 ```text
-native/c Chebyshev+RZ kernel validation: ok
-validation passes: 3
-scalar ctypes C: 11.18x vs Python
-batch ctypes C: 104.96x vs Python
+NSPROOF_NATIVE_C_VALIDATION_PASSES=2 NSPROOF_NATIVE_C_REPEATS=50
+native/c Chebyshev+RZ+PDE-tail kernel validation: ok
+scalar ctypes C: 10.27x vs Python
+batch ctypes C: 97.12x vs Python
 ```
 
-## Remaining Work Before Stage-0 Wiring
+## Remaining Native Work
 
-- Define the stable row/Jacobian kernel ABI around complete PDE/guard row
-  batches. The next concrete C boundaries for a real 128 speedup are:
+- Define the stable row/Jacobian kernel ABI around complete multi-point
+  PDE/guard row batches. The current PDE kernel batches tail columns at one
+  point; the next boundary should batch many points and include origin columns
+  or a packed profile view:
 
 ```c
 int nsproof_pde_linearized_columns_batch(
@@ -202,8 +223,9 @@ int nsproof_stage0_prediction_scan_batch(
 );
 ```
 
-- Decide how patch inventory, active-patch selection, alpha values, and
-  coefficient metadata are packed for deterministic JSON-facing APIs.
+- Decide how patch inventory, active-patch selection, alpha values, base profile
+  scalars, and coefficient metadata are packed for deterministic JSON-facing
+  APIs.
 - Add native tests in CI once solver semantics and row definitions stop moving.
 - Keep Python as orchestration/reporting while moving repeated row assembly and
   guard scan loops behind compiled batch calls.

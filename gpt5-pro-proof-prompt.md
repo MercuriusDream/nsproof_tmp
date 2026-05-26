@@ -129,16 +129,16 @@ not substitute narrative confidence for the evidence type.
 Latest repo update in this prompt:
 
 ```text
-Add C-backed R/Z mortar Jacobian path and rerun 128 scaled inequality KKT
+Add C-backed PDE/guard tail columns and rerun 128 scaled inequality KKT
 ```
 
 The repo now includes guarded-KKT row-cache/rank diagnostics, 64/128-variable
 true-worst-row equality-KKT diagnostics, inequality no-growth active-set KKT,
 analytic coefficient scaling, prediction-vs-actual reporting, process-parallel
-Stage-0 PDE/guard row assembly, and the first actual native C path for physical
-R/Z mortar tail-coefficient Jacobian columns. It is still not a proof-grade
-solver; the latest C-backed 128 run is infrastructure plus a sharper negative
-diagnostic, not profile progress.
+Stage-0 PDE/guard row assembly, native C physical R/Z mortar tail-Jacobian
+columns, and native C PDE/guard tail-coefficient columns. It is still not a
+proof-grade solver; the latest C-backed 128 run is infrastructure plus a
+sharper negative diagnostic, not profile progress.
 
 Current progress ledger:
 
@@ -152,7 +152,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | `work/v117_twochart_init.json`; equality rank reports `work/twochart_stage0_rz_kkt_seamlimit64_rank.json`, `work/twochart_stage0_rz_kkt_seamlimit128_rank.json`; C-backed inequality run `work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_report.json`; held-out scan `work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_residual.json`; C4 mortar audit `work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_mortar_c4.json` | Floating diagnostic only; native C and KKT diagnostics are not interval certificates | Not certified; held-out normalized structural residuals remain standard/focused `1.016228983517e1`, secondary `1.422825475247e1`, origin `9.132494644305e1`, edge `4.489165334070e2`, overlap `3.239718900261e2`, and C0-C4 physical R/Z mortar remains `5.833745908165e6` after the 128 C-backed inequality run | `certs/profile/profile_nk.json` plus `certs/profile/pressure_reconstruction.json` |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | `work/v117_twochart_init.json`; equality rank reports `work/twochart_stage0_rz_kkt_seamlimit64_rank.json`, `work/twochart_stage0_rz_kkt_seamlimit128_rank.json`; C-backed inequality run `work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_report.json`; held-out scan `work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_residual.json`; C4 mortar audit `work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_mortar_c4.json` | Floating diagnostic only; native C and KKT diagnostics are not interval certificates | Not certified; held-out normalized structural residuals remain standard/focused `1.016228983517e1`, secondary `1.422825475247e1`, origin `9.132494644305e1`, edge `4.489165334070e2`, overlap `3.239718900261e2`, and C0-C4 physical R/Z mortar remains `5.833745908165e6` after the 128 C-backed inequality run | `certs/profile/profile_nk.json` plus `certs/profile/pressure_reconstruction.json` |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile | Not certified as a theorem gate because no interval-certified admissible profile is linked to it | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and manifest linkage |
 | Natural tail, transseries, indicial certification | q1/forced-`q^p`/q2-zero diagnostics and floating Pluecker/Evans probes | Formal/floating; no interval box cover | Not certified; q1 exclusion and forced `q^p` are enforced in current seed, but recurrence and indicial exclusion are not interval-certified | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json` |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not true Leray-projected operator | Not certified; geometric modes and Riesz projection are not validated | `certs/spectrum/projected_spectrum.json` |
@@ -193,6 +193,7 @@ supports analytic/column coefficient scaling and active-set row/column equilibra
 supports prediction-vs-actual line-search reports via --prediction-actual-report-out.
 supports process-parallel PDE/active-guard row assembly via --stage0-workers.
 supports native C R/Z mortar tail-Jacobian batches via --native-c.
+supports native C PDE/guard tail-column batches via --native-c.
 supports meaningful acceptance thresholds via --min-objective-decrease-abs/rel.
 supports guarded rank/angle report output via --rank-report-out.
 supports first-row cache output via --row-cache-out.
@@ -217,18 +218,24 @@ Native C status:
 native/c/nsproof_kernel.c exports:
   nsproof_weighted_cheb_coeff_partial_array
   nsproof_rz_weighted_coeff_partials_batch
+  nsproof_pde_tail_coeff_columns_batch
 
 The R/Z batch path evaluates q(R,Z), x(R,Z), q^alpha, and Chebyshev jets in C
 up to order 4 for tail coefficient Jacobian columns.
 
+The PDE-tail batch path evaluates physical-space linearized PDE columns for
+active tail variables at a `(q,b)` point, using Python-provided base profile
+scalars but C-side mechanical variation jets and residual-kind normalization.
+
 Benchmark:
-  NSPROOF_NATIVE_C_VALIDATION_PASSES=3 NSPROOF_NATIVE_C_REPEATS=100
+  NSPROOF_NATIVE_C_VALIDATION_PASSES=2 NSPROOF_NATIVE_C_REPEATS=50
   python3 tools/benchmark_native_c_kernel.py
 
 Result:
-  deterministic Chebyshev and R/Z validation passed,
-  scalar ctypes C about 11.18x faster than Python,
-  batched ctypes C about 104.96x faster than Python for the weighted
+  deterministic Chebyshev, R/Z, and PDE-tail validation passed,
+  PDE tail validation: points=4, cases=320, max_abs=1.997e-6, max_rel=2.239e-13,
+  scalar ctypes C about 10.27x faster than Python,
+  batched ctypes C about 97.12x faster than Python for the weighted
   Chebyshev microkernel.
 ```
 
@@ -286,6 +293,11 @@ work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_rank.json
 work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_prediction.json
 work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_residual.json
 work/twochart_stage0_rz_ineqkkt_seamlimit128_scaled_w8_c_mortar_c4.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_report.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_rank.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_prediction.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_residual.json
+work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_mortar_c4.json
 work/twochart_mortar_rz_nativec_smoke.json
 work/guarded_kkt_rank_selftest.json
 work/synth_mortar_polynomial_guardedkkt.json
@@ -485,6 +497,28 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
       rho_grad = 0.073774018604
       predicted_best_factor_inf = 0.430226722141
       best feasible step is still enormous, max_abs = 4.044264535809e12.
+    actual C-backed R/Z + PDE-tail 128-variable inequality run:
+      artifact = work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_report.json
+      --native-c, --stage0-workers 8
+      real time = 37.06s
+      selected variables = 128 = 101 tail + 27 origin
+      native_c_rz in Stage-0: calls=42, cases=804, seconds=0.000598
+      native_c_pde in Stage-0: cases=1222, seconds=0.004336
+      accepted block = full
+      alpha_applied = 1.593332997368e-7
+      objective decrease = 2.699795991182e1 from base 6.513175709741e7
+      held-out standard/focused = 1.016228983517e1
+      secondary = 1.422825475247e1
+      origin = 9.132494644305e1
+      edge = 4.489165334070e2
+      overlap = 3.239718900261e2
+      C0-C4 R/Z mortar = 5.833745908165e6
+      C4 mortar audit:
+        artifact = work/twochart_stage0_rz_ineqkkt_seamlimit128_nativepde_w8_c_mortar_c4.json
+        max_abs = 5.833745908165e6
+      32-variable native/baseline smoke:
+        same selected variables, same accepted block, same base metrics
+        max line-trial objective delta = 1.490116119385e-8
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -500,10 +534,12 @@ latest guarded-KKT full16 held-out edge = 4.489165350285e2
 latest equality-KKT 128 held-out edge = 4.489165349915e2
 latest bounded inequality-KKT F_frac held-out edge = 4.489164259811e2
 latest scaled 128 C-backed inequality-KKT held-out edge = 4.489165334070e2
+latest native PDE+R/Z C-backed 128 inequality-KKT held-out edge = 4.489165334070e2
 C0-C2 R,Z mortar max = 4.214529161145e3
 latest guarded-KKT full16 C0-C2 R,Z mortar max = 4.214529161145e3
 latest bounded inequality-KKT F_frac C0-C4 R,Z mortar max = 5.833745519362e6
 latest scaled 128 C-backed inequality-KKT C0-C4 R,Z mortar max = 5.833745908165e6
+latest native PDE+R/Z C-backed 128 C0-C4 R,Z mortar max = 5.833745908165e6
 ```
 
 Important interpretation:
@@ -539,11 +575,13 @@ active-set implementation proves equality no-change is too restrictive on a
 synthetic case and is wired into the real solver, but the bounded real-profile
 smoke and the 64/128 scaled inequality runs still leave the theorem-scale
 blockers unchanged. The new C R/Z mortar path proves that native batched kernels
-can be integrated without changing solver semantics, but it accelerates only
-the current R/Z tail-coefficient Jacobian slice. The actual runtime bottleneck
-for the 128 run is now mostly Python-side PDE/active-guard residual/Jacobian
-assembly plus solver/report bookkeeping. This is safe Stage-0 infrastructure
-progress, not a Newton basin.
+can be integrated without changing solver semantics, and the new PDE-tail C
+path proves the same for tail coefficient columns in PDE/guard rows. The
+32-variable native/baseline smoke matches solver decisions to roundoff, and the
+128 native PDE+R/Z run reaches the same mathematical conclusion faster. The
+remaining runtime bottleneck is now mostly Python-side origin-column PDE work,
+base profile evaluation, active-set linear algebra, and prediction/line-search
+bookkeeping. This is safe Stage-0 infrastructure progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -561,8 +599,8 @@ The immediate solver fork is:
 
 ```text
 two-sided seam-limit guard generation / cached active-row evaluation /
-native PDE/active-guard residual/Jacobian kernels, then bounded inequality
-active-set KKT with shifted-overlap 64/128/256 diagnostics.
+native multi-point PDE/active-guard residual/Jacobian kernels, then bounded
+inequality active-set KKT with shifted-overlap 64/128/256 diagnostics.
 ```
 
 Do not propose more sparse bumps, origin-only refits, or one-chart polishing as

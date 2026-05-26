@@ -569,6 +569,30 @@ static NsproofJet2 jet_mul(NsproofJet2 lhs, NsproofJet2 rhs) {
     return out;
 }
 
+static NsproofJet2 jet_dr(NsproofJet2 jet) {
+    NsproofJet2 out = jet_zero(jet.order);
+    int a;
+    int b;
+    for (a = 1; a <= jet.order; a++) {
+        for (b = 0; b <= jet.order - a; b++) {
+            out.c[a - 1][b] += (double)a * jet.c[a][b];
+        }
+    }
+    return out;
+}
+
+static NsproofJet2 jet_dz(NsproofJet2 jet) {
+    NsproofJet2 out = jet_zero(jet.order);
+    int a;
+    int b;
+    for (a = 0; a <= jet.order; a++) {
+        for (b = 1; b <= jet.order - a; b++) {
+            out.c[a][b - 1] += (double)b * jet.c[a][b];
+        }
+    }
+    return out;
+}
+
 static int jet_pow_real(NsproofJet2 jet, double exponent, NsproofJet2 *out) {
     double base;
     double binom_value = 1.0;
@@ -693,6 +717,125 @@ static int make_rz_qx_jets(double q_coord, double x_coord, int order, NsproofJet
     status = jet_div(Z, rho, x_jet);
     if (status != NSPROOF_KERNEL_OK) {
         return status;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int make_physical_qx_jets(
+    double q_coord,
+    double b_coord,
+    int order,
+    NsproofJet2 *r_jet,
+    NsproofJet2 *z_jet,
+    NsproofJet2 *q_jet,
+    NsproofJet2 *x_jet
+) {
+    double rho2_value;
+    double rho_value;
+    double one_minus_b2;
+    double r0;
+    double z0;
+    NsproofJet2 rho2;
+    NsproofJet2 one_plus_rho2;
+    NsproofJet2 z2;
+    int status;
+
+    if (r_jet == NULL || z_jet == NULL || q_jet == NULL || x_jet == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!check_finite(q_coord) || !check_finite(b_coord)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    if (!(q_coord > 0.0) || !(q_coord < 1.0) || b_coord < -1.0 || b_coord > 1.0) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+
+    rho2_value = 1.0 / (q_coord * q_coord) - 1.0;
+    one_minus_b2 = 1.0 - b_coord * b_coord;
+    if (!(rho2_value > 0.0) || one_minus_b2 < 0.0 || !check_finite(rho2_value)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    rho_value = sqrt(rho2_value);
+    r0 = rho_value * sqrt(one_minus_b2);
+    z0 = rho_value * b_coord;
+    if (!(r0 > 0.0) || !check_finite(r0) || !check_finite(z0)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+
+    *r_jet = jet_var_r(order, r0);
+    *z_jet = jet_var_z(order, z0);
+    rho2 = jet_add(jet_mul(*r_jet, *r_jet), jet_mul(*z_jet, *z_jet));
+    one_plus_rho2 = jet_add_scalar(rho2, 1.0);
+    status = jet_pow_real(one_plus_rho2, -0.5, q_jet);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    z2 = jet_mul(*z_jet, *z_jet);
+    status = jet_div(z2, rho2, x_jet);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int weighted_coeff_jet(
+    int order,
+    NsproofJet2 q_jet,
+    NsproofJet2 x_jet,
+    double q0,
+    double q1,
+    double x0,
+    double x1,
+    double alpha,
+    int kq,
+    int kx,
+    NsproofJet2 *out
+) {
+    NsproofJet2 tq;
+    NsproofJet2 tx;
+    NsproofJet2 t_q;
+    NsproofJet2 t_x;
+    NsproofJet2 q_alpha;
+    int status;
+
+    if (out == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!check_order(order)) {
+        return NSPROOF_KERNEL_BAD_ORDER;
+    }
+    if (kq < 0 || kx < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (q1 == q0 || x1 == x0) {
+        return NSPROOF_KERNEL_DEGENERATE_INTERVAL;
+    }
+    if (
+        !check_finite(q0) ||
+        !check_finite(q1) ||
+        !check_finite(x0) ||
+        !check_finite(x1) ||
+        !check_finite(alpha)
+    ) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    tq = jet_scale(jet_add_scalar(jet_scale(q_jet, 2.0), -q0 - q1), 1.0 / (q1 - q0));
+    tx = jet_scale(jet_add_scalar(jet_scale(x_jet, 2.0), -x0 - x1), 1.0 / (x1 - x0));
+    status = jet_cheb_t(kq, tq, &t_q);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    status = jet_cheb_t(kx, tx, &t_x);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    status = jet_pow_real(q_jet, alpha, &q_alpha);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    *out = jet_mul(q_alpha, jet_mul(t_q, t_x));
+    if (!jet_is_finite(out)) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
     }
     return NSPROOF_KERNEL_OK;
 }
@@ -854,5 +997,309 @@ NSPROOF_EXPORT int nsproof_rz_weighted_coeff_partials_batch(
         }
     }
 
+    return first_status;
+}
+
+static int compactified_residual_factors_c(
+    int residual_kind,
+    double q,
+    double b,
+    double p,
+    double *fac_psi,
+    double *fac_gamma
+) {
+    double x;
+    double one_minus_x;
+    double one_minus_q2;
+    double rho2;
+    double rho;
+    double q_factor;
+    double floor_value = 1e-14;
+
+    if (fac_psi == NULL || fac_gamma == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (!check_finite(q) || !check_finite(b) || !check_finite(p)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    if (residual_kind == 0) {
+        *fac_psi = 1.0;
+        *fac_gamma = 1.0;
+        return NSPROOF_KERNEL_OK;
+    }
+    if (residual_kind == 1) {
+        rho2 = 1.0 / (q * q) - 1.0;
+        rho = sqrt(rho2 > 0.0 ? rho2 : 0.0);
+        one_minus_x = 1.0 - b * b;
+        if (one_minus_x < 0.0) {
+            one_minus_x = 0.0;
+        }
+        q_factor = pow(q, 2.0 * p);
+        *fac_psi = q_factor * rho * rho * rho * one_minus_x * one_minus_x;
+        *fac_gamma = q_factor * rho * rho * one_minus_x;
+        if (fabs(*fac_psi) < floor_value) {
+            *fac_psi = floor_value;
+        }
+        if (fabs(*fac_gamma) < floor_value) {
+            *fac_gamma = floor_value;
+        }
+        return NSPROOF_KERNEL_OK;
+    }
+    x = b * b;
+    one_minus_x = 1.0 - x;
+    if (one_minus_x < 0.0) {
+        one_minus_x = 0.0;
+    }
+    one_minus_q2 = 1.0 - q * q;
+    if (one_minus_q2 < 0.0) {
+        one_minus_q2 = 0.0;
+    }
+    if (residual_kind == 2) {
+        *fac_psi = b * one_minus_x * one_minus_x * pow(one_minus_q2, 2.5) * pow(q, p - 1.0);
+        *fac_gamma = one_minus_x * one_minus_q2 * pow(q, p);
+    } else if (residual_kind == 3) {
+        *fac_psi = b * one_minus_x * one_minus_x * pow(one_minus_q2, 2.5) * pow(q, 2.0 * p - 3.0);
+        *fac_gamma = one_minus_x * one_minus_q2 * pow(q, 2.0 * p - 2.0);
+    } else {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (!check_finite(*fac_psi) || !check_finite(*fac_gamma)) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    if (fabs(*fac_psi) <= floor_value || fabs(*fac_gamma) <= floor_value) {
+        return NSPROOF_KERNEL_DEGENERATE_INTERVAL;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+static int pde_tail_coeff_column_one(
+    int residual_kind,
+    double gamma_value,
+    double p,
+    double q_coord,
+    double b_coord,
+    double psi_r,
+    double psi_z,
+    double swirl_value,
+    double swirl_r,
+    double swirl_z,
+    double a_value,
+    double a_r,
+    double a_z,
+    double q0,
+    double q1,
+    double x0,
+    double x1,
+    double alpha,
+    int kq,
+    int kx,
+    int component,
+    double *out_e_psi,
+    double *out_e_gamma
+) {
+    const int order = 3;
+    NsproofJet2 r_jet;
+    NsproofJet2 z_jet;
+    NsproofJet2 q_jet;
+    NsproofJet2 x_jet;
+    NsproofJet2 coeff;
+    NsproofJet2 q_p;
+    NsproofJet2 r2;
+    NsproofJet2 dpsi;
+    NsproofJet2 dgamma_jet;
+    NsproofJet2 dpsi_r_jet;
+    NsproofJet2 dpsi_z_jet;
+    NsproofJet2 dgamma_r_jet;
+    NsproofJet2 dgamma_z_jet;
+    NsproofJet2 dpsi_rr_jet;
+    NsproofJet2 dpsi_zz_jet;
+    NsproofJet2 div_term;
+    NsproofJet2 da;
+    double r;
+    double z;
+    double dpsi_r;
+    double dpsi_z;
+    double dgamma_value;
+    double dgamma_r;
+    double dgamma_z;
+    double da_value;
+    double da_r_value;
+    double da_z_value;
+    double e_psi;
+    double e_gamma;
+    double fac_psi;
+    double fac_gamma;
+    int status;
+
+    if (out_e_psi == NULL || out_e_gamma == NULL) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (
+        !check_finite(gamma_value) ||
+        !check_finite(p) ||
+        !check_finite(psi_r) ||
+        !check_finite(psi_z) ||
+        !check_finite(swirl_value) ||
+        !check_finite(swirl_r) ||
+        !check_finite(swirl_z) ||
+        !check_finite(a_value) ||
+        !check_finite(a_r) ||
+        !check_finite(a_z)
+    ) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    if (component != 0 && component != 1) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+
+    status = make_physical_qx_jets(q_coord, b_coord, order, &r_jet, &z_jet, &q_jet, &x_jet);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    status = weighted_coeff_jet(order, q_jet, x_jet, q0, q1, x0, x1, alpha, kq, kx, &coeff);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    status = jet_pow_real(q_jet, p, &q_p);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    r2 = jet_mul(r_jet, r_jet);
+    if (component == 0) {
+        dpsi = jet_mul(jet_mul(jet_mul(r2, z_jet), q_p), coeff);
+        dgamma_jet = jet_zero(order);
+    } else {
+        dpsi = jet_zero(order);
+        dgamma_jet = jet_mul(jet_mul(r2, q_p), coeff);
+    }
+
+    dpsi_r_jet = jet_dr(dpsi);
+    dpsi_z_jet = jet_dz(dpsi);
+    dgamma_r_jet = jet_dr(dgamma_jet);
+    dgamma_z_jet = jet_dz(dgamma_jet);
+    dpsi_rr_jet = jet_dr(dpsi_r_jet);
+    dpsi_zz_jet = jet_dz(dpsi_z_jet);
+    status = jet_div(dpsi_r_jet, r_jet, &div_term);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    da = jet_add(jet_sub(dpsi_rr_jet, div_term), dpsi_zz_jet);
+
+    r = r_jet.c[0][0];
+    z = z_jet.c[0][0];
+    dpsi_r = dpsi_r_jet.c[0][0];
+    dpsi_z = dpsi_z_jet.c[0][0];
+    dgamma_value = dgamma_jet.c[0][0];
+    dgamma_r = dgamma_r_jet.c[0][0];
+    dgamma_z = dgamma_z_jet.c[0][0];
+    da_value = da.c[0][0];
+    da_r_value = jet_dr(da).c[0][0];
+    da_z_value = jet_dz(da).c[0][0];
+
+    e_psi =
+        (1.0 - gamma_value) * r * r * da_value
+        + gamma_value * r * r * r * da_r_value
+        + gamma_value * z * r * r * da_z_value
+        + r * (dpsi_r * a_z + psi_r * da_z_value - dpsi_z * a_r - psi_z * da_r_value)
+        + 2.0 * dpsi_z * a_value
+        + 2.0 * psi_z * da_value
+        + 2.0 * (swirl_z * dgamma_value + swirl_value * dgamma_z);
+    e_gamma =
+        (1.0 - 2.0 * gamma_value) * dgamma_value
+        + gamma_value * (r * dgamma_r + z * dgamma_z)
+        + (dpsi_r * swirl_z + psi_r * dgamma_z - dpsi_z * swirl_r - psi_z * dgamma_r) / r;
+
+    status = compactified_residual_factors_c(residual_kind, q_coord, b_coord, p, &fac_psi, &fac_gamma);
+    if (status != NSPROOF_KERNEL_OK) {
+        return status;
+    }
+    *out_e_psi = e_psi / fac_psi;
+    *out_e_gamma = e_gamma / fac_gamma;
+    if (!check_finite(*out_e_psi) || !check_finite(*out_e_gamma)) {
+        return NSPROOF_KERNEL_NONFINITE_OUTPUT;
+    }
+    return NSPROOF_KERNEL_OK;
+}
+
+NSPROOF_EXPORT int nsproof_pde_tail_coeff_columns_batch(
+    int count,
+    int residual_kind,
+    double gamma_value,
+    double p,
+    double q,
+    double b,
+    double psi_r,
+    double psi_z,
+    double swirl,
+    double swirl_r,
+    double swirl_z,
+    double a_value,
+    double a_r,
+    double a_z,
+    const double *q0,
+    const double *q1,
+    const double *x0,
+    const double *x1,
+    const double *alpha,
+    const int *kq,
+    const int *kx,
+    const int *component,
+    double *out_e_psi,
+    double *out_e_gamma,
+    int *out_status
+) {
+    int i;
+    int first_status = NSPROOF_KERNEL_OK;
+
+    if (count <= 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        q0 == NULL ||
+        q1 == NULL ||
+        x0 == NULL ||
+        x1 == NULL ||
+        alpha == NULL ||
+        kq == NULL ||
+        kx == NULL ||
+        component == NULL ||
+        out_e_psi == NULL ||
+        out_e_gamma == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    for (i = 0; i < count; i++) {
+        int status = pde_tail_coeff_column_one(
+            residual_kind,
+            gamma_value,
+            p,
+            q,
+            b,
+            psi_r,
+            psi_z,
+            swirl,
+            swirl_r,
+            swirl_z,
+            a_value,
+            a_r,
+            a_z,
+            q0[i],
+            q1[i],
+            x0[i],
+            x1[i],
+            alpha[i],
+            kq[i],
+            kx[i],
+            component[i],
+            &out_e_psi[i],
+            &out_e_gamma[i]
+        );
+        if (out_status != NULL) {
+            out_status[i] = status;
+        }
+        if (status != NSPROOF_KERNEL_OK && first_status == NSPROOF_KERNEL_OK) {
+            first_status = status;
+        }
+    }
     return first_status;
 }
