@@ -17,6 +17,19 @@ completed derivations, diagnostic solvers, tail/indicial evidence, projection
 tools, normalized residual checks, and early validator scaffolds, but it is not
 a proof certificate.
 
+Operating loop with GPT-5 Pro:
+
+```text
+1. Codex computes locally until a real proof-strategy/review fork appears.
+2. Codex updates gpt5-pro-proof-prompt.md so all current evidence is inline.
+3. User submits that prompt to GPT-5 Pro for a 30+ minute reasoning pass.
+4. User gives Codex the GPT-5 Pro response.
+5. Codex performs the requested compute/implementation and repeats the loop.
+```
+
+The persistent proof goal is not complete when a prompt is prepared; the loop is
+only a way to get stronger outside reasoning at each fork.
+
 Current certified gate status:
 
 ```text
@@ -118,11 +131,12 @@ Current certified gate status:
 - [x] Added generated broad guard grids to `tools/profile_newton_twochart.py` (`--guard-grid edge|box`, guard q/b ranges, and guard sample counts), composing them with explicit `--guard-qb-points` while preserving the existing guard objective/max acceptance checks. The canonical seam-Jacobian injected tail run `work/twochart_stage0_rz_tail_jacinject_guardgrid_edge_report.json` uses 46 effective guard points (45 generated plus the known hidden point) and rejects every tail step: the raw sampled objective improves, but the broad guard objective grows at all tested alphas. The hidden edge `q=0.86,b=0.20` remains the worst guard, with max residual `3.169794284607e5` at alpha `1` and still `1.241904721621e3` at alpha `0.00390625`, versus a baseline broad-guard max `3.891736619747e2`. This confirms the seam-Jacobian tail direction has a positive guarded-edge conflict, not merely a coarse line-search issue. A broader edge guard is now implemented; the next decisive fork is to make those edge rows active in the linear solve or add a guarded KKT/Schur-style constrained solve.
 - [x] Tried the direct active-edge-row variant after the broad guard rejection. The uncapped 64-variable tail candidate scoring and a bounded 24-variable retry both spent multiple minutes in repeated active-row scoring without producing artifacts, so they were stopped. This is an implementation bottleneck rather than mathematical evidence: the next active-edge experiment should first add cached row/column evaluation or a guarded KKT/Schur solve mode instead of repeatedly rebuilding the full Stage-0 system for every line-search trial.
 - [x] Added opt-in active guard rows and cheap objective-only line-search scoring to `tools/profile_newton_twochart.py`. `--active-guard-weight` adds the effective guard grid as weighted PDE rows after variable selection, and `--line-search-eval objective-only` scores trial steps on the same sampled rows without rebuilding candidate selection/Jacobians. This made the previously too-expensive active-edge probe feasible, but the result is a negative diagnostic rather than profile progress: the w1/w10 widened-q active-guard runs accepted tail steps, yet held-out edge scans still found large mobile low-`b` spikes (`5.516786077531e4`, `3.162227861431e4`, `1.778391689505e3`, `1.255394972997e3` across successive guarded variants). The seam-limit run `work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_report.json` used 168 active guard rows and accepted a tiny objective decrease (`4.124206167745e7 -> 4.115853419466e7`), but the held-out scan `work/twochart_stage0_rz_tail_jacinject_activeguard_w10_qwide_seamlim_residual.json` still has edge max `3.119540552543e4` at `q=0.78,b=0.20`, origin max `9.132494634431e1`, overlap max `3.239718884452e2`, and unchanged C0-C2 R/Z mortar max `4.214529161145e3`. The guard/holdout mismatch also exposed a one-sided seam issue: `q=0.90` can evaluate on the origin side while `q=0.8999999999999999` samples the tail side. Active guards regularize some edge damage but do not solve the worst seam row; the next solver fork needs explicit two-sided seam-limit guards and a cached KKT/Schur-style constrained correction, not weaker guards.
+- [x] Added two-sided seam-limit guard generation to `tools/profile_newton_twochart.py`: `--guard-seam-sides none|below|above|both`, `--guard-seam-q`, `--guard-seam-eps`, and `--guard-seam-b-points`. A dry-run confirms the report separates ordinary generated grid points from `guard_qb_points_seam`, including `q=0.899999999999` and `q=0.900000000001` at requested `b` values. The expensive post-interface Stage-0 diagnostic was intentionally stopped before completion; no accepted solver result should be inferred from this interface addition.
 
 ## Active mathematical obligations
 
 - [ ] Compute trusted indicial roots `delta_j(gamma,B)` with interval or ball validation; the current floating shooting, modal, matching, and Pluecker diagnostics have not found a non-geometric root-like candidate, and apparent basins are dominated by forbidden far-field modes.
-- [ ] Build the full proof-native two-chart transseries/Chebyshev plus origin-regular `(R,Z)` solver while preserving the exact `q=0` conical boundary trace; the q2-free two-chart projection, origin/mortar audits, coefficient inventory, exact q/x and R/Z mortar Jacobians, PDE Jacobian smoke hook, bounded Stage-0 analytic update loop, origin-only R/Z refit diagnostic, chart-balanced variable selection, row-normalization/raw/held-out guards, block-search Stage-0, seam-Jacobian candidate injection, broad guard-grid rejection, active guard rows, objective-only line-search scoring, and coupled tail+origin probes exist, but the current safe solver does not yet find a meaningful Newton basin.
+- [ ] Build the full proof-native two-chart transseries/Chebyshev plus origin-regular `(R,Z)` solver while preserving the exact `q=0` conical boundary trace; the q2-free two-chart projection, origin/mortar audits, coefficient inventory, exact q/x and R/Z mortar Jacobians, PDE Jacobian smoke hook, bounded Stage-0 analytic update loop, origin-only R/Z refit diagnostic, chart-balanced variable selection, row-normalization/raw/held-out guards, block-search Stage-0, seam-Jacobian candidate injection, broad guard-grid rejection, active guard rows, objective-only line-search scoring, two-sided seam-limit guards, and coupled tail+origin probes exist, but the current safe solver does not yet find a meaningful Newton basin.
 - [ ] Re-solve the nonlinear compactified profile with the conical `q=0` trace enforced from the start; v49 is the best low-residual finite-box admissible seed, while final v117 is the best q1-free forced-tail diagnostic seed and still has residuals `O(1)`.
 - [ ] Produce a validated profile candidate `U_n` in the wedge `2/5 < gamma < 1/2`.
 - [ ] Build the matching determinant `D_match(gamma,B)` through a Lyapunov-Schmidt reduction.

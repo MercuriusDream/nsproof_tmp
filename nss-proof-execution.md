@@ -4172,6 +4172,30 @@ guarded KKT/Schur-style correction that reduces the seam inside the edge-feasibl
 tangent space.  Weakening the guard, freeing `(gamma,B)`, or pivoting to radial
 matching now would skip the still-unresolved Stage-0 linear algebra obstruction.
 
+The first part of that next interface is now implemented.  The two-chart solver
+accepts:
+
+```text
+--guard-seam-sides none|below|above|both
+--guard-seam-q
+--guard-seam-eps
+--guard-seam-b-points
+```
+
+These options generate `q=q_switch-eps` and/or `q=q_switch+eps` guard points
+and report them separately as `guard_qb_points_seam`.  A dry-run confirms the
+intended one-sided samples:
+
+```text
+q = 0.899999999999
+q = 0.900000000001
+```
+
+at requested `b` values.  This is an interface/diagnostic improvement only.
+The interrupted expensive run produced no artifact and should not be counted as
+an accepted Stage-0 result.  The next real implementation step is still cached
+row/column evaluation and a guarded KKT/Schur solve mode.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4192,8 +4216,8 @@ improve origin/overlap while preserving the guard, broad guard grids catch the
 nonlocal hidden-edge damage from high-degree tail seam variables, and active
 guard rows make that conflict cheap enough to test. The sampled system still
 cannot reduce the worst seam row and guarded edge simultaneously. The next
-solver step is not to weaken the guard; it is to add two-sided seam-limit guard
-generation and implement a true constrained Schur-style solve with cached
-row/column evaluation. Row normalization alone is not enough. It is too early
-to free `(gamma,B)`, pivot to radial matching, or start spectral validation as
-a theorem dependency.
+solver step is not to weaken the guard; it is to implement a true constrained
+Schur-style solve with cached row/column evaluation, using the new two-sided
+seam-limit guards as active constraints. Row normalization alone is not enough.
+It is too early to free `(gamma,B)`, pivot to radial matching, or start spectral
+validation as a theorem dependency.

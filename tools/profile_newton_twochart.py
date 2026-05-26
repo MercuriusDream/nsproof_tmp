@@ -226,13 +226,31 @@ def generated_guard_qb_points(args: argparse.Namespace) -> list[tuple[float, flo
     return [(q, b) for q in q_values for b in b_values]
 
 
+def generated_seam_guard_qb_points(args: argparse.Namespace) -> list[tuple[float, float]]:
+    if args.guard_seam_sides == "none":
+        return []
+    if args.guard_seam_b_points.strip():
+        b_values = parse_float_list(args.guard_seam_b_points)
+    else:
+        b_values = grid_values(args.guard_b_min, args.guard_b_max, args.guard_b_samples)
+    if args.guard_seam_sides == "below":
+        q_values = [args.guard_seam_q - args.guard_seam_eps]
+    elif args.guard_seam_sides == "above":
+        q_values = [args.guard_seam_q + args.guard_seam_eps]
+    else:
+        q_values = [args.guard_seam_q - args.guard_seam_eps, args.guard_seam_q + args.guard_seam_eps]
+    return [(q, b) for q in q_values for b in b_values]
+
+
 def guard_qb_points_from_args(args: argparse.Namespace) -> dict[str, Any]:
     explicit = parse_optional_qb_points(args.guard_qb_points)
     generated = generated_guard_qb_points(args)
-    combined = dedupe_qb_points(explicit + generated)
+    seam = generated_seam_guard_qb_points(args)
+    combined = dedupe_qb_points(explicit + generated + seam)
     return {
         "explicit": explicit,
         "generated": generated,
+        "seam": seam,
         "combined": combined,
     }
 
@@ -1171,10 +1189,17 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guard_qb_points": [[q, b] for q, b in guard_points],
             "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
             "guard_qb_points_generated": [[q, b] for q, b in guard_point_report["generated"]],
+            "guard_qb_points_seam": [[q, b] for q, b in guard_point_report["seam"]],
             "guard_grid": args.guard_grid,
             "guard_grid_q_range": [args.guard_q_min, args.guard_q_max],
             "guard_grid_b_range": [args.guard_b_min, args.guard_b_max],
             "guard_grid_samples": [args.guard_q_samples, args.guard_b_samples],
+            "guard_seam_sides": args.guard_seam_sides,
+            "guard_seam_q": args.guard_seam_q,
+            "guard_seam_eps": args.guard_seam_eps,
+            "guard_seam_b_points": parse_float_list(args.guard_seam_b_points)
+            if args.guard_seam_b_points.strip()
+            else [],
             "solve_mode": args.solve_mode,
             "block_search_labels": args.block_search_labels,
             "max_guard_objective_growth": args.max_guard_objective_growth,
@@ -1252,10 +1277,17 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "guard_qb_points": [[q, b] for q, b in guard_point_report["combined"]],
             "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
             "guard_qb_points_generated": [[q, b] for q, b in guard_point_report["generated"]],
+            "guard_qb_points_seam": [[q, b] for q, b in guard_point_report["seam"]],
             "guard_grid": args.guard_grid,
             "guard_grid_q_range": [args.guard_q_min, args.guard_q_max],
             "guard_grid_b_range": [args.guard_b_min, args.guard_b_max],
             "guard_grid_samples": [args.guard_q_samples, args.guard_b_samples],
+            "guard_seam_sides": args.guard_seam_sides,
+            "guard_seam_q": args.guard_seam_q,
+            "guard_seam_eps": args.guard_seam_eps,
+            "guard_seam_b_points": parse_float_list(args.guard_seam_b_points)
+            if args.guard_seam_b_points.strip()
+            else [],
             "active_guard_weight": args.active_guard_weight,
             "row_normalization": args.row_normalization,
             "line_search_eval": args.line_search_eval,
@@ -1331,6 +1363,22 @@ def main() -> None:
     parser.add_argument("--guard-b-max", type=float, default=0.98)
     parser.add_argument("--guard-q-samples", type=positive_int, default=5)
     parser.add_argument("--guard-b-samples", type=positive_int, default=7)
+    parser.add_argument(
+        "--guard-seam-sides",
+        choices=("none", "below", "above", "both"),
+        default="none",
+        help=(
+            "Generate extra guard points at q=guard-seam-q +/- guard-seam-eps "
+            "using the guard b grid, or --guard-seam-b-points when provided."
+        ),
+    )
+    parser.add_argument("--guard-seam-q", type=float, default=0.90)
+    parser.add_argument("--guard-seam-eps", type=positive_float, default=1e-12)
+    parser.add_argument(
+        "--guard-seam-b-points",
+        default="",
+        help="Optional comma-separated b values for seam-limit guards; defaults to the guard b grid.",
+    )
     parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
     parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
     parser.add_argument(
@@ -1411,6 +1459,14 @@ def main() -> None:
         parser.error("--guard-q-max must be greater than --guard-q-min")
     if args.guard_b_max <= args.guard_b_min:
         parser.error("--guard-b-max must be greater than --guard-b-min")
+    if args.guard_seam_sides in ("below", "both") and args.guard_seam_q - args.guard_seam_eps <= 0.0:
+        parser.error("--guard-seam-q - --guard-seam-eps must be positive")
+    if args.guard_seam_sides in ("above", "both") and args.guard_seam_q + args.guard_seam_eps >= 1.0:
+        parser.error("--guard-seam-q + --guard-seam-eps must be less than 1")
+    if args.guard_seam_b_points.strip():
+        for b_value in parse_float_list(args.guard_seam_b_points):
+            if b_value < 0.0 or b_value > 1.0:
+                parser.error("--guard-seam-b-points values must lie in [0, 1]")
 
     data = load_json(args.input)
     validate_input_schema(data, args.input)

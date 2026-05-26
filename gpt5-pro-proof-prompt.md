@@ -18,6 +18,43 @@ attempt, or branch-kill decision, update this prompt before sending it to
 ChatGPT/GPT-5 Pro. Do not rely on hidden chat history. Inline the latest
 artifacts, numerical results, branch interpretation, and next commands here.
 
+## 0A. Codex / GPT-5 Pro Iteration Loop
+
+Use this loop until the theorem is either certified or a rigorous branch kill
+forces a pivot:
+
+```text
+1. Codex computes locally until the next point where further proof strategy,
+   mathematical design, or breakthrough-level review would help.
+
+2. Codex stops the compute cycle, updates this prompt so it is fully
+   self-contained, and tells the user exactly: submit gpt5-pro-proof-prompt.md
+   to GPT-5 Pro.
+
+3. The user submits this prompt to GPT-5 Pro and gives it at least 30 minutes
+   of reasoning time.
+
+4. GPT-5 Pro returns a response. Most useful responses will ask for concrete
+   computation, implementation, validation, or branch-kill evidence.
+
+5. Codex ingests that response, performs the requested compute or proof
+   infrastructure work in the repository, updates TODO.md and this prompt with
+   all new evidence inline, then returns to step 1.
+```
+
+Rules for the loop:
+
+```text
+Do not rely on earlier chat context.
+Do not send a partial prompt.
+Do not omit the current proof percentage, latest commit/artifacts, or the
+DeepMind/Google-paper method-transfer context.
+Do not ask GPT-5 Pro for vibes; ask for definite paths, kill criteria, and
+certificate-producing next steps.
+Do not mark the persistent Codex goal complete merely because a prompt was
+prepared. The mathematical objective remains active until the proof gates pass.
+```
+
 ## 1. Objective
 
 The final objective is not a low residual, not a plausible numerical profile, and not a conditional theorem. The final objective is a complete proof package for a finite-energy Navier-Stokes blow-up construction through an unstable self-similar saddle profile.
@@ -125,6 +162,8 @@ supports chart/component/block restricted line-search via --solve-mode block-sea
 supports broad generated guard grids via --guard-grid edge|box,
 supports opt-in active guard PDE rows via --active-guard-weight,
 supports objective-only line-search scoring via --line-search-eval objective-only.
+supports two-sided seam-limit guard generation via --guard-seam-sides,
+  --guard-seam-q, --guard-seam-eps, and --guard-seam-b-points.
 ```
 
 `validators/twochart_mortar_jacobian.py` now supports both old q/x rows and
@@ -252,6 +291,12 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
     w10 seam-limit C0-C2 R,Z mortar max remains 4.214529161145e3.
     The pathology is mobile: guarding q=0.90,b=0.20 or the tail-side
     q=0.8999999999999999,b=0.20 shifts the damage to another low-b edge point.
+  two-sided seam-limit guard interface:
+    implemented after the w10 seam-limit diagnostic.
+    dry-run confirms generated guard_qb_points_seam contains
+      q=0.899999999999 and q=0.900000000001
+      at requested b values.
+    no expensive post-interface Stage-0 diagnostic has been accepted yet.
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -893,7 +938,8 @@ tools/profile_newton_twochart.py:
   block-search line-search,
   broad guard grids,
   active guard rows,
-  objective-only line-search scoring.
+  objective-only line-search scoring,
+  two-sided seam-limit guard generation.
 
 validators/compactified_equations_twochart.py and validators/twochart_mortar_jacobian.py:
   provide floating two-chart residual and R/Z mortar Jacobian diagnostics.
@@ -901,9 +947,28 @@ validators/compactified_equations_twochart.py and validators/twochart_mortar_jac
 
 The current tools are discovery/proof-scaffold tools. They are not yet interval proof tools.
 
-## 7. Lessons from arXiv-2509.14185v1
+## 7. Inline Context from the DeepMind / Google Paper
 
-The archive `arXiv-2509.14185v1.tar.gz` in the workspace is the "Discovery of Unstable Singularities" paper package. Use the following lessons, but do not confuse them with certificates:
+The archive `arXiv-2509.14185v1.tar.gz` in the workspace is the source bundle
+for `Discovery of Unstable Singularities`. This is the "Google paper thing" to
+keep inline in every GPT-5 Pro handoff. It is useful as a discovery playbook,
+not as a Navier-Stokes certificate.
+
+Applicability boundary:
+
+```text
+The paper studies unstable self-similar singularities in CCF, 2D IPM with
+boundary, and 2D Boussinesq / Euler-with-boundary analogues.
+It does not provide the missing 3D axisymmetric-with-swirl NS profile.
+It explicitly frames PINN-style machinery as specialized discovery machinery,
+not a general proof engine.
+It says computer-assisted proof suitability is problem-dependent.
+Its spectral discovery section learns nonnegative real eigenvalues under a
+real-axis assumption; NSProof needs complex contour/Fredholm/Evans validation
+of the true Leray-projected operator.
+```
+
+Transfer these methods, but do not confuse them with certificates:
 
 ```text
 1. Factor mechanical vanishing prefactors before optimizing residuals.
@@ -912,6 +977,46 @@ The archive `arXiv-2509.14185v1.tar.gz` in the workspace is the "Discovery of Un
 4. Use staged linearized correction rather than blind global optimization.
 5. Discover parameters through smoothness/funnel scans, not blind continuation.
 6. Treat neural/PINN-style discovery as a profile-finding engine, not a proof certificate.
+```
+
+Specific method-transfer map for NSProof:
+
+```text
+Solution modeling / equation factorization:
+  compactify the domain;
+  multiply unknowns by exact envelopes enforcing parity, origin smoothness,
+  tail behavior, and forbidden modes;
+  divide equations by exact mechanical prefactors;
+  optimize the quotient residual, not raw equations.
+
+Training loss analogue:
+  d0 residual -> normalized structural PDE quotient rows;
+  d1/d2 residuals -> derivative mortar rows, seam-limit guards, smoothness
+  penalties, and later C3/C4 interface rows;
+  dense validation max residual -> standard/focused/secondary/origin/edge
+  scans plus shifted/off-grid checks.
+
+Collocation/adaptive sampling analogue:
+  use hard points from dense residual topology scans;
+  sample both high-gradient regions and broad guard regions;
+  add small shifted/one-sided seam perturbations to prevent grid-aligned
+  chart-switch blind spots.
+
+Second-order optimizer analogue:
+  use Gauss-Newton / Levenberg-Marquardt in coefficient space;
+  use block-search only as a diagnostic;
+  next solver should be cached active-row KKT/Schur, not first-order descent.
+
+Multistage correction analogue:
+  once Stage-0 identifies the residual shape, solve D E[u] h = -E[u] in a
+  dedicated correction space;
+  choose enrichment modes from residual spectral/patch content;
+  then re-project into the proof-native Chebyshev/Bernstein representation.
+
+Funnel/admissibility analogue:
+  only after the fixed hard two-chart solver is real, run a (gamma,B) funnel;
+  a funnel is discovery evidence only;
+  final admissibility still needs interval transversality/NK certificates.
 ```
 
 Reported residual scales in that paper package are roughly:
@@ -1410,14 +1515,19 @@ mobile across low-`b` edge points and that `q=0.90` versus
 implementation work is:
 
 ```text
-1. Add explicit two-sided seam-limit guard generation, e.g.
+1. DONE: add explicit two-sided seam-limit guard generation, e.g.
    q=q_switch-eps and q=q_switch+eps for the same b grid, with eps recorded
    in the report. Do not rely on decimal q=0.90 as a chart-side proxy.
+   Current flags:
+     --guard-seam-sides none|below|above|both
+     --guard-seam-q
+     --guard-seam-eps
+     --guard-seam-b-points
 
-2. Cache row/column evaluations for selected variables and selected q,b/mortar
+2. NEXT: cache row/column evaluations for selected variables and selected q,b/mortar
    rows so active guard rows can be used without repeated full system rebuilds.
 
-3. Add a guarded KKT/Schur solve mode:
+3. NEXT: add a guarded KKT/Schur solve mode:
    - primary equation: reduce active R/Z seam mortar rows;
    - constraints: no growth in broad edge/seam-limit PDE rows and no tail-gate
      damage;
@@ -1426,8 +1536,8 @@ implementation work is:
    - fallback: if the KKT system is singular, return a certificate of rank
      deficiency and the offending row/column subspace.
 
-4. Only after that implementation exists, run a new Stage-0 diagnostic of the
-   following form.
+4. Only after cached active rows and guarded KKT exist, run a new Stage-0
+   diagnostic of the following form.
 ```
 
 ```bash
@@ -1473,9 +1583,9 @@ python3 tools/profile_newton_twochart.py \
   --line-search 1,0.25,0.0625,0.015625,0.00390625
 ```
 
-The flags `--solve-mode guarded-kkt`, `--guard-seam-sides`,
-`--guard-seam-q`, and `--guard-seam-eps` are not yet implemented as of this
-prompt update. They are the requested next interface, not current CLI facts.
+The flags `--guard-seam-sides`, `--guard-seam-q`, `--guard-seam-eps`, and
+`--guard-seam-b-points` are implemented. The flag
+`--solve-mode guarded-kkt` is not yet implemented as of this prompt update.
 
 Stage-0 go criterion:
 
