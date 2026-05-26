@@ -50,6 +50,7 @@ def compact_trial(report: dict[str, Any], ridge_relative: float, svd_rcond: floa
         "row_cache": report["row_cache"],
         "profile": report.get("profile"),
         "profile_hash_sha256": report.get("profile_hash_sha256"),
+        "row_labels": report["row_selection"]["labels"],
         "ridge_relative": ridge_relative,
         "svd_rcond": svd_rcond,
         "selected_row_count": report["row_selection"]["selected_row_count"],
@@ -83,37 +84,40 @@ def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
     failures: list[dict[str, str]] = []
     column_scaling_modes = args.column_scaling
     row_scaling_modes = args.row_scaling
+    row_label_sets = args.row_label_set or [args.row_labels]
     for row_cache in args.row_cache:
-        for row_scaling_mode in row_scaling_modes:
-            for column_scaling_mode in column_scaling_modes:
-                for ridge in ridges:
-                    for rcond in rconds:
-                        trial_args = argparse.Namespace(
-                            row_cache=row_cache,
-                            row_labels=args.row_labels,
-                            max_rows=args.max_rows,
-                            ridge_relative=ridge,
-                            svd_rcond=rcond,
-                            summary_only=True,
-                            column_scaling=column_scaling_mode,
-                            column_scale_floor=args.column_scale_floor,
-                            row_scaling=row_scaling_mode,
-                            row_scale_floor=args.row_scale_floor,
-                        )
-                        try:
-                            report = build_report(trial_args)
-                            trials.append(compact_trial(report, ridge, rcond))
-                        except Exception as exc:  # noqa: BLE001 - diagnostic sweep should keep going.
-                            failures.append(
-                                {
-                                    "row_cache": row_cache,
-                                    "row_scaling": row_scaling_mode,
-                                    "column_scaling": column_scaling_mode,
-                                    "ridge_relative": str(ridge),
-                                    "svd_rcond": str(rcond),
-                                    "error": repr(exc),
-                                }
+        for row_label_set in row_label_sets:
+            for row_scaling_mode in row_scaling_modes:
+                for column_scaling_mode in column_scaling_modes:
+                    for ridge in ridges:
+                        for rcond in rconds:
+                            trial_args = argparse.Namespace(
+                                row_cache=row_cache,
+                                row_labels=row_label_set,
+                                max_rows=args.max_rows,
+                                ridge_relative=ridge,
+                                svd_rcond=rcond,
+                                summary_only=True,
+                                column_scaling=column_scaling_mode,
+                                column_scale_floor=args.column_scale_floor,
+                                row_scaling=row_scaling_mode,
+                                row_scale_floor=args.row_scale_floor,
                             )
+                            try:
+                                report = build_report(trial_args)
+                                trials.append(compact_trial(report, ridge, rcond))
+                            except Exception as exc:  # noqa: BLE001 - diagnostic sweep should keep going.
+                                failures.append(
+                                    {
+                                        "row_cache": row_cache,
+                                        "row_labels": row_label_set,
+                                        "row_scaling": row_scaling_mode,
+                                        "column_scaling": column_scaling_mode,
+                                        "ridge_relative": str(ridge),
+                                        "svd_rcond": str(rcond),
+                                        "error": repr(exc),
+                                    }
+                                )
     best_by_cache: dict[str, dict[str, Any]] = {}
     best_by_scaling: dict[str, dict[str, Any]] = {}
     best_by_row_scaling: dict[str, dict[str, Any]] = {}
@@ -150,7 +154,7 @@ def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
         "row_caches": args.row_cache,
         "ridge_relative_values": ridges,
         "svd_rcond_values": rconds,
-        "row_labels": args.row_labels,
+        "row_label_sets": row_label_sets,
         "max_rows": args.max_rows,
         "column_scaling_modes": column_scaling_modes,
         "column_scale_floor": args.column_scale_floor,
@@ -180,6 +184,7 @@ def main() -> None:
     parser.add_argument("--row-cache", action="append", required=True)
     parser.add_argument("--out", default="work/profile_finite_nk_sweep.json")
     parser.add_argument("--row-labels", default="all")
+    parser.add_argument("--row-label-set", action="append")
     parser.add_argument("--max-rows", type=int)
     parser.add_argument("--ridge-relative", default="1e-6,1e-8,1e-10,1e-12")
     parser.add_argument("--svd-rcond", default="1e-10,1e-12")
