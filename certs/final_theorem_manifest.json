@@ -190,6 +190,6 @@
   },
   "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
   "pass": false,
-  "repo_commit": "22d654f7aeeef5e3ea5dc04c6baf4277cff38791",
+  "repo_commit": "775e59256109552a627e06efef4b6f625291210f",
   "schema_version": "nsproof-cert-v1"
 }
