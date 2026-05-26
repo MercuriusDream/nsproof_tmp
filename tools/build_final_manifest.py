@@ -66,6 +66,12 @@ GATES: tuple[dict[str, Any], ...] = (
     },
 )
 
+INFRASTRUCTURE_CERTIFICATES: tuple[str, ...] = (
+    "certs/infrastructure/interval_backend_smoke.json",
+    "certs/infrastructure/bernstein_backend_smoke.json",
+    "certs/infrastructure/manufactured_nk.json",
+)
+
 
 def repo_commit() -> str:
     try:
@@ -147,6 +153,7 @@ def build_manifest() -> dict[str, Any]:
         )
 
     total = len(GATES)
+    infrastructure = [dependency_status(path) for path in INFRASTRUCTURE_CERTIFICATES]
     return {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "final_theorem_manifest",
@@ -158,6 +165,15 @@ def build_manifest() -> dict[str, Any]:
         },
         "final_theorem_certificate_percent": 100.0 * passed / max(total, 1),
         "gates": gate_reports,
+        "infrastructure_certificates": {
+            "note": (
+                "These are proof-engineering smoke certificates. They are useful "
+                "for backend readiness but do not count toward theorem gate pass/fail."
+            ),
+            "passed": sum(1 for item in infrastructure if item["exists"] and item["pass"]),
+            "total": len(infrastructure),
+            "items": infrastructure,
+        },
         "mathematical_statement": (
             "All stop-condition gates for the final theorem are hash-linked to "
             "passing interval/exact certificates."
@@ -185,4 +201,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
