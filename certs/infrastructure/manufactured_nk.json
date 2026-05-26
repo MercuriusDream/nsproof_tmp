@@ -2,7 +2,7 @@
   "backend": "decimal-scalar-radii-polynomial",
   "certificate_name": "manufactured_nk",
   "commands": [
-    "tools/validate_manufactured_nk.py"
+    "tools/validate_manufactured_nk.py --out certs/infrastructure/manufactured_nk.json"
   ],
   "dependency_hashes": {
     "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
@@ -35,7 +35,7 @@
   "mathematical_statement": "For the manufactured scalar Newton-Kantorovich example with Y0=0, Z0=0.1, Z2=0.1, the scalar radii polynomial p(r)=Y0-(1-Z0)r+Z2*r^2 is strictly negative on the certified radius interval, so the infrastructure acceptance path can record a passing toy certificate.",
   "pass": true,
   "precision_digits": 80,
-  "repo_commit": "09e6fc515e2bd30f730a7c67c089f8cd77fde245",
+  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
   "schema_version": "nsproof-cert-v1",
   "scope": "infrastructure-only manufactured scalar NK positive control"
 }

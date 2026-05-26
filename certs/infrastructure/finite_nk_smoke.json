@@ -1,0 +1,196 @@
+{
+  "backend": "native-c-interval-linalg+decimal-scalar-radii-polynomial",
+  "certificate_name": "finite_nk_smoke",
+  "commands": [
+    "tools/validate_finite_nk_smoke.py --out certs/infrastructure/finite_nk_smoke.json"
+  ],
+  "dependency_hashes": {
+    "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
+    "tools/validate_finite_nk_smoke.py": "a0409336488944591342d5dc83dd7f743814fece5ecdb419f92d6ac58e595010",
+    "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
+    "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
+  },
+  "final_theorem_manifest_dependency": false,
+  "finite_block_backend": "native-c-outward-rounded-double-interval",
+  "input_hashes": {
+    "native/c/nsproof_kernel.c": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863",
+    "tools/validate_finite_nk_smoke.py": "a0409336488944591342d5dc83dd7f743814fece5ecdb419f92d6ac58e595010",
+    "validators/interval_backend.py": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
+    "validators/radii_polynomial.py": "2ea6f40217c418f0f90f57205f36432321624eb1b19c811fb2cc6b4be9aa9ee3"
+  },
+  "manufactured_finite_nk": {
+    "Y0_infinity_norm_A_r": 6.560000000000005e-05,
+    "Z0_infinity_norm_B": 0.010000000000000432,
+    "Z2": 0.05,
+    "approximate_inverse_A": [
+      [
+        0.52,
+        -0.17
+      ],
+      [
+        -0.09,
+        0.7
+      ]
+    ],
+    "dimension": 2,
+    "jacobian_J": [
+      [
+        2.0,
+        0.5
+      ],
+      [
+        0.25,
+        1.5
+      ]
+    ],
+    "native_interval_inputs": {
+      "approximate_inverse_A": [
+        [
+          [
+            0.52,
+            0.52
+          ],
+          [
+            -0.17,
+            -0.17
+          ]
+        ],
+        [
+          [
+            -0.09,
+            -0.09
+          ],
+          [
+            0.7,
+            0.7
+          ]
+        ]
+      ],
+      "jacobian_J": [
+        [
+          [
+            2.0,
+            2.0
+          ],
+          [
+            0.5,
+            0.5
+          ]
+        ],
+        [
+          [
+            0.25,
+            0.25
+          ],
+          [
+            1.5,
+            1.5
+          ]
+        ]
+      ],
+      "residual_vector_r": [
+        [
+          0.0001,
+          0.0001
+        ],
+        [
+          -8e-05,
+          -8e-05
+        ]
+      ]
+    },
+    "native_interval_products": {
+      "A_times_J": [
+        [
+          [
+            0.9974999999999995,
+            0.9975000000000006
+          ],
+          [
+            0.004999999999999837,
+            0.005000000000000172
+          ]
+        ],
+        [
+          [
+            -0.005000000000000089,
+            -0.00499999999999992
+          ],
+          [
+            1.0049999999999994,
+            1.0050000000000003
+          ]
+        ]
+      ],
+      "A_times_r": [
+        [
+          6.559999999999998e-05,
+          6.560000000000004e-05
+        ],
+        [
+          -6.500000000000002e-05,
+          -6.499999999999998e-05
+        ]
+      ],
+      "defect_matrix_B_equals_I_minus_AJ": [
+        [
+          [
+            0.002499999999999391,
+            0.0025000000000005023
+          ],
+          [
+            -0.005000000000000173,
+            -0.004999999999999836
+          ]
+        ],
+        [
+          [
+            0.0049999999999999194,
+            0.0050000000000000894
+          ],
+          [
+            -0.005000000000000338,
+            -0.0049999999999994485
+          ]
+        ]
+      ]
+    },
+    "radius_interval": [
+      0.001,
+      0.01
+    ],
+    "residual_vector_r": [
+      0.0001,
+      -8e-05
+    ]
+  },
+  "mathematical_statement": "For the explicit 2D manufactured Newton problem with residual r, approximate inverse A, defect B=I-AJ, C-backed interval bounds Y0>=||A r||_inf and Z0>=||B||_inf, and Z2=0.05, the scalar radii polynomial p(rho)=Y0-(1-Z0)rho+Z2*rho^2 is strictly negative on the certified radius interval.",
+  "note": "Infrastructure-only positive control; this is not a final theorem manifest dependency.",
+  "pass": true,
+  "precision_digits": 80,
+  "radii_polynomial_backend": "decimal-scalar-radii-polynomial",
+  "radii_polynomial_validation": {
+    "Y0": "0.00006560000000000005",
+    "Z0": "0.010000000000000432",
+    "Z2": "0.05",
+    "backend": "decimal-scalar-radii-polynomial",
+    "conditions": {
+      "Z0_less_than_one": true,
+      "upper_bound_negative": true
+    },
+    "mathematical_statement": "For p(r)=Y0-(1-Z0)r+Z2*r^2, the supplied radius interval has p(r)<0 throughout it.",
+    "pass": true,
+    "precision_digits": 80,
+    "radii_polynomial_interval": [
+      "-0.00982939999999999563",
+      "-0.000924349999999999518"
+    ],
+    "radius_interval": [
+      "0.001",
+      "0.01"
+    ]
+  },
+  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
+  "schema_version": "nsproof-cert-v1",
+  "scope": "infrastructure-only finite-dimensional manufactured NK smoke"
+}

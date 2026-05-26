@@ -1,7 +1,7 @@
 {
   "backend": "native-c-outward-double-intervals",
   "benchmark": {
-    "output": "interval kernel validation: ok\ncase counts: add=4 mul=4 recip=3 poly=4 total=15\nmax widths: add=1.1250000000000002 mul=1.2500000000000002 recip=2.2204460492503131e-15 poly=1.9984014443252818e-15 overall=1.2500000000000002\nbenchmark: mul_batch count=4 repeats=100 elapsed=0.000117s\n",
+    "output": "interval kernel validation: ok\ncase counts: add=4 mul=4 recip=3 poly=4 total=15\nmax widths: add=1.1250000000000002 mul=1.2500000000000002 recip=2.2204460492503131e-15 poly=1.9984014443252818e-15 overall=1.2500000000000002\nbenchmark: mul_batch count=4 repeats=100 elapsed=0.000118s\n",
     "ran": true
   },
   "blockers": [
@@ -11,14 +11,14 @@
   ],
   "certificate_name": "interval_backend_smoke",
   "commands": [
-    "tools/validate_interval_backend.py --repeats 100"
+    "tools/validate_interval_backend.py --repeats 100 --out certs/infrastructure/interval_backend_smoke.json"
   ],
   "dependency_hashes": {},
   "failure_reason": "backend uses outward-rounded double intervals, not Arb/MPFI multiprecision balls; elementary functions and matrix/operator interval kernels are not implemented; exact residual/NK validators do not yet consume this backend for theorem gates",
   "input_hashes": {
-    "interval_backend": "66eda1ccf7734a3dab47983e7b97be72b73b1947f2c5bb3700e82cf797c7a121",
+    "interval_backend": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
     "interval_kernel_validator": "8078f5096663b27c5320b5cdd068cb8999ca35dbb6843dcd60ccf0e49c4a8f8b",
-    "native_c_kernel": "f173d5c9723dd086aa669cca6fffe0093848b59983f02d13abbfd306296e78cc"
+    "native_c_kernel": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863"
   },
   "interval_widths": {
     "max": 1.2500000000000002,
@@ -27,7 +27,7 @@
   "mathematical_statement": "Batched interval add/sub/mul/reciprocal/polynomial primitives return outward double enclosures for deterministic smoke cases.",
   "pass": false,
   "precision_bits": 53,
-  "repo_commit": "d9c57f3f3ddd97bead7ec2768140f1c371cdaf24",
+  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
   "rounding_mode": "nextafter outward enclosure",
   "schema_version": "nsproof-cert-v1",
   "smoke": {

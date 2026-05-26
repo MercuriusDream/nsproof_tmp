@@ -7,15 +7,15 @@
   ],
   "certificate_name": "bernstein_backend_smoke",
   "commands": [
-    "tools/validate_bernstein_backend.py"
+    "tools/validate_bernstein_backend.py --out certs/infrastructure/bernstein_backend_smoke.json"
   ],
   "dependency_hashes": {},
   "failure_reason": "Bernstein backend is not yet wired to exact two-chart residual expressions; directed-rounding coefficient generation from profile charts is missing; subdivision/domain cover selection for profile NK is missing",
   "input_hashes": {
     "bernstein_ball": "23081cd25e35d674182394d402c87c861d278bbdfe359d0df91ce48f9f69bfaf",
-    "interval_backend": "66eda1ccf7734a3dab47983e7b97be72b73b1947f2c5bb3700e82cf797c7a121",
+    "interval_backend": "5715e8e5ea7a13d7dfd7a7b8f1478efee5ea9a1e6b9edcf601c909a293730e82",
     "native_bernstein_validator": "8ee1e7a4cf03519fffc517f2036fce24340f45b0b9227606d73128b4afeda68c",
-    "native_c_kernel": "d2f07a608e2cdfe3c17c4f86652079a5559a6b07acd878500cee69768f511db9"
+    "native_c_kernel": "8818cf6d1cfb2e8cdfaa8971e802ad726101789f141e78e73f2ea9c0dcc7d863"
   },
   "interval_widths": {
     "max": 3.0,
@@ -24,7 +24,7 @@
   "mathematical_statement": "A Bernstein polynomial range on a domain is enclosed by the hull of its Bernstein coefficients; subdivision by de Casteljau preserves that hull enclosure.",
   "pass": false,
   "precision_bits": 53,
-  "repo_commit": "09e6fc515e2bd30f730a7c67c089f8cd77fde245",
+  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
   "rounding_mode": "nearest for smoke; proof path must use directed intervals",
   "schema_version": "nsproof-cert-v1",
   "smoke": {

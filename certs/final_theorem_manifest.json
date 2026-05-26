@@ -161,7 +161,7 @@
         "path": "certs/infrastructure/interval_backend_smoke.json",
         "profile_hash_sha256": null,
         "schema_version": "nsproof-cert-v1",
-        "sha256": "33fa74af787d5782b484872bae81fc1d1961a9c46ce22e5e58f079284253253a"
+        "sha256": "e45ef927c7e3e5830179a10e734e8410e90904f41a1f1d789eb7e02bc51ed8c0"
       },
       {
         "certificate_name": "bernstein_backend_smoke",
@@ -171,7 +171,7 @@
         "path": "certs/infrastructure/bernstein_backend_smoke.json",
         "profile_hash_sha256": null,
         "schema_version": "nsproof-cert-v1",
-        "sha256": "8fb4c1e2b2b60a2b474096db3591fd146c8dd1a0471565f7459f40891ab1e4e6"
+        "sha256": "c93b775fdd89b125875121eaf56cf7c72cc7577657ccea6014a10f5e7796539c"
       },
       {
         "certificate_name": "manufactured_nk",
@@ -182,14 +182,24 @@
         "profile_hash_sha256": null,
         "schema_version": "nsproof-cert-v1",
         "sha256": "3560e021c8adca72c6de0c605e71cc5a6896048bfe972dec3426efc4758e5c02"
+      },
+      {
+        "certificate_name": "finite_nk_smoke",
+        "exists": true,
+        "failure_reason": null,
+        "pass": true,
+        "path": "certs/infrastructure/finite_nk_smoke.json",
+        "profile_hash_sha256": null,
+        "schema_version": "nsproof-cert-v1",
+        "sha256": "ee8c23f709edd48e67dcacf3c6db0432fb83c0c0fa29dc087a3e22f4f1cf9423"
       }
     ],
     "note": "These are proof-engineering smoke certificates. They are useful for backend readiness but do not count toward theorem gate pass/fail.",
-    "passed": 1,
-    "total": 3
+    "passed": 2,
+    "total": 4
   },
   "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
   "pass": false,
-  "repo_commit": "775e59256109552a627e06efef4b6f625291210f",
+  "repo_commit": "ca0d296c05d9bb6ed4111f5b1a2a0bb05e8e051b",
   "schema_version": "nsproof-cert-v1"
 }

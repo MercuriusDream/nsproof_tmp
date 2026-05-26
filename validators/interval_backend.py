@@ -124,3 +124,83 @@ def interval_poly_eval(coeffs: list[float], points: Iterable[Interval]) -> list[
     _check_statuses(rc, statuses, "interval_poly_eval")
     return [Interval(float(out_lo[index]), float(out_hi[index])) for index in range(point_count)]
 
+
+def _matrix_arrays(matrix: list[list[Interval]]) -> tuple[int, int, ctypes.Array[ctypes.c_double], ctypes.Array[ctypes.c_double]]:
+    if not matrix:
+        raise ValueError("expected at least one matrix row")
+    column_count = len(matrix[0])
+    if column_count == 0:
+        raise ValueError("matrix rows must not be empty")
+    lo_values: list[float] = []
+    hi_values: list[float] = []
+    for row in matrix:
+        if len(row) != column_count:
+            raise ValueError("matrix rows must have stable width")
+        for item in row:
+            lo_values.append(item.lo)
+            hi_values.append(item.hi)
+    double_array = ctypes.c_double * len(lo_values)
+    return len(matrix), column_count, double_array(*lo_values), double_array(*hi_values)
+
+
+def interval_matvec(matrix: list[list[Interval]], vector: Iterable[Interval]) -> list[Interval]:
+    values = _as_intervals(vector)
+    row_count, column_count, matrix_lo, matrix_hi = _matrix_arrays(matrix)
+    if len(values) != column_count:
+        raise ValueError("matrix/vector dimension mismatch")
+    vector_lo, vector_hi = _arrays(values)
+    double_array = ctypes.c_double * row_count
+    int_array = ctypes.c_int * row_count
+    out_lo = double_array()
+    out_hi = double_array()
+    statuses = int_array()
+    lib = native_c_library()
+    rc = lib.nsproof_interval_matvec_batch(
+        row_count,
+        column_count,
+        matrix_lo,
+        matrix_hi,
+        vector_lo,
+        vector_hi,
+        out_lo,
+        out_hi,
+        statuses,
+    )
+    _check_statuses(rc, statuses, "interval_matvec")
+    return [Interval(float(out_lo[index]), float(out_hi[index])) for index in range(row_count)]
+
+
+def interval_vector_inf_norm(vector: Iterable[Interval]) -> float:
+    values = _as_intervals(vector)
+    lo, hi = _arrays(values)
+    out = ctypes.c_double(0.0)
+    status = ctypes.c_int(0)
+    lib = native_c_library()
+    rc = lib.nsproof_interval_vector_inf_norm(
+        len(values),
+        lo,
+        hi,
+        ctypes.byref(out),
+        ctypes.byref(status),
+    )
+    if rc != STATUS_OK or status.value != STATUS_OK:
+        raise RuntimeError(f"interval_vector_inf_norm failed rc={rc} status={status.value}")
+    return float(out.value)
+
+
+def interval_matrix_inf_norm(matrix: list[list[Interval]]) -> float:
+    row_count, column_count, lo, hi = _matrix_arrays(matrix)
+    out = ctypes.c_double(0.0)
+    status = ctypes.c_int(0)
+    lib = native_c_library()
+    rc = lib.nsproof_interval_matrix_inf_norm(
+        row_count,
+        column_count,
+        lo,
+        hi,
+        ctypes.byref(out),
+        ctypes.byref(status),
+    )
+    if rc != STATUS_OK or status.value != STATUS_OK:
+        raise RuntimeError(f"interval_matrix_inf_norm failed rc={rc} status={status.value}")
+    return float(out.value)

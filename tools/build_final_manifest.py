@@ -70,6 +70,7 @@ INFRASTRUCTURE_CERTIFICATES: tuple[str, ...] = (
     "certs/infrastructure/interval_backend_smoke.json",
     "certs/infrastructure/bernstein_backend_smoke.json",
     "certs/infrastructure/manufactured_nk.json",
+    "certs/infrastructure/finite_nk_smoke.json",
 )
 
 

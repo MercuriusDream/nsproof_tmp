@@ -553,6 +553,35 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_bernstein_range_batch.restype = ctypes.c_int
+    lib.nsproof_interval_matvec_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_interval_matvec_batch.restype = ctypes.c_int
+    lib.nsproof_interval_vector_inf_norm.argtypes = [
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        ctypes.POINTER(ctypes.c_double),
+        ctypes.POINTER(ctypes.c_int),
+    ]
+    lib.nsproof_interval_vector_inf_norm.restype = ctypes.c_int
+    lib.nsproof_interval_matrix_inf_norm.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        c_double_p,
+        c_double_p,
+        ctypes.POINTER(ctypes.c_double),
+        ctypes.POINTER(ctypes.c_int),
+    ]
+    lib.nsproof_interval_matrix_inf_norm.restype = ctypes.c_int
     lib.nsproof_rz_weighted_coeff_partials_batch.argtypes = [
         ctypes.c_int,
         ctypes.c_int,
