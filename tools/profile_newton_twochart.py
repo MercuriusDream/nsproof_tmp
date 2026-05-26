@@ -146,6 +146,13 @@ def positive_int(value: str) -> int:
     return parsed
 
 
+def nonnegative_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be nonnegative")
+    return parsed
+
+
 def positive_float(value: str) -> float:
     parsed = float(value)
     if parsed <= 0.0:
@@ -252,6 +259,8 @@ def tail_variable_is_gate_locked(data: dict[str, Any], variable: Any) -> bool:
 
 
 def cap_candidate_pool(variables: list[Any], limit: int) -> list[Any]:
+    if limit <= 0:
+        return variables
     if len(variables) <= limit:
         return variables
     groups: dict[tuple[str, str, str], list[Any]] = {}
@@ -584,6 +593,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 
     projection = projection_from_twochart(data)
     all_variables = enumerate_coefficients(data)
+    all_variables_by_index = {variable.index: variable for variable in all_variables}
     pde_points = parse_qb_points(args.pde_qb_points)
     variable_charts = parse_variable_charts(args.variable_charts)
     q_values = grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples) if "interface" in blocks else []
@@ -599,7 +609,62 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         and variable_under_candidate_caps(variable, args)
         and not tail_variable_is_gate_locked(data, variable)
     ]
+    pre_score_candidate_count = len(candidate_variables)
     candidate_variables = cap_candidate_pool(candidate_variables, args.candidate_pool_limit)
+    candidate_by_index = {variable.index: variable for variable in candidate_variables}
+    injected_mortar_candidates: list[dict[str, Any]] = []
+
+    def build_mortar_rows(variables: list[Any]) -> list[Any]:
+        if args.mortar_coordinates == "RZ":
+            return build_rz_rows(data, variables, q_values, x_values, args.mortar_order)
+        if args.mortar_coordinates == "qx":
+            return build_rows(data, variables, q_values, x_values, args.mortar_order)
+        return build_rows(data, variables, q_values, x_values, args.mortar_order) + build_rz_rows(
+            data, variables, q_values, x_values, args.mortar_order
+        )
+
+    if "interface" in blocks and args.mortar_jacobian_candidate_count > 0:
+        mortar_variable_pool = [
+            variable
+            for variable in all_variables
+            if variable_allowed_for_blocks(variable, blocks)
+            and variable_allowed_for_chart_filter(variable, variable_charts)
+            and (args.include_origin_constants or not variable_is_origin_constant(variable))
+            and variable_relevant_for_samples(data, variable, pde_points, mortar_points)
+            and not tail_variable_is_gate_locked(data, variable)
+        ]
+        exploratory_rows = build_mortar_rows(mortar_variable_pool)
+        if args.mortar_active_count > 0 and len(exploratory_rows) > args.mortar_active_count:
+            exploratory_rows = sorted(exploratory_rows, key=lambda row: abs(row.residual), reverse=True)[
+                : args.mortar_active_count
+            ]
+        injection_scores: dict[int, float] = {}
+        injection_best: dict[int, tuple[str, float]] = {}
+        for row in exploratory_rows:
+            for var_index, jac_value in row.jacobian:
+                score = abs(args.mortar_weight * jac_value * row.residual)
+                injection_scores[var_index] = injection_scores.get(var_index, 0.0) + score
+                current_best = injection_best.get(var_index)
+                if current_best is None or score > current_best[1]:
+                    injection_best[var_index] = (row.derivative_label, score)
+        for var_index, score in sorted(injection_scores.items(), key=lambda item: item[1], reverse=True):
+            if len(injected_mortar_candidates) >= args.mortar_jacobian_candidate_count:
+                break
+            if var_index in candidate_by_index:
+                continue
+            variable = all_variables_by_index[var_index]
+            candidate_variables.append(variable)
+            candidate_by_index[var_index] = variable
+            derivative_label, best_score = injection_best[var_index]
+            injected_mortar_candidates.append(
+                {
+                    "variable": variable.label,
+                    "var_index": var_index,
+                    "score": score,
+                    "best_row_derivative": derivative_label,
+                    "best_row_score": best_score,
+                }
+            )
 
     pde_rows: list[dict[str, Any]] = []
     variable_scores = {variable.index: 0.0 for variable in candidate_variables}
@@ -618,14 +683,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     mortar_rows = []
     mortar_rows_available = 0
     if "interface" in blocks:
-        if args.mortar_coordinates == "RZ":
-            mortar_rows = build_rz_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
-        elif args.mortar_coordinates == "qx":
-            mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
-        else:
-            mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order) + build_rz_rows(
-                data, candidate_variables, q_values, x_values, args.mortar_order
-            )
+        mortar_rows = build_mortar_rows(candidate_variables)
         mortar_rows_available = len(mortar_rows)
         if args.mortar_active_count > 0 and len(mortar_rows) > args.mortar_active_count:
             mortar_rows = sorted(mortar_rows, key=lambda row: abs(row.residual), reverse=True)[
@@ -695,6 +753,9 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "mortar_coordinates": args.mortar_coordinates,
         "mortar_rows_available": mortar_rows_available,
         "mortar_rows_active": len(mortar_rows),
+        "pre_score_candidate_count": pre_score_candidate_count,
+        "post_pool_candidate_count": len(candidate_variables),
+        "injected_mortar_candidates": injected_mortar_candidates,
         "variable_score_preview": [
             {"variable": variable.label, "score": variable_scores.get(variable.index, 0.0)}
             for variable in selected[:12]
@@ -942,6 +1003,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
                 "mortar_rows_active": system["mortar_rows_active"],
+                "pre_score_candidate_count": system["pre_score_candidate_count"],
+                "post_pool_candidate_count": system["post_pool_candidate_count"],
+                "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
                 "variable_score_preview": system["variable_score_preview"],
                 "line_trials": line_trials,
                 "accepted": accepted,
@@ -1000,6 +1064,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "candidate_kx_max": args.candidate_kx_max,
             "candidate_origin_degree_max": args.candidate_origin_degree_max,
             "candidate_pool_limit": args.candidate_pool_limit,
+            "mortar_jacobian_candidate_count": args.mortar_jacobian_candidate_count,
             "pde_weight": args.pde_weight,
             "mortar_weight": args.mortar_weight,
             "line_search": args.line_search,
@@ -1133,7 +1198,13 @@ def main() -> None:
     parser.add_argument("--candidate-kq-max", type=int, default=6)
     parser.add_argument("--candidate-kx-max", type=int, default=6)
     parser.add_argument("--candidate-origin-degree-max", type=int, default=6)
-    parser.add_argument("--candidate-pool-limit", type=positive_int, default=512)
+    parser.add_argument("--candidate-pool-limit", type=nonnegative_int, default=512, help="Pre-score candidate cap; 0 disables the cap.")
+    parser.add_argument(
+        "--mortar-jacobian-candidate-count",
+        type=nonnegative_int,
+        default=0,
+        help="Inject this many extra variables by largest active mortar-row Jacobian score, ignoring degree caps.",
+    )
     parser.add_argument("--line-search", type=parse_float_list, default=parse_float_list("1,0.5,0.25,0.125"))
     parser.add_argument("--include-origin-constants", action="store_true")
     parser.add_argument("--chart-balanced-selection", action="store_true")

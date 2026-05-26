@@ -111,6 +111,9 @@ work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3_report.json
 work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_report.json
 work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
 work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_mortar_rows.json
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_guardedge_report.json
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
@@ -168,6 +171,11 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
     overlap holdout -> 3.235344358647e2
     edge holdout remains 4.489165350285e2
     C2 R/Z mortar max remains 4.214529161145e3
+  seam-Jacobian injected tail variables:
+    worst row = F dZZ at q=0.84, x=1.0
+    top injected variables include tail.F_an[p24].c[0,10]
+    sampled objective improves, but hidden edge q=0.86,b=0.20 blows up to 3.169794284607e5
+    adding q=0.86,b=0.20 to guard rejects every tail seam step
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -197,7 +205,10 @@ for held-out edge damage. If the edge is injected into the active set, the seam
 barely moves; if it is used only as a guard, all candidate steps are rejected.
 The first restricted block-search changes that: guarded origin-chart substeps
 produce safe descent for origin/overlap/guard, but not for the worst R/Z mortar
-row. This is safe Stage-0 progress, not a Newton basin.
+row. Seam-Jacobian injection then shows why: the worst row is reachable through
+high-degree tail variables, but those tail directions create severe hidden-edge
+damage unless a much broader guard/regularizer is active. This is safe Stage-0
+progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -618,10 +629,12 @@ Do not spend the next branch on more origin-only refits except as diagnostics.
 Update after the chart-balanced conditioning probes:
 `tools/profile_newton_twochart.py` now supports `--chart-balanced-selection`,
 `--row-normalization`, `--max-raw-objective-growth`, `--guard-qb-points`,
-`--solve-mode block-search`, and `--block-search-labels`. This prevents a
-row-normalized scaled-objective decrease from being accepted when the unscaled
-sampled objective or a held-out point worsens, and it can test restricted
-substeps such as `chart:tail` and `chart:origin`. Current evidence:
+`--solve-mode block-search`, `--block-search-labels`,
+`--mortar-jacobian-candidate-count`, and `--candidate-pool-limit 0`. This
+prevents a row-normalized scaled-objective decrease from being accepted when
+the unscaled sampled objective or a held-out point worsens, can test restricted
+substeps such as `chart:tail` and `chart:origin`, and can explicitly inject
+variables from the largest active seam-row Jacobians. Current evidence:
 
 ```text
 work/twochart_stage0_rz_coupled_tail_origin_norm48_guarded_report.json
@@ -656,14 +669,32 @@ work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
   overlap holdout = 3.235344358647e2
   edge holdout = 4.489165350285e2
   C2 R/Z mortar max = 4.214529161145e3
+
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_mortar_rows.json
+  worst row = F dZZ, q=0.84, x=1.0, residual = 4.214529161145e3
+  top variables include high-degree tail.F_an/F_frac coefficients with kx=10
+
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_guardedge_report.json
+  injected top active mortar-Jacobian variables into the tail block
+  selected variables now include tail.F_an[p24].c[0,10], [5,10], [10,10]
+  sampled objective = 6.104097875585e4 -> 6.100057015116e4
+  hidden edge holdout blows up to 3.169794284607e5 at q=0.86,b=0.20
+
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
+  guard points = q=0.90,b=0.98 and q=0.86,b=0.20
+  accepted_any_step = false
+  q=0.86,b=0.20 guard grows to 2.008315326633e4 even at alpha=0.0625
 ```
 
 Interpretation: balanced tail+origin variables are now genuinely active, but
 the current sampled system still trades seam movement against held-out edge
 control under full steps. Restricted block-search finds safe guarded origin
-descent, but it does not move the worst seam row. The next implementation should
-broaden active rows/variables around the worst seam row or implement a true
-Schur complement that combines safe origin descent with seam reduction.
+descent, but it does not move the worst seam row. Seam-Jacobian injection shows
+that direct tail control of the seam is possible only through directions that
+create hidden-edge explosions. The next implementation should add a broad edge
+guard/regularization grid before accepting high-degree tail seam variables, or
+else implement a true Schur complement that combines safe origin descent with
+regularized seam reduction.
 
 ## 6. Current Repository Tooling
 

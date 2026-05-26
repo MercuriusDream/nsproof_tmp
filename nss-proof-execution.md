@@ -4032,6 +4032,45 @@ This is useful but limited.  It shows safe origin-chart descent exists once
 full coupled steps are rejected by the guard.  It does not move the worst
 interface row.
 
+A row-level R/Z mortar dump then identified that worst row:
+
+```text
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_mortar_rows.json
+worst row: F dZZ, q=0.84, x=1.0
+residual: 4.214529161145e3
+dominant variables: high-degree tail coefficients such as
+  tail.F_an[p24].c[0,10],
+  tail.F_an[p24].c[5,10],
+  tail.F_frac[f1][p24].c[0,10].
+```
+
+`tools/profile_newton_twochart.py` now has
+`--mortar-jacobian-candidate-count` and allows `--candidate-pool-limit 0`, so
+these high-degree seam variables can be injected without globally disabling the
+candidate cap.  The injected tail-block probe confirms that the seam row is
+reachable, but the resulting tail direction is not safe:
+
+```text
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_guardedge_report.json
+sampled objective: 6.104097875585e4 -> 6.100057015116e4
+selected tail variables include tail.F_an[p24].c[0,10], [5,10], [10,10]
+hidden edge holdout: 3.169794284607e5 at q=0.86,b=0.20
+```
+
+Adding that hidden edge point to the guard rejects all injected tail steps:
+
+```text
+work/twochart_stage0_rz_blocksearch24_tail_jacinject_multiguard_report.json
+guard points: q=0.90,b=0.98 and q=0.86,b=0.20
+accepted_any_step: false
+at alpha=0.0625, q=0.86,b=0.20 guard max is still 2.008315326633e4
+```
+
+So the failure is now sharper: the worst seam row is not immovable, but its
+direct high-degree tail controls are violently nonlocal in the edge diagnostic.
+They need broad edge regularization/guards or a true constrained Schur solve
+before they can be accepted.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4049,8 +4088,9 @@ coordinate language, and the origin chart has enough algebraic freedom to match
 the seam alone. Balanced tail+origin variables are now active, held-out guards
 prevent accepting edge-damaging steps, and restricted origin-block descent can
 improve origin/overlap while preserving the guard. The sampled system still
-cannot reduce the worst seam row and guarded edge simultaneously. The next
-solver step should broaden active rows/variables around the worst seam row or
-implement a true Schur-style solve; row normalization alone is not enough. It is
-too early to free `(gamma,B)`, pivot to radial matching, or start spectral
-validation as a theorem dependency.
+cannot reduce the worst seam row and guarded edge simultaneously. Seam-Jacobian
+injection shows that the relevant tail variables create hidden-edge explosions.
+The next solver step should add a broad edge guard/regularization grid around
+the high-degree tail controls or implement a true constrained Schur-style solve;
+row normalization alone is not enough. It is too early to free `(gamma,B)`,
+pivot to radial matching, or start spectral validation as a theorem dependency.
