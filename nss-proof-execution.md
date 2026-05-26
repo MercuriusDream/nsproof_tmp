@@ -4011,6 +4011,27 @@ base guard max: 3.065963042569e2
 all tested alphas through 0.0625 increase the guard residual
 ```
 
+`tools/profile_newton_twochart.py` now also has `--solve-mode block-search`
+and `--block-search-labels`, so the same sampled system can test restricted
+full/chart/component/block substeps against the raw and held-out guards.  A
+limited chart-block run gives the first safe guarded Stage-0 descent:
+
+```text
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
+solve mode: block-search over full, chart:tail, chart:origin
+accepted block: chart:origin on all three iterations
+sampled objective: 6.173191142295e4 -> 6.158294685900e4
+guard max: 3.065963042569e2 -> 3.055238263138e2
+origin holdout: 9.128755428936e1
+overlap holdout: 3.235344358647e2
+edge holdout: 4.489165350285e2
+C2 R/Z mortar max: 4.214529161145e3
+```
+
+This is useful but limited.  It shows safe origin-chart descent exists once
+full coupled steps are rejected by the guard.  It does not move the worst
+interface row.
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -4025,9 +4046,11 @@ C0-C2 R,Z mortar max = 4.214529161145e3
 Conclusion: the immediate blocker is still the two-chart Stage-0 coupled
 linear system and interface/PDE balance. The new R/Z rows are the right
 coordinate language, and the origin chart has enough algebraic freedom to match
-the seam alone. Balanced tail+origin variables are now active, and held-out
-guards prevent accepting edge-damaging steps, but the sampled system still
-cannot reduce seam and guarded edge simultaneously. The next solver step should
-be a blocked Schur-style solve or broader active-row design; row normalization
-alone is not enough. It is too early to free `(gamma,B)`, pivot to radial
-matching, or start spectral validation as a theorem dependency.
+the seam alone. Balanced tail+origin variables are now active, held-out guards
+prevent accepting edge-damaging steps, and restricted origin-block descent can
+improve origin/overlap while preserving the guard. The sampled system still
+cannot reduce the worst seam row and guarded edge simultaneously. The next
+solver step should broaden active rows/variables around the worst seam row or
+implement a true Schur-style solve; row normalization alone is not enough. It is
+too early to free `(gamma,B)`, pivot to radial matching, or start spectral
+validation as a theorem dependency.

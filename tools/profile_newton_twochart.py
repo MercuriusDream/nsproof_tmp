@@ -740,6 +740,65 @@ def normal_step(
     }
 
 
+def restricted_normal_step(
+    jacobian_rows: list[list[float]],
+    residual_vector: list[float],
+    active_columns: list[int],
+    total_columns: int,
+    lm_lambda: float,
+) -> tuple[list[float], dict[str, Any]]:
+    if not active_columns:
+        raise ValueError("empty active column set")
+    restricted_rows = [[row[column] for column in active_columns] for row in jacobian_rows]
+    restricted_delta, report = normal_step(restricted_rows, residual_vector, lm_lambda)
+    full_delta = [0.0 for _ in range(total_columns)]
+    for local_index, column in enumerate(active_columns):
+        full_delta[column] = restricted_delta[local_index]
+    return full_delta, {
+        **report,
+        "active_columns": len(active_columns),
+        "total_columns": total_columns,
+    }
+
+
+def stage0_block_specs(variables: list[Any], solve_mode: str, labels_raw: str = "") -> list[dict[str, Any]]:
+    if solve_mode == "full":
+        return [{"label": "full", "columns": list(range(len(variables)))}]
+    requested = {item.strip() for item in labels_raw.split(",") if item.strip()}
+    specs: list[dict[str, Any]] = [{"label": "full", "columns": list(range(len(variables)))}]
+    seen = {"full"}
+
+    def add(label: str, predicate: Any) -> None:
+        if label in seen:
+            return
+        columns = [index for index, variable in enumerate(variables) if predicate(variable)]
+        if not columns:
+            return
+        specs.append({"label": label, "columns": columns})
+        seen.add(label)
+
+    for chart in ("tail", "origin"):
+        add(f"chart:{chart}", lambda variable, chart=chart: variable.chart == chart)
+    for component in ("F", "G"):
+        add(f"component:{component}", lambda variable, component=component: variable.component == component)
+    for chart in ("tail", "origin"):
+        for component in ("F", "G"):
+            add(
+                f"{chart}.{component}",
+                lambda variable, chart=chart, component=component: variable.chart == chart and variable.component == component,
+            )
+    for block in sorted({str(variable.block) for variable in variables}):
+        add(f"block:{block}", lambda variable, block=block: str(variable.block) == block)
+    if requested:
+        specs = [spec for spec in specs if spec["label"] in requested]
+        missing = sorted(requested - {str(spec["label"]) for spec in specs})
+        if missing:
+            raise ValueError(f"--block-search-labels requested unavailable block(s): {', '.join(missing)}")
+        if not specs:
+            raise ValueError("--block-search-labels removed every block candidate")
+    return specs
+
+
 def attach_stage0_tail_gate(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
     report = tail_gate_report_twochart(data, args)
     data["tail_legality"] = {
@@ -766,63 +825,114 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         base_metrics = vector_metrics(base_vec)
         base_raw_metrics = system["raw_residual_metrics"]
         base_guard_metrics = guard_point_metrics(current, args, guard_points)
-        delta, scaling_report = normal_step(system["jacobian_rows"], base_vec, args.lm_lambda)
-        delta_norm = math.sqrt(sum(value * value for value in delta))
+        block_specs = stage0_block_specs(system["variables"], args.solve_mode, args.block_search_labels)
         line_trials: list[dict[str, Any]] = []
+        candidate_previews: list[dict[str, Any]] = []
+        best_accepted: dict[str, Any] | None = None
         accepted = False
-        for alpha in args.line_search:
-            trial_data, update_metrics = apply_delta(current, system["variables"], delta, alpha, args.trust)
-            tail_gate = attach_stage0_tail_gate(trial_data, args)
-            if not tail_gate["all_ok"]:
+        for block_spec in block_specs:
+            try:
+                delta, scaling_report = restricted_normal_step(
+                    system["jacobian_rows"],
+                    base_vec,
+                    list(block_spec["columns"]),
+                    len(system["variables"]),
+                    args.lm_lambda,
+                )
+            except ValueError as exc:
                 line_trials.append(
                     {
-                        "alpha": alpha,
-                        **update_metrics,
-                        "rejected_by_tail_gate": True,
-                        "tail_gate": tail_gate,
+                        "block": block_spec["label"],
+                        "rejected_by_solver": True,
+                        "error": str(exc),
                     }
                 )
                 continue
-            trial_system = build_stage0_system(trial_data, args, blocks)
-            trial_metrics = vector_metrics(trial_system["residual_vector"])
-            trial_raw_metrics = trial_system["raw_residual_metrics"]
-            trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
-            raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
-                base_raw_metrics["objective"], 1e-300
-            )
-            guard_growth_ok = True
-            if guard_points:
-                guard_growth_ok = (
-                    trial_guard_metrics["objective"]
-                    <= args.max_guard_objective_growth * max(base_guard_metrics["objective"], 1e-300)
-                    and trial_guard_metrics["max_abs"]
-                    <= args.max_guard_max_growth * max(base_guard_metrics["max_abs"], 1e-300)
-                )
-            line_trials.append(
+            delta_norm = math.sqrt(sum(value * value for value in delta))
+            candidate_previews.append(
                 {
-                    "alpha": alpha,
-                    **update_metrics,
-                    **trial_metrics,
-                    "raw_objective": trial_raw_metrics["objective"],
-                    "raw_max_abs": trial_raw_metrics["max_abs"],
-                    "raw_growth_ok": raw_growth_ok,
-                    "guard_metrics": trial_guard_metrics,
-                    "guard_growth_ok": guard_growth_ok,
-                    "tail_gate": tail_gate,
+                    "block": block_spec["label"],
+                    "active_columns": len(block_spec["columns"]),
+                    "delta_norm": delta_norm,
+                    "column_scaling": scaling_report,
                 }
             )
-            if trial_metrics["objective"] < base_metrics["objective"] and raw_growth_ok and guard_growth_ok:
-                current = trial_data
-                best_trial = trial_data
-                best_trial_metrics = trial_metrics
-                accepted = True
+            for alpha in args.line_search:
+                trial_data, update_metrics = apply_delta(current, system["variables"], delta, alpha, args.trust)
+                tail_gate = attach_stage0_tail_gate(trial_data, args)
+                trial_record: dict[str, Any] = {
+                    "block": block_spec["label"],
+                    "active_columns": len(block_spec["columns"]),
+                    "alpha": alpha,
+                    "delta_norm": delta_norm,
+                    "column_scaling": scaling_report,
+                    **update_metrics,
+                }
+                if not tail_gate["all_ok"]:
+                    line_trials.append(
+                        {
+                            **trial_record,
+                            "rejected_by_tail_gate": True,
+                            "tail_gate": tail_gate,
+                        }
+                    )
+                    continue
+                trial_system = build_stage0_system(trial_data, args, blocks)
+                trial_metrics = vector_metrics(trial_system["residual_vector"])
+                trial_raw_metrics = trial_system["raw_residual_metrics"]
+                trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
+                raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
+                    base_raw_metrics["objective"], 1e-300
+                )
+                guard_growth_ok = True
+                if guard_points:
+                    guard_growth_ok = (
+                        trial_guard_metrics["objective"]
+                        <= args.max_guard_objective_growth * max(base_guard_metrics["objective"], 1e-300)
+                        and trial_guard_metrics["max_abs"]
+                        <= args.max_guard_max_growth * max(base_guard_metrics["max_abs"], 1e-300)
+                    )
+                improved = trial_metrics["objective"] < base_metrics["objective"]
+                accepted_here = improved and raw_growth_ok and guard_growth_ok
+                line_trials.append(
+                    {
+                        **trial_record,
+                        **trial_metrics,
+                        "raw_objective": trial_raw_metrics["objective"],
+                        "raw_max_abs": trial_raw_metrics["max_abs"],
+                        "raw_growth_ok": raw_growth_ok,
+                        "guard_metrics": trial_guard_metrics,
+                        "guard_growth_ok": guard_growth_ok,
+                        "accepted": accepted_here,
+                        "tail_gate": tail_gate,
+                    }
+                )
+                if accepted_here and (
+                    best_accepted is None
+                    or trial_metrics["objective"] < best_accepted["trial_metrics"]["objective"]
+                ):
+                    best_accepted = {
+                        "block": block_spec["label"],
+                        "trial_data": trial_data,
+                        "trial_metrics": trial_metrics,
+                        "update_metrics": update_metrics,
+                        "alpha": alpha,
+                    }
+            if args.solve_mode == "full":
                 break
+        if best_accepted is not None:
+            current = best_accepted["trial_data"]
+            best_trial = current
+            best_trial_metrics = best_accepted["trial_metrics"]
+            accepted = True
         history.append(
             {
                 "iteration": iteration,
                 "base": base_metrics,
-                "delta_norm": delta_norm,
-                "column_scaling": scaling_report,
+                "solve_mode": args.solve_mode,
+                "accepted_block": best_accepted["block"] if best_accepted is not None else "",
+                "accepted_alpha": best_accepted["alpha"] if best_accepted is not None else 0.0,
+                "block_candidate_previews": candidate_previews,
                 "selected_variables": len(system["variables"]),
                 "row_groups": system["row_groups"],
                 "raw_residual_metrics": system["raw_residual_metrics"],
@@ -878,6 +988,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
             "guard_qb_points": [[q, b] for q, b in guard_points],
+            "solve_mode": args.solve_mode,
+            "block_search_labels": args.block_search_labels,
             "max_guard_objective_growth": args.max_guard_objective_growth,
             "max_guard_max_growth": args.max_guard_max_growth,
             "max_iter": args.max_iter,
@@ -951,6 +1063,7 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
             "scan": args.scan,
+            "solve_mode": args.solve_mode,
         },
         "hard_constraints": {
             "q2_policy": "zero",
@@ -1005,6 +1118,12 @@ def main() -> None:
     parser.add_argument("--guard-qb-points", default="", help="Semicolon-separated q,b points used only as line-search guards.")
     parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
     parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
+    parser.add_argument("--solve-mode", choices=("full", "block-search"), default="full")
+    parser.add_argument(
+        "--block-search-labels",
+        default="",
+        help="Comma list of block-search candidates to evaluate, e.g. full,chart:tail,chart:origin.",
+    )
     parser.add_argument("--pde-weight", type=positive_float, default=1.0)
     parser.add_argument("--mortar-weight", type=positive_float, default=1e-6)
     parser.add_argument("--forced-tol", type=positive_float, default=1e-12)
@@ -1082,6 +1201,8 @@ def main() -> None:
             print(f"iterations_run={len(result['history'])}")
             print(f"row_groups={last['row_groups']}")
             print(f"row_normalization={args.row_normalization}")
+            print(f"solve_mode={args.solve_mode}")
+            print(f"accepted_block={last.get('accepted_block', '')}")
             print(f"selected_by_chart={last.get('selected_by_chart', {})}")
             print(f"selected_variables={last['selected_variables']}")
             print(f"base_objective_first={first['base']['objective']:.12e}")

@@ -110,6 +110,7 @@ work/twochart_stage0_rz_coupled_tail_origin_bal48_report.json
 work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3_report.json
 work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_report.json
 work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
@@ -159,6 +160,14 @@ chart-balanced tail+origin Stage-0 with row-normalization guard:
   with edge point used only as a line-search guard:
     accepted_any_step = false
     guard residual grows at every tested alpha down to 0.0625
+  chart block-search, guarded edge, 3 iterations:
+    accepted block = chart:origin on every iteration
+    sampled objective 6.173191142295e4 -> 6.158294685900e4
+    guard max 3.065963042569e2 -> 3.055238263138e2
+    origin holdout -> 9.128755428936e1
+    overlap holdout -> 3.235344358647e2
+    edge holdout remains 4.489165350285e2
+    C2 R/Z mortar max remains 4.214529161145e3
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -186,6 +195,9 @@ guarded against raw sampled objective growth, it rejects the candidate step;
 when chart-balanced raw steps are accepted, they still trade active objective
 for held-out edge damage. If the edge is injected into the active set, the seam
 barely moves; if it is used only as a guard, all candidate steps are rejected.
+The first restricted block-search changes that: guarded origin-chart substeps
+produce safe descent for origin/overlap/guard, but not for the worst R/Z mortar
+row. This is safe Stage-0 progress, not a Newton basin.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -605,10 +617,11 @@ Do not spend the next branch on more origin-only refits except as diagnostics.
 
 Update after the chart-balanced conditioning probes:
 `tools/profile_newton_twochart.py` now supports `--chart-balanced-selection`,
-`--row-normalization`, `--max-raw-objective-growth`, and `--guard-qb-points`.
-This prevents a row-normalized scaled-objective decrease from being accepted
-when the unscaled sampled objective or a held-out point worsens. Current
-evidence:
+`--row-normalization`, `--max-raw-objective-growth`, `--guard-qb-points`,
+`--solve-mode block-search`, and `--block-search-labels`. This prevents a
+row-normalized scaled-objective decrease from being accepted when the unscaled
+sampled objective or a held-out point worsens, and it can test restricted
+substeps such as `chart:tail` and `chart:origin`. Current evidence:
 
 ```text
 work/twochart_stage0_rz_coupled_tail_origin_norm48_guarded_report.json
@@ -633,13 +646,24 @@ work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
   q=0.900, b=0.980 used only as line-search guard
   accepted_any_step = false
   guard max grows from 3.065963042569e2 even at alpha=0.0625
+
+work/twochart_stage0_rz_blocksearch24_chart_guardedge_iter3_report.json
+  solve mode = block-search over full, chart:tail, chart:origin
+  accepted block = chart:origin for all 3 iterations
+  sampled objective = 6.173191142295e4 -> 6.158294685900e4
+  guard max = 3.065963042569e2 -> 3.055238263138e2
+  origin holdout = 9.128755428936e1
+  overlap holdout = 3.235344358647e2
+  edge holdout = 4.489165350285e2
+  C2 R/Z mortar max = 4.214529161145e3
 ```
 
 Interpretation: balanced tail+origin variables are now genuinely active, but
 the current sampled system still trades seam movement against held-out edge
-control. The next implementation should add a blocked/Schur solve with broader
-active rows that can reduce seam and guarded edge simultaneously, not just more
-row scaling.
+control under full steps. Restricted block-search finds safe guarded origin
+descent, but it does not move the worst seam row. The next implementation should
+broaden active rows/variables around the worst seam row or implement a true
+Schur complement that combines safe origin descent with seam reduction.
 
 ## 6. Current Repository Tooling
 
