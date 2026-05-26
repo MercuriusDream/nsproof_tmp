@@ -1,0 +1,183 @@
+{
+  "coordinate_derivatives": "R,Z",
+  "diagnostic_vs_proof": "sampled floating two-chart R,Z mortar metadata only; no interval smoothness proof",
+  "orders": "C0-C2",
+  "overlap_q_range": [
+    0.84,
+    0.92
+  ],
+  "profile": "work/twochart_stage0_rz_coupled_tail_origin_norm48.json",
+  "rz_mortar": {
+    "max_abs_diff": 4214.520682522873,
+    "rms_diff": 560.3300649558804,
+    "status": "TWOCHART_RZ_MORTAR_METADATA_NOT_INTERVAL",
+    "summary": {
+      "count": 120,
+      "groups": [
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dZZ",
+          "dq_order": 0,
+          "dx_order": 2,
+          "key": "RZ:F:dZZ",
+          "max_abs": 4214.520682522873,
+          "rms": 1437.8926417509335
+        },
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dRR",
+          "dq_order": 2,
+          "dx_order": 0,
+          "key": "RZ:F:dRR",
+          "max_abs": 1915.6176255772893,
+          "rms": 909.0073790677222
+        },
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dRZ",
+          "dq_order": 1,
+          "dx_order": 1,
+          "key": "RZ:F:dRZ",
+          "max_abs": 1213.760541941589,
+          "rms": 662.9374088036691
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dZZ",
+          "dq_order": 0,
+          "dx_order": 2,
+          "key": "RZ:G:dZZ",
+          "max_abs": 976.2786162163201,
+          "rms": 454.18920921806597
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dRR",
+          "dq_order": 2,
+          "dx_order": 0,
+          "key": "RZ:G:dRR",
+          "max_abs": 646.8371486695771,
+          "rms": 367.7361294297443
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dRZ",
+          "dq_order": 1,
+          "dx_order": 1,
+          "key": "RZ:G:dRZ",
+          "max_abs": 569.8306598042185,
+          "rms": 290.2240352391723
+        },
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dZ",
+          "dq_order": 0,
+          "dx_order": 1,
+          "key": "RZ:F:dZ",
+          "max_abs": 230.68232439967494,
+          "rms": 79.19261345289445
+        },
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dR",
+          "dq_order": 1,
+          "dx_order": 0,
+          "key": "RZ:F:dR",
+          "max_abs": 75.13594131354796,
+          "rms": 38.05369667812492
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dZ",
+          "dq_order": 0,
+          "dx_order": 1,
+          "key": "RZ:G:dZ",
+          "max_abs": 60.53176382669987,
+          "rms": 24.286728518972122
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "dR",
+          "dq_order": 1,
+          "dx_order": 0,
+          "key": "RZ:G:dR",
+          "max_abs": 32.68714503273391,
+          "rms": 15.936990540270186
+        },
+        {
+          "component": "F",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "value",
+          "dq_order": 0,
+          "dx_order": 0,
+          "key": "RZ:F:value",
+          "max_abs": 9.274968886641144,
+          "rms": 3.1065223837960563
+        },
+        {
+          "component": "G",
+          "coordinate": "RZ",
+          "count": 10,
+          "derivative": "value",
+          "dq_order": 0,
+          "dx_order": 0,
+          "key": "RZ:G:value",
+          "max_abs": 2.5069789305072065,
+          "rms": 0.9906832125823677
+        }
+      ],
+      "jacobian_nnz_per_row": 0.0,
+      "jacobian_total_nnz": 0,
+      "max_abs": 4214.520682522873,
+      "rms": 560.3300649558804,
+      "worst": {
+        "abs_residual": 4214.520682522873,
+        "component": "F",
+        "coordinate": "RZ",
+        "derivative": "dZZ",
+        "dq_order": 0,
+        "dx_order": 2,
+        "jacobian": [],
+        "jacobian_nnz": 0,
+        "origin_value": -4217.252390165919,
+        "q": 0.84,
+        "residual_tail_minus_origin": 4214.520682522873,
+        "row_index": 27,
+        "tail_value": -2.7317076430457417,
+        "total_order": 2,
+        "x": 1.0
+      }
+    }
+  },
+  "sample_shape": {
+    "q_samples": 2,
+    "x_samples": 5
+  },
+  "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+  "status": "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF",
+  "x_range": [
+    0.0,
+    1.0
+  ]
+}

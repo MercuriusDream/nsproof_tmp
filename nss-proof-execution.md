@@ -3961,6 +3961,56 @@ origin holdout: 9.132494634431e1 -> 9.132455612598e1
 edge holdout: 4.489165350285e2
 ```
 
+The next conditioning probe added chart-balanced tail+origin variable selection,
+optional row normalization, a raw sampled-objective guard, and optional
+held-out point guards to
+`tools/profile_newton_twochart.py`.  The raw guard is important: the
+row-normalized run
+`work/twochart_stage0_rz_coupled_tail_origin_norm48_guarded_report.json`
+rejects all line-search trials because each trial improves the scaled objective
+while worsening the unnormalized sampled objective.
+
+With row normalization disabled but chart-balanced tail+origin variables active,
+the trust-`1e-2` run does make a real sampled-objective step:
+
+```text
+work/twochart_stage0_rz_coupled_tail_origin_bal48_report.json
+sampled objective: 6.180327501156e4 -> 6.176500260009e4
+C2 R/Z mortar max: 4.214529161145e3 -> 4.214335665156e3
+edge holdout: 4.555430954376e2
+```
+
+That step is not acceptable as profile progress because it worsens the held-out
+edge.  Reducing the trust radius limits the damage but leaves only microscopic
+seam motion:
+
+```text
+work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3_report.json
+C2 R/Z mortar max: 4.214509821220e3
+edge holdout: 4.495798285817e2
+```
+
+Injecting the held-out edge maximum as an active PDE hardpoint protects the edge
+but again stalls the seam:
+
+```text
+work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_report.json
+active hardpoint: q=0.900, b=0.980
+edge holdout: 4.489318148267e2
+C2 R/Z mortar max: 4.214522613381e3
+```
+
+Using the same edge point as a line-search guard, rather than as an active row,
+rejects all candidate steps:
+
+```text
+work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
+guard point: q=0.900, b=0.980
+accepted_any_step: false
+base guard max: 3.065963042569e2
+all tested alphas through 0.0625 increase the guard residual
+```
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -3975,8 +4025,9 @@ C0-C2 R,Z mortar max = 4.214529161145e3
 Conclusion: the immediate blocker is still the two-chart Stage-0 coupled
 linear system and interface/PDE balance. The new R/Z rows are the right
 coordinate language, and the origin chart has enough algebraic freedom to match
-the seam alone. The obstruction is that seam fitting and the normalized profile
-equations fight unless tail/interior and origin coefficients are solved together
-with better conditioning, blocking, and row normalization. It is too early to
-free `(gamma,B)`, pivot to radial matching, or start spectral validation as a
-theorem dependency.
+the seam alone. Balanced tail+origin variables are now active, and held-out
+guards prevent accepting edge-damaging steps, but the sampled system still
+cannot reduce seam and guarded edge simultaneously. The next solver step should
+be a blocked Schur-style solve or broader active-row design; row normalization
+alone is not enough. It is too early to free `(gamma,B)`, pivot to radial
+matching, or start spectral validation as a theorem dependency.

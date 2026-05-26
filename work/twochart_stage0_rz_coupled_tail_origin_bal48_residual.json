@@ -1,0 +1,329 @@
+{
+  "diagnostic_vs_proof": "sampled floating residual baseline only; no interval or proof claim",
+  "format": "twochart_profile_projection_v1",
+  "mortar_summary": {
+    "coordinate_derivatives": "R,Z",
+    "max_abs_diff": 4214.335665155636,
+    "orders": "C0-C2",
+    "sample_shape": {
+      "q_samples": 2,
+      "x_samples": 5
+    },
+    "status": "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF"
+  },
+  "overall": {
+    "all_finite": true,
+    "combined_rms": 26.517523165983352,
+    "max_abs": 455.5430954376102,
+    "worst_scan": "edge"
+  },
+  "profile": "work/twochart_stage0_rz_coupled_tail_origin_bal48.json",
+  "projection_parameters": {
+    "B": 1.0,
+    "gamma": 0.45,
+    "p": 2.2222222222222223
+  },
+  "requested_options": {
+    "B_override": "1",
+    "forced_qp": "formal",
+    "gamma_override": "9/20",
+    "origin_chart": "RZ",
+    "q2_policy": "zero"
+  },
+  "residual_kind": "normalized-structural",
+  "scan_executed": [
+    "standard",
+    "secondary",
+    "origin",
+    "edge",
+    "overlap"
+  ],
+  "scan_request": [
+    "standard",
+    "secondary",
+    "origin",
+    "edge",
+    "overlap"
+  ],
+  "scans": {
+    "edge": {
+      "b_range": [
+        0.02,
+        0.98
+      ],
+      "chart": "mixed_edge",
+      "finite": true,
+      "grid": {
+        "n_b": 17,
+        "n_q": 17,
+        "points": 289,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "edge",
+      "max_abs": 455.5430954376102,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Broad near-axis/high-|b| floating diagnostic; exact axes are excluded.",
+      "q_range": [
+        0.34,
+        0.98
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 30.210704500140885,
+      "worst": {
+        "b": 0.98,
+        "e_gamma": 0.8530219766692645,
+        "e_psi": 455.5430954376102,
+        "max_abs": 455.5430954376102,
+        "q": 0.8999999999999999,
+        "r": 0.09637888196533986,
+        "z": 0.4746356627410957
+      }
+    },
+    "origin": {
+      "b_range": [
+        0.05,
+        0.8
+      ],
+      "chart": "origin",
+      "finite": true,
+      "grid": {
+        "n_b": 17,
+        "n_q": 17,
+        "points": 289,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "origin",
+      "max_abs": 91.28931569813089,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Origin-chart residual quotient scan.",
+      "q_range": [
+        0.91,
+        0.98
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 30.49136567494716,
+      "worst": {
+        "b": 0.05,
+        "e_gamma": 0.599695594082235,
+        "e_psi": 91.28931569813089,
+        "max_abs": 91.28931569813089,
+        "q": 0.9625,
+        "r": 0.281498561946245,
+        "z": 0.01409255481442253
+      }
+    },
+    "overlap": {
+      "b_range": [
+        0.05,
+        0.95
+      ],
+      "chart": "overlap",
+      "finite": true,
+      "grid": {
+        "n_b": 17,
+        "n_q": 17,
+        "points": 289,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "overlap",
+      "max_abs": 323.87256307862714,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Samples the stored tail-origin overlap band; may cross the diagnostic origin switch.",
+      "q_range": [
+        0.84,
+        0.92
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 36.129591467471606,
+      "worst": {
+        "b": 0.95,
+        "e_gamma": 1.4841411802358915,
+        "e_psi": -323.87256307862714,
+        "max_abs": 323.87256307862714,
+        "q": 0.9,
+        "r": 0.15122952876462445,
+        "z": 0.4601059995959599
+      }
+    },
+    "secondary": {
+      "b_range": [
+        0.2,
+        0.27
+      ],
+      "chart": "tail",
+      "finite": true,
+      "grid": {
+        "n_b": 13,
+        "n_q": 13,
+        "points": 169,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "secondary",
+      "max_abs": 14.228254752470185,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Secondary tail/interior lobe near q ~= 0.608 and |b| ~= 0.241.",
+      "q_range": [
+        0.57,
+        0.64
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 8.449486312803396,
+      "worst": {
+        "b": 0.20583333333333334,
+        "e_gamma": 0.5307560144728014,
+        "e_psi": -14.228254752470185,
+        "max_abs": 14.228254752470185,
+        "q": 0.64,
+        "r": 1.1748777259351024,
+        "z": 0.247120576038424
+      }
+    },
+    "standard": {
+      "b_range": [
+        0.18,
+        0.38
+      ],
+      "chart": "tail",
+      "finite": true,
+      "grid": {
+        "n_b": 17,
+        "n_q": 17,
+        "points": 289,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "standard",
+      "max_abs": 10.162289835165117,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Focused inherited tail/ridge diagnostic.",
+      "q_range": [
+        0.345,
+        0.495
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 5.866086173480906,
+      "worst": {
+        "b": 0.18,
+        "e_gamma": 0.7931121221045325,
+        "e_psi": -10.162289835165117,
+        "max_abs": 10.162289835165117,
+        "q": 0.495,
+        "r": 1.7266686993947755,
+        "z": 0.31596108139876605
+      }
+    }
+  },
+  "source_forward_compare": {
+    "edge": {
+      "compared": 289,
+      "max_abs": 134.09751864177787,
+      "max_e_gamma_abs": 0.08305324952983684,
+      "max_e_psi_abs": 134.09751864177787,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_MISMATCH_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {
+        "b": 0.19999999999999998,
+        "diff_e_gamma": -0.01876183985821034,
+        "diff_e_psi": 134.09751864177787,
+        "max_abs": 134.09751864177787,
+        "q": 0.8999999999999999,
+        "r": 0.47453681120139174,
+        "source_e_gamma": 0.4496373786494353,
+        "source_e_psi": -12.771931339769463,
+        "twochart_e_gamma": 0.430875538791225,
+        "twochart_e_psi": 121.3255873020084,
+        "z": 0.09686442096757054
+      }
+    },
+    "origin": {
+      "compared": 289,
+      "max_abs": 0.2432432671157887,
+      "max_e_gamma_abs": 0.005510796999595113,
+      "max_e_psi_abs": 0.2432432671157887,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_MISMATCH_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {
+        "b": 0.8,
+        "diff_e_gamma": -0.005510796999595113,
+        "diff_e_psi": 0.2432432671157887,
+        "max_abs": 0.2432432671157887,
+        "q": 0.91,
+        "r": 0.2733680761533345,
+        "source_e_gamma": 1.4080917690644414,
+        "source_e_psi": 11.989846815568727,
+        "twochart_e_gamma": 1.4025809720648463,
+        "twochart_e_psi": 12.233090082684516,
+        "z": 0.3644907682044461
+      }
+    },
+    "overlap": {
+      "compared": 289,
+      "max_abs": 54.33282152702982,
+      "max_e_gamma_abs": 0.03732855437520888,
+      "max_e_psi_abs": 54.33282152702982,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_MISMATCH_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {
+        "b": 0.16249999999999998,
+        "diff_e_gamma": -0.0014880482911502901,
+        "diff_e_psi": 54.33282152702982,
+        "max_abs": 54.33282152702982,
+        "q": 0.895,
+        "r": 0.4917734859868063,
+        "source_e_gamma": 0.3613817200444748,
+        "source_e_psi": -14.640108851323372,
+        "twochart_e_gamma": 0.3598936717533245,
+        "twochart_e_psi": 39.692712675706446,
+        "z": 0.08098966203519058
+      }
+    },
+    "secondary": {
+      "compared": 169,
+      "max_abs": 0.0,
+      "max_e_gamma_abs": 0.0,
+      "max_e_psi_abs": 0.0,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_OK_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {}
+    },
+    "standard": {
+      "compared": 289,
+      "max_abs": 0.0,
+      "max_e_gamma_abs": 0.0,
+      "max_e_psi_abs": 0.0,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_OK_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {}
+    }
+  },
+  "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+  "status": "DIAGNOSTIC_TWOCHART_RESIDUAL_BASELINE_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_F_sample_error": 8.881784197001252e-16,
+    "forced_qp_G_sample_error": 5.551115123125783e-16,
+    "forced_qp_coeff_error": 8.881784197001252e-16,
+    "gamma": 0.45,
+    "note": "Floating structural two-chart tail gate; this is not interval validation.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "samples_per_patch": 9,
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "accepted_any_step": true,
+  "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+  "format": "twochart_newton_stage0_run_v1",
+  "history": [
+    {
+      "accepted": true,
+      "base": {
+        "count": 22.0,
+        "max_abs": 323.97188844516563,
+        "objective": 61803.27501156244,
+        "rms": 74.95651770530483
+      },
+      "column_scaling": {
+        "column_norm_max": 2272361.4945875155,
+        "column_norm_min": 14.320830338989191,
+        "column_scale_max": 0.06982835326785829,
+        "column_scale_min": 4.4007082604676964e-07
+      },
+      "delta_norm": 66.27907222140554,
+      "iteration": 0,
+      "line_trials": [
+        {
+          "alpha": 1.0,
+          "alpha_applied": 1.5087718739627125e-05,
+          "count": 22.0,
+          "delta_norm": 66.27907222140554,
+          "max_abs": 323.96860274765487,
+          "max_abs_update": 0.0008833037949353118,
+          "objective": 61802.007007290624,
+          "raw_growth_ok": true,
+          "raw_max_abs": 323.96860274765487,
+          "raw_objective": 61802.007007290624,
+          "rms": 74.95574876812356,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 72,
+      "raw_residual_metrics": {
+        "count": 22.0,
+        "max_abs": 323.97188844516563,
+        "objective": 61803.27501156244,
+        "rms": 74.95651770530483
+      },
+      "row_groups": {
+        "mortar": 10,
+        "pde": 12
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 18,
+        "origin.G_origin_taylor": 6,
+        "tail.F_an": 12,
+        "tail.F_frac": 10,
+        "tail.G_an": 2
+      },
+      "selected_by_chart": {
+        "origin": 24,
+        "tail": 24
+      },
+      "selected_variables": 48,
+      "variable_score_preview": [
+        {
+          "score": 2866518.5454475665,
+          "variable": "tail.F_an[p24].c[0,3]"
+        },
+        {
+          "score": 23328886.524536505,
+          "variable": "origin.F_origin_taylor[6,0]"
+        },
+        {
+          "score": 2470839.5235821865,
+          "variable": "tail.F_an[p30].c[0,2]"
+        },
+        {
+          "score": 4414815.340530766,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "score": 1048591.082781799,
+          "variable": "tail.F_an[p35].c[0,2]"
+        },
+        {
+          "score": 1664505.3320506683,
+          "variable": "origin.F_origin_taylor[5,1]"
+        },
+        {
+          "score": 856788.8725006296,
+          "variable": "tail.G_an[p30].c[0,2]"
+        },
+        {
+          "score": 718688.0326277097,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 730746.4429805728,
+          "variable": "tail.F_an[p30].c[0,1]"
+        },
+        {
+          "score": 416361.7709282288,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "score": 721412.2207554951,
+          "variable": "tail.F_frac[f1][p30].c[0,1]"
+        },
+        {
+          "score": 146491.55194322576,
+          "variable": "origin.F_origin_taylor[4,2]"
+        }
+      ]
+    },
+    {
+      "accepted": true,
+      "base": {
+        "count": 22.0,
+        "max_abs": 323.96860274765487,
+        "objective": 61802.007007290624,
+        "rms": 74.95574876812356
+      },
+      "column_scaling": {
+        "column_norm_max": 2272361.4945875155,
+        "column_norm_min": 14.320528553194682,
+        "column_scale_max": 0.06982982480607644,
+        "column_scale_min": 4.4007082604676964e-07
+      },
+      "delta_norm": 66.27698269700116,
+      "iteration": 1,
+      "line_trials": [
+        {
+          "alpha": 1.0,
+          "alpha_applied": 1.5088194412405667e-05,
+          "count": 22.0,
+          "delta_norm": 66.27698269700116,
+          "max_abs": 323.96531489733366,
+          "max_abs_update": 0.0008833249853085669,
+          "objective": 61800.73833950205,
+          "raw_growth_ok": true,
+          "raw_max_abs": 323.96531489733366,
+          "raw_objective": 61800.73833950205,
+          "rms": 74.95497942068113,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 72,
+      "raw_residual_metrics": {
+        "count": 22.0,
+        "max_abs": 323.96860274765487,
+        "objective": 61802.007007290624,
+        "rms": 74.95574876812356
+      },
+      "row_groups": {
+        "mortar": 10,
+        "pde": 12
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 18,
+        "origin.G_origin_taylor": 6,
+        "tail.F_an": 12,
+        "tail.F_frac": 10,
+        "tail.G_an": 2
+      },
+      "selected_by_chart": {
+        "origin": 24,
+        "tail": 24
+      },
+      "selected_variables": 48,
+      "variable_score_preview": [
+        {
+          "score": 2866475.2933760467,
+          "variable": "tail.F_an[p24].c[0,3]"
+        },
+        {
+          "score": 23328886.52452967,
+          "variable": "origin.F_origin_taylor[6,0]"
+        },
+        {
+          "score": 2470838.792958741,
+          "variable": "tail.F_an[p30].c[0,2]"
+        },
+        {
+          "score": 4414815.340469872,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "score": 1048485.5020155696,
+          "variable": "tail.F_an[p35].c[0,2]"
+        },
+        {
+          "score": 1664505.3320203808,
+          "variable": "origin.F_origin_taylor[5,1]"
+        },
+        {
+          "score": 856775.4559472324,
+          "variable": "tail.G_an[p30].c[0,2]"
+        },
+        {
+          "score": 718688.0320223697,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 730750.0710472576,
+          "variable": "tail.F_an[p30].c[0,1]"
+        },
+        {
+          "score": 416361.77082110563,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "score": 721415.9196197375,
+          "variable": "tail.F_frac[f1][p30].c[0,1]"
+        },
+        {
+          "score": 146491.55192255153,
+          "variable": "origin.F_origin_taylor[4,2]"
+        }
+      ]
+    },
+    {
+      "accepted": true,
+      "base": {
+        "count": 22.0,
+        "max_abs": 323.96531489733366,
+        "objective": 61800.73833950205,
+        "rms": 74.95497942068113
+      },
+      "column_scaling": {
+        "column_norm_max": 2272361.4945875155,
+        "column_norm_min": 14.32022683667321,
+        "column_scale_max": 0.06983129606851353,
+        "column_scale_min": 4.4007082604676964e-07
+      },
+      "delta_norm": 66.27489395827054,
+      "iteration": 2,
+      "line_trials": [
+        {
+          "alpha": 1.0,
+          "alpha_applied": 1.5088669936305626e-05,
+          "count": 22.0,
+          "delta_norm": 66.27489395827054,
+          "max_abs": 323.96202489436985,
+          "max_abs_update": 0.0008833461668886438,
+          "objective": 61799.469008260996,
+          "raw_growth_ok": true,
+          "raw_max_abs": 323.96202489436985,
+          "raw_objective": 61799.469008260996,
+          "rms": 74.95420966300388,
+          "tail_gate": {
+            "all_ok": true,
+            "forced_qp_F_sample_error": 8.881784197001252e-16,
+            "forced_qp_G_sample_error": 5.551115123125783e-16,
+            "forced_qp_coeff_error": 8.881784197001252e-16,
+            "note": "Floating structural two-chart tail gate; this is not interval validation.",
+            "q1_f_max": 0.0,
+            "q1_g_max": 0.0,
+            "q2_f_trace_max": 1.8041124150158794e-16,
+            "q2_g_trace_max": 7.771561172376096e-16,
+            "q2_ok": true,
+            "q2_policy": "zero",
+            "samples_per_patch": 9,
+            "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+          }
+        }
+      ],
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 72,
+      "raw_residual_metrics": {
+        "count": 22.0,
+        "max_abs": 323.96531489733366,
+        "objective": 61800.73833950205,
+        "rms": 74.95497942068113
+      },
+      "row_groups": {
+        "mortar": 10,
+        "pde": 12
+      },
+      "row_scaling": {
+        "groups": {},
+        "row_normalization": "none",
+        "scale_max": 1.0,
+        "scale_min": 1.0
+      },
+      "selected_by_block": {
+        "origin.F_origin_taylor": 18,
+        "origin.G_origin_taylor": 6,
+        "tail.F_an": 12,
+        "tail.F_frac": 10,
+        "tail.G_an": 2
+      },
+      "selected_by_chart": {
+        "origin": 24,
+        "tail": 24
+      },
+      "selected_variables": 48,
+      "variable_score_preview": [
+        {
+          "score": 2866432.0405935533,
+          "variable": "tail.F_an[p24].c[0,3]"
+        },
+        {
+          "score": 23328886.524522826,
+          "variable": "origin.F_origin_taylor[6,0]"
+        },
+        {
+          "score": 2470838.0658719046,
+          "variable": "tail.F_an[p30].c[0,2]"
+        },
+        {
+          "score": 4414815.340408979,
+          "variable": "origin.F_origin_taylor[5,0]"
+        },
+        {
+          "score": 1048379.9236341477,
+          "variable": "tail.F_an[p35].c[0,2]"
+        },
+        {
+          "score": 1664505.3319900925,
+          "variable": "origin.F_origin_taylor[5,1]"
+        },
+        {
+          "score": 856762.0401200315,
+          "variable": "tail.G_an[p30].c[0,2]"
+        },
+        {
+          "score": 718688.0314170432,
+          "variable": "origin.F_origin_taylor[4,0]"
+        },
+        {
+          "score": 730753.7003114552,
+          "variable": "tail.F_an[p30].c[0,1]"
+        },
+        {
+          "score": 416361.7707139802,
+          "variable": "origin.F_origin_taylor[4,1]"
+        },
+        {
+          "score": 721419.6196708005,
+          "variable": "tail.F_frac[f1][p30].c[0,1]"
+        },
+        {
+          "score": 146491.5519018766,
+          "variable": "origin.F_origin_taylor[4,2]"
+        }
+      ]
+    }
+  ],
+  "input": "work/v117_twochart_init.json",
+  "newton_executed": true,
+  "optimization_faked": false,
+  "out": "work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3.json",
+  "requested_solver": {
+    "blocks": [
+      "origin",
+      "interface"
+    ],
+    "candidate_kq_max": 6,
+    "candidate_kx_max": 6,
+    "candidate_origin_degree_max": 6,
+    "candidate_pool_limit": 256,
+    "chart_balanced_selection": true,
+    "forced_tol": 1e-12,
+    "include_origin_constants": false,
+    "line_search": [
+      1.0,
+      0.5,
+      0.25,
+      0.125,
+      0.0625
+    ],
+    "lm_lambda": 1e-06,
+    "max_iter": 3,
+    "max_raw_objective_growth": 1.0,
+    "max_variables": 48,
+    "mortar_active_count": 12,
+    "mortar_coordinates": "RZ",
+    "mortar_order": 2,
+    "mortar_q_samples": 2,
+    "mortar_weight": 0.01,
+    "mortar_x_samples": 3,
+    "overlap_q_range": [
+      0.84,
+      0.92
+    ],
+    "pde_qb_points": [
+      [
+        0.9,
+        0.95
+      ],
+      [
+        0.9625,
+        0.05
+      ],
+      [
+        0.98,
+        0.02
+      ],
+      [
+        0.98,
+        0.92
+      ],
+      [
+        0.64,
+        0.20583333333333334
+      ],
+      [
+        0.495,
+        0.18
+      ]
+    ],
+    "pde_weight": 1.0,
+    "q2_policy": "zero",
+    "q2_tol": 1e-12,
+    "residual_kind": "normalized-structural",
+    "row_normalization": "none",
+    "row_normalization_floor": 1e-12,
+    "row_scale_max": 1000000.0,
+    "row_scale_min": 0.0,
+    "tail_gate_samples_per_patch": 9,
+    "trust": 0.001,
+    "variable_charts": [
+      "tail",
+      "origin"
+    ]
+  },
+  "status": "TWOCHART_NEWTON_STAGE0_ANALYTIC_GN_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_coeff_error": 0.0,
+    "gamma": 0.45,
+    "note": "Formal tail recurrence gate only: q1-zero, first forced q^(1/gamma), and zero ordinary q^2 trace are checked. This is not an interval proof.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}

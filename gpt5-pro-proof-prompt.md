@@ -53,7 +53,7 @@ Current progress ledger:
 ```text
 Final theorem certificate: 0%
 Certified stop-condition gates: 0/5
-Proof-engineering scaffold: about 34%
+Proof-engineering scaffold: about 35%
 ```
 
 The current two-chart seed is:
@@ -105,11 +105,17 @@ work/twochart_origin_rz_refit_c2_d6.json
 work/twochart_origin_rz_refit_c2_d8.json
 work/twochart_origin_rz_refit_c2_d8_ridge1e6.json
 work/twochart_stage0_origin_only_rz_coupled_report.json
+work/twochart_stage0_rz_coupled_tail_origin_norm48_guarded_report.json
+work/twochart_stage0_rz_coupled_tail_origin_bal48_report.json
+work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3_report.json
+work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_report.json
+work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
 work/twochart_stage0_rz_active_mortar_trust5_residual.json
 work/twochart_stage0_origin_only_rz_coupled_residual.json
+work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_residual.json
 ```
 
 The safe locked solver does not yet show a real Newton basin:
@@ -136,6 +142,23 @@ coupled origin-only Stage-0 with PDE rows:
   C2 R/Z mortar max 4.214529161145e3 -> 4.214511547830e3
   edge holdout stays 4.489165350285e2
   origin holdout 9.132494634431e1 -> 9.132455612598e1
+
+chart-balanced tail+origin Stage-0 with row-normalization guard:
+  Jacobian row-normalized trial is rejected because scaled objective improves
+  while raw sampled objective worsens.
+  raw chart-balanced trust 0.01:
+    sampled objective 6.180327501156e4 -> 6.176500260009e4
+    C2 R/Z mortar max 4.214529161145e3 -> 4.214335665156e3
+    edge holdout worsens to 4.555430954376e2
+  raw chart-balanced trust 0.001:
+    C2 R/Z mortar max -> 4.214509821220e3
+    edge holdout -> 4.495798285817e2
+  with edge hardpoint injected:
+    edge holdout -> 4.489318148267e2
+    C2 R/Z mortar max -> 4.214522613381e3
+  with edge point used only as a line-search guard:
+    accepted_any_step = false
+    guard residual grows at every tested alpha down to 0.0625
 ```
 
 Held-out normalized structural checks remain far from proof scale:
@@ -157,8 +180,12 @@ After q=0 tail locking, the solver mostly rejects updates.
 The origin Taylor block has enough degrees to match the physical R/Z seam in
 isolation, but doing so destroys the PDE residual. Therefore the blocker is not
 mere origin algebraic capacity. It is the coupled tail-origin PDE/mortar balance
-and the conditioning/blocking of the Stage-0 linear system, not gamma/B and not
-spectrum.
+and the conditioning/blocking/acceptance logic of the Stage-0 linear system, not
+gamma/B and not spectrum. Row normalization alone is not sufficient: when it is
+guarded against raw sampled objective growth, it rejects the candidate step;
+when chart-balanced raw steps are accepted, they still trade active objective
+for held-out edge damage. If the edge is injected into the active set, the seam
+barely moves; if it is used only as a guard, all candidate steps are rejected.
 ```
 
 Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
@@ -575,6 +602,44 @@ edge holdout = 4.489165350285e2
 Interpretation: origin seam fitting and PDE balance conflict unless tail and
 origin coefficients are solved together in a better-conditioned coupled system.
 Do not spend the next branch on more origin-only refits except as diagnostics.
+
+Update after the chart-balanced conditioning probes:
+`tools/profile_newton_twochart.py` now supports `--chart-balanced-selection`,
+`--row-normalization`, `--max-raw-objective-growth`, and `--guard-qb-points`.
+This prevents a row-normalized scaled-objective decrease from being accepted
+when the unscaled sampled objective or a held-out point worsens. Current
+evidence:
+
+```text
+work/twochart_stage0_rz_coupled_tail_origin_norm48_guarded_report.json
+  accepted_any_step = false
+  reason: all line-search trials improve scaled objective but worsen raw objective
+
+work/twochart_stage0_rz_coupled_tail_origin_bal48_report.json
+  sampled objective = 6.180327501156e4 -> 6.176500260009e4
+  C2 R/Z mortar max = 4.214529161145e3 -> 4.214335665156e3
+  edge holdout = 4.555430954376e2
+
+work/twochart_stage0_rz_coupled_tail_origin_bal48_trust1e3_report.json
+  C2 R/Z mortar max = 4.214509821220e3
+  edge holdout = 4.495798285817e2
+
+work/twochart_stage0_rz_coupled_tail_origin_bal48_edgehp_report.json
+  injected q=0.900, b=0.980 as a PDE hardpoint
+  edge holdout = 4.489318148267e2
+  C2 R/Z mortar max = 4.214522613381e3
+
+work/twochart_stage0_rz_coupled_tail_origin_bal48_guardedge_report.json
+  q=0.900, b=0.980 used only as line-search guard
+  accepted_any_step = false
+  guard max grows from 3.065963042569e2 even at alpha=0.0625
+```
+
+Interpretation: balanced tail+origin variables are now genuinely active, but
+the current sampled system still trades seam movement against held-out edge
+control. The next implementation should add a blocked/Schur solve with broader
+active rows that can reduce seam and guarded edge simultaneously, not just more
+row scaling.
 
 ## 6. Current Repository Tooling
 
@@ -1134,10 +1199,15 @@ variable blocking:
 # mortar weight, preserving PDE scale.
 python3 tools/profile_newton_twochart.py \
   --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_rz_coupled_tail_origin.json \
-  --report-out work/twochart_stage0_rz_coupled_tail_origin_report.json \
+  --out work/twochart_stage0_rz_coupled_tail_origin_next.json \
+  --report-out work/twochart_stage0_rz_coupled_tail_origin_next_report.json \
   --blocks origin,interface \
   --variable-charts tail,origin \
+  --chart-balanced-selection \
+  --max-raw-objective-growth 1 \
+  --guard-qb-points "0.90,0.98" \
+  --max-guard-objective-growth 1 \
+  --max-guard-max-growth 1 \
   --gamma-fixed --B-fixed \
   --residual-kind normalized-structural \
   --q2-policy zero \
@@ -1155,7 +1225,8 @@ python3 tools/profile_newton_twochart.py \
   --lm-lambda 1e-6 \
   --pde-weight 1 \
   --mortar-weight 0.01 \
-  --line-search 1,0.5,0.25,0.125,0.0625
+  --line-search 1,0.5,0.25,0.125,0.0625 \
+  --pde-qb-points "0.90,0.98;0.90,0.95;0.9625,0.05;0.98,0.02;0.98,0.92;0.64,0.20583333333333334;0.495,0.18"
 
 # Branch B: origin-only control run. It should preserve PDE scale but is not
 # expected to solve the seam; use it only to measure conflict.

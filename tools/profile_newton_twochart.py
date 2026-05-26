@@ -171,6 +171,18 @@ def parse_qb_points(raw: str) -> list[tuple[float, float]]:
     return points
 
 
+def parse_optional_qb_points(raw: str) -> list[tuple[float, float]]:
+    if not raw.strip():
+        return []
+    points: list[tuple[float, float]] = []
+    for item in raw.split(";"):
+        if not item.strip():
+            continue
+        q_raw, b_raw = item.split(",", 1)
+        points.append((float(q_raw), float(b_raw)))
+    return points
+
+
 def variable_allowed_for_blocks(variable: Any, blocks: tuple[str, ...]) -> bool:
     if variable.chart == "origin":
         return "origin" in blocks or "interface" in blocks
@@ -268,6 +280,26 @@ def cap_candidate_pool(variables: list[Any], limit: int) -> list[Any]:
                 next_keys.append(key)
         keys = next_keys
     return capped
+
+
+def select_active_variables(ranked: list[Any], max_variables: int, chart_balanced: bool) -> list[Any]:
+    if not chart_balanced:
+        return ranked[:max_variables]
+    groups: dict[str, list[Any]] = {"tail": [], "origin": []}
+    for variable in ranked:
+        groups.setdefault(variable.chart, []).append(variable)
+    selected: list[Any] = []
+    keys = [key for key in ("tail", "origin") if groups.get(key)]
+    while len(selected) < max_variables and keys:
+        next_keys: list[str] = []
+        for key in keys:
+            group = groups[key]
+            if group and len(selected) < max_variables:
+                selected.append(group.pop(0))
+            if group:
+                next_keys.append(key)
+        keys = next_keys
+    return selected
 
 
 def cheb_eval_1d(coeffs: list[float], t: float) -> float:
@@ -434,6 +466,114 @@ def vector_metrics(vec: list[float]) -> dict[str, float]:
     }
 
 
+def guard_point_metrics(data: dict[str, Any], args: argparse.Namespace, points: list[tuple[float, float]]) -> dict[str, Any]:
+    if not points:
+        return {"enabled": False, **vector_metrics([])}
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import projection_from_twochart
+
+    projection = projection_from_twochart(data)
+    values: list[float] = []
+    skipped = 0
+    worst: dict[str, Any] = {"abs": -1.0}
+    for q, b in points:
+        if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+            skipped += 1
+            continue
+        r, z = qb_to_rz(q, b)
+        raw = projection.exact_residual_at(r, z)
+        residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+        for component, value in (("e_psi", residual.e_psi), ("e_gamma", residual.e_gamma)):
+            values.append(value)
+            if abs(value) > worst["abs"]:
+                worst = {"q": q, "b": b, "component": component, "value": value, "abs": abs(value)}
+    return {
+        "enabled": True,
+        "points_requested": len(points),
+        "skipped": skipped,
+        "worst": worst,
+        **vector_metrics(values),
+    }
+
+
+def stage0_row_scaling(
+    jacobian_rows: list[list[float]],
+    residual_vector: list[float],
+    row_labels: list[str],
+    args: argparse.Namespace,
+) -> tuple[list[list[float]], list[float], dict[str, Any]]:
+    if args.row_normalization == "none":
+        return jacobian_rows, residual_vector, {
+            "row_normalization": "none",
+            "scale_min": 1.0,
+            "scale_max": 1.0,
+            "groups": {},
+        }
+
+    scaled_rows: list[list[float]] = []
+    scaled_residuals: list[float] = []
+    scales: list[float] = []
+    by_group: dict[str, dict[str, float]] = {}
+    for row, residual, label in zip(jacobian_rows, residual_vector, row_labels):
+        jac_norm = math.sqrt(sum(value * value for value in row))
+        if args.row_normalization == "jacobian":
+            denom = jac_norm
+        elif args.row_normalization == "residual-jacobian":
+            denom = math.sqrt(jac_norm * jac_norm + residual * residual)
+        else:  # pragma: no cover - argparse choices enforce this.
+            raise ValueError(f"unknown row normalization {args.row_normalization!r}")
+        denom = max(denom, args.row_normalization_floor)
+        scale = 1.0 / denom
+        scale = min(scale, args.row_scale_max)
+        if args.row_scale_min > 0.0:
+            scale = max(scale, args.row_scale_min)
+        scales.append(scale)
+        scaled_rows.append([scale * value for value in row])
+        scaled_residuals.append(scale * residual)
+        group = by_group.setdefault(
+            label,
+            {
+                "count": 0.0,
+                "raw_residual_l2": 0.0,
+                "scaled_residual_l2": 0.0,
+                "raw_residual_max": 0.0,
+                "scaled_residual_max": 0.0,
+                "jac_norm_min": float("inf"),
+                "jac_norm_max": 0.0,
+                "scale_min": float("inf"),
+                "scale_max": 0.0,
+            },
+        )
+        group["count"] += 1.0
+        group["raw_residual_l2"] += residual * residual
+        group["scaled_residual_l2"] += (scale * residual) * (scale * residual)
+        group["raw_residual_max"] = max(group["raw_residual_max"], abs(residual))
+        group["scaled_residual_max"] = max(group["scaled_residual_max"], abs(scale * residual))
+        group["jac_norm_min"] = min(group["jac_norm_min"], jac_norm)
+        group["jac_norm_max"] = max(group["jac_norm_max"], jac_norm)
+        group["scale_min"] = min(group["scale_min"], scale)
+        group["scale_max"] = max(group["scale_max"], scale)
+
+    for group in by_group.values():
+        count = max(group["count"], 1.0)
+        group["raw_residual_rms"] = math.sqrt(group.pop("raw_residual_l2") / count)
+        group["scaled_residual_rms"] = math.sqrt(group.pop("scaled_residual_l2") / count)
+        if group["jac_norm_min"] == float("inf"):
+            group["jac_norm_min"] = 0.0
+        if group["scale_min"] == float("inf"):
+            group["scale_min"] = 0.0
+
+    return scaled_rows, scaled_residuals, {
+        "row_normalization": args.row_normalization,
+        "row_normalization_floor": args.row_normalization_floor,
+        "row_scale_min_limit": args.row_scale_min,
+        "row_scale_max_limit": args.row_scale_max,
+        "scale_min": min(scales) if scales else 0.0,
+        "scale_max": max(scales) if scales else 0.0,
+        "groups": by_group,
+    }
+
+
 def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: tuple[str, ...]) -> dict[str, Any]:
     from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
@@ -499,13 +639,14 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 
     ranked = sorted(candidate_variables, key=lambda variable: variable_scores.get(variable.index, 0.0), reverse=True)
     selected = [variable for variable in ranked if variable_scores.get(variable.index, 0.0) > 0.0]
-    selected = selected[: args.max_variables]
+    selected = select_active_variables(selected, args.max_variables, args.chart_balanced_selection)
     selected_index = {variable.index: column for column, variable in enumerate(selected)}
     if not selected:
         raise ValueError("no active variables selected for Stage-0 system")
 
     residual_vector: list[float] = []
     jacobian_rows: list[list[float]] = []
+    row_labels: list[str] = []
     row_groups: dict[str, int] = {"pde": 0, "mortar": 0}
 
     for row in pde_rows:
@@ -518,6 +659,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
             jac_row.append(args.pde_weight * (column.e_psi if component == "e_psi" else column.e_gamma))
         jacobian_rows.append(jac_row)
+        row_labels.append("pde")
         row_groups["pde"] += 1
 
     for row in mortar_rows:
@@ -529,13 +671,27 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         for column_index, value in active_entries:
             jac_row[column_index] = args.mortar_weight * value
         jacobian_rows.append(jac_row)
+        row_labels.append("mortar")
         row_groups["mortar"] += 1
+
+    raw_metrics = vector_metrics(residual_vector)
+    jacobian_rows, residual_vector, row_scaling = stage0_row_scaling(jacobian_rows, residual_vector, row_labels, args)
+    selected_by_chart: dict[str, int] = {}
+    selected_by_block: dict[str, int] = {}
+    for variable in selected:
+        selected_by_chart[variable.chart] = selected_by_chart.get(variable.chart, 0) + 1
+        key = f"{variable.chart}.{variable.block}"
+        selected_by_block[key] = selected_by_block.get(key, 0) + 1
 
     return {
         "variables": selected,
         "residual_vector": residual_vector,
         "jacobian_rows": jacobian_rows,
+        "raw_residual_metrics": raw_metrics,
+        "row_scaling": row_scaling,
         "row_groups": row_groups,
+        "selected_by_chart": selected_by_chart,
+        "selected_by_block": selected_by_block,
         "mortar_coordinates": args.mortar_coordinates,
         "mortar_rows_available": mortar_rows_available,
         "mortar_rows_active": len(mortar_rows),
@@ -603,10 +759,13 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
     history: list[dict[str, Any]] = []
     best_trial: dict[str, Any] | None = None
     best_trial_metrics: dict[str, Any] | None = None
+    guard_points = parse_optional_qb_points(args.guard_qb_points)
     for iteration in range(args.max_iter):
         system = build_stage0_system(current, args, blocks)
         base_vec = system["residual_vector"]
         base_metrics = vector_metrics(base_vec)
+        base_raw_metrics = system["raw_residual_metrics"]
+        base_guard_metrics = guard_point_metrics(current, args, guard_points)
         delta, scaling_report = normal_step(system["jacobian_rows"], base_vec, args.lm_lambda)
         delta_norm = math.sqrt(sum(value * value for value in delta))
         line_trials: list[dict[str, Any]] = []
@@ -626,8 +785,33 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 continue
             trial_system = build_stage0_system(trial_data, args, blocks)
             trial_metrics = vector_metrics(trial_system["residual_vector"])
-            line_trials.append({"alpha": alpha, **update_metrics, **trial_metrics, "tail_gate": tail_gate})
-            if trial_metrics["objective"] < base_metrics["objective"]:
+            trial_raw_metrics = trial_system["raw_residual_metrics"]
+            trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
+            raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
+                base_raw_metrics["objective"], 1e-300
+            )
+            guard_growth_ok = True
+            if guard_points:
+                guard_growth_ok = (
+                    trial_guard_metrics["objective"]
+                    <= args.max_guard_objective_growth * max(base_guard_metrics["objective"], 1e-300)
+                    and trial_guard_metrics["max_abs"]
+                    <= args.max_guard_max_growth * max(base_guard_metrics["max_abs"], 1e-300)
+                )
+            line_trials.append(
+                {
+                    "alpha": alpha,
+                    **update_metrics,
+                    **trial_metrics,
+                    "raw_objective": trial_raw_metrics["objective"],
+                    "raw_max_abs": trial_raw_metrics["max_abs"],
+                    "raw_growth_ok": raw_growth_ok,
+                    "guard_metrics": trial_guard_metrics,
+                    "guard_growth_ok": guard_growth_ok,
+                    "tail_gate": tail_gate,
+                }
+            )
+            if trial_metrics["objective"] < base_metrics["objective"] and raw_growth_ok and guard_growth_ok:
                 current = trial_data
                 best_trial = trial_data
                 best_trial_metrics = trial_metrics
@@ -641,6 +825,11 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "column_scaling": scaling_report,
                 "selected_variables": len(system["variables"]),
                 "row_groups": system["row_groups"],
+                "raw_residual_metrics": system["raw_residual_metrics"],
+                "row_scaling": system["row_scaling"],
+                "base_guard_metrics": base_guard_metrics,
+                "selected_by_chart": system["selected_by_chart"],
+                "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
                 "mortar_rows_active": system["mortar_rows_active"],
                 "variable_score_preview": system["variable_score_preview"],
@@ -688,6 +877,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_active_count": args.mortar_active_count,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
+            "guard_qb_points": [[q, b] for q, b in guard_points],
+            "max_guard_objective_growth": args.max_guard_objective_growth,
+            "max_guard_max_growth": args.max_guard_max_growth,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -700,6 +892,12 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_weight": args.mortar_weight,
             "line_search": args.line_search,
             "include_origin_constants": args.include_origin_constants,
+            "chart_balanced_selection": args.chart_balanced_selection,
+            "row_normalization": args.row_normalization,
+            "row_normalization_floor": args.row_normalization_floor,
+            "row_scale_min": args.row_scale_min,
+            "row_scale_max": args.row_scale_max,
+            "max_raw_objective_growth": args.max_raw_objective_growth,
             "tail_gate_samples_per_patch": args.tail_gate_samples_per_patch,
             "forced_tol": args.forced_tol,
             "q2_tol": args.q2_tol,
@@ -747,6 +945,8 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_order": args.mortar_order,
             "mortar_coordinates": args.mortar_coordinates,
             "mortar_active_count": args.mortar_active_count,
+            "chart_balanced_selection": args.chart_balanced_selection,
+            "row_normalization": args.row_normalization,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -802,6 +1002,9 @@ def main() -> None:
     parser.add_argument("--overlap-q-min", type=float, default=0.84)
     parser.add_argument("--overlap-q-max", type=float, default=0.92)
     parser.add_argument("--pde-qb-points", default="")
+    parser.add_argument("--guard-qb-points", default="", help="Semicolon-separated q,b points used only as line-search guards.")
+    parser.add_argument("--max-guard-objective-growth", type=positive_float, default=1.0)
+    parser.add_argument("--max-guard-max-growth", type=positive_float, default=1.0)
     parser.add_argument("--pde-weight", type=positive_float, default=1.0)
     parser.add_argument("--mortar-weight", type=positive_float, default=1e-6)
     parser.add_argument("--forced-tol", type=positive_float, default=1e-12)
@@ -814,6 +1017,17 @@ def main() -> None:
     parser.add_argument("--candidate-pool-limit", type=positive_int, default=512)
     parser.add_argument("--line-search", type=parse_float_list, default=parse_float_list("1,0.5,0.25,0.125"))
     parser.add_argument("--include-origin-constants", action="store_true")
+    parser.add_argument("--chart-balanced-selection", action="store_true")
+    parser.add_argument("--row-normalization", choices=("none", "jacobian", "residual-jacobian"), default="none")
+    parser.add_argument("--row-normalization-floor", type=positive_float, default=1e-12)
+    parser.add_argument("--row-scale-min", type=float, default=0.0)
+    parser.add_argument("--row-scale-max", type=positive_float, default=1e6)
+    parser.add_argument(
+        "--max-raw-objective-growth",
+        type=positive_float,
+        default=1.0,
+        help="Reject line-search steps whose unnormalized sampled objective grows by more than this factor.",
+    )
     parser.add_argument("--max-iter", type=positive_int, default=20)
     parser.add_argument("--trust", type=positive_float, default=0.05)
     parser.add_argument("--lm-lambda", type=positive_float, default=1e-8)
@@ -827,6 +1041,10 @@ def main() -> None:
         parser.error("candidate degree caps must be nonnegative")
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
         parser.error("--line-search must contain positive floats")
+    if args.row_scale_min < 0.0:
+        parser.error("--row-scale-min must be nonnegative")
+    if args.row_scale_min > args.row_scale_max:
+        parser.error("--row-scale-min must be <= --row-scale-max")
 
     data = load_json(args.input)
     validate_input_schema(data, args.input)
@@ -863,6 +1081,8 @@ def main() -> None:
             last = result["history"][-1]
             print(f"iterations_run={len(result['history'])}")
             print(f"row_groups={last['row_groups']}")
+            print(f"row_normalization={args.row_normalization}")
+            print(f"selected_by_chart={last.get('selected_by_chart', {})}")
             print(f"selected_variables={last['selected_variables']}")
             print(f"base_objective_first={first['base']['objective']:.12e}")
             final_metrics = result["candidate"]["twochart_newton_stage0_summary"].get("final_metrics", {})
