@@ -20,7 +20,7 @@
           "path": "certs/profile/profile_nk.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497"
+          "sha256": "96076e2c8faef6c25bc039b63a5ebbda2e7da1684e5a6dcdaf80ab654ee444d6"
         },
         {
           "certificate_name": "pressure_reconstruction",
@@ -30,7 +30,7 @@
           "path": "certs/profile/pressure_reconstruction.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "8304417e5d540b1f31edc4901f6a9e355c99ff097d454e3c1a0206009b4d1286"
+          "sha256": "bc280d3f08feaf3d09838345c2af5de11593a75107a57250fa2ee50bcdca66a7"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -48,7 +48,7 @@
           "path": "certs/profile/profile_nk.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497"
+          "sha256": "96076e2c8faef6c25bc039b63a5ebbda2e7da1684e5a6dcdaf80ab654ee444d6"
         },
         {
           "certificate_name": "tail_recurrence",
@@ -58,7 +58,7 @@
           "path": "certs/tail/tail_recurrence.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "7a818fc333f093242002b0d830ae60ff3c488646d22e5aaef87cdb8c0de4f5b2"
+          "sha256": "69b7e241e1b4ed2ffc6613563de7e0b3e24696e1be8f5acb809ebc1872d300d8"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -76,7 +76,7 @@
           "path": "certs/tail/tail_recurrence.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "7a818fc333f093242002b0d830ae60ff3c488646d22e5aaef87cdb8c0de4f5b2"
+          "sha256": "69b7e241e1b4ed2ffc6613563de7e0b3e24696e1be8f5acb809ebc1872d300d8"
         },
         {
           "certificate_name": "indicial_pluecker_cover",
@@ -86,7 +86,7 @@
           "path": "certs/tail/indicial_pluecker_cover.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "779a235f4ddcd87596fdd3c827d20e9c1eea80a8d67e96d23401d9625ae90020"
+          "sha256": "3c62085d39c4aee15fa468835d4af35603969f0a4135c433136b1f433509c5ad"
         },
         {
           "certificate_name": "matching_determinant",
@@ -96,7 +96,7 @@
           "path": "certs/profile/matching_determinant.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "78a4553246f319f4699b05c31efcb49392faa69271fb6a248381694b0bf2fd77"
+          "sha256": "a1a8743af005cf477d77ae1e599db7ee6c03c3c1404a536a3edb058e4d26c931"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -114,7 +114,7 @@
           "path": "certs/spectrum/projected_spectrum.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "5b4ae64b47d0042cd81ebb2e1e80e5eab136bd43471a012204c1c50d2e491972"
+          "sha256": "6b7c54e937551ce0e95e2045f481a656a98eea9d30bec31d7b713da1d3e6066e"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -132,7 +132,7 @@
           "path": "certs/spectrum/high_frequency_exclusion.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "7a1bf577d8a6fd8fe903e6d67183db304bfe6bda226e23d22951005b0d61e0b1"
+          "sha256": "7538af5ef41e2f8907d71511c0723012454da1887e761850629860714c5d3e3a"
         },
         {
           "certificate_name": "stable_semigroup",
@@ -142,7 +142,7 @@
           "path": "certs/spectrum/stable_semigroup.json",
           "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "c9ca3f27d86e782e7a40c9f30a851825b2e7c69fee7e8d26252c8dce6e774ca7"
+          "sha256": "6606e196e14b90cf7e6d967c717b4e46a8e6b6e140024871a3208f1a78ec8ab0"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -200,6 +200,6 @@
   },
   "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
   "pass": false,
-  "repo_commit": "800dea2455acedf24d614c313c0ae9a8af2aa6dd",
+  "repo_commit": "2e185048e6d52ede080bf15995bb87544b709687",
   "schema_version": "nsproof-cert-v1"
 }

@@ -19,14 +19,14 @@
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
     "pressure_reconstruction_map": "13d3b13cbb5d7f3168743a676521e956f4585c8f55ab5f85978679b9a8e421fc",
-    "profile_nk_file": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497",
-    "profile_nk_stable_json": "dfaf25c97db2b05a02943b27839ab162e9223508571e461ab25144bb4f9a2eba",
+    "profile_nk_file": "96076e2c8faef6c25bc039b63a5ebbda2e7da1684e5a6dcdaf80ab654ee444d6",
+    "profile_nk_stable_json": "94d3f3ea2c8abff3c48e483932d929c50ca57e5a5968185b20e62c6efd01c351",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "failure_reason": "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=2.670891433969e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep Z0=1.109715777297e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate",
   "input_hashes": {
     "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-    "profile_nk": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497"
+    "profile_nk": "96076e2c8faef6c25bc039b63a5ebbda2e7da1684e5a6dcdaf80ab654ee444d6"
   },
   "interval_bounds": {
     "R_theta": null,
@@ -100,8 +100,8 @@
     "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
     "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
     "schema_version": "nsproof-cert-v1",
-    "sha256": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497",
-    "stable_json_hash_sha256": "dfaf25c97db2b05a02943b27839ab162e9223508571e461ab25144bb4f9a2eba"
+    "sha256": "96076e2c8faef6c25bc039b63a5ebbda2e7da1684e5a6dcdaf80ab654ee444d6",
+    "stable_json_hash_sha256": "94d3f3ea2c8abff3c48e483932d929c50ca57e5a5968185b20e62c6efd01c351"
   },
   "profile_summary": {
     "B": 1.0,
@@ -117,7 +117,7 @@
       "status": "projection_scaffold_not_validated"
     }
   },
-  "repo_commit": "800dea2455acedf24d614c313c0ae9a8af2aa6dd",
+  "repo_commit": "2e185048e6d52ede080bf15995bb87544b709687",
   "rounding_mode": null,
   "schema_version": "nsproof-cert-v1",
   "status": "PRESSURE_RECONSTRUCTION_LEDGER_NOT_INTERVAL",
