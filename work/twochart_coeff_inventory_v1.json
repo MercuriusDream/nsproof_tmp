@@ -1,0 +1,382 @@
+{
+  "counts": {
+    "by_block": {
+      "origin.F_origin_taylor": 28,
+      "origin.G_origin_taylor": 28,
+      "tail.F_an": 4356,
+      "tail.F_frac": 8712,
+      "tail.G_an": 4356,
+      "tail.G_frac": 8712
+    },
+    "by_chart": {
+      "origin": 56,
+      "tail": 26136
+    },
+    "by_chart_component": {
+      "origin": {
+        "F": 28,
+        "G": 28
+      },
+      "tail": {
+        "F": 13068,
+        "G": 13068
+      }
+    },
+    "by_chart_component_block": {
+      "origin": {
+        "F": {
+          "origin.F_origin_taylor": 28
+        },
+        "G": {
+          "origin.G_origin_taylor": 28
+        }
+      },
+      "tail": {
+        "F": {
+          "tail.F_an": 4356,
+          "tail.F_frac": 8712
+        },
+        "G": {
+          "tail.G_an": 4356,
+          "tail.G_frac": 8712
+        }
+      }
+    },
+    "by_component": {
+      "F": 13096,
+      "G": 13096
+    },
+    "total": 26192
+  },
+  "diagnostic_vs_proof": "coefficient inventory only; no residual, interval, or proof claim",
+  "format": "twochart_profile_projection_v1",
+  "layout": {
+    "origin_basis": "Taylor monomials R^a Z^b",
+    "tail_active_patch_counts": {
+      "F_an": 36,
+      "F_frac_total": 72,
+      "G_an": 36,
+      "G_frac_total": 72
+    },
+    "tail_patch_layout": {
+      "degree_q": 10,
+      "degree_x": 10,
+      "q_breaks": [
+        0.0,
+        0.16,
+        0.34,
+        0.52,
+        0.72,
+        0.9,
+        1.0
+      ],
+      "x_breaks": [
+        0.0,
+        0.04,
+        0.1,
+        0.2,
+        0.45,
+        0.75,
+        1.0
+      ]
+    }
+  },
+  "parameters": {
+    "B": 1.0,
+    "gamma": 0.45,
+    "p": 2.2222222222222223
+  },
+  "profile": "work/v117_twochart_init.json",
+  "records_included": false,
+  "records_note": "Full coefficient records omitted; rerun with --include-records to emit them.",
+  "sample": [
+    {
+      "block": "tail.F_an",
+      "block_kind": "analytic",
+      "chart": "tail",
+      "coefficient": -0.29110606371373554,
+      "component": "F",
+      "frac_index": null,
+      "kq": 0,
+      "kx": 0,
+      "patch_index": 0,
+      "q_interval": [
+        0.0,
+        0.16
+      ],
+      "variable_id": "tail.F_an[patch=0][kq=0,kx=0]",
+      "x_interval": [
+        0.0,
+        0.04
+      ]
+    },
+    {
+      "block": "tail.F_an",
+      "block_kind": "analytic",
+      "chart": "tail",
+      "coefficient": -1.330703252477819e-12,
+      "component": "F",
+      "frac_index": null,
+      "kq": 7,
+      "kx": 5,
+      "patch_index": 19,
+      "q_interval": [
+        0.52,
+        0.72
+      ],
+      "variable_id": "tail.F_an[patch=19][kq=7,kx=5]",
+      "x_interval": [
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "block": "tail.G_an",
+      "block_kind": "analytic",
+      "chart": "tail",
+      "coefficient": -5.380064588864666e-10,
+      "component": "G",
+      "frac_index": null,
+      "kq": 3,
+      "kx": 10,
+      "patch_index": 3,
+      "q_interval": [
+        0.0,
+        0.16
+      ],
+      "variable_id": "tail.G_an[patch=3][kq=3,kx=10]",
+      "x_interval": [
+        0.2,
+        0.45
+      ]
+    },
+    {
+      "block": "tail.G_an",
+      "block_kind": "analytic",
+      "chart": "tail",
+      "coefficient": 0.0005107931768391161,
+      "component": "G",
+      "frac_index": null,
+      "kq": 0,
+      "kx": 4,
+      "patch_index": 23,
+      "q_interval": [
+        0.52,
+        0.72
+      ],
+      "variable_id": "tail.G_an[patch=23][kq=0,kx=4]",
+      "x_interval": [
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "block": "tail.F_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": -6.761671549606355e-18,
+      "component": "F",
+      "frac_index": 0,
+      "kq": 7,
+      "kx": 9,
+      "patch_index": 6,
+      "q_interval": [
+        0.16,
+        0.34
+      ],
+      "variable_id": "tail.F_frac[frac=0][patch=6][kq=7,kx=9]",
+      "x_interval": [
+        0.0,
+        0.04
+      ]
+    },
+    {
+      "block": "tail.F_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 1.198792840492883e-19,
+      "component": "F",
+      "frac_index": 0,
+      "kq": 4,
+      "kx": 3,
+      "patch_index": 26,
+      "q_interval": [
+        0.72,
+        0.9
+      ],
+      "variable_id": "tail.F_frac[frac=0][patch=26][kq=4,kx=3]",
+      "x_interval": [
+        0.1,
+        0.2
+      ]
+    },
+    {
+      "block": "tail.F_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 0.0,
+      "component": "F",
+      "frac_index": 1,
+      "kq": 0,
+      "kx": 8,
+      "patch_index": 10,
+      "q_interval": [
+        0.16,
+        0.34
+      ],
+      "variable_id": "tail.F_frac[frac=1][patch=10][kq=0,kx=8]",
+      "x_interval": [
+        0.45,
+        0.75
+      ]
+    },
+    {
+      "block": "tail.F_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 0.0,
+      "component": "F",
+      "frac_index": 1,
+      "kq": 8,
+      "kx": 2,
+      "patch_index": 29,
+      "q_interval": [
+        0.72,
+        0.9
+      ],
+      "variable_id": "tail.F_frac[frac=1][patch=29][kq=8,kx=2]",
+      "x_interval": [
+        0.75,
+        1.0
+      ]
+    },
+    {
+      "block": "tail.G_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 1.2708996912582635e-19,
+      "component": "G",
+      "frac_index": 0,
+      "kq": 4,
+      "kx": 7,
+      "patch_index": 13,
+      "q_interval": [
+        0.34,
+        0.52
+      ],
+      "variable_id": "tail.G_frac[frac=0][patch=13][kq=4,kx=7]",
+      "x_interval": [
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "block": "tail.G_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 2.569177679652376e-06,
+      "component": "G",
+      "frac_index": 0,
+      "kq": 1,
+      "kx": 1,
+      "patch_index": 33,
+      "q_interval": [
+        0.9,
+        1.0
+      ],
+      "variable_id": "tail.G_frac[frac=0][patch=33][kq=1,kx=1]",
+      "x_interval": [
+        0.2,
+        0.45
+      ]
+    },
+    {
+      "block": "tail.G_frac",
+      "block_kind": "fractional",
+      "chart": "tail",
+      "coefficient": 0.0,
+      "component": "G",
+      "frac_index": 1,
+      "kq": 8,
+      "kx": 6,
+      "patch_index": 16,
+      "q_interval": [
+        0.34,
+        0.52
+      ],
+      "variable_id": "tail.G_frac[frac=1][patch=16][kq=8,kx=6]",
+      "x_interval": [
+        0.45,
+        0.75
+      ]
+    },
+    {
+      "R_power": 6,
+      "Z_power": 0,
+      "block": "origin.G_origin_taylor",
+      "block_kind": "taylor",
+      "chart": "origin",
+      "coefficient": 2263.660469483921,
+      "component": "G",
+      "frac_index": null,
+      "origin_basis_index": 27,
+      "patch_index": null,
+      "variable_id": "origin.G_origin_taylor[27][R^6,Z^0]"
+    }
+  ],
+  "sample_size_requested": 12,
+  "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+  "status": "TWOCHART_COEFFICIENT_INVENTORY_NOT_PROOF",
+  "tail_gate": {
+    "all_ok": true,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  },
+  "unknown_blocks": [
+    {
+      "chart": "tail",
+      "component": "F",
+      "layout": "patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.F_an",
+      "source_block": "blocks.F_an"
+    },
+    {
+      "chart": "tail",
+      "component": "G",
+      "layout": "patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.G_an",
+      "source_block": "blocks.G_an"
+    },
+    {
+      "chart": "tail",
+      "component": "F",
+      "layout": "fractional_block -> patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.F_frac",
+      "source_block": "blocks.F_frac"
+    },
+    {
+      "chart": "tail",
+      "component": "G",
+      "layout": "fractional_block -> patch Chebyshev coeffs[kq][kx]",
+      "name": "tail.G_frac",
+      "source_block": "blocks.G_frac"
+    },
+    {
+      "chart": "origin",
+      "component": "F",
+      "degree": 6,
+      "layout": "monomial entries in R=rho2*(1-x), Z=rho2*x",
+      "name": "origin.F_origin_taylor",
+      "source_block": "blocks.F_origin_taylor.basis"
+    },
+    {
+      "chart": "origin",
+      "component": "G",
+      "degree": 6,
+      "layout": "monomial entries in R=rho2*(1-x), Z=rho2*x",
+      "name": "origin.G_origin_taylor",
+      "source_block": "blocks.G_origin_taylor.basis"
+    }
+  ]
+}

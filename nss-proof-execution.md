@@ -2950,6 +2950,64 @@ All these numbers are finite and diagnostic.  They are still far from a
 Newton-Kantorovich center and mostly quantify how much work the actual
 two-chart residual/Jacobian Newton solve must do.
 
+Two additional pre-Newton scaffolds are now in place:
+
+```text
+validators/twochart_coefficients.py
+validators/twochart_mortar_jacobian.py
+```
+
+The coefficient inventory command
+
+```text
+python3 validators/twochart_coefficients.py \
+  --profile work/v117_twochart_init.json \
+  --out work/twochart_coeff_inventory_v1.json
+```
+
+enforces the q2-zero tail gate and records:
+
+```text
+total coefficients = 26192,
+tail coefficients = 26136,
+origin coefficients = 56,
+F coefficients = 13096,
+G coefficients = 13096,
+tail.F_an = 4356,
+tail.G_an = 4356,
+tail.F_frac = 8712,
+tail.G_frac = 8712,
+origin.F_origin_taylor = 28,
+origin.G_origin_taylor = 28.
+```
+
+The overlap mortar Jacobian command
+
+```text
+python3 validators/twochart_mortar_jacobian.py \
+  --profile work/v117_twochart_init.json \
+  --smoke \
+  --json-out work/twochart_mortar_jacobian_smoke.json
+```
+
+builds C0-C4 floating mortar rows and exact coefficient columns for the
+tail-minus-origin overlap residual:
+
+```text
+rows = 1350,
+jacobian_total_nnz = 434250,
+max C0-C4 residual = 1.325241538254e+08,
+finite-difference smoke max abs diff = 1.529406290501e-08.
+```
+
+This gives a tested analytic mortar-Jacobian block for the future Newton
+system.  It still does not include the PDE residual Jacobian, which remains the
+main missing hook:
+
+```text
+validators.compactified_equations_twochart.eval_residual_and_jacobian.
+```
+
 The profile validation gates are:
 
 ```text

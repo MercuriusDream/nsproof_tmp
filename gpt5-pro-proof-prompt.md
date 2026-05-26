@@ -349,6 +349,8 @@ tools/profile_project_twochart.py
 validators/twochart_mortar.py
 validators/compactified_equations_twochart.py
 tools/profile_newton_twochart.py
+validators/twochart_coefficients.py
+validators/twochart_mortar_jacobian.py
 ```
 
 `validators/origin_chart.py` passes a derivative-order-4 self-test and rejects
@@ -384,6 +386,23 @@ C0-C4 R,Z mortar max = 5.833745769211e+06
 refuses coefficient updates until
 `validators.compactified_equations_twochart.eval_residual_and_jacobian` exists.
 That refusal is intentional.
+
+The coefficient and overlap mortar-Jacobian scaffolds now exist. Current facts:
+
+```text
+two-chart coefficient count = 26192
+tail coefficients = 26136
+origin Taylor coefficients = 56
+C0-C4 overlap mortar rows = 1350
+C0-C4 overlap mortar Jacobian nnz = 434250
+finite-difference smoke max abs diff = 1.529406290501e-08
+C4 mortar residual max = 1.325241538254e+08
+```
+
+The remaining missing hook is the PDE residual Jacobian. Implement it with
+spatial Jet2 derivatives through order 3. For origin Taylor coefficient
+variations in PDE rows, use direct spatial monomials `R=r^2`, `Z=z^2` rather
+than the singular angular ratio `x=z^2/(r^2+z^2)`.
 
 ## 6. Current Repository Tooling
 

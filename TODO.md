@@ -7,12 +7,12 @@ This ledger is derived from `proof-problem.md` and `conver.md`.
 ```text
 Final theorem certificate (binary gate): 0%
 Certified stop-condition gates: 0/5
-Proof-engineering scaffold progress: about 28%
+Proof-engineering scaffold progress: about 30%
 Last updated: 2026-05-26
 ```
 
 The `0%` theorem number is intentional: no final proof gate is certified until
-an exact admissible profile is validated.  The `28%` scaffold estimate counts
+an exact admissible profile is validated.  The `30%` scaffold estimate counts
 completed derivations, diagnostic solvers, tail/indicial evidence, projection
 tools, normalized residual checks, and early validator scaffolds, but it is not
 a proof certificate.
@@ -107,11 +107,12 @@ Current certified gate status:
 - [x] Added `tools/profile_zero_q2_trace.py` and generated q2-free diagnostics. `work/v117_transcheb_formal_forced_q2zero.json` and `work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json` keep q1 zero and forced `q^p` exact while reducing the ordinary `q^2` trace to roundoff. The focused and strict-tail residual checks did not worsen at the sampled gates, so the next two-chart solver should start from q2-free data unless a formal recurrence later proves `q^2` legal.
 - [x] Added the first hard-route two-chart scaffolds: `validators/origin_chart.py`, `tools/profile_project_twochart.py`, and `validators/twochart_mortar.py`. The origin self-test passes through derivative order 4 and rejects the fake-smooth `x=Z/(R+Z)` artifact, while `work/v117_twochart_init.json` is a tail-legal diagnostic two-chart object with q1 zero, forced `q^p` exact, and q2 zero. The current one-chart-derived overlap is badly non-smooth: C2 mortar max `5.076810111338e+4` and C3 smoke max `2.810512623453e+6`, both at `q=0.84`, `x=1.0`. This is not a proof failure of the branch; it is evidence that the final solver must impose hard C3/C4 two-chart matching.
 - [x] Added `validators/compactified_equations_twochart.py` and `tools/profile_newton_twochart.py` as the first two-chart residual/Newton baseline. The baseline is diagnostic only but enforces q2-zero tail legality and forwards the existing exact Taylor-jet evaluator with zero source mismatch. Current two-chart residual maxima are focused `1.016228983517e+1`, secondary `1.422825475247e+1`, origin `9.132494634431e+1`, edge `4.489165350285e+2`, and overlap `3.239718884452e+2`; C0-C4 `(R,Z)` mortar max is `5.833745769211e+6`. The Newton CLI writes `work/twochart_newton_stage0_dryrun.json` and refuses coefficient updates until `eval_residual_and_jacobian` exists. The analytic Jacobian design is fixed: PDE rows need spatial jets through order 3, seam rows need exact `(q,x)` partials through order 4, and the old coefficient finite-difference Newton loop must not be ported.
+- [x] Added coefficient/Jacobian scaffolds for the missing two-chart Newton hook. `validators/twochart_coefficients.py` inventories `26192` active coefficients (`26136` tail and `56` origin). `validators/twochart_mortar_jacobian.py` builds floating C0-C4 overlap mortar residual/Jacobian rows, enforces the q2-zero tail gate, and passes a finite-difference smoke check with max difference `1.529406290501e-8`. The current C4 mortar residual is huge (`1.325241538254e+8`), so this is infrastructure for the analytic solve, not progress toward a proof center.
 
 ## Active mathematical obligations
 
 - [ ] Compute trusted indicial roots `delta_j(gamma,B)` with interval or ball validation; the current floating shooting, modal, matching, and Pluecker diagnostics have not found a non-geometric root-like candidate, and apparent basins are dominated by forbidden far-field modes.
-- [ ] Build the full proof-native two-chart transseries/Chebyshev plus origin-regular `(R,Z)` solver while preserving the exact `q=0` conical boundary trace; the q2-free two-chart projection, origin/mortar audits, and Newton dry-run CLI exist, but the hard two-chart residual evaluator and analytic coefficient Jacobian are not implemented.
+- [ ] Build the full proof-native two-chart transseries/Chebyshev plus origin-regular `(R,Z)` solver while preserving the exact `q=0` conical boundary trace; the q2-free two-chart projection, origin/mortar audits, coefficient inventory, exact mortar Jacobian, and Newton dry-run CLI exist, but the PDE residual Jacobian hook is not implemented.
 - [ ] Re-solve the nonlinear compactified profile with the conical `q=0` trace enforced from the start; v49 is the best low-residual finite-box admissible seed, while final v117 is the best q1-free forced-tail diagnostic seed and still has residuals `O(1)`.
 - [ ] Produce a validated profile candidate `U_n` in the wedge `2/5 < gamma < 1/2`.
 - [ ] Build the matching determinant `D_match(gamma,B)` through a Lyapunov-Schmidt reduction.
