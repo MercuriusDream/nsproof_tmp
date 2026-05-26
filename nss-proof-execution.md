@@ -3866,3 +3866,56 @@ continuations improve the constrained interior balance but remain far from
 validation. The next proof-relevant improvement is a richer
 interior/asymptotic matching basis in the framework of v64/v117, together with
 a validated non-geometric indicial determinant.
+
+## 20. Two-Chart Stage-0 Newton Status
+
+The current proof route has moved past sparse bumps and one-chart origin
+polishing. The active diagnostic profile is the q2-zero two-chart projection
+
+```text
+work/v117_twochart_init.json
+```
+
+with floating formal tail gates
+
+```text
+q1_F = q1_G = 0,
+forced q^(1/gamma) trace sample error <= 8.9e-16,
+ordinary q^2 trace <= 7.8e-16.
+```
+
+`tools/profile_newton_twochart.py` now has a bounded Stage-0 analytic
+Gauss-Newton loop. It assembles sampled PDE rows and sampled overlap mortar
+rows, uses column-scaled damped normal equations, locks all q=0 tail
+coefficients, and rechecks the floating tail gate before accepting a trial.
+This is discovery infrastructure only.
+
+The safe locked probes do not yet show a Newton basin. The smoke and
+PDE-hardpoint probes reject all line-search trials:
+
+```text
+work/twochart_stage0_smoke_report.json: accepted_any_step = false
+work/twochart_stage0_pde_hardpoints_report.json: accepted_any_step = false
+```
+
+The C2 mortar-dominant probe accepts only a tiny objective reduction:
+
+```text
+work/twochart_stage0_mortar_c2_report.json
+objective: 1.555167227349e9 -> 1.555167163472e9
+```
+
+Held-out normalized structural scans remain essentially baseline-sized:
+
+```text
+standard = 1.016228983517e1
+secondary = 1.422825475247e1
+origin = 9.132492825929e1
+overlap = 3.239719410176e2
+edge = 4.489150149273e2
+C0-C2 R,Z mortar max = 4.214529161145e3
+```
+
+Conclusion: the immediate blocker is still the two-chart Stage-0 linear
+system and interface formulation. It is too early to free `(gamma,B)`, pivot
+to radial matching, or start spectral validation as a theorem dependency.

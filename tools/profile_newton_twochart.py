@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Stage-0 CLI skeleton for hard-constrained two-chart Newton.
+"""Stage-0 CLI for hard-constrained two-chart Newton diagnostics.
 
-This command is intentionally a dry-run planner until
-``validators.compactified_equations_twochart`` exposes the residual/Jacobian
-contract needed by the real solver.  It parses the planned Newton flags,
-checks the hard tail gates carried by the two-chart profile, and emits a
-machine-readable plan.  It does not perform coefficient updates.
+This command now has a bounded production path: it assembles analytic PDE and
+overlap-mortar rows for a controlled variable subset, solves a damped least
+squares correction, and writes a candidate only if a line-search step improves
+the same sampled objective.  It is still discovery infrastructure, not an
+interval proof or a final Newton-Kantorovich validator.
 """
 
 from __future__ import annotations
 
 import argparse
+import copy
 import importlib
 import json
+import math
 import os
 import sys
 from dataclasses import asdict, dataclass
@@ -23,8 +25,11 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+from validators.tail_transseries import forced_qp_expected_coeffs  # noqa: E402
+
 
 STATUS = "TWOCHART_NEWTON_STAGE0_DRY_RUN_ONLY"
+RUN_STATUS = "TWOCHART_NEWTON_STAGE0_ANALYTIC_GN_NOT_PROOF"
 MISSING_HOOK_STATUS = "REFUSED_REAL_NEWTON_MISSING_TWOCHART_RESIDUAL_JACOBIAN_HOOKS"
 SUPPORTED_FORMATS = {
     "twochart_profile_projection_v1",
@@ -32,6 +37,10 @@ SUPPORTED_FORMATS = {
     "compactified_twochart_profile_v1",
 }
 REQUIRED_HOOKS = ("eval_residual_and_jacobian",)
+
+
+class NewtonNoImprovement(RuntimeError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -133,6 +142,533 @@ def positive_float(value: str) -> float:
     return parsed
 
 
+def parse_float_list(raw: str) -> list[float]:
+    return [float(item.strip()) for item in raw.split(",") if item.strip()]
+
+
+def parse_qb_points(raw: str) -> list[tuple[float, float]]:
+    if not raw.strip():
+        return [(0.45, 0.30), (0.61, 0.24), (0.93, 0.35), (0.90, 0.95)]
+    points: list[tuple[float, float]] = []
+    for item in raw.split(";"):
+        if not item.strip():
+            continue
+        q_raw, b_raw = item.split(",", 1)
+        points.append((float(q_raw), float(b_raw)))
+    if not points:
+        raise ValueError("--pde-qb-points did not contain any points")
+    return points
+
+
+def variable_allowed_for_blocks(variable: Any, blocks: tuple[str, ...]) -> bool:
+    if variable.chart == "origin":
+        return "origin" in blocks or "interface" in blocks
+    if variable.chart == "tail":
+        return "tail" in blocks or "interface" in blocks
+    return False
+
+
+def variable_is_origin_constant(variable: Any) -> bool:
+    return variable.chart == "origin" and int(variable.r_power or 0) == 0 and int(variable.z_power or 0) == 0
+
+
+def tail_variable_patch(data: dict[str, Any], variable: Any) -> dict[str, Any]:
+    blocks = data["tail_chart"]["blocks"]
+    if variable.frac_index is None:
+        return blocks[variable.block][variable.patch_index]
+    return blocks[variable.block][variable.frac_index - 1][variable.patch_index]
+
+
+def patch_contains_point(patch: dict[str, Any], q: float, x: float) -> bool:
+    q0, q1 = patch["q_interval"]
+    x0, x1 = patch["x_interval"]
+    return (
+        float(q0) - 1e-14 <= q <= float(q1) + 1e-14
+        and float(x0) - 1e-14 <= x <= float(x1) + 1e-14
+    )
+
+
+def variable_relevant_for_samples(
+    data: dict[str, Any],
+    variable: Any,
+    pde_points: list[tuple[float, float]],
+    mortar_points: list[tuple[float, float]],
+) -> bool:
+    if variable.chart == "origin":
+        return True
+    if variable.chart != "tail":
+        return False
+    patch = tail_variable_patch(data, variable)
+    for q, b in pde_points:
+        if patch_contains_point(patch, q, b * b):
+            return True
+    for q, x in mortar_points:
+        if patch_contains_point(patch, q, x):
+            return True
+    return False
+
+
+def variable_under_candidate_caps(variable: Any, args: argparse.Namespace) -> bool:
+    if variable.chart == "origin":
+        return int(variable.r_power or 0) + int(variable.z_power or 0) <= args.candidate_origin_degree_max
+    if variable.chart == "tail":
+        return int(variable.kq or 0) <= args.candidate_kq_max and int(variable.kx or 0) <= args.candidate_kx_max
+    return False
+
+
+def tail_variable_is_gate_locked(data: dict[str, Any], variable: Any) -> bool:
+    if variable.chart != "tail":
+        return False
+    patch = tail_variable_patch(data, variable)
+    q0, _q1 = patch["q_interval"]
+    return abs(float(q0)) <= 1e-15
+
+
+def cap_candidate_pool(variables: list[Any], limit: int) -> list[Any]:
+    if len(variables) <= limit:
+        return variables
+    groups: dict[tuple[str, str, str], list[Any]] = {}
+    for variable in variables:
+        key = (variable.chart, variable.component, variable.block)
+        groups.setdefault(key, []).append(variable)
+    for group in groups.values():
+        group.sort(
+            key=lambda variable: (
+                int(variable.r_power or 0) + int(variable.z_power or 0),
+                int(variable.kq or 0) + int(variable.kx or 0),
+                int(variable.kq or 0),
+                int(variable.kx or 0),
+                variable.label,
+            )
+        )
+    capped: list[Any] = []
+    keys = sorted(groups)
+    while len(capped) < limit and keys:
+        next_keys: list[tuple[str, str, str]] = []
+        for key in keys:
+            group = groups[key]
+            if group and len(capped) < limit:
+                capped.append(group.pop(0))
+            if group:
+                next_keys.append(key)
+        keys = next_keys
+    return capped
+
+
+def cheb_eval_1d(coeffs: list[float], t: float) -> float:
+    if not coeffs:
+        return 0.0
+    b_k2 = 0.0
+    b_k1 = 0.0
+    for coeff in reversed(coeffs[1:]):
+        b_k0 = 2.0 * t * b_k1 - b_k2 + float(coeff)
+        b_k2 = b_k1
+        b_k1 = b_k0
+    return float(coeffs[0]) + t * b_k1 - b_k2
+
+
+def cheb_eval_tensor(
+    coeffs: list[list[float]],
+    q: float,
+    x: float,
+    q0: float,
+    q1: float,
+    x0: float,
+    x1: float,
+) -> float:
+    tq = 0.0 if q1 == q0 else (2.0 * q - q0 - q1) / (q1 - q0)
+    tx = 0.0 if x1 == x0 else (2.0 * x - x0 - x1) / (x1 - x0)
+    q_values = [cheb_eval_1d([float(value) for value in row], tx) for row in coeffs]
+    return cheb_eval_1d(q_values, tq)
+
+
+def q0_trace_sample_max(
+    patches: list[dict[str, Any]],
+    expected: Any,
+    samples_per_patch: int,
+) -> float:
+    worst = 0.0
+    for patch in patches:
+        q0, q1 = patch["q_interval"]
+        x0, x1 = patch["x_interval"]
+        q0f = float(q0)
+        if abs(q0f) > 1e-15:
+            continue
+        count = max(samples_per_patch, 2)
+        for index in range(count):
+            x = float(x0) + (float(x1) - float(x0)) * index / (count - 1)
+            value = cheb_eval_tensor(patch["coeffs"], q0f, x, q0f, float(q1), float(x0), float(x1))
+            target = expected(x) if callable(expected) else float(expected)
+            worst = max(worst, abs(value - target))
+    return worst
+
+
+def tail_gate_report_twochart(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    blocks = data["tail_chart"]["blocks"]
+    expected_f, expected_g = forced_qp_expected_coeffs(float(data["gamma"]), float(data["B"]))
+    q2_f = q0_trace_sample_max(blocks["F_an"], 0.0, args.tail_gate_samples_per_patch)
+    q2_g = q0_trace_sample_max(blocks["G_an"], 0.0, args.tail_gate_samples_per_patch)
+    forced_f = q0_trace_sample_max(
+        blocks.get("F_frac", [[]])[0],
+        lambda x: expected_f[0] + expected_f[1] * x,
+        args.tail_gate_samples_per_patch,
+    )
+    forced_g = q0_trace_sample_max(
+        blocks.get("G_frac", [[]])[0],
+        lambda x: expected_g[0] + expected_g[1] * x,
+        args.tail_gate_samples_per_patch,
+    )
+    forced_error = max(forced_f, forced_g)
+    q2_ok = q2_f <= args.q2_tol and q2_g <= args.q2_tol
+    forced_ok = forced_error <= args.forced_tol
+    all_ok = q2_ok and forced_ok
+    return {
+        "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+        if all_ok
+        else "TAIL_FORMAL_RECURRENCE_GATE_FAILED_NOT_INTERVAL",
+        "all_ok": all_ok,
+        "q1_f_max": 0.0,
+        "q1_g_max": 0.0,
+        "forced_qp_coeff_error": forced_error,
+        "forced_qp_F_sample_error": forced_f,
+        "forced_qp_G_sample_error": forced_g,
+        "q2_f_trace_max": q2_f,
+        "q2_g_trace_max": q2_g,
+        "q2_policy": args.q2_policy,
+        "q2_ok": q2_ok,
+        "samples_per_patch": args.tail_gate_samples_per_patch,
+        "note": "Floating structural two-chart tail gate; this is not interval validation.",
+    }
+
+
+def solve_linear(matrix: list[list[float]], rhs: list[float]) -> list[float]:
+    n = len(rhs)
+    a = [row[:] + [rhs[i]] for i, row in enumerate(matrix)]
+    for col in range(n):
+        pivot = max(range(col, n), key=lambda row: abs(a[row][col]))
+        if abs(a[pivot][col]) < 1e-28:
+            raise ValueError("singular damped normal matrix")
+        if pivot != col:
+            a[col], a[pivot] = a[pivot], a[col]
+        pivot_value = a[col][col]
+        for item in range(col, n + 1):
+            a[col][item] /= pivot_value
+        for row in range(n):
+            if row == col:
+                continue
+            factor = a[row][col]
+            if factor == 0.0:
+                continue
+            for item in range(col, n + 1):
+                a[row][item] -= factor * a[col][item]
+    return [a[i][n] for i in range(n)]
+
+
+def set_path(data: dict[str, Any], path: tuple[Any, ...], value: float) -> None:
+    node: Any = data
+    for part in path[:-1]:
+        node = node[part]
+    node[path[-1]] = value
+
+
+def get_path(data: dict[str, Any], path: tuple[Any, ...]) -> float:
+    node: Any = data
+    for part in path:
+        node = node[part]
+    return float(node)
+
+
+def apply_delta(
+    data: dict[str, Any],
+    variables: list[Any],
+    delta: list[float],
+    alpha: float,
+    max_update_norm: float,
+) -> tuple[dict[str, Any], dict[str, float]]:
+    norm = math.sqrt(sum(value * value for value in delta))
+    trust_scale = 1.0
+    if max_update_norm > 0.0 and norm > max_update_norm:
+        trust_scale = max_update_norm / max(norm, 1e-300)
+    scale = alpha * trust_scale
+    out = copy.deepcopy(data)
+    max_abs = 0.0
+    for variable, value in zip(variables, delta):
+        update = scale * value
+        set_path(out, variable.path, get_path(out, variable.path) + update)
+        max_abs = max(max_abs, abs(update))
+    out["twochart_newton_stage0_evidence"] = {
+        "status": RUN_STATUS,
+        "alpha_requested": alpha,
+        "alpha_applied": scale,
+        "delta_norm": norm,
+        "max_abs_update": max_abs,
+        "note": "Floating sampled analytic Gauss-Newton update; not a proof certificate.",
+    }
+    return out, {"alpha_applied": scale, "delta_norm": norm, "max_abs_update": max_abs}
+
+
+def vector_metrics(vec: list[float]) -> dict[str, float]:
+    if not vec:
+        return {"count": 0.0, "max_abs": 0.0, "rms": 0.0, "objective": 0.0}
+    total = sum(value * value for value in vec)
+    return {
+        "count": float(len(vec)),
+        "max_abs": max(abs(value) for value in vec),
+        "rms": math.sqrt(total / len(vec)),
+        "objective": 0.5 * total,
+    }
+
+
+def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: tuple[str, ...]) -> dict[str, Any]:
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations_twochart import (
+        linearized_residual_with_kind,
+        projection_from_twochart,
+    )
+    from validators.twochart_mortar_jacobian import build_rows, enumerate_coefficients, grid
+
+    projection = projection_from_twochart(data)
+    all_variables = enumerate_coefficients(data)
+    pde_points = parse_qb_points(args.pde_qb_points)
+    q_values = grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples) if "interface" in blocks else []
+    x_values = grid(0.0, 1.0, args.mortar_x_samples) if "interface" in blocks else []
+    mortar_points = [(q, x) for q in q_values for x in x_values]
+    candidate_variables = [
+        variable
+        for variable in all_variables
+        if variable_allowed_for_blocks(variable, blocks)
+        and (args.include_origin_constants or not variable_is_origin_constant(variable))
+        and variable_relevant_for_samples(data, variable, pde_points, mortar_points)
+        and variable_under_candidate_caps(variable, args)
+        and not tail_variable_is_gate_locked(data, variable)
+    ]
+    candidate_variables = cap_candidate_pool(candidate_variables, args.candidate_pool_limit)
+
+    pde_rows: list[dict[str, Any]] = []
+    variable_scores = {variable.index: 0.0 for variable in candidate_variables}
+    for q, b in pde_points:
+        if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+            continue
+        r, z = qb_to_rz(q, b)
+        raw = projection.exact_residual_at(r, z)
+        residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
+        pde_rows.append({"q": q, "b": b, "component": "e_psi", "residual": residual.e_psi})
+        pde_rows.append({"q": q, "b": b, "component": "e_gamma", "residual": residual.e_gamma})
+        for variable in candidate_variables:
+            column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
+            variable_scores[variable.index] += abs(column.e_psi * residual.e_psi) + abs(column.e_gamma * residual.e_gamma)
+
+    mortar_rows = []
+    if "interface" in blocks:
+        mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
+        candidate_indexes = {variable.index for variable in candidate_variables}
+        for row in mortar_rows:
+            for var_index, jac_value in row.jacobian:
+                if var_index in candidate_indexes:
+                    variable_scores[var_index] += abs(args.mortar_weight * jac_value * row.residual)
+
+    ranked = sorted(candidate_variables, key=lambda variable: variable_scores.get(variable.index, 0.0), reverse=True)
+    selected = [variable for variable in ranked if variable_scores.get(variable.index, 0.0) > 0.0]
+    selected = selected[: args.max_variables]
+    selected_index = {variable.index: column for column, variable in enumerate(selected)}
+    if not selected:
+        raise ValueError("no active variables selected for Stage-0 system")
+
+    residual_vector: list[float] = []
+    jacobian_rows: list[list[float]] = []
+    row_groups: dict[str, int] = {"pde": 0, "mortar": 0}
+
+    for row in pde_rows:
+        q = float(row["q"])
+        b = float(row["b"])
+        component = str(row["component"])
+        residual_vector.append(args.pde_weight * float(row["residual"]))
+        jac_row: list[float] = []
+        for variable in selected:
+            column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
+            jac_row.append(args.pde_weight * (column.e_psi if component == "e_psi" else column.e_gamma))
+        jacobian_rows.append(jac_row)
+        row_groups["pde"] += 1
+
+    for row in mortar_rows:
+        active_entries = [(selected_index[var_index], value) for var_index, value in row.jacobian if var_index in selected_index]
+        if not active_entries:
+            continue
+        residual_vector.append(args.mortar_weight * row.residual)
+        jac_row = [0.0 for _ in selected]
+        for column_index, value in active_entries:
+            jac_row[column_index] = args.mortar_weight * value
+        jacobian_rows.append(jac_row)
+        row_groups["mortar"] += 1
+
+    return {
+        "variables": selected,
+        "residual_vector": residual_vector,
+        "jacobian_rows": jacobian_rows,
+        "row_groups": row_groups,
+        "variable_score_preview": [
+            {"variable": variable.label, "score": variable_scores.get(variable.index, 0.0)}
+            for variable in selected[:12]
+        ],
+    }
+
+
+def normal_step(
+    jacobian_rows: list[list[float]],
+    residual_vector: list[float],
+    lm_lambda: float,
+) -> tuple[list[float], dict[str, float]]:
+    if not jacobian_rows:
+        raise ValueError("empty Jacobian")
+    n = len(jacobian_rows[0])
+    column_norms = []
+    for column in range(n):
+        norm = math.sqrt(sum(row[column] * row[column] for row in jacobian_rows))
+        column_norms.append(norm)
+    scales = [1.0 / norm if norm > 1e-14 else 1.0 for norm in column_norms]
+    normal = [[0.0 for _ in range(n)] for _ in range(n)]
+    rhs = [0.0 for _ in range(n)]
+    for row, residual in zip(jacobian_rows, residual_vector):
+        scaled_row = [value * scales[index] for index, value in enumerate(row)]
+        for i, ji in enumerate(scaled_row):
+            rhs[i] -= ji * residual
+            if ji == 0.0:
+                continue
+            for j in range(i, n):
+                normal[i][j] += ji * scaled_row[j]
+    for i in range(n):
+        for j in range(i):
+            normal[i][j] = normal[j][i]
+        normal[i][i] += lm_lambda
+    scaled_delta = solve_linear(normal, rhs)
+    delta = [value * scales[index] for index, value in enumerate(scaled_delta)]
+    nonzero_norms = [value for value in column_norms if value > 0.0]
+    return delta, {
+        "column_norm_min": min(nonzero_norms) if nonzero_norms else 0.0,
+        "column_norm_max": max(column_norms) if column_norms else 0.0,
+        "column_scale_min": min(scales) if scales else 0.0,
+        "column_scale_max": max(scales) if scales else 0.0,
+    }
+
+
+def attach_stage0_tail_gate(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    report = tail_gate_report_twochart(data, args)
+    data["tail_legality"] = {
+        **data.get("tail_legality", {}),
+        **report,
+    }
+    return report
+
+
+def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport) -> dict[str, Any]:
+    if not hooks.available:
+        return build_plan(args, data, hooks)
+    blocks = parse_blocks(args.blocks)
+    tail_legality = validate_hard_gates(data, args.q2_policy)
+
+    current = copy.deepcopy(data)
+    history: list[dict[str, Any]] = []
+    best_trial: dict[str, Any] | None = None
+    best_trial_metrics: dict[str, Any] | None = None
+    for iteration in range(args.max_iter):
+        system = build_stage0_system(current, args, blocks)
+        base_vec = system["residual_vector"]
+        base_metrics = vector_metrics(base_vec)
+        delta, scaling_report = normal_step(system["jacobian_rows"], base_vec, args.lm_lambda)
+        delta_norm = math.sqrt(sum(value * value for value in delta))
+        line_trials: list[dict[str, Any]] = []
+        accepted = False
+        for alpha in args.line_search:
+            trial_data, update_metrics = apply_delta(current, system["variables"], delta, alpha, args.trust)
+            tail_gate = attach_stage0_tail_gate(trial_data, args)
+            if not tail_gate["all_ok"]:
+                line_trials.append(
+                    {
+                        "alpha": alpha,
+                        **update_metrics,
+                        "rejected_by_tail_gate": True,
+                        "tail_gate": tail_gate,
+                    }
+                )
+                continue
+            trial_system = build_stage0_system(trial_data, args, blocks)
+            trial_metrics = vector_metrics(trial_system["residual_vector"])
+            line_trials.append({"alpha": alpha, **update_metrics, **trial_metrics, "tail_gate": tail_gate})
+            if trial_metrics["objective"] < base_metrics["objective"]:
+                current = trial_data
+                best_trial = trial_data
+                best_trial_metrics = trial_metrics
+                accepted = True
+                break
+        history.append(
+            {
+                "iteration": iteration,
+                "base": base_metrics,
+                "delta_norm": delta_norm,
+                "column_scaling": scaling_report,
+                "selected_variables": len(system["variables"]),
+                "row_groups": system["row_groups"],
+                "variable_score_preview": system["variable_score_preview"],
+                "line_trials": line_trials,
+                "accepted": accepted,
+            }
+        )
+        if not accepted:
+            break
+    final_data = best_trial if best_trial is not None else current
+    final_tail_gate = attach_stage0_tail_gate(final_data, args)
+    final_metrics = best_trial_metrics if best_trial_metrics is not None else (history[-1]["base"] if history else {})
+    final_data["twochart_newton_stage0_summary"] = {
+        "status": RUN_STATUS if best_trial is not None else "TWOCHART_NEWTON_STAGE0_NO_IMPROVEMENT_NOT_PROOF",
+        "newton_executed": True,
+        "accepted_any_step": best_trial is not None,
+        "iterations_requested": args.max_iter,
+        "iterations_run": len(history),
+        "final_metrics": final_metrics,
+        "final_tail_gate": final_tail_gate,
+        "row_definition": "sampled PDE normalized residual rows plus sampled C0-Ck overlap mortar rows",
+        "diagnostic_vs_proof": "floating analytic Gauss-Newton diagnostic only; no interval proof",
+    }
+    return {
+        "format": "twochart_newton_stage0_run_v1",
+        "status": final_data["twochart_newton_stage0_summary"]["status"],
+        "newton_executed": True,
+        "optimization_faked": False,
+        "input": args.input,
+        "out": args.out,
+        "accepted_any_step": best_trial is not None,
+        "tail_legality": tail_legality,
+        "requested_solver": {
+            "blocks": list(blocks),
+            "residual_kind": args.residual_kind,
+            "q2_policy": args.q2_policy,
+            "mortar_order": args.mortar_order,
+            "mortar_q_samples": args.mortar_q_samples,
+            "mortar_x_samples": args.mortar_x_samples,
+            "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
+            "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
+            "max_iter": args.max_iter,
+            "trust": args.trust,
+            "lm_lambda": args.lm_lambda,
+            "max_variables": args.max_variables,
+            "candidate_kq_max": args.candidate_kq_max,
+            "candidate_kx_max": args.candidate_kx_max,
+            "candidate_origin_degree_max": args.candidate_origin_degree_max,
+            "candidate_pool_limit": args.candidate_pool_limit,
+            "pde_weight": args.pde_weight,
+            "mortar_weight": args.mortar_weight,
+            "line_search": args.line_search,
+            "include_origin_constants": args.include_origin_constants,
+            "tail_gate_samples_per_patch": args.tail_gate_samples_per_patch,
+            "forced_tol": args.forced_tol,
+            "q2_tol": args.q2_tol,
+        },
+        "history": history,
+        "candidate": final_data,
+        "diagnostic_vs_proof": "floating sampled analytic Gauss-Newton run only; no interval proof",
+    }
+
+
 def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport) -> dict[str, Any]:
     blocks = parse_blocks(args.blocks)
     tail_legality = validate_hard_gates(data, args.q2_policy)
@@ -205,35 +741,91 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", required=True, help="Two-chart profile JSON.")
-    parser.add_argument("--out", required=True, help="Dry-run plan JSON to write.")
+    parser.add_argument("--out", required=True, help="Candidate/profile JSON to write, or dry-run plan with --dry-run.")
+    parser.add_argument("--report-out", default="", help="Optional full Stage-0 run report JSON.")
+    parser.add_argument("--dry-run", action="store_true", help="Write the old solver plan without mutating coefficients.")
     parser.add_argument("--blocks", default="origin,interface", help="Comma list: tail,origin,interface.")
     parser.add_argument("--gamma-fixed", action="store_true", default=True, help="Accepted planned flag; enforced true.")
     parser.add_argument("--B-fixed", action="store_true", default=True, help="Accepted planned flag; enforced true.")
     parser.add_argument("--residual-kind", default="normalized-structural")
     parser.add_argument("--q2-policy", choices=("zero",), default="zero")
     parser.add_argument("--mortar-order", type=positive_int, default=4)
+    parser.add_argument("--mortar-q-samples", type=positive_int, default=3)
+    parser.add_argument("--mortar-x-samples", type=positive_int, default=5)
+    parser.add_argument("--overlap-q-min", type=float, default=0.84)
+    parser.add_argument("--overlap-q-max", type=float, default=0.92)
+    parser.add_argument("--pde-qb-points", default="")
+    parser.add_argument("--pde-weight", type=positive_float, default=1.0)
+    parser.add_argument("--mortar-weight", type=positive_float, default=1e-6)
+    parser.add_argument("--forced-tol", type=positive_float, default=1e-12)
+    parser.add_argument("--q2-tol", type=positive_float, default=1e-12)
+    parser.add_argument("--tail-gate-samples-per-patch", type=positive_int, default=9)
+    parser.add_argument("--max-variables", type=positive_int, default=32)
+    parser.add_argument("--candidate-kq-max", type=int, default=6)
+    parser.add_argument("--candidate-kx-max", type=int, default=6)
+    parser.add_argument("--candidate-origin-degree-max", type=int, default=6)
+    parser.add_argument("--candidate-pool-limit", type=positive_int, default=512)
+    parser.add_argument("--line-search", type=parse_float_list, default=parse_float_list("1,0.5,0.25,0.125"))
+    parser.add_argument("--include-origin-constants", action="store_true")
     parser.add_argument("--max-iter", type=positive_int, default=20)
     parser.add_argument("--trust", type=positive_float, default=0.05)
     parser.add_argument("--lm-lambda", type=positive_float, default=1e-8)
     parser.add_argument("--scan", default="standard,focused,secondary,origin,edge")
     args = parser.parse_args()
+    if args.overlap_q_max <= args.overlap_q_min:
+        parser.error("--overlap-q-max must be greater than --overlap-q-min")
+    if args.candidate_kq_max < 0 or args.candidate_kx_max < 0 or args.candidate_origin_degree_max < 0:
+        parser.error("candidate degree caps must be nonnegative")
+    if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
+        parser.error("--line-search must contain positive floats")
 
     data = load_json(args.input)
     validate_input_schema(data, args.input)
     hooks = hook_report()
-    plan = build_plan(args, data, hooks)
-    save_json(args.out, plan)
+
+    if args.dry_run:
+        result = build_plan(args, data, hooks)
+        save_json(args.out, result)
+    else:
+        result = run_stage0(args, data, hooks)
+        if result.get("newton_executed"):
+            candidate = result["candidate"]
+            run_report = {key: value for key, value in result.items() if key != "candidate"}
+            candidate["twochart_newton_stage0_run_report"] = run_report
+            save_json(args.out, candidate)
+            if args.report_out:
+                save_json(args.report_out, run_report)
+        else:
+            save_json(args.out, result)
+            if args.report_out:
+                save_json(args.report_out, result)
 
     print(f"input={args.input}")
     print(f"saved={args.out}")
-    print(f"status={plan['status']}")
-    print(f"newton_executed={plan['newton_executed']}")
+    if args.report_out:
+        print(f"report_saved={args.report_out}")
+    print(f"status={result['status']}")
+    print(f"newton_executed={result['newton_executed']}")
     print(f"q2_policy={args.q2_policy}")
-    print(f"tail_legality_all_ok={plan['hard_constraints']['tail_legality_all_ok']}")
+    if result.get("newton_executed"):
+        print(f"accepted_any_step={result['accepted_any_step']}")
+        if result.get("history"):
+            first = result["history"][0]
+            last = result["history"][-1]
+            print(f"iterations_run={len(result['history'])}")
+            print(f"row_groups={last['row_groups']}")
+            print(f"selected_variables={last['selected_variables']}")
+            print(f"base_objective_first={first['base']['objective']:.12e}")
+            final_metrics = result["candidate"]["twochart_newton_stage0_summary"].get("final_metrics", {})
+            if final_metrics:
+                print(f"final_objective={final_metrics.get('objective', float('nan')):.12e}")
+                print(f"final_max_abs={final_metrics.get('max_abs', float('nan')):.12e}")
+    else:
+        print(f"tail_legality_all_ok={result['hard_constraints']['tail_legality_all_ok']}")
     print(f"hook_module={hooks.module}")
     print(f"hook_available={hooks.available}")
     if not hooks.available:
-        print(f"refusal_status={plan['refusal_status']}")
+        print(f"refusal_status={result['refusal_status']}")
         print(f"missing_hooks={','.join(hooks.missing_hooks)}")
 
 

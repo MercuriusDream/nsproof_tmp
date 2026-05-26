@@ -44,6 +44,84 @@ numerical discovery -> exact representation -> interval certificate -> theorem d
 
 If a branch cannot plausibly reach the interval-certificate stage, kill it and replace it with a better branch.
 
+## 1A. Latest Repository Update
+
+The repo now contains a bounded Stage-0 two-chart Newton diagnostic, but not a proof-grade solver.
+
+Current progress ledger:
+
+```text
+Final theorem certificate: 0%
+Certified stop-condition gates: 0/5
+Proof-engineering scaffold: about 33%
+```
+
+The current two-chart seed is:
+
+```text
+work/v117_twochart_init.json
+```
+
+It is q2-zero and formal-tail legal at the floating gate:
+
+```text
+q1_F = q1_G = 0,
+forced q^(1/gamma) trace sample error <= 8.9e-16,
+ordinary q^2 trace <= 7.8e-16.
+```
+
+`tools/profile_newton_twochart.py` now:
+
+```text
+assembles sampled analytic PDE residual rows,
+assembles sampled overlap mortar rows,
+uses column-scaled damped normal equations,
+uses a trust/line search,
+locks all q=0 tail coefficients so q1/forced-qp/q2-zero gates cannot be silently damaged,
+rechecks the floating tail gate on every trial.
+```
+
+Latest Stage-0 artifacts:
+
+```text
+work/twochart_stage0_smoke_report.json
+work/twochart_stage0_pde_hardpoints_report.json
+work/twochart_stage0_mortar_c2_report.json
+work/twochart_stage0_smoke_residual.json
+work/twochart_stage0_pde_hardpoints_residual.json
+work/twochart_stage0_mortar_c2_residual.json
+```
+
+The safe locked solver does not yet show a real Newton basin:
+
+```text
+smoke: accepted_any_step = false
+pde hardpoints: accepted_any_step = false
+mortar C2: accepted_any_step = true, but tiny objective change only
+  1.555167227349e9 -> 1.555167163472e9
+```
+
+Held-out normalized structural checks remain far from proof scale:
+
+```text
+standard = 1.016228983517e1
+secondary = 1.422825475247e1
+origin = 9.132492825929e1
+overlap = 3.239719410176e2
+edge = 4.489150149273e2
+C0-C2 R,Z mortar max = 4.214529161145e3
+```
+
+Important interpretation:
+
+```text
+The pre-lock toy smoke improvement is no longer trusted.
+After q=0 tail locking, the solver mostly rejects updates.
+This suggests the immediate blocker is still Stage-0 linear-system/variable-choice/mortar formulation, not gamma/B and not spectrum.
+```
+
+Do not treat these Stage-0 artifacts as profile progress. Treat them as evidence about the next implementation fork.
+
 ## 2. Current Mathematical Target
 
 Use the Type-II Euler-dominated ansatz
@@ -382,11 +460,6 @@ overlap normalized structural max = 3.239718884452e+02
 C0-C4 R,Z mortar max = 5.833745769211e+06
 ```
 
-`tools/profile_newton_twochart.py` currently performs only a dry run and
-refuses coefficient updates until
-`validators.compactified_equations_twochart.eval_residual_and_jacobian` exists.
-That refusal is intentional.
-
 The coefficient and overlap mortar-Jacobian scaffolds now exist. Current facts:
 
 ```text
@@ -414,11 +487,16 @@ max_abs_diff = 3.709908824590e-09
 max_relative_diff = 9.865718291564e-10
 ```
 
-`tools/profile_newton_twochart.py` now sees the hook as available but still
-performs a dry run. The next implementation step is the actual Stage-0/Stage-1
-Newton assembly and update loop: combine PDE rows, C0-C4 mortar rows, q2-zero
-tail constraints, LM/trust-region solving, and post-step audits without
-reintroducing coefficient finite-difference Jacobians.
+`tools/profile_newton_twochart.py` now has a bounded Stage-0 analytic update
+loop. It is still not a proof solver: it samples rows, solves floating
+column-scaled damped normal equations, locks q=0 tail coefficients, and accepts
+a trial only if the same sampled objective decreases while the formal tail gate
+still passes. The current safe locked probes mostly reject updates; the
+mortar-dominant C2 probe accepts only a tiny objective decrease. The next
+implementation step is therefore not a parameter search; it is to make the
+Stage-0 system less toy-like by adding proper physical `(R,Z)` interface rows,
+better active variable blocking, and broader sampled residual rows without
+unlocking the tail gates.
 
 ## 6. Current Repository Tooling
 
@@ -865,35 +943,67 @@ python3 -m validators.compactified_equations_twochart \
   --out work/v117_twochart_mortar_baseline.json
 ```
 
-Then run the first hard-constrained Newton stage:
+Then run the current safe Stage-0 probes. These are diagnostics for the linear
+system, not proof candidates:
 
 ```bash
 python3 tools/profile_newton_twochart.py \
   --input work/v117_twochart_init.json \
-  --out work/twochart_stage0_origin.json \
+  --out work/twochart_stage0_pde_hardpoints.json \
+  --report-out work/twochart_stage0_pde_hardpoints_report.json \
   --blocks origin,interface \
   --gamma-fixed --B-fixed \
   --residual-kind normalized-structural \
   --q2-policy zero \
-  --mortar-order 4 \
-  --max-iter 20
+  --pde-qb-points "0.90,0.98;0.90,0.95;0.9625,0.05;0.64,0.20583333333333334;0.495,0.18" \
+  --pde-weight 1 \
+  --mortar-weight 1e-12 \
+  --mortar-order 2 \
+  --mortar-q-samples 3 \
+  --mortar-x-samples 5 \
+  --max-variables 24 \
+  --candidate-origin-degree-max 6 \
+  --candidate-kq-max 5 \
+  --candidate-kx-max 5 \
+  --candidate-pool-limit 256 \
+  --max-iter 2 \
+  --trust 0.001 \
+  --lm-lambda 1e-4 \
+  --line-search 1,0.5,0.25,0.125,0.0625
 
 python3 tools/profile_newton_twochart.py \
-  --input work/twochart_stage0_origin.json \
-  --out work/twochart_stage1_global.json \
-  --blocks tail,origin,interface \
+  --input work/v117_twochart_init.json \
+  --out work/twochart_stage0_mortar_c2.json \
+  --report-out work/twochart_stage0_mortar_c2_report.json \
+  --blocks origin,interface \
+  --gamma-fixed --B-fixed \
   --residual-kind normalized-structural \
   --q2-policy zero \
-  --mortar-order 4 \
-  --trust 0.05 \
-  --max-iter 40
+  --pde-weight 1e-12 \
+  --mortar-weight 1 \
+  --mortar-order 2 \
+  --mortar-q-samples 3 \
+  --mortar-x-samples 5 \
+  --max-variables 32 \
+  --candidate-origin-degree-max 6 \
+  --candidate-kq-max 5 \
+  --candidate-kx-max 5 \
+  --candidate-pool-limit 256 \
+  --max-iter 2 \
+  --trust 0.0005 \
+  --lm-lambda 1e-4 \
+  --line-search 1,0.5,0.25,0.125,0.0625
 ```
 
 Stage-0 go criterion:
 
 ```text
-origin structural max drops from the current q2-zero origin-refit scale
-~2.11e2 to < 1e2 without increasing focused/secondary residuals by >25%.
+tail gates remain exact at the floating formal gate,
+overlap max drops below 1e2,
+edge max drops below 1e2,
+C2 mortar drops below 1e2 or at least by a factor of 10,
+origin stays below 1e2,
+standard/secondary increase by at most 25%.
 ```
 
 Stage-1 go criterion:
