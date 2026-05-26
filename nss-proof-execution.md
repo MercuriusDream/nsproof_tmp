@@ -3890,6 +3890,19 @@ rows, uses column-scaled damped normal equations, locks all q=0 tail
 coefficients, and rechecks the floating tail gate before accepting a trial.
 This is discovery infrastructure only.
 
+The mortar Jacobian now has true physical `(R,Z)` rows in addition to the old
+q/x rows. The R/Z rows compose `q(R,Z)` and `x(R,Z)` through the origin-chart
+jet algebra and preserve the residual sign convention `tail - origin`.
+Finite-difference smoke checks give
+
+```text
+R/Z mortar columns: max error = 9.926964139595e-9
+q/x regression columns: max error = 1.817716110963e-8
+```
+
+The two-chart residual validator now reports candidate R/Z mortar metadata
+instead of reusing the source projection's fixed origin consistency report.
+
 The safe locked probes do not yet show a Newton basin. The smoke and
 PDE-hardpoint probes reject all line-search trials:
 
@@ -3905,6 +3918,15 @@ work/twochart_stage0_mortar_c2_report.json
 objective: 1.555167227349e9 -> 1.555167163472e9
 ```
 
+The physical R/Z active-row probe also accepts, but it does not give usable
+profile progress:
+
+```text
+work/twochart_stage0_rz_active_mortar_trust5_report.json
+C2 R/Z mortar max: 4.214529161145e3 -> 4.214524899404e3
+edge holdout: 4.489165350285e2 -> 4.499902802188e2
+```
+
 Held-out normalized structural scans remain essentially baseline-sized:
 
 ```text
@@ -3917,5 +3939,7 @@ C0-C2 R,Z mortar max = 4.214529161145e3
 ```
 
 Conclusion: the immediate blocker is still the two-chart Stage-0 linear
-system and interface formulation. It is too early to free `(gamma,B)`, pivot
-to radial matching, or start spectral validation as a theorem dependency.
+system and interface formulation. The new R/Z rows are the right coordinate
+language, but the active solve is rank/variable limited at the current degree
+and weighting. It is too early to free `(gamma,B)`, pivot to radial matching,
+or start spectral validation as a theorem dependency.

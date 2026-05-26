@@ -34,14 +34,14 @@ from validators.compactified_equations import (  # noqa: E402
 )
 from validators.twochart_mortar_jacobian import (  # noqa: E402
     CoefficientVariable,
+    build_rz_rows,
     enumerate_coefficients,
     get_path,
     patch_interval,
     set_path,
+    summarize_rows,
 )
 from validators.origin_chart import (  # noqa: E402
-    RectangularProjection,
-    consistency_diagnostics,
     grid as local_grid,
 )
 
@@ -343,6 +343,9 @@ def linearized_residual_with_kind(
 ) -> Residual:
     r, z = qb_to_rz(q, b)
     raw = linearized_raw_residual_at(data, projection, variable, r, z)
+    # The current normalized residual quotients depend only on q, b, and p.
+    # If a future quotient depends on the profile itself, this linearization
+    # must include the derivative of that normalization factor.
     return residual_with_kind(raw, q, b, projection.p, residual_kind)
 
 
@@ -599,27 +602,27 @@ def source_profile_path(data: dict[str, Any], twochart_path: str) -> str:
     return resolve_profile_path(raw, base)
 
 
-def mortar_metadata(source_path: str, args: argparse.Namespace) -> dict[str, Any]:
-    projection = RectangularProjection.load(source_path)
+def mortar_metadata(data: dict[str, Any], profile_path: str, args: argparse.Namespace) -> dict[str, Any]:
     q_values = local_grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples)
     x_values = local_grid(0.0, 1.0, args.mortar_x_samples)
-    rz = consistency_diagnostics(
-        projection=projection,
-        q_values=q_values,
-        x_values=x_values,
-        derivative_order=args.mortar_order,
-        tolerance=args.mortar_tolerance,
-    )
+    rows = build_rz_rows(data, [], q_values, x_values, args.mortar_order)
+    rz = summarize_rows(rows)
     return {
         "status": MORTAR_STATUS,
-        "diagnostic_vs_proof": "sampled floating mortar metadata only; no interval smoothness proof",
-        "source_profile_json": relpath(source_path),
+        "diagnostic_vs_proof": "sampled floating two-chart R,Z mortar metadata only; no interval smoothness proof",
+        "profile": relpath(profile_path),
+        "source_profile_json": relpath(str(data.get("source_profile_json") or "")),
         "coordinate_derivatives": "R,Z",
         "orders": f"C0-C{args.mortar_order}",
         "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
         "x_range": [0.0, 1.0],
         "sample_shape": {"q_samples": args.mortar_q_samples, "x_samples": args.mortar_x_samples},
-        "rz_mortar": rz,
+        "rz_mortar": {
+            "status": "TWOCHART_RZ_MORTAR_METADATA_NOT_INTERVAL",
+            "max_abs_diff": rz["max_abs"],
+            "rms_diff": rz["rms"],
+            "summary": rz,
+        },
     }
 
 
@@ -666,7 +669,7 @@ def build_report(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, An
         scans[name] = scan_to_json(projection, spec, args.residual_kind, args.h)
         compares[name] = compare_to_source(projection, source_projection, spec, args.residual_kind, args.h)
 
-    mortar = mortar_metadata(source_path, args)
+    mortar = mortar_metadata(data, profile_path, args)
     report = {
         "status": STATUS,
         "diagnostic_vs_proof": "sampled floating residual baseline only; no interval or proof claim",

@@ -74,12 +74,25 @@ ordinary q^2 trace <= 7.8e-16.
 
 ```text
 assembles sampled analytic PDE residual rows,
-assembles sampled overlap mortar rows,
+assembles sampled physical R,Z overlap mortar rows by default,
 uses column-scaled damped normal equations,
 uses a trust/line search,
 locks all q=0 tail coefficients so q1/forced-qp/q2-zero gates cannot be silently damaged,
 rechecks the floating tail gate on every trial.
 ```
+
+`validators/twochart_mortar_jacobian.py` now supports both old q/x rows and
+true physical `(R,Z)` rows. The R/Z rows compose `q(R,Z)` and `x(R,Z)` using
+the origin-chart jet machinery and keep the residual sign `tail - origin`.
+Smoke checks:
+
+```text
+work/twochart_mortar_rz_smoke.json: fd max abs diff = 9.926964139595e-9
+work/twochart_mortar_qx_regression_smoke.json: fd max abs diff = 1.817716110963e-8
+```
+
+`validators/compactified_equations_twochart.py` now reports candidate
+two-chart R/Z mortar metadata, not just the immutable source projection.
 
 Latest Stage-0 artifacts:
 
@@ -87,9 +100,11 @@ Latest Stage-0 artifacts:
 work/twochart_stage0_smoke_report.json
 work/twochart_stage0_pde_hardpoints_report.json
 work/twochart_stage0_mortar_c2_report.json
+work/twochart_stage0_rz_active_mortar_trust5_report.json
 work/twochart_stage0_smoke_residual.json
 work/twochart_stage0_pde_hardpoints_residual.json
 work/twochart_stage0_mortar_c2_residual.json
+work/twochart_stage0_rz_active_mortar_trust5_residual.json
 ```
 
 The safe locked solver does not yet show a real Newton basin:
@@ -99,6 +114,9 @@ smoke: accepted_any_step = false
 pde hardpoints: accepted_any_step = false
 mortar C2: accepted_any_step = true, but tiny objective change only
   1.555167227349e9 -> 1.555167163472e9
+R/Z active mortar: accepted_any_step = true, but still tiny and harms edge holdout
+  C2 R/Z mortar max 4.214529161145e3 -> 4.214524899404e3
+  edge holdout 4.489165350285e2 -> 4.499902802188e2
 ```
 
 Held-out normalized structural checks remain far from proof scale:

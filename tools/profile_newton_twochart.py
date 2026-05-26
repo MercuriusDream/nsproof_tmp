@@ -425,7 +425,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         linearized_residual_with_kind,
         projection_from_twochart,
     )
-    from validators.twochart_mortar_jacobian import build_rows, enumerate_coefficients, grid
+    from validators.twochart_mortar_jacobian import build_rows, build_rz_rows, enumerate_coefficients, grid
 
     projection = projection_from_twochart(data)
     all_variables = enumerate_coefficients(data)
@@ -459,8 +459,21 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             variable_scores[variable.index] += abs(column.e_psi * residual.e_psi) + abs(column.e_gamma * residual.e_gamma)
 
     mortar_rows = []
+    mortar_rows_available = 0
     if "interface" in blocks:
-        mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
+        if args.mortar_coordinates == "RZ":
+            mortar_rows = build_rz_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
+        elif args.mortar_coordinates == "qx":
+            mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order)
+        else:
+            mortar_rows = build_rows(data, candidate_variables, q_values, x_values, args.mortar_order) + build_rz_rows(
+                data, candidate_variables, q_values, x_values, args.mortar_order
+            )
+        mortar_rows_available = len(mortar_rows)
+        if args.mortar_active_count > 0 and len(mortar_rows) > args.mortar_active_count:
+            mortar_rows = sorted(mortar_rows, key=lambda row: abs(row.residual), reverse=True)[
+                : args.mortar_active_count
+            ]
         candidate_indexes = {variable.index for variable in candidate_variables}
         for row in mortar_rows:
             for var_index, jac_value in row.jacobian:
@@ -506,6 +519,9 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "residual_vector": residual_vector,
         "jacobian_rows": jacobian_rows,
         "row_groups": row_groups,
+        "mortar_coordinates": args.mortar_coordinates,
+        "mortar_rows_available": mortar_rows_available,
+        "mortar_rows_active": len(mortar_rows),
         "variable_score_preview": [
             {"variable": variable.label, "score": variable_scores.get(variable.index, 0.0)}
             for variable in selected[:12]
@@ -608,6 +624,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "column_scaling": scaling_report,
                 "selected_variables": len(system["variables"]),
                 "row_groups": system["row_groups"],
+                "mortar_rows_available": system["mortar_rows_available"],
+                "mortar_rows_active": system["mortar_rows_active"],
                 "variable_score_preview": system["variable_score_preview"],
                 "line_trials": line_trials,
                 "accepted": accepted,
@@ -626,7 +644,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         "iterations_run": len(history),
         "final_metrics": final_metrics,
         "final_tail_gate": final_tail_gate,
-        "row_definition": "sampled PDE normalized residual rows plus sampled C0-Ck overlap mortar rows",
+        "row_definition": (
+            "sampled PDE normalized residual rows plus sampled C0-Ck overlap "
+            f"{args.mortar_coordinates} mortar rows"
+        ),
         "diagnostic_vs_proof": "floating analytic Gauss-Newton diagnostic only; no interval proof",
     }
     return {
@@ -643,8 +664,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "residual_kind": args.residual_kind,
             "q2_policy": args.q2_policy,
             "mortar_order": args.mortar_order,
+            "mortar_coordinates": args.mortar_coordinates,
             "mortar_q_samples": args.mortar_q_samples,
             "mortar_x_samples": args.mortar_x_samples,
+            "mortar_active_count": args.mortar_active_count,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
             "max_iter": args.max_iter,
@@ -703,6 +726,8 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "residual_kind": args.residual_kind,
             "q2_policy": args.q2_policy,
             "mortar_order": args.mortar_order,
+            "mortar_coordinates": args.mortar_coordinates,
+            "mortar_active_count": args.mortar_active_count,
             "max_iter": args.max_iter,
             "trust": args.trust,
             "lm_lambda": args.lm_lambda,
@@ -750,6 +775,8 @@ def main() -> None:
     parser.add_argument("--residual-kind", default="normalized-structural")
     parser.add_argument("--q2-policy", choices=("zero",), default="zero")
     parser.add_argument("--mortar-order", type=positive_int, default=4)
+    parser.add_argument("--mortar-coordinates", choices=("RZ", "qx", "both"), default="RZ")
+    parser.add_argument("--mortar-active-count", type=int, default=0)
     parser.add_argument("--mortar-q-samples", type=positive_int, default=3)
     parser.add_argument("--mortar-x-samples", type=positive_int, default=5)
     parser.add_argument("--overlap-q-min", type=float, default=0.84)
@@ -774,6 +801,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.overlap_q_max <= args.overlap_q_min:
         parser.error("--overlap-q-max must be greater than --overlap-q-min")
+    if args.mortar_active_count < 0:
+        parser.error("--mortar-active-count must be nonnegative")
     if args.candidate_kq_max < 0 or args.candidate_kx_max < 0 or args.candidate_origin_degree_max < 0:
         parser.error("candidate degree caps must be nonnegative")
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):

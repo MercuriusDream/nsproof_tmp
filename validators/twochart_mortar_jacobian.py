@@ -15,11 +15,23 @@ import copy
 import json
 import math
 import os
-from dataclasses import dataclass
+import sys
+from dataclasses import dataclass, replace
 from typing import Any, Iterable
 
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from validators.origin_chart import (  # noqa: E402
+    Jet2 as RZJet2,
+    Patch as RZPatch,
+    cheb_eval_tensor_jet as cheb_eval_tensor_rz_jet,
+    derivative_indices as rz_derivative_indices,
+    qx_to_rz,
+)
+
 STATUS = "TWOCHART_MORTAR_JACOBIAN_FLOATING_NOT_PROOF"
 SUPPORTED_FORMAT = "twochart_profile_projection_v1"
 
@@ -86,10 +98,19 @@ class MortarRow:
     origin_value: float
     residual: float
     jacobian: tuple[tuple[int, float], ...]
+    coordinate: str = "qx"
 
     @property
     def derivative(self) -> DerivativeSpec:
         return DerivativeSpec(self.dq_order, self.dx_order)
+
+    @property
+    def derivative_label(self) -> str:
+        if self.coordinate == "RZ":
+            if self.dq_order + self.dx_order == 0:
+                return "value"
+            return "d" + ("R" * self.dq_order) + ("Z" * self.dx_order)
+        return self.derivative.label
 
     @property
     def abs_residual(self) -> float:
@@ -112,9 +133,10 @@ class MortarRow:
         return {
             "row_index": self.row_index,
             "component": self.component,
+            "coordinate": self.coordinate,
             "q": self.q,
             "x": self.x,
-            "derivative": self.derivative.label,
+            "derivative": self.derivative_label,
             "dq_order": self.dq_order,
             "dx_order": self.dx_order,
             "total_order": self.dq_order + self.dx_order,
@@ -330,6 +352,112 @@ def origin_coeff_partial(
     return origin_h_partial(r_power + z_power, q, dq_order) * origin_x_partial(
         r_power, z_power, x, dx_order
     )
+
+
+def rz_coordinate_jets(R0: float, Z0: float, order: int) -> tuple[RZJet2, RZJet2, RZJet2, RZJet2]:
+    R = RZJet2.var_R(order, R0)
+    Z = RZJet2.var_Z(order, Z0)
+    rho2 = R + Z
+    if rho2.value() <= 0.0:
+        raise ValueError("R,Z mortar rows are undefined at R+Z=0")
+    q = (1.0 + rho2).pow(-0.5)
+    x = Z / rho2
+    return R, Z, q, x
+
+
+def one_hot_coeffs(patch: dict[str, Any], kq: int, kx: int) -> list[list[float]]:
+    coeffs = patch["coeffs"]
+    return [
+        [1.0 if iq == kq and ix == kx else 0.0 for ix, _value in enumerate(row)]
+        for iq, row in enumerate(coeffs)
+    ]
+
+
+def weighted_patch_rz_jet(patch: dict[str, Any], alpha: float, q: RZJet2, x: RZJet2) -> RZJet2:
+    return q.pow(alpha) * cheb_eval_tensor_rz_jet(patch["coeffs"], q, x, RZPatch.from_json(patch))
+
+
+def weighted_coeff_rz_jet(
+    patch: dict[str, Any],
+    alpha: float,
+    q: RZJet2,
+    x: RZJet2,
+    kq: int,
+    kx: int,
+) -> RZJet2:
+    coeffs = one_hot_coeffs(patch, kq, kx)
+    return q.pow(alpha) * cheb_eval_tensor_rz_jet(coeffs, q, x, RZPatch.from_json(patch))
+
+
+def tail_total_rz_jet(data: dict[str, Any], component: str, R0: float, Z0: float, order: int) -> RZJet2:
+    _R, _Z, q, x = rz_coordinate_jets(R0, Z0, order)
+    blocks = data["tail_chart"]["blocks"]
+    p = float(data["p"])
+    if component == "F":
+        total = RZJet2.const(order, 0.5)
+        analytic_block = "F_an"
+        frac_block = "F_frac"
+    elif component == "G":
+        total = RZJet2.const(order, float(data["B"]))
+        analytic_block = "G_an"
+        frac_block = "G_frac"
+    else:
+        raise ValueError(f"unknown component {component!r}")
+    analytic_patch = blocks[analytic_block][find_patch_index(blocks[analytic_block], q.value(), x.value())]
+    total = total + weighted_patch_rz_jet(analytic_patch, 2.0, q, x)
+    for frac_index, frac_patches in enumerate(blocks.get(frac_block, []), start=1):
+        frac_patch = frac_patches[find_patch_index(frac_patches, q.value(), x.value())]
+        total = total + weighted_patch_rz_jet(frac_patch, frac_index * p, q, x)
+    return total
+
+
+def origin_total_rz_jet(data: dict[str, Any], component: str, R0: float, Z0: float, order: int) -> RZJet2:
+    R, Z, _q, _x = rz_coordinate_jets(R0, Z0, order)
+    key = "F_origin_taylor" if component == "F" else "G_origin_taylor"
+    total = RZJet2.const(order, 0.0)
+    for entry in data["origin_chart"]["blocks"][key].get("basis", []):
+        total = total + float(entry["coeff"]) * (R ** int(entry["R_power"])) * (Z ** int(entry["Z_power"]))
+    return total
+
+
+def variable_tail_patch(data: dict[str, Any], variable: CoefficientVariable) -> dict[str, Any]:
+    blocks = data["tail_chart"]["blocks"]
+    if variable.frac_index is None:
+        return blocks[variable.block][variable.patch_index]
+    return blocks[variable.block][variable.frac_index - 1][variable.patch_index]
+
+
+def point_in_patch(patch: dict[str, Any], q: float, x: float) -> bool:
+    q0, q1, x0, x1 = patch_interval(patch)
+    return q0 - 1e-14 <= q <= q1 + 1e-14 and x0 - 1e-14 <= x <= x1 + 1e-14
+
+
+def variable_rz_residual_jet(
+    data: dict[str, Any],
+    variable: CoefficientVariable,
+    component: str,
+    R0: float,
+    Z0: float,
+    order: int,
+) -> RZJet2:
+    if variable.component != component:
+        return RZJet2.const(order, 0.0)
+    R, Z, q, x = rz_coordinate_jets(R0, Z0, order)
+    if variable.chart == "tail":
+        patch = variable_tail_patch(data, variable)
+        if not point_in_patch(patch, q.value(), x.value()):
+            return RZJet2.const(order, 0.0)
+        return weighted_coeff_rz_jet(
+            patch,
+            float(variable.alpha),
+            q,
+            x,
+            int(variable.kq),
+            int(variable.kx),
+        )
+    if variable.chart == "origin":
+        return -((R ** int(variable.r_power)) * (Z ** int(variable.z_power)))
+    return RZJet2.const(order, 0.0)
 
 
 def tail_total_partial(
@@ -572,6 +700,54 @@ def build_rows(
     return rows
 
 
+def build_rz_rows(
+    data: dict[str, Any],
+    variables: list[CoefficientVariable],
+    q_values: Iterable[float],
+    x_values: Iterable[float],
+    max_order: int,
+) -> list[MortarRow]:
+    if max_order < 0 or max_order > 4:
+        raise ValueError("--max-order must be between 0 and 4")
+    rows: list[MortarRow] = []
+    specs = rz_derivative_indices(max_order)
+    for component in ("F", "G"):
+        for q in q_values:
+            for x in x_values:
+                R0, Z0 = qx_to_rz(q, x)
+                tail = tail_total_rz_jet(data, component, R0, Z0, max_order)
+                origin = origin_total_rz_jet(data, component, R0, Z0, max_order)
+                variable_jets = [
+                    (variable.index, variable_rz_residual_jet(data, variable, component, R0, Z0, max_order))
+                    for variable in variables
+                    if variable.component == component
+                ]
+                for dR_order, dZ_order in specs:
+                    jacobian = tuple(
+                        (var_index, jet.partial(dR_order, dZ_order))
+                        for var_index, jet in variable_jets
+                        if jet.partial(dR_order, dZ_order) != 0.0
+                    )
+                    tail_value = tail.partial(dR_order, dZ_order)
+                    origin_value = origin.partial(dR_order, dZ_order)
+                    rows.append(
+                        MortarRow(
+                            row_index=len(rows),
+                            component=component,
+                            q=q,
+                            x=x,
+                            dq_order=dR_order,
+                            dx_order=dZ_order,
+                            tail_value=tail_value,
+                            origin_value=origin_value,
+                            residual=tail_value - origin_value,
+                            jacobian=jacobian,
+                            coordinate="RZ",
+                        )
+                    )
+    return rows
+
+
 def get_path(data: dict[str, Any], path: tuple[Any, ...]) -> Any:
     node: Any = data
     for part in path:
@@ -587,6 +763,12 @@ def set_path(data: dict[str, Any], path: tuple[Any, ...], value: float) -> None:
 
 
 def residual_for_row(data: dict[str, Any], row: MortarRow) -> float:
+    if row.coordinate == "RZ":
+        R0, Z0 = qx_to_rz(row.q, row.x)
+        order = row.dq_order + row.dx_order
+        return tail_total_rz_jet(data, row.component, R0, Z0, order).partial(
+            row.dq_order, row.dx_order
+        ) - origin_total_rz_jet(data, row.component, R0, Z0, order).partial(row.dq_order, row.dx_order)
     return tail_total_partial(data, row.component, row.q, row.x, row.dq_order, row.dx_order) - origin_total_partial(
         data, row.component, row.q, row.x, row.dq_order, row.dx_order
     )
@@ -623,9 +805,10 @@ def smoke_finite_difference(
                 {
                     "row_index": row.row_index,
                     "component": row.component,
+                    "coordinate": row.coordinate,
                     "q": row.q,
                     "x": row.x,
-                    "derivative": row.derivative.label,
+                    "derivative": row.derivative_label,
                     "var_index": var_index,
                     "variable": variable.label,
                     "epsilon": epsilon,
@@ -670,13 +853,14 @@ def summarize_rows(rows: list[MortarRow]) -> dict[str, Any]:
     for row in rows:
         total_sq += row.residual * row.residual
         total_nnz += len(row.jacobian)
-        key = f"{row.component}:{row.derivative.label}"
+        key = f"{row.coordinate}:{row.component}:{row.derivative_label}"
         group = groups.setdefault(
             key,
             {
                 "key": key,
+                "coordinate": row.coordinate,
                 "component": row.component,
-                "derivative": row.derivative.label,
+                "derivative": row.derivative_label,
                 "dq_order": row.dq_order,
                 "dx_order": row.dx_order,
                 "count": 0,
@@ -693,6 +877,7 @@ def summarize_rows(rows: list[MortarRow]) -> dict[str, Any]:
         group_items.append(
             {
                 "key": group["key"],
+                "coordinate": group["coordinate"],
                 "component": group["component"],
                 "derivative": group["derivative"],
                 "dq_order": group["dq_order"],
@@ -721,12 +906,24 @@ def default_profile_path() -> str:
     return os.path.join(ROOT_DIR, "work", "twochart_projection_v1.json")
 
 
+def renumber_rows(rows: list[MortarRow]) -> list[MortarRow]:
+    return [replace(row, row_index=index) for index, row in enumerate(rows)]
+
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     data = load_json(args.profile)
     variables = enumerate_coefficients(data)
     q_values = grid(args.q_min, args.q_max, args.q_samples)
     x_values = grid(0.0, 1.0, args.x_samples)
-    rows = build_rows(data, variables, q_values, x_values, args.max_order)
+    if args.coordinates == "qx":
+        rows = build_rows(data, variables, q_values, x_values, args.max_order)
+    elif args.coordinates == "RZ":
+        rows = build_rz_rows(data, variables, q_values, x_values, args.max_order)
+    else:
+        rows = renumber_rows(
+            build_rows(data, variables, q_values, x_values, args.max_order)
+            + build_rz_rows(data, variables, q_values, x_values, args.max_order)
+        )
     smoke = smoke_finite_difference(data, variables, rows, args.fd_epsilon) if args.smoke else None
 
     profile_rel = os.path.relpath(args.profile, ROOT_DIR) if os.path.isabs(args.profile) else args.profile
@@ -736,16 +933,37 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "profile": profile_rel,
         "format": SUPPORTED_FORMAT,
         "diagnostic_vs_proof": "floating residual/Jacobian assembly only; no interval proof or proof claim",
-        "residual_definition": "tail_total_partial(q,x) - origin_total_partial(q,x)",
+        "coordinates": args.coordinates,
+        "residual_definition": (
+            "tail_total_jet(R,Z) - origin_total_jet(R,Z)"
+            if args.coordinates == "RZ"
+            else "tail_total_partial(q,x) - origin_total_partial(q,x)"
+            if args.coordinates == "qx"
+            else "both q,x and composed R,Z overlap rows"
+        ),
         "tail_legality": data.get("tail_legality"),
         "q_band": [args.q_min, args.q_max],
         "q_samples": args.q_samples,
         "x_samples": args.x_samples,
         "max_order": args.max_order,
-        "derivative_specs": [
-            {"derivative": spec.label, "dq_order": spec.dq_order, "dx_order": spec.dx_order}
-            for spec in derivative_specs(args.max_order)
-        ],
+        "derivative_specs": (
+            [
+                {"coordinate": "qx", "derivative": spec.label, "dq_order": spec.dq_order, "dx_order": spec.dx_order}
+                for spec in derivative_specs(args.max_order)
+            ]
+            if args.coordinates == "qx"
+            else [
+                {
+                    "coordinate": "RZ",
+                    "derivative": "value" if dR + dZ == 0 else "d" + ("R" * dR) + ("Z" * dZ),
+                    "dR_order": dR,
+                    "dZ_order": dZ,
+                }
+                for dR, dZ in rz_derivative_indices(args.max_order)
+            ]
+            if args.coordinates == "RZ"
+            else []
+        ),
         "coefficient_inventory": summarize_inventory(variables),
         "summary": summarize_rows(rows),
         "rows_included": row_preview_count,
@@ -761,6 +979,7 @@ def print_summary(result: dict[str, Any]) -> None:
     summary = result["summary"]
     print(f"profile={result['profile']}")
     print(f"status={result['status']}")
+    print(f"coordinates={result['coordinates']}")
     print(f"q_band={result['q_band']} q_samples={result['q_samples']} x_samples={result['x_samples']}")
     print(f"max_order=C{result['max_order']}")
     print(f"coefficients={result['coefficient_inventory']['count']}")
@@ -781,6 +1000,7 @@ def main() -> None:
     parser.add_argument("--q-samples", type=int, default=5)
     parser.add_argument("--x-samples", type=int, default=9)
     parser.add_argument("--max-order", type=int, default=4)
+    parser.add_argument("--coordinates", choices=("qx", "RZ", "both"), default="qx")
     parser.add_argument("--json-out", default="")
     parser.add_argument("--row-limit", type=int, default=20)
     parser.add_argument("--include-rows", action="store_true", help="write all rows instead of a preview")
