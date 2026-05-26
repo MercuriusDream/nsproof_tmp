@@ -1,0 +1,781 @@
+{
+  "B_interval": [
+    "1.0",
+    "1.0"
+  ],
+  "Y0_interval": null,
+  "Z0_interval": null,
+  "Z2_interval": null,
+  "backend": "not-started-interval-nk",
+  "basis_hash_sha256": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
+  "blockers": [
+    "directed-rounding interval backend is not yet attached",
+    "validated approximate inverse A is not yet supplied",
+    "sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08",
+    "C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08",
+    "interval residual evaluator is not implemented",
+    "validated approximate inverse hash is missing",
+    "Y0/Z0/Z2 interval bounds are not available for this profile"
+  ],
+  "certificate_name": "profile_nk",
+  "commands": [
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c"
+  ],
+  "dependency_hashes": {
+    "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
+    "exact_residual_audit": "3c12c1aae642e2524c984ceef3da05f41138fe17085e4daa3c8b0ae833c2f97f",
+    "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
+  },
+  "exact_residual_audit": {
+    "backend": "floating-taylor-jet+native-c-rz",
+    "basis_hash_sha256": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
+    "blockers": [
+      "directed-rounding interval backend is not yet attached",
+      "validated approximate inverse A is not yet supplied",
+      "sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08",
+      "C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08"
+    ],
+    "certificate_name": "exact_residual_twochart_audit",
+    "commands": [
+      "tools/validate_profile_nk.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c"
+    ],
+    "dependency_hashes": {},
+    "entry_ready_for_interval_nk": false,
+    "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08",
+    "input_hashes": {
+      "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8"
+    },
+    "interval_widths": {
+      "max": null,
+      "median": null
+    },
+    "mathematical_statement": "Audit of the proof-intended two-chart residual map and physical R/Z mortar rows. This is not an interval zero certificate.",
+    "mortar": {
+      "coordinate_derivatives": "R,Z",
+      "native_c_rz_mortar": {
+        "cases": 657120,
+        "enabled": true,
+        "rows": 2430,
+        "seconds": 0.9901422920000016
+      },
+      "orders": "C0-C4",
+      "overlap_q_range": [
+        0.84,
+        0.92
+      ],
+      "sample_shape": {
+        "q_samples": 9,
+        "x_samples": 9
+      },
+      "summary": {
+        "count": 2430,
+        "groups": [
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRRR",
+            "dq_order": 4,
+            "dx_order": 0,
+            "key": "RZ:F:dRRRR",
+            "max_abs": 4969532.719135218,
+            "rms": 862396.3187695399
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRRZ",
+            "dq_order": 3,
+            "dx_order": 1,
+            "key": "RZ:F:dRRRZ",
+            "max_abs": 1518141.9297052217,
+            "rms": 277536.92313927115
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZZZ",
+            "dq_order": 0,
+            "dx_order": 4,
+            "key": "RZ:F:dZZZZ",
+            "max_abs": 604869.8393051017,
+            "rms": 138803.11881432965
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZZZ",
+            "dq_order": 0,
+            "dx_order": 4,
+            "key": "RZ:G:dZZZZ",
+            "max_abs": 543131.1633134711,
+            "rms": 105106.62949194064
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRZZ",
+            "dq_order": 2,
+            "dx_order": 2,
+            "key": "RZ:F:dRRZZ",
+            "max_abs": 334105.02116231347,
+            "rms": 105339.24809641344
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZZZ",
+            "dq_order": 1,
+            "dx_order": 3,
+            "key": "RZ:G:dRZZZ",
+            "max_abs": 283469.5319360751,
+            "rms": 58880.13817921
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRRR",
+            "dq_order": 4,
+            "dx_order": 0,
+            "key": "RZ:G:dRRRR",
+            "max_abs": 243523.97465929677,
+            "rms": 62547.194046761586
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRRZ",
+            "dq_order": 3,
+            "dx_order": 1,
+            "key": "RZ:G:dRRRZ",
+            "max_abs": 192280.744547865,
+            "rms": 50329.162521996404
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZZZ",
+            "dq_order": 1,
+            "dx_order": 3,
+            "key": "RZ:F:dRZZZ",
+            "max_abs": 154696.82986096403,
+            "rms": 57377.747175829834
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRZZ",
+            "dq_order": 2,
+            "dx_order": 2,
+            "key": "RZ:G:dRRZZ",
+            "max_abs": 102077.44317791302,
+            "rms": 46210.50066258283
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRR",
+            "dq_order": 3,
+            "dx_order": 0,
+            "key": "RZ:F:dRRR",
+            "max_abs": 99871.98008160955,
+            "rms": 16327.741872058097
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZZ",
+            "dq_order": 0,
+            "dx_order": 3,
+            "key": "RZ:F:dZZZ",
+            "max_abs": 59422.60011404603,
+            "rms": 10962.332979134679
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRZ",
+            "dq_order": 2,
+            "dx_order": 1,
+            "key": "RZ:F:dRRZ",
+            "max_abs": 26620.82590663222,
+            "rms": 7927.779588168742
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZZ",
+            "dq_order": 0,
+            "dx_order": 3,
+            "key": "RZ:G:dZZZ",
+            "max_abs": 16285.322185601062,
+            "rms": 4135.322569396288
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZZ",
+            "dq_order": 1,
+            "dx_order": 2,
+            "key": "RZ:F:dRZZ",
+            "max_abs": 15051.10589445546,
+            "rms": 5429.386411705723
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRR",
+            "dq_order": 3,
+            "dx_order": 0,
+            "key": "RZ:G:dRRR",
+            "max_abs": 9088.397186014412,
+            "rms": 3315.6938140817356
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRRZ",
+            "dq_order": 2,
+            "dx_order": 1,
+            "key": "RZ:G:dRRZ",
+            "max_abs": 8891.509384641573,
+            "rms": 3325.538693792709
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZZ",
+            "dq_order": 1,
+            "dx_order": 2,
+            "key": "RZ:G:dRZZ",
+            "max_abs": 7365.987253012071,
+            "rms": 3074.3150538299615
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZ",
+            "dq_order": 0,
+            "dx_order": 2,
+            "key": "RZ:F:dZZ",
+            "max_abs": 4214.529161145141,
+            "rms": 700.1843027852101
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRR",
+            "dq_order": 2,
+            "dx_order": 0,
+            "key": "RZ:F:dRR",
+            "max_abs": 1919.675103415954,
+            "rms": 518.5839976244766
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZ",
+            "dq_order": 1,
+            "dx_order": 1,
+            "key": "RZ:F:dRZ",
+            "max_abs": 1213.7629841957732,
+            "rms": 369.9410690198227
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZZ",
+            "dq_order": 0,
+            "dx_order": 2,
+            "key": "RZ:G:dZZ",
+            "max_abs": 976.2786162163204,
+            "rms": 256.03015684309975
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRR",
+            "dq_order": 2,
+            "dx_order": 0,
+            "key": "RZ:G:dRR",
+            "max_abs": 646.8384804835716,
+            "rms": 222.29745823623063
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dRZ",
+            "dq_order": 1,
+            "dx_order": 1,
+            "key": "RZ:G:dRZ",
+            "max_abs": 569.8318063839646,
+            "rms": 180.43435593876458
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZ",
+            "dq_order": 0,
+            "dx_order": 1,
+            "key": "RZ:F:dZ",
+            "max_abs": 230.68247955205356,
+            "rms": 35.88045106876496
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dR",
+            "dq_order": 1,
+            "dx_order": 0,
+            "key": "RZ:F:dR",
+            "max_abs": 75.13295720795736,
+            "rms": 21.35848727579106
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dZ",
+            "dq_order": 0,
+            "dx_order": 1,
+            "key": "RZ:G:dZ",
+            "max_abs": 60.53507022897611,
+            "rms": 12.26329305071984
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "dR",
+            "dq_order": 1,
+            "dx_order": 0,
+            "key": "RZ:G:dR",
+            "max_abs": 32.68736333274805,
+            "rms": 9.400996988016146
+          },
+          {
+            "component": "F",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "value",
+            "dq_order": 0,
+            "dx_order": 0,
+            "key": "RZ:F:value",
+            "max_abs": 9.275672220424383,
+            "rms": 1.3198373322684103
+          },
+          {
+            "component": "G",
+            "coordinate": "RZ",
+            "count": 81,
+            "derivative": "value",
+            "dq_order": 0,
+            "dx_order": 0,
+            "key": "RZ:G:value",
+            "max_abs": 2.5083584725000025,
+            "rms": 0.4612782870230194
+          }
+        ],
+        "max_abs": 4969532.719135218,
+        "rms": 171078.21121658877,
+        "worst": {
+          "abs_residual": 4969532.719135218,
+          "component": "F",
+          "coordinate": "RZ",
+          "derivative": "dRRRR",
+          "dq_order": 4,
+          "dx_order": 0,
+          "jacobian": [],
+          "jacobian_nnz": 0,
+          "origin_value": -83529.32747274575,
+          "q": 0.91,
+          "residual_tail_minus_origin": -4969532.719135218,
+          "row_index": 1079,
+          "tail_value": -5053062.04660795,
+          "total_order": 4,
+          "x": 1.0
+        }
+      },
+      "x_range": [
+        0.0,
+        1.0
+      ]
+    },
+    "parameters": {
+      "B": 1.0,
+      "gamma": 0.45,
+      "p": 2.2222222222222223,
+      "residual_kind": "normalized-structural"
+    },
+    "pass": false,
+    "precision_bits": 53,
+    "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+    "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+    "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+    "residual_blocks": {
+      "max_abs": 448.91653502849033,
+      "scans": {
+        "edge": {
+          "b_range": [
+            0.02,
+            0.98
+          ],
+          "chart": "mixed_edge",
+          "finite": true,
+          "grid": {
+            "n_b": 17,
+            "n_q": 17,
+            "points": 289,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "edge",
+          "max_abs": 448.91653502849033,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Broad near-axis/high-|b| floating diagnostic; exact axes are excluded.",
+          "q_range": [
+            0.34,
+            0.98
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 29.50877653118454,
+          "worst": {
+            "b": 0.98,
+            "e_gamma": 0.8908371839334299,
+            "e_psi": 448.91653502849033,
+            "max_abs": 448.91653502849033,
+            "q": 0.8999999999999999,
+            "r": 0.09637888196533986,
+            "z": 0.4746356627410957
+          }
+        },
+        "focused": {
+          "b_range": [
+            0.18,
+            0.38
+          ],
+          "chart": "tail",
+          "finite": true,
+          "grid": {
+            "n_b": 17,
+            "n_q": 17,
+            "points": 289,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "focused",
+          "max_abs": 10.162289835165117,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Hidden low-|b| ridge diagnostic inherited from the projected-profile audits.",
+          "q_range": [
+            0.345,
+            0.495
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 5.866086173480906,
+          "worst": {
+            "b": 0.18,
+            "e_gamma": 0.7931121221045325,
+            "e_psi": -10.162289835165117,
+            "max_abs": 10.162289835165117,
+            "q": 0.495,
+            "r": 1.7266686993947755,
+            "z": 0.31596108139876605
+          }
+        },
+        "origin": {
+          "b_range": [
+            0.05,
+            0.8
+          ],
+          "chart": "origin",
+          "finite": true,
+          "grid": {
+            "n_b": 17,
+            "n_q": 17,
+            "points": 289,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "origin",
+          "max_abs": 91.32494634431002,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Origin-chart residual quotient scan.",
+          "q_range": [
+            0.91,
+            0.98
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 30.498293403593692,
+          "worst": {
+            "b": 0.05,
+            "e_gamma": 0.5998360284813143,
+            "e_psi": 91.32494634431002,
+            "max_abs": 91.32494634431002,
+            "q": 0.9625,
+            "r": 0.281498561946245,
+            "z": 0.01409255481442253
+          }
+        },
+        "overlap": {
+          "b_range": [
+            0.05,
+            0.95
+          ],
+          "chart": "overlap",
+          "finite": true,
+          "grid": {
+            "n_b": 17,
+            "n_q": 17,
+            "points": 289,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "overlap",
+          "max_abs": 323.97188844516563,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Samples the stored tail-origin overlap band; may cross the diagnostic origin switch.",
+          "q_range": [
+            0.84,
+            0.92
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 36.018674168861025,
+          "worst": {
+            "b": 0.95,
+            "e_gamma": 1.495606137493445,
+            "e_psi": -323.97188844516563,
+            "max_abs": 323.97188844516563,
+            "q": 0.9,
+            "r": 0.15122952876462445,
+            "z": 0.4601059995959599
+          }
+        },
+        "secondary": {
+          "b_range": [
+            0.2,
+            0.27
+          ],
+          "chart": "tail",
+          "finite": true,
+          "grid": {
+            "n_b": 13,
+            "n_q": 13,
+            "points": 169,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "secondary",
+          "max_abs": 14.228254752470185,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Secondary tail/interior lobe near q ~= 0.608 and |b| ~= 0.241.",
+          "q_range": [
+            0.57,
+            0.64
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 8.449486312803396,
+          "worst": {
+            "b": 0.20583333333333334,
+            "e_gamma": 0.5307560144728014,
+            "e_psi": -14.228254752470185,
+            "max_abs": 14.228254752470185,
+            "q": 0.64,
+            "r": 1.1748777259351024,
+            "z": 0.247120576038424
+          }
+        },
+        "standard": {
+          "b_range": [
+            0.18,
+            0.38
+          ],
+          "chart": "tail",
+          "finite": true,
+          "grid": {
+            "n_b": 17,
+            "n_q": 17,
+            "points": 289,
+            "skipped": 0
+          },
+          "h": 0.001,
+          "label": "standard",
+          "max_abs": 10.162289835165117,
+          "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+          "note": "Focused inherited tail/ridge diagnostic.",
+          "q_range": [
+            0.345,
+            0.495
+          ],
+          "residual_kind": "normalized-structural",
+          "rms": 5.866086173480906,
+          "worst": {
+            "b": 0.18,
+            "e_gamma": 0.7931121221045325,
+            "e_psi": -10.162289835165117,
+            "max_abs": 10.162289835165117,
+            "q": 0.495,
+            "r": 1.7266686993947755,
+            "z": 0.31596108139876605
+          }
+        }
+      }
+    },
+    "residual_map_hash_sha256": "6aa1408a3ee671a9def3b4453919c1e4a47d31157a19481c3ad9a1c43108efc7",
+    "residual_map_statement": "psi = r^2 z q^p F(q,x), Gamma = r^2 q^p G(q,x),\nq = (1+r^2+z^2)^(-1/2), x = z^2/(r^2+z^2).\n\nA = psi_rr - psi_r/r + psi_zz.\n\nE_psi = (1-gamma) r^2 A + gamma r^3 A_r + gamma z r^2 A_z\n        + r(psi_r A_z - psi_z A_r) + 2 psi_z A + (Gamma^2)_z.\n\nE_Gamma = (1-2gamma) Gamma + gamma(r Gamma_r + z Gamma_z)\n          + (psi_r Gamma_z - psi_z Gamma_r)/r.\n\nThe discovery quotient residual divides by the configured compactified\nmechanical factors only.  Physical two-chart mortar is evaluated in R=r^2,\nZ=z^2 derivatives.",
+    "rounding_mode": "nearest",
+    "schema_version": "nsproof-cert-v1",
+    "status": "EXACT_RESIDUAL_TWOCHART_AUDIT_FLOATING_NOT_INTERVAL",
+    "tail_policy": {
+      "preserved_tail_constraints": {
+        "F0": 0.5,
+        "G0": 1.0,
+        "forced_qp": {
+          "F_trace_x_coeffs": [
+            1.9218140929535197,
+            -0.9786773280026653
+          ],
+          "G_trace_x_coeffs": [
+            0.11111111111111108,
+            -1.1111111111111112
+          ],
+          "formal_origin_cutoff_power": 6,
+          "lifted_from_vanishing_edge": true,
+          "mode": "formal",
+          "note": "Trace is the formal first forced-tail recurrence coefficient.",
+          "seed_lifted_from_vanishing_edge": true,
+          "seed_vanishing_edge_power": 2.2222222222222223
+        },
+        "ordinary_q1": {
+          "F_coeffs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "F_max_abs": 0.0,
+          "G_coeffs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "G_max_abs": 0.0
+        }
+      },
+      "requested_options": {
+        "B_override": "1",
+        "forced_qp": "formal",
+        "gamma_override": "9/20",
+        "origin_chart": "RZ",
+        "q2_policy": "zero"
+      },
+      "tail_legality": {
+        "B": 1.0,
+        "all_ok": true,
+        "forced_qp_F_sample_error": 8.881784197001252e-16,
+        "forced_qp_G_sample_error": 5.551115123125783e-16,
+        "forced_qp_coeff_error": 8.881784197001252e-16,
+        "gamma": 0.45,
+        "note": "Floating structural two-chart tail gate; this is not interval validation.",
+        "p": 2.2222222222222223,
+        "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+        "q1_f_max": 0.0,
+        "q1_g_max": 0.0,
+        "q2_f_trace_max": 1.8041124150158794e-16,
+        "q2_g_trace_max": 7.771561172376096e-16,
+        "q2_ok": true,
+        "q2_policy": "zero",
+        "samples_per_patch": 9,
+        "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+      }
+    },
+    "tail_policy_hash_sha256": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495",
+    "thresholds": {
+      "nk_entry_mortar_max": 1e-08,
+      "nk_entry_residual_max": 1e-08
+    }
+  },
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+  "gamma_interval": [
+    "0.45",
+    "0.45"
+  ],
+  "input_hashes": {
+    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8"
+  },
+  "interval_widths": {
+    "max": null,
+    "median": null
+  },
+  "mathematical_statement": "There exists a zero of the pressure-eliminated two-chart profile residual map inside a Newton-Kantorovich ball around the supplied profile.",
+  "pass": false,
+  "patch_mortar_order": 4,
+  "precision_bits": null,
+  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "radii_polynomial_helper_self_test": {
+    "Y0": "0",
+    "Z0": "0.1",
+    "Z2": "0.1",
+    "backend": "decimal-scalar-radii-polynomial",
+    "conditions": {
+      "Z0_less_than_one": true,
+      "upper_bound_negative": true
+    },
+    "mathematical_statement": "For p(r)=Y0-(1-Z0)r+Z2*r^2, the supplied radius interval has p(r)<0 throughout it.",
+    "pass": true,
+    "precision_digits": 80,
+    "radii_polynomial_interval": [
+      "-0.8",
+      "-0.00899"
+    ],
+    "radius_interval": [
+      "0.01",
+      "1"
+    ]
+  },
+  "radii_polynomial_interval": null,
+  "radius_interval": null,
+  "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+  "residual_map_hash_sha256": "6aa1408a3ee671a9def3b4453919c1e4a47d31157a19481c3ad9a1c43108efc7",
+  "rounding_mode": null,
+  "schema_version": "nsproof-cert-v1",
+  "tail_inverse_bound": null,
+  "tail_policy_hash_sha256": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
+}

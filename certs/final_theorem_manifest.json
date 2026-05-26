@@ -1,0 +1,142 @@
+{
+  "certificate_name": "final_theorem_manifest",
+  "certified_stop_condition_gates": {
+    "passed": 0,
+    "total": 5
+  },
+  "commands": [
+    "tools/build_final_manifest.py --out certs/final_theorem_manifest.json"
+  ],
+  "failure_reason": "0/5 stop-condition gates are certified",
+  "final_theorem_certificate_percent": 0.0,
+  "gates": [
+    {
+      "dependencies": [
+        {
+          "certificate_name": "profile_nk",
+          "exists": true,
+          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+          "pass": false,
+          "path": "certs/profile/profile_nk.json",
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
+        },
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/profile/pressure_reconstruction.json",
+          "sha256": null
+        }
+      ],
+      "failure_reason": "one or more required interval/exact certificates are missing or failing",
+      "gate_id": "exact_profile_equation",
+      "pass": false,
+      "statement": "Exact profile equation F_gamma(U_*,P_*) = 0"
+    },
+    {
+      "dependencies": [
+        {
+          "certificate_name": "profile_nk",
+          "exists": true,
+          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.489165350285e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969532719135e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Y0/Z0/Z2 interval bounds are not available for this profile",
+          "pass": false,
+          "path": "certs/profile/profile_nk.json",
+          "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+          "schema_version": "nsproof-cert-v1",
+          "sha256": "4076c260bfa7df620c0690d780cb0d0f0961fe987323a5984d034d624dab0921"
+        },
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/tail/tail_recurrence.json",
+          "sha256": null
+        }
+      ],
+      "failure_reason": "one or more required interval/exact certificates are missing or failing",
+      "gate_id": "validated_exponent",
+      "pass": false,
+      "statement": "Validated exponent 2/5 < gamma < 1/2 linked to an admissible profile"
+    },
+    {
+      "dependencies": [
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/tail/tail_recurrence.json",
+          "sha256": null
+        },
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/tail/indicial_pluecker_cover.json",
+          "sha256": null
+        },
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/profile/matching_determinant.json",
+          "sha256": null
+        }
+      ],
+      "failure_reason": "one or more required interval/exact certificates are missing or failing",
+      "gate_id": "natural_tail_indicial",
+      "pass": false,
+      "statement": "Natural tail, exact transseries, and indicial certification"
+    },
+    {
+      "dependencies": [
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/spectrum/projected_spectrum.json",
+          "sha256": null
+        }
+      ],
+      "failure_reason": "one or more required interval/exact certificates are missing or failing",
+      "gate_id": "finite_unstable_projection",
+      "pass": false,
+      "statement": "Finite unstable projection rank P_+ < infinity"
+    },
+    {
+      "dependencies": [
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/spectrum/high_frequency_exclusion.json",
+          "sha256": null
+        },
+        {
+          "certificate_name": null,
+          "exists": false,
+          "failure_reason": "missing certificate file",
+          "pass": false,
+          "path": "certs/spectrum/stable_semigroup.json",
+          "sha256": null
+        }
+      ],
+      "failure_reason": "one or more required interval/exact certificates are missing or failing",
+      "gate_id": "stable_complement_gap",
+      "pass": false,
+      "statement": "Stable-complement spectral gap sigma(L_s) subset {Re z <= -c < 0}"
+    }
+  ],
+  "mathematical_statement": "All stop-condition gates for the final theorem are hash-linked to passing interval/exact certificates.",
+  "pass": false,
+  "repo_commit": "ac5a9e712799aaedb58f1bd2207369df9183d09e",
+  "schema_version": "nsproof-cert-v1"
+}
