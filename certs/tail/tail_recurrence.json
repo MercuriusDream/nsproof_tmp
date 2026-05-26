@@ -71,7 +71,7 @@
   "q1_exclusion": "structural",
   "q2_policy": "zero",
   "remainder_bound": null,
-  "repo_commit": "4fd70adb1769167c2123d0608590156aeacccf53",
+  "repo_commit": "1c1d406d900ed1bc9871d292695cac0dc136b74a",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "tail_metadata": {

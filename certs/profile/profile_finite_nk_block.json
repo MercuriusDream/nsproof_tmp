@@ -1,0 +1,85 @@
+{
+  "approximate_inverse": {
+    "rank_after_cutoff": 81,
+    "ridge_absolute": 141687776831392.47,
+    "ridge_relative": 1e-08,
+    "singular_value_count": 128,
+    "singular_values": {
+      "condition_estimate": 1.0080960476411572e+16,
+      "first_12": [
+        119032674855.01302,
+        11187893469.37311,
+        9822303712.872864,
+        2283717831.061479,
+        761883891.6222341,
+        741650389.2001007,
+        514705552.4353452,
+        130030267.7080424,
+        98719322.92909989,
+        79041542.36014399,
+        65097033.86117862,
+        27900825.23927009
+      ],
+      "last_12": [
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05,
+        1.1807672010374155e-05
+      ],
+      "max": 119032674855.01302,
+      "min_nonzero": 1.1807672010374155e-05
+    },
+    "svd_rcond": 1e-12
+  },
+  "blockers": [
+    "row cache is floating, not interval residual data",
+    "approximate inverse is floating ridge-SVD, not validated",
+    "Z2 and infinite complement bounds are missing",
+    "profile residual/mortar is far above NK entry scale"
+  ],
+  "certificate_name": "profile_finite_nk_block",
+  "commands": [
+    "tools/export_profile_finite_nk_block.py --row-cache work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled_rows.json --out certs/profile/profile_finite_nk_block.json --ridge-relative 1e-8 --svd-rcond 1e-12"
+  ],
+  "diagnostic_vs_proof": "Floating sampled row-cache finite block.  Uses native C interval linear algebra for finite Y0/Z0 arithmetic, but the row cache, Jacobian, inverse, and residual are not interval-certified and no Z2/tail-complement bound is supplied.",
+  "finite_block_hashes": {
+    "approximate_inverse_float64": "c5d83ce1809a0a3e8bfe3fe2d3603f732f289441660ca51a9c230ff39907a110",
+    "jacobian_float64": "86fb8cba367f75aa5b83a89ca133111a704d06acd6456d3723c0dba36dc4f9cd",
+    "residual_vector_float64": "b52e2324d466f1f733220706214dc11df98668ba4077ce97bc188adbcd79c776"
+  },
+  "finite_nk_bounds": {
+    "Y0_infinity_norm_A_r": 9.862592301467444e-05,
+    "Z0_infinity_norm_B": 2.670891433968756,
+    "backend": "native-c-outward-rounded-double-interval",
+    "coefficient_dimension": 128,
+    "residual_dimension": 326
+  },
+  "floating_norms": {
+    "approximate_inverse_row_sum_inf": 8.487298417509136e-08,
+    "jacobian_row_sum_inf": 739853955257.6367,
+    "residual_inf": 58337.457692108546
+  },
+  "pass": false,
+  "profile": "work/v117_twochart_init.json",
+  "profile_hash_sha256": "0f043a7f33e7f0dfce0ada3acc00f1d3a9da3ac4e4d7d5cb4563e31ae3a65c14",
+  "repo_commit": "1c1d406d900ed1bc9871d292695cac0dc136b74a",
+  "row_cache": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled_rows.json",
+  "row_cache_sha256": "eb21990e49a26932538d78b394c23329319a76efd06012c816e0d59ffaa63a8e",
+  "row_selection": {
+    "available_row_count": 326,
+    "column_count": 128,
+    "labels": "all",
+    "max_rows": null,
+    "selected_row_count": 326
+  },
+  "schema_version": "nsproof-cert-v1",
+  "status": "PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF"
+}

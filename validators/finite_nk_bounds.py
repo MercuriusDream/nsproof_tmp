@@ -102,22 +102,35 @@ def finite_nk_bounds(
     jacobian: Iterable[Iterable[Interval | float | int | list[float] | tuple[float, float]]],
     approximate_inverse: Iterable[Iterable[Interval | float | int | list[float] | tuple[float, float]]],
 ) -> dict[str, Any]:
-    """Compute finite-block NK bounds using native interval linear algebra."""
+    """Compute finite-block NK bounds using native interval linear algebra.
+
+    Shapes follow the overdetermined profile convention:
+
+    - ``residual`` has length ``m``;
+    - ``jacobian`` has shape ``m x n``;
+    - ``approximate_inverse`` has shape ``n x m``.
+
+    Then ``A r`` has length ``n`` and ``I_n - A J`` has shape ``n x n``.
+    """
 
     residual_i = coerce_vector(residual)
     jacobian_i = coerce_matrix(jacobian)
     inverse_i = coerce_matrix(approximate_inverse)
-    dimension = len(residual_i)
-    if len(jacobian_i) != dimension or len(jacobian_i[0]) != dimension:
-        raise ValueError("jacobian must be square with dimension matching residual")
-    if len(inverse_i) != dimension or len(inverse_i[0]) != dimension:
-        raise ValueError("approximate inverse must be square with dimension matching residual")
+    residual_dimension = len(residual_i)
+    coefficient_dimension = len(jacobian_i[0])
+    if len(jacobian_i) != residual_dimension:
+        raise ValueError("jacobian row count must match residual length")
+    if len(inverse_i) != coefficient_dimension or len(inverse_i[0]) != residual_dimension:
+        raise ValueError(
+            "approximate inverse must have shape coefficient_dimension x residual_dimension"
+        )
 
     correction = interval_matvec(inverse_i, residual_i)
     inverse_jacobian = interval_matmul(inverse_i, jacobian_i)
     defect = identity_minus(inverse_jacobian)
     return {
-        "dimension": dimension,
+        "residual_dimension": residual_dimension,
+        "coefficient_dimension": coefficient_dimension,
         "backend": "native-c-outward-rounded-double-interval",
         "A_times_r": vector_repr(correction),
         "A_times_J": matrix_repr(inverse_jacobian),

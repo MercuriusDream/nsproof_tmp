@@ -58,6 +58,47 @@ def finite_nk_backend_report() -> dict[str, Any]:
     }
 
 
+def resolve(path: str) -> str:
+    return path if os.path.isabs(path) else os.path.join(ROOT_DIR, path)
+
+
+def load_optional_json(path: str | None) -> dict[str, Any] | None:
+    if not path:
+        return None
+    full = resolve(path)
+    if not os.path.exists(full):
+        raise FileNotFoundError(f"finite block report not found: {path}")
+    with open(full, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+    if not isinstance(data, dict):
+        raise ValueError(f"finite block report must be a JSON object: {path}")
+    data = dict(data)
+    data["_path"] = path
+    data["_sha256"] = sha256_file(full)
+    return data
+
+
+def finite_block_blockers(report: dict[str, Any] | None) -> list[str]:
+    if report is None:
+        return [
+            (
+                "profile finite residual/Jacobian/inverse export is missing; "
+                "native finite-block Y0/Z0 backend is available but has no "
+                "profile block to certify"
+            )
+        ]
+    blockers = [f"finite-block report is diagnostic-only: {report.get('status')}"]
+    bounds = report.get("finite_nk_bounds", {})
+    z0 = bounds.get("Z0_infinity_norm_B")
+    if z0 is None:
+        blockers.append("finite-block report does not contain Z0")
+    elif float(z0) >= 1.0:
+        blockers.append(f"finite-block sampled Z0={float(z0):.12e} is >= 1")
+    if not report.get("pass", False):
+        blockers.extend(str(item) for item in report.get("blockers", []))
+    return blockers
+
+
 def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     exact_audit = build_exact_residual_audit(
         profile=args.profile,
@@ -75,21 +116,30 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
     )
     exact_audit["commands"] = [" ".join(sys.argv)]
 
+    finite_block_report = load_optional_json(args.finite_block_report)
     blockers = list(exact_audit.get("blockers", []))
     blockers.extend(
         [
             "interval residual evaluator is not implemented",
             "validated approximate inverse hash is missing",
-            (
-                "profile finite residual/Jacobian/inverse export is missing; "
-                "native finite-block Y0/Z0 backend is available but has no "
-                "profile block to certify"
-            ),
             "Z2/tail-complement interval bound is not available for this profile",
         ]
     )
+    blockers.extend(finite_block_blockers(finite_block_report))
     toy_radii = manufactured_zero_self_test()
     finite_backend = finite_nk_backend_report()
+    if finite_block_report is not None:
+        finite_backend["profile_block_status"] = "floating_profile_block_attached_not_certified"
+    dependency_hashes = {
+        "exact_residual_audit": stable_json_hash(exact_audit),
+        "basis": exact_audit["basis_hash_sha256"],
+        "tail_policy": exact_audit["tail_policy_hash_sha256"],
+        "finite_nk_bounds": finite_backend["input_hashes"][FINITE_NK_BACKEND],
+        "interval_backend": finite_backend["input_hashes"][INTERVAL_BACKEND],
+        "native_interval_kernel": finite_backend["input_hashes"][NATIVE_INTERVAL_KERNEL],
+    }
+    if finite_block_report is not None:
+        dependency_hashes["sampled_finite_block_report"] = finite_block_report["_sha256"]
     cert = {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "profile_nk",
@@ -98,14 +148,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         "profile": exact_audit["profile"],
         "profile_hash_sha256": exact_audit["profile_hash_sha256"],
         "input_hashes": exact_audit["input_hashes"],
-        "dependency_hashes": {
-            "exact_residual_audit": stable_json_hash(exact_audit),
-            "basis": exact_audit["basis_hash_sha256"],
-            "tail_policy": exact_audit["tail_policy_hash_sha256"],
-            "finite_nk_bounds": finite_backend["input_hashes"][FINITE_NK_BACKEND],
-            "interval_backend": finite_backend["input_hashes"][INTERVAL_BACKEND],
-            "native_interval_kernel": finite_backend["input_hashes"][NATIVE_INTERVAL_KERNEL],
-        },
+        "dependency_hashes": dependency_hashes,
         "basis_hash_sha256": exact_audit["basis_hash_sha256"],
         "residual_map_hash_sha256": exact_audit["residual_map_hash_sha256"],
         "tail_policy_hash_sha256": exact_audit["tail_policy_hash_sha256"],
@@ -123,6 +166,19 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         "Z0_interval": None,
         "Z2_interval": None,
         "finite_nk_backend": finite_backend,
+        "sampled_finite_block_report": None
+        if finite_block_report is None
+        else {
+            "path": finite_block_report["_path"],
+            "sha256": finite_block_report["_sha256"],
+            "status": finite_block_report.get("status"),
+            "pass": bool(finite_block_report.get("pass", False)),
+            "diagnostic_vs_proof": finite_block_report.get("diagnostic_vs_proof"),
+            "row_selection": finite_block_report.get("row_selection"),
+            "floating_norms": finite_block_report.get("floating_norms"),
+            "approximate_inverse": finite_block_report.get("approximate_inverse"),
+            "finite_nk_bounds": finite_block_report.get("finite_nk_bounds"),
+        },
         "radius_interval": None,
         "radii_polynomial_interval": None,
         "radii_polynomial_helper_self_test": toy_radii,
@@ -155,6 +211,7 @@ def main() -> None:
     parser.add_argument("--residual-threshold", type=float, default=1e-8)
     parser.add_argument("--mortar-threshold", type=float, default=1e-8)
     parser.add_argument("--native-c", action="store_true")
+    parser.add_argument("--finite-block-report")
     args = parser.parse_args()
 
     cert, exact_audit = build_profile_nk_certificate(args)
