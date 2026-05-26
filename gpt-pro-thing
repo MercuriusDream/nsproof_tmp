@@ -1,0 +1,1312 @@
+## 1. Executive Verdict
+
+The compactified Chebyshev/transseries route is still viable as a proof language, but the current implementation is not viable as a proof path without a major two-chart rebuild. The useful part is the structure
+
+`F = 1/2 + q^2 F_an + q^(1/gamma) F_frac + ...`,
+`G = B + q^2 G_an + q^(1/gamma) G_frac + ...`,
+
+with the ordinary `q^1` channel structurally absent and the forced `q^(1/gamma)` coefficient pinned. That is the right certificate grammar. The current least-squares origin Taylor patch, sparse flat bumps, finite-difference Gauss-Newton, and penalty-style seam matching are discovery scaffolds, not a route to a validated theorem. The repo itself labels the theorem certificate as `0%`, with `0/5` certified stop-condition gates, and the exact profile gate is still unchecked.
+
+`(gamma,B)=(9/20,1)` remains a reasonable calibration target, not a reasonable single-point commitment. Keep it as the first target only long enough to test the rebuilt solver. If the rebuilt solver cannot produce a genuine Newton basin at `(9/20,1)`, free `(gamma,B)` immediately. The current indicial evidence at this point is not friendly: the floating Pluecker/Evans scans find only the geometric `delta=1` branch, and the old complex basin is forbidden-mode dominated rather than root-like.
+
+The primary obstruction is not just “bad residual.” It is, in order:
+
+1. missing origin chart and fake-smooth origin representation;
+2. missing hard two-chart interface conditions;
+3. bad solver/Jacobian architecture for the normalized problem;
+4. unresolved tail-mode legality beyond `q^1` exclusion and forced `q^p`;
+5. possibly wrong fixed parameters;
+6. possible nonexistence of this branch, but the current data do not prove nonexistence.
+
+Sparse bumps are retired as proof objects. They are useful only as residue-location dye in the water. The proof object must be a hard-constrained two-chart Chebyshev/Bernstein transseries profile with an interval Newton-Kantorovich certificate.
+
+The strongest current factual state is this: the formal forced projection now pins `q^p` exactly, but the normalized residuals remain far from proof scale. The formal forced projection has `forced_qp_coeff_error=0`, yet the origin structural residual is about `9.14e3`, the focused structural residual about `1.07e1`, and the focused raw residual about `4.36e-1`. The hotpatch keeps the forced coefficient correct but only modestly improves these figures.
+
+So the verdict is:
+
+The route survives, but only after replacing “global compactified Chebyshev plus least-squares origin metadata” by a hard-constrained two-chart solver. `(9/20,1)` is a test chamber, not a throne. The next decisive computation is not another bump branch; it is whether a formal-tail-pinned two-chart Newton solve can drive the normalized structural residual down by six to eight orders of magnitude.
+
+## 2. Requirements for a Real Proof
+
+The theorem dependency chain is linear until the spectral step, then it branches into finite-rank, stable-gap, and Lyapunov-Perron constants. Nothing later can certify the theorem before the profile gate is closed.
+
+### 1. Exact profile theorem
+
+Mathematical statement: There exist `2/5 < gamma < 1/2`, a nonzero axisymmetric-with-swirl profile `(psi,Gamma)`, and a pressure `P_*` such that
+
+`F_gamma(U_*,P_*) = 0`,
+`div U_* = 0`,
+
+with
+
+`u^r = -psi_z/r`,
+`u^z = psi_r/r`,
+`Gamma = r u^theta`.
+
+In the pressure-eliminated variables, the two profile equations are exactly the repo’s axisymmetric equations involving `A = psi_rr - r^{-1} psi_r + psi_zz`.
+
+Required certificate: An interval Newton-Kantorovich certificate for the compactified/origin two-chart unknowns. The certificate must include a coefficient vector `a_bar`, an approximate inverse `A_NK`, interval enclosures of `E(a_bar)`, `DE(a_bar)`, and the second-derivative Lipschitz bound. In a coefficient norm,
+
+`Y0 = ||A_NK E(a_bar)||`,
+`Z0 = ||I - A_NK DE(a_bar)||`,
+`Z2 = sup_{||h||<=r} ||A_NK(D E(a_bar+h)-DE(a_bar))|| / ||h||`,
+
+and some `r > 0` must satisfy
+
+`Y0 + (Z0 - 1)r + Z2 r^2 < 0`.
+
+Current repo evidence: No exact profile certificate. The best formal-tail-pinned objects remain many orders of magnitude from a Newton-Kantorovich center. The current tools explicitly mark the Chebyshev Newton and compactified residual bridge as non-validation scaffolds.
+
+Missing work: Replace finite-difference Gauss-Newton and least-squares origin patching with an analytic two-chart residual/Jacobian and interval radii-polynomial validator.
+
+Acceptance criterion: A saved interval certificate with `r > 0` and a negative radii polynomial in the final coefficient norm. Discovery residual thresholds are only preconditions; proof acceptance is the interval NK inequality.
+
+### 2. Pressure reconstruction theorem
+
+Mathematical statement: The pressure-eliminated solution `(psi,Gamma)` reconstructs a velocity `U_*` for which there exists `P_*` satisfying
+
+`(1-gamma)U_* + gamma y·∇U_* + (U_*·∇)U_* + ∇P_* = 0`,
+`div U_* = 0`.
+
+Required certificate: Given `U_*`, define
+
+`R(U_*) = -[(1-gamma)U_* + gamma y·∇U_* + (U_*·∇)U_*]`.
+
+Certify that `R(U_*)` is a gradient field in the chosen weighted chart space, reconstruct `P_*` from
+
+`ΔP_* = -div[(U_*·∇)U_*] - div[(1-gamma)U_* + gamma y·∇U_*]`,
+
+and verify
+
+`||R(U_*) - ∇P_*||_Y = 0`
+
+inside the same interval ball as the profile.
+
+Current repo evidence: The repo works primarily with pressure-eliminated equations; the final pressure certificate is not present. The conditional theorem section explicitly assumes the full profile equation with pressure.
+
+Missing work: `tools/validate_pressure_reconstruction.py` and `validators/pressure_reconstruction.py`.
+
+Acceptance criterion: Interval bounds proving the reconstructed pressure satisfies the velocity-pressure profile equation with residual absorbed by the profile NK ball, plus a gauge normalization such as `P_*(0)=0` or zero mean on a reference patch.
+
+### 3. Tail/transseries validation theorem
+
+Mathematical statement: The profile has the natural tail
+
+`U_*(y) = |y|^(1 - 1/gamma) H(y/|y|) + faster decay`.
+
+In the compactified ansatz,
+
+`psi = r^2 z q^(1/gamma) F(q,b)`,
+`Gamma = r^2 q^(1/gamma) G(q,b)`,
+
+the leading trace is
+
+`F(0,b)=1/2`,
+`G(0,b)=B`.
+
+The ordinary `q^1` channel is absent unless identified as a geometric/modulation channel. The first forced nonlinear correction at `q^p`, `p=1/gamma`, must match the formal recurrence.
+
+Required certificate: Exact or interval-rational recurrence validation for the tail coefficients through enough orders to dominate the final residual. The first forced block must match
+
+`F_p(x) = f0(gamma,B) + f2(gamma)x`,
+`G_p(x) = g0(gamma,B) + g2(gamma,B)x`.
+
+The current code already implements these formulas in `forced_qp_expected_coeffs`.
+
+Current repo evidence: The structural tail validator now checks ordinary `q^1`, formal `q^p`, projection errors, and origin Taylor errors. It explicitly prints `STRUCTURAL_CHECK_NOT_INTERVAL_VALIDATION`.  The old mortar checkpoint is rejected by the stricter forced-tail recurrence because its forced coefficient error is about `1.384330015818e-2`, while `work/v117_transcheb_formal_forced.json` pins this error to zero.
+
+Missing work: Interval recurrence, next-exponent detection, and a decision about whether ordinary `q^2` trace data are legal or are currently smuggling an unvalidated tail mode.
+
+Acceptance criterion: Tail coefficient constraints hold as exact algebraic identities or with interval width below `1e-30` for fixed rational `gamma=9/20`. The leading residual exponent after subtracting certified tail blocks must be strictly beyond the last included exponent, with an interval remainder bound.
+
+### 4. Indicial validation theorem
+
+Mathematical statement: The admissible escape/tail modes from the conical core are exactly the roots of the indicial pencil. Around the conical core
+
+`psi_* = (1/2)r^2z`,
+`Gamma_* = B r^2`,
+
+the indicial system is
+
+`(3/2) zeta h' + (3/2 + alpha delta)h + 2B chi' = 0`,
+`(3/2) zeta chi' + alpha delta chi - 2B phi' = 0`,
+
+with `alpha = 1/2 - gamma`, together with the definition of `h`.
+
+Required certificate: A ball-arithmetic Evans/Pluecker box cover of a specified `delta` domain. The local analytic two-plane at `zeta=0` and the far-field admissible plane/line must be propagated with interval ODE bounds. All Pluecker minors must be either bounded away from zero or isolated and classified.
+
+Current repo evidence: Floating diagnostics find only `delta=1`, and classify it as a geometric axial-center/Galilean mode. The complex basin near `0.13 + 1.79i` is dominated by forbidden far-field modes.  The current `validate_indicial_evans.py` samples boxes at centers and corners only and is explicitly heuristic, not validated.
+
+Missing work: Replace sampled Pluecker diagnostics with interval Taylor ODE propagation and a rigorous argument-principle or interval lower-bound cover.
+
+Acceptance criterion: A JSON certificate covering the chosen `delta` region, proving either all admissible non-geometric roots used by the tail package, or proving their absence. The `delta=1` zero must be factored out and classified as geometric/removable.
+
+### 5. Projected spectral theorem
+
+Mathematical statement: For the validated profile,
+
+`L v = -P_L[(1-gamma)v + gamma(y·∇)v + (U_*·∇)v + (v·∇)U_*]`
+
+has the claimed unstable and stable spectral structure in the chosen divergence-free perturbation space.
+
+Required certificate: A Leray-projected spectral validation, not a residual-Jacobian spectrum. It must include pressure projection, divergence-free domain, azimuthal block decomposition, geometric mode checks, finite-dimensional eigenvalue counts, high-frequency exclusion, essential spectrum bounds, and a stable resolvent/semigroup estimate.
+
+Current repo evidence: `tools/linearized_spectrum_probe.py` is explicitly only a rough finite-difference residual oracle spectrum; it does not handle pressure projection or geometric-mode correctness.
+
+Missing work: Almost the entire spectral proof stack.
+
+Acceptance criterion: A spectral certificate proving the unstable count and stable gap with interval residual bounds and validated geometric modes.
+
+### 6. Finite unstable rank theorem
+
+Mathematical statement: The Riesz projection
+
+`P_+ = (1/2πi) ∮_Γ (z-L)^(-1) dz`
+
+around the non-geometric unstable spectrum has finite rank.
+
+Required certificate: A contour resolvent validation enclosing all unstable eigenvalues and excluding spectrum on the contour. The finite-rank count must be stable under Galerkin/tail truncation.
+
+Current repo evidence: None beyond the conditional theorem statement that this is required.
+
+Missing work: `tools/validate_spectrum_evans.py` or `tools/validate_spectrum_galerkin.py`, plus a high-frequency exclusion theorem.
+
+Acceptance criterion: A validated integer `m = rank P_+`, after subtracting geometric modes.
+
+### 7. Stable semigroup gap theorem
+
+Mathematical statement: On the stable complement,
+
+`sigma(L|stable) ⊂ { Re z <= -c < 0 }`
+
+and
+
+`||e^{sL}P_s||_{X→X} <= C e^{-cs}`.
+
+Required certificate: Resolvent bounds on a line `Re z = -c` and a semigroup theorem in the chosen weighted Hilbert/Banach space.
+
+Current repo evidence: The conditional theorem assumes this hypothesis; it is not certified.
+
+Missing work: Essential spectrum estimate, finite-mode resolvent validation, and non-normal semigroup constant control.
+
+Acceptance criterion: Explicit positive `c`, finite `C`, resolvent bounds, and a dependency link to the same validated profile ball.
+
+### 8. Lyapunov-Perron/modulation closure theorem
+
+Mathematical statement: After modulating unstable and geometric modes, the perturbation equation around the moving cutoff profile has a contraction in a weighted-in-time stable space.
+
+Required certificate: Constants for nonlinear estimates, gluing error, viscous forcing, Bogovskii divergence repair, pressure moment correction, spectral projection norms, and semigroup decay.
+
+Current repo evidence: The scaling/gluing theorem is already derived conditionally. The moving cutoff residual satisfies a decay of the form
+
+`||G_R(s)||_{H^8_1} <= C R(s)^(3/2 - 1/gamma)`,
+
+and this decays in the wedge `2/5 < gamma < 1/2`.
+
+Missing work: Quantitative constants tied to the validated profile and spectral certificates.
+
+Acceptance criterion: A contraction inequality of the form
+
+`||Phi(v)|| <= M`,
+`Lip(Phi) < 1`
+
+with explicit constants and a declared codimension equal to the validated non-geometric unstable rank.
+
+### 9. Final finite-codimension blow-up theorem
+
+Mathematical statement: There exists a finite-codimension manifold of smooth divergence-free finite-energy Navier-Stokes data whose solutions blow up at time `T` with rate
+
+`u(t,x) = (T-t)^(-(1-gamma))[U_*((x-x_*)/(T-t)^gamma) + o_X(1)]`.
+
+Required certificate: A theorem manifest linking the exact profile, tail, pressure, indicial, spectral, gluing, and Lyapunov-Perron certificates.
+
+Current repo evidence: Only a conditional theorem is justified. The execution draft says the proof reduces to finding `(U_*,P_*,gamma)` with exact profile, natural tail, and the spectral package.
+
+Missing work: All hard certificates after the conditional scaffold.
+
+Acceptance criterion: Every dependency certificate passes, with reproducible commands, hashes, interval logs, and theorem dependency manifest.
+
+## 3. Decide the Next Main Path
+
+The primary route should be A: hard-constrained two-chart Chebyshev/Bernstein profile solver.
+
+This is the only route that directly attacks the current hard blocker. The formal tail is now pinned correctly, but the origin/high-`|b|` seam is still a geyser. The old mortar checkpoint improved some sampled residuals but violated the forced-tail recurrence. The formal-tail projection repairs the recurrence and exposes the origin/interface problem again. That is a structural diagnosis, not a tuning problem.
+
+The fallback route should be C: free `(gamma,B)` search with recomputed formal forced-tail coefficients.
+
+Do not free `(gamma,B)` before the two-chart solver exists. A bad representation will invent false parameter valleys. But once the hard-constrained two-chart solver works, `(9/20,1)` should be treated as one point in a funnel scan, not a sacred coordinate.
+
+The kill criterion is this:
+
+After `tools/profile_newton_twochart.py` exists with analytic Jacobian, hard tail constraints, hard origin chart, and derivative-matched interface, abandon fixed `(9/20,1)` if the best discovery run cannot reduce all held-out normalized structural residuals below `1e-4` and the origin quotient below `1e-5`. Then run the same solver over a nearby `(gamma,B)` box. Abandon the current branch class if no point in the nearby box reaches `1e-6` discovery residual and the interval indicial package proves there are no missing admissible tail modes capable of closing the residual.
+
+Do not use E, neural/PINN discovery, as a main route. It can serve as a profile finder only after the exact two-chart residual is implemented. It cannot be part of the certificate.
+
+Do not use D, radial core-tail matching pivot, yet. It becomes the fallback after the two-chart compactified representation fails. The current failure is concentrated at the origin/interface and high-angle edge, so the right first move is to give those regions their own analytic coordinates, not to throw away compactification.
+
+## 4. Exact Profile Solver Blueprint
+
+Create a new proof-native solver:
+
+`tools/profile_newton_twochart.py`
+
+Do not keep stretching `tools/profile_newton_cheb.py` into this job. That file is a useful discovery scaffold, but its own docstring says it is not an interval Newton-Kantorovich validator and its Jacobian is finite-difference based.
+
+### Variables
+
+Use fixed `gamma=9/20`, `B=1` in phase 1. Add free parameters only in phase 2.
+
+Use `x=b^2`.
+
+Tail chart, valid away from the origin:
+
+`q ∈ [0,q_o]`, `x ∈ [0,1]`, with `q_o ≈ 0.90`.
+
+Represent
+
+`F_t(q,x) = 1/2 + q^p F_p^formal(x) + q^2 A_F(q,x) + higher certified blocks`,
+`G_t(q,x) = B   + q^p G_p^formal(x) + q^2 A_G(q,x) + higher certified blocks`,
+
+where `p=1/gamma`.
+
+The first forced block is not a variable at its trace. At `(9/20,1)`,
+
+`F_p(x) = 1.9218140929535197 - 0.9786773280026653 x`,
+`G_p(x) = 0.11111111111111108 - 1.1111111111111112 x`.
+
+These are already the expected coefficients in the formal forced-tail validator.
+
+Allow optional variable corrections to the fractional block only if they vanish at `q=0`, for example
+
+`q^p [F_p^formal(x) + q^alpha \widetilde F_p(q,x)]`
+
+with `alpha` chosen from a validated next exponent. Until that exponent is validated, keep the `q^p` block frozen except for the known smooth cutoff used to remove origin pollution.
+
+Origin chart, valid near `q=1`:
+
+Use
+
+`R = r^2`,
+`Z = z^2`.
+
+Represent the de-prefactored origin functions
+
+`F_o(R,Z)`,
+`G_o(R,Z)`
+
+by tensor Chebyshev or Bernstein patches in `(R,Z)`, with
+
+`psi = r^2 z q^p F_o(R,Z)`,
+`Gamma = r^2 q^p G_o(R,Z)`.
+
+The current `profile_project_cheb.py` fits an origin Taylor scaffold in `R,Z`, but it is least-squares metadata and has large fit errors for current projections.  The new solver must make `F_o,G_o` primary unknowns, not a post-fit.
+
+### Charts
+
+Use three computational regions:
+
+1. Tail chart: `q ∈ [0,0.86]`.
+2. Overlap/mortar band: `q ∈ [0.84,0.92]`.
+3. Origin chart: `R+Z <= rho_o^2`, equivalently `q >= q_o`, with `q_o ≈ 0.88`.
+
+Do not use a smooth partition of unity. A partition would introduce artificial cutoff derivatives and could hide the defect in the transition. Use hard patch boundaries plus mortar derivative matching.
+
+### Basis
+
+Discovery basis:
+
+Tail chart: piecewise tensor Chebyshev on `(q,x)`.
+
+Origin chart: tensor Chebyshev on small rectangles in `(R,Z)`, or Bernstein on a triangular cap `R+Z <= rho_o^2`.
+
+Proof basis:
+
+Convert to Bernstein blocks on each rectangle/simplex before interval validation, because Bernstein coefficients give stable interval sup-norm bounds for products and derivatives.
+
+Use coefficient norms such as
+
+`||a||_rho = Σ |a_{ij}| rho_q^i rho_x^j`
+
+for analytic Chebyshev discovery and Bernstein `ℓ^1` or coefficient `ℓ∞` bounds for validation.
+
+### Hard constraints
+
+Enforce by parameterization, not by penalty:
+
+`F(0,x)=1/2`,
+`G(0,x)=B`,
+ordinary `q^1` absent,
+first forced `q^p` trace exactly formal,
+even parity in `b` by using `x=b^2`,
+axis regularity by the prefactors `r^2 z` and `r^2`,
+origin regularity by `(R,Z)` chart.
+
+Current projection format structurally removes ordinary `q^1`, but it still leaves other unvalidated traces to check. `profile_project_cheb.py` explicitly says it projects remaining seed content into the analytic `q^2` block.  The next solver must decide, through tail recurrence validation, whether the `q^2` trace is legal. If not, enforce `A_F(0,x)=A_G(0,x)=0`.
+
+### How `q^p` forced coefficients are pinned
+
+The coefficient should be produced by `validators.tail_transseries.forced_qp_expected_coeffs(gamma,B)` and stored as an exact rational or high-precision interval, not copied as a decimal.
+
+For `gamma=9/20`, `B=1`, store the exact rational forms:
+
+`G_p(x) = 1/9 - (10/9)x`,
+`F_p(x) = 25637/13340 - (5875/6003)x`.
+
+Then represent the block as
+
+`q^p (1-q^2)^M F_p(x)`,
+`q^p (1-q^2)^M G_p(x)`,
+
+with `M=6` initially, matching the current formal projection design.
+
+The cutoff is allowed because it equals `1` at infinity and vanishes at the physical origin. But it creates additional interior terms, so the solver must account for them exactly.
+
+### How ordinary `q^1` is structurally absent
+
+Do not include a `q A_1(x)` block anywhere. Do not allow Chebyshev patches to change the `q^1` trace. The JSON schema should make this impossible:
+
+`tail_blocks = { "ordinary": [{"power": 0, fixed trace}, {"power": 2, ...}], "fractional": [{"power": p, fixed trace}] }`
+
+There should be no `"power": 1` entry.
+
+Tail validation should fail if any fitted expansion has a nonzero `q^1` coefficient. The current validator already checks this structurally.
+
+### Interface derivatives
+
+The profile equations involve third derivatives of `psi` through `A_r` and `A_z`. Therefore value-only seam matching is insufficient.
+
+In the overlap band, match either:
+
+`F_t(q(R,Z),x(R,Z)) = F_o(R,Z)`,
+`G_t(q(R,Z),x(R,Z)) = G_o(R,Z)`,
+
+and all derivatives in `(R,Z)` up to order `3`, or match the physical fields
+
+`psi_t = psi_o`,
+`Gamma_t = Gamma_o`
+
+up to order `3`.
+
+Use derivative order `4` in the solver to give margin for interval derivative bounds. Minimal proof smoothness requires order `3`; order `4` is the safer certificate target.
+
+### Residual quotients
+
+Use quotient residuals, not raw residuals, because raw residuals hide mechanical vanishing.
+
+Tail structural residuals should continue using the repo’s normalized factors:
+
+`fac_psi = r^4 z q^(p+4) = b(1-b^2)^2(1-q^2)^(5/2) q^(p-1)`,
+`fac_Gamma = r^2 q^(p+2) = (1-b^2)(1-q^2) q^p`.
+
+These factors are already implemented as `normalized-structural`.
+
+Origin chart residuals should use algebraic quotient forms in `(R,Z)`:
+
+`Q_psi^o = E_psi / (r^4 z q^(p+4))`,
+`Q_Gamma^o = E_Gamma / (r^2 q^(p+2))`.
+
+Since `z` changes sign and the origin chart uses `Z=z^2`, compute `E_psi/z` symbolically before substituting `Z`, so the quotient is even and finite. The validator must prove the quotient extends continuously to `R=0`, `Z=0`, and the axis.
+
+### Jacobian
+
+Do not use coefficient finite differences for the new solver. Build analytic coefficient derivatives.
+
+Implementation design:
+
+`validators/compactified_equations_twochart.py` should expose
+
+`eval_residual_and_jacobian(profile_data, points, variables, residual_kind)`.
+
+Each coefficient enters linearly in `F` or `G`, but the residual is nonlinear. Use a jet/automatic-differentiation object that carries both `(r,z)` derivatives and coefficient sensitivities. The current `Jet2` object already handles Taylor derivatives of the projected profile, but not coefficient sensitivities or interval arithmetic.
+
+Use a sparse row-scaled Levenberg-Marquardt system:
+
+`(J^T W J + lambda D^T D) delta = -J^T W R`.
+
+Use QR/SVD for discovery if available; avoid pure normal equations once dimensions grow.
+
+### Damping and trust region
+
+Use three nested controls:
+
+1. coefficient trust radius in the weighted coefficient norm;
+2. residual max-norm acceptance on a held-out grid;
+3. tail/origin constraints as hard filters before accepting a step.
+
+Acceptance rule:
+
+A step is accepted only if all of these improve or remain within tolerance:
+
+`max normalized structural residual`,
+`origin quotient max`,
+`seam derivative residual`,
+`tail structural check`,
+`held-out residual`.
+
+Penalty-only seam matching is insufficient. The existing `profile_newton_cheb.py` adds continuity and origin-match rows, but they are discovery penalties, not hard interface constraints.
+
+### Files to add or modify
+
+Add:
+
+`tools/profile_newton_twochart.py`,
+`tools/profile_project_twochart.py`,
+`tools/profile_linear_correction_cheb.py`,
+`tools/profile_gamma_funnel.py`,
+`tools/tail_leading_exponent.py`,
+`tools/validate_profile_nk.py`,
+`validators/compactified_equations_twochart.py`,
+`validators/origin_chart.py`,
+`validators/bernstein2d.py`,
+`validators/radii_polynomial.py`,
+`validators/tail_formal_recurrence.py`.
+
+Modify lightly:
+
+`tools/profile_project_cheb.py`, only to export stricter tail metadata and to refuse unvalidated `q^2` traces if the new recurrence validator marks them illegal.
+
+Do not turn `tools/profile_newton_cheb.py` into the final solver. Keep it as a diagnostic baseline.
+
+## 5. Origin/Axis Obstruction
+
+The current dominant failure is the origin/high-`|b|` interface. The present representation uses `(q,x)` globally, then splices in a least-squares origin Taylor block. That is exactly where fake smoothness can enter. Near `q=1`, the angular variable
+
+`x = z^2/(r^2+z^2)`
+
+is not a smooth origin coordinate. A profile can look smooth in sampled `(q,x)` values while failing as a function of `(r,z)`.
+
+### Exact origin variables
+
+Use
+
+`R = r^2`,
+`Z = z^2`.
+
+Represent
+
+`F_o(R,Z)`,
+`G_o(R,Z)`
+
+directly. The physical fields are
+
+`psi_o(r,z) = r^2 z q(R,Z)^p F_o(R,Z)`,
+`Gamma_o(r,z) = r^2 q(R,Z)^p G_o(R,Z)`,
+
+with
+
+`q(R,Z) = (1 + R + Z)^(-1/2)`.
+
+This makes axis and parity regularity structural.
+
+### Transition between charts
+
+In the overlap,
+
+`rho^2 = R+Z`,
+`q = (1+R+Z)^(-1/2)`,
+`x = Z/(R+Z)` for `R+Z>0`.
+
+Use this map only in the overlap, not at the origin.
+
+The tail chart gives
+
+`F_t(q,x)`,
+`G_t(q,x)`.
+
+The origin chart gives
+
+`F_o(R,Z)`,
+`G_o(R,Z)`.
+
+Match them in the overlap by evaluating both in `(R,Z)` and equating derivatives.
+
+### Partition of unity or hard patch boundaries
+
+Use hard patch boundaries with mortar derivative constraints.
+
+Do not use a smooth partition of unity for the proof object. A partition introduces artificial terms into the profile equations. It also lets the solver trade PDE residual against cutoff derivatives in a way that is hard to certify.
+
+For discovery, an overlap least-squares mortar is acceptable, but the certificate must end with hard derivative matching.
+
+### Required derivative matching order
+
+The pressure-eliminated profile equations contain third derivatives of `psi`, because `A` is second order and `A_r,A_z` appear.
+
+Therefore:
+
+Minimum seam matching: derivatives of `psi` and `Gamma` up to order `3`.
+
+Recommended seam matching: derivatives up to order `4`, so the interval residual has a derivative margin and the pressure reconstruction sees no hidden distributional seam defect.
+
+### Origin residual quotient factors
+
+Use the same structural factors already diagnosed in the repo, but implement them algebraically in `(R,Z)`:
+
+`Q_psi = E_psi / (r^4 z q^(p+4))`,
+`Q_Gamma = E_Gamma / (r^2 q^(p+2))`.
+
+In `(R,Z)`, this is
+
+`Q_psi = (E_psi/z) / (R^2 q^(p+4))`,
+`Q_Gamma = E_Gamma / (R q^(p+2))`.
+
+The validator must compute `E_psi/z` and `E_Gamma/R` symbolically or by jets that prove divisibility. It must not sample near `z=0` and divide by a small number.
+
+### Tests proving the origin chart is not fake-smooth
+
+Add `tools/test_origin_chart.py` or a `--self-test` mode in `validators/origin_chart.py`.
+
+The tests should be:
+
+1. Chart consistency test. Choose analytic polynomial `F_o,G_o`, convert to tail variables on an overlap annulus, and verify values and derivatives through order `4` agree to `1e-12` in floating discovery and interval-zero in validation.
+
+2. Fake-smooth rejection test. Construct a function smooth in `(q,x)` but not smooth in `(R,Z)` at `R=Z=0`; verify the origin quotient or derivative matching explodes or fails.
+
+3. Axis regularity test. Approach `R=0` with fixed `Z>0`; verify `u^theta=Gamma/r`, `u^r`, and `u^z` remain smooth axisymmetric functions.
+
+4. Ray limit test. Approach `(R,Z)=(0,0)` along multiple rays `Z/(R+Z)=x`; verify `Q_psi` and `Q_Gamma` have ray-independent interval limits when the residual is zero.
+
+5. Seam test. Evaluate left and right derivatives up to order `4` on the overlap boundary. Any derivative jump above `1e-10` in discovery or any interval not containing zero in validation rejects the profile.
+
+This is the origin gate. It must become binary, not “origin fit error is large but noted.”
+
+## 6. Tail and Indicial Package
+
+### Correct formal `F_p(x), G_p(x)` logic
+
+The conical trace alone is not a full tail solution. Substituting
+
+`F_0=1/2`,
+`G_0=B`
+
+generates a forced nonlinear source. The first forced correction occurs at
+
+`q^p`, `p=1/gamma`.
+
+The formal recurrence gives
+
+`G_p(x) = B(1-2gamma)/(2gamma) - B x/(2gamma)`,
+
+and
+
+`F_p(x) = f0(gamma,B) + f2(gamma)x`,
+
+where the code formula is implemented in `forced_qp_expected_coeffs`.
+
+At `(9/20,1)` this is
+
+`G_p(x) = 1/9 - (10/9)x`,
+`F_p(x) = 25637/13340 - (5875/6003)x`.
+
+Any profile with a different first forced trace is not admissible. That is why the earlier mortar checkpoint must be rejected even though it helped sampled residuals.
+
+### Next tail exponents to include
+
+Do not guess them by optimizer convenience. Define the allowed exponent set recursively.
+
+Start with
+
+`S_0 = {0}` for the conical trace.
+
+Add forced nonlinear exponents generated by products:
+
+`p`,
+`2p`,
+`p + λ_j`,
+`λ_i + λ_j`,
+and so on,
+
+where `λ_j` are validated admissible indicial exponents.
+
+Add ordinary smooth homogeneous exponents only if the formal homogeneous recurrence validates them. In particular, `q^1` is absent. The prior algebraic calculation in `gpt-pro-convo.md` shows that at `gamma=9/20`, the ordinary smooth polynomial streamfunction exponents do not include `s=1`.
+
+The urgent unresolved issue is the ordinary `q^2` trace. The current projection format permits a `q^2 F_an` block.  The next tail validator must decide whether the `q^2` trace is an admissible homogeneous correction, a removable geometric channel, or an illegal compensator. If it is not validated, enforce
+
+`F_an(0,x)=0`,
+`G_an(0,x)=0`,
+
+so the analytic block vanishes faster than `q^2` at infinity.
+
+### Detecting residual leading exponent after each stage
+
+Add:
+
+`tools/tail_leading_exponent.py`.
+
+For a candidate profile, evaluate the quotient residual at geometric tail slices
+
+`q_j = q0 * theta^j`, for example `q0=0.20`, `theta=0.75`,
+
+on a fixed angular Bernstein grid in `x`.
+
+For each residual component, compute:
+
+1. sup norm over `x`;
+2. log-log slope;
+3. angular coefficient projection onto Bernstein/Chebyshev basis;
+4. candidate leading exponent `lambda_res`.
+
+Output:
+
+`work/<profile>_tail_exponent.json`.
+
+Success means the leading residual exponent is at or beyond the next formal recurrence order. Failure means the solver is relying on an unmodeled tail channel.
+
+### Interval validation plan for tail recurrence
+
+Add:
+
+`validators/tail_formal_recurrence.py`,
+`tools/validate_tail_recurrence.py`.
+
+Use polynomial arithmetic in `x∈[0,1]`, preferably Bernstein coefficients. For fixed `gamma=9/20`, use exact rational arithmetic for the recurrence through order `N`. For free `gamma`, use interval coefficients.
+
+For each exponent `λ`, define the linear angular recurrence operator
+
+`T_λ H_λ = S_λ`.
+
+Validate either:
+
+`H_λ = T_λ^{-1} S_λ`
+
+with an interval inverse and residual bound, or prove `S_λ=0` and `H_λ=0`.
+
+Acceptance:
+
+`||T_λ H_λ - S_λ||_Bernstein <= 1e-30`
+
+for fixed rational gamma, or an interval containing zero with width below the chosen certificate tolerance.
+
+### Rigorous indicial Evans/Pluecker validation plan
+
+Replace `validators/pluecker.py`, which currently only samples boxes and explicitly performs no interval arithmetic.
+
+New stack:
+
+`validators/ode_taylor_interval.py`,
+`validators/indicial_pluecker_interval.py`,
+`tools/validate_indicial_evans_interval.py`.
+
+Use the first-order indicial system in `Y=(phi,phi',chi,h)`.
+
+At `zeta=eps`, construct the two-dimensional analytic local plane by interval Taylor series from the recurrence.
+
+At `zeta=L`, construct the far-field forbidden/admissible splitting using the asymptotic exponents:
+
+admissible channel `s_1 = 1-delta`,
+forbidden channel `s_2 = 3-delta`,
+plus the two additional large-`zeta` channels already used in the modal diagnostic.
+
+Propagate exterior products, not individual normalized shots. Compute interval Pluecker minors for the intersection of the local analytic two-plane with the admissible far-field subspace.
+
+For the `delta` domain:
+
+First validate the box
+
+`Re delta ∈ [0,1.5]`,
+`Im delta ∈ [0,4]`,
+
+with symmetry for negative imaginary part. Then expand only if the nonlinear tail residual demands larger exponents.
+
+Around `delta=1`, factor the known geometric branch explicitly:
+
+`phi=1`,
+`chi=0`,
+`h=0`.
+
+Prove it is simple in the appropriate quotient and remove it from the admissible non-geometric set.
+
+### Failure that kills the branch
+
+The branch is killed if both of these hold:
+
+1. The profile residual demands a leading tail exponent not in the validated allowed set.
+2. The interval indicial/recurrence package proves no admissible non-geometric root or forced exponent exists there.
+
+That would mean the optimizer is trying to solve the PDE using illegal tail degrees. At that point, no amount of interior Chebyshev polishing can create a proof.
+
+## 7. Parameter Search
+
+Free `(gamma,B)` after the two-chart solver has proven it can reduce the residual for at least one fixed parameter problem, or after it decisively fails at `(9/20,1)`.
+
+### Parameterization
+
+Use unconstrained variables `(eta,beta)`:
+
+`gamma(eta) = 2/5 + (1/10) * sigmoid(eta)`,
+
+so `gamma∈(2/5,1/2)` automatically.
+
+Use
+
+`B(beta) = exp(beta)`
+
+for the first search, since sign reversal of swirl can be treated separately by symmetry. Search initially over
+
+`gamma ∈ [0.42,0.48]`,
+`B ∈ [0.5,2.0]`.
+
+If needed, expand to
+
+`gamma ∈ [0.405,0.495]`,
+`B ∈ [0.25,4.0]`.
+
+### Forced coefficients as functions of `(gamma,B)`
+
+Every residual and Jacobian evaluation must recompute
+
+`F_p(x;gamma,B)`,
+`G_p(x;gamma,B)`
+
+using the formal recurrence.
+
+Include derivatives with respect to `gamma` and `B` in the Jacobian. Do not freeze the forced tail while varying parameters.
+
+Reject parameter values near recurrence denominator singularities. The current formula already detects singular denominators in `forced_qp_expected_coeffs`.
+
+### Continuation strategy
+
+Stage 1: Fixed `(9/20,1)` two-chart solve.
+
+Stage 2: Reduced-variable funnel scan. Use low-order tail/origin variables and solve 10 to 20 Newton steps at each coarse `(gamma,B)` grid point.
+
+Stage 3: Track residual valleys by pseudo-arclength continuation. Continue in `(gamma,B,a)` where `a` is a profile coefficient vector, with formal tail recomputed at each step.
+
+Stage 4: Refine only points that satisfy:
+
+tail recurrence OK,
+origin quotient below `1e-3`,
+seam derivative residual below `1e-4`,
+global normalized residual below `1e-4`.
+
+### Residual/funnel metrics
+
+Use these metrics, in this order:
+
+`M_tail`: largest forbidden tail coefficient or leading residual exponent mismatch;
+`M_origin`: max origin quotient residual;
+`M_struct`: global normalized structural max residual;
+`M_seam`: max derivative mismatch through order `3`;
+`M_sing`: smallest singular value of the constrained Jacobian;
+`M_holdout`: dense held-out max residual.
+
+The funnel score is
+
+`max(M_tail/tail_tol, M_origin/origin_tol, M_struct/struct_tol, M_seam/seam_tol)`.
+
+### Rejection criteria for `(9/20,1)`
+
+Reject fixed `(9/20,1)` if, after the two-chart analytic Jacobian solver:
+
+`M_struct > 1e-4`,
+or `M_origin > 1e-5`,
+or the leading tail residual demands an excluded exponent,
+or the constrained Jacobian remains badly singular without a geometric explanation.
+
+### Rejection criteria for the nearby box
+
+Reject the nearby branch if the best point in the box cannot reach
+
+`M_struct < 1e-6`,
+`M_origin < 1e-6`,
+`M_tail` certified through the included orders,
+
+and if interval indicial validation proves no missing admissible modes in the relevant exponent range.
+
+## 8. Spectral Path to the Final Theorem
+
+Spectrum cannot certify the theorem before profile certification. The smallest useful spectral work now is operator scaffolding and geometric-mode testing. Eigenvalue counts from the current residual-Jacobian probe do not count.
+
+### Correct Leray-projected operator
+
+Use
+
+`L v = -P_L[(1-gamma)v + gamma(y·∇)v + (U_*·∇)v + (v·∇)U_*]`.
+
+The pressure projection is part of the operator. It cannot be replaced by the Jacobian of the pressure-eliminated residual map.
+
+### Banach/Hilbert space
+
+Use the tail-subtracted weighted space compatible with the conditional theorem:
+
+`X = H^8_1(R^3)`,
+`||v||_X^2 = Σ_{|alpha|<=8} ∫ |∂^alpha v(y)|^2 <y>^{-2} dy`.
+
+The repo’s conditional theorem already uses this space because the profile is not globally finite-energy before moving truncation.
+
+For spectral computation, define a divergence-free domain `D(L)⊂X` with one additional weighted derivative in the transport direction and with the tail/geometric modes subtracted.
+
+### Fourier azimuthal block decomposition
+
+Decompose
+
+`v(r,theta,z)=Σ_{m∈Z} v_m(r,z)e^{im theta}`.
+
+Validate each `m` block separately.
+
+`m=0`: axisymmetric perturbations, including swirl.
+
+`m=1`: translations and some rotational geometric modes.
+
+`m>=2`: non-geometric full 3D perturbations.
+
+The final unstable rank is the sum over blocks, with conjugacy symmetry for `±m`.
+
+### Geometric modes
+
+The spectral validator must reproduce these before any eigenvalue claim is trusted:
+
+`mu=1`: time translation/scaling mode;
+`mu=gamma`: spatial translations, with multiplicity depending on `m`;
+`mu=0`: rotations, branch/gauge modes, and possibly swirl-amplitude mode if the profile family contains one.
+
+For each explicit geometric mode `Phi_j`, certify
+
+`||L Phi_j - mu_j Phi_j||_X <= eps_geom`
+
+inside the profile interval ball. In the final certificate, this residual must be interval-absorbed, not just small floating error.
+
+### Pressure projection
+
+For each `m`, solve the pressure Poisson problem
+
+`-Δ_m p = div_m[(U_*·∇)v + (v·∇)U_*]`
+
+with axis regularity and weighted infinity conditions. Then define
+
+`P_L f = f - ∇p`.
+
+Two implementation options are acceptable:
+
+1. divergence-free basis, so pressure is eliminated by construction;
+2. mixed velocity-pressure discretization with a Schur complement and interval inf-sup bound.
+
+The first is cleaner for a certificate.
+
+### Finite Galerkin/Evans validation
+
+Low and moderate frequencies:
+
+Build a compactified spectral Galerkin matrix on the validated two-chart mesh. Use interval matrix entries induced by the profile coefficient ball.
+
+For an unstable contour `Γ`, validate the Riesz count by either:
+
+`wind det(I - K_N(z))`
+
+for an Evans/Fredholm determinant, or interval contour integration of the finite Galerkin resolvent with tail error bound.
+
+Acceptance requires stable counts under increasing truncation:
+
+`N -> N+8`,
+patch refinement,
+and interval tail bound `||R_tail(z)|| < 1` on the contour.
+
+### High-frequency and large-`m` exclusion
+
+Prove an estimate of the form
+
+`Re <L_m v, v>_X <= -c_m ||v||_X^2 + C_profile ||compact part||^2`
+
+outside a finite-dimensional low-frequency subspace.
+
+Large `|m|` exclusion must use axis regularity, weighted Hardy inequalities, and pressure projection bounds. It cannot be inferred from a finite matrix.
+
+The output should be
+
+`certs/spectrum/high_m_exclusion.json`
+
+with a threshold `m >= m0` and a proven resolvent lower bound in `Re z >= -c`.
+
+### Essential spectrum estimate
+
+At infinity, `U_*` decays and the operator approaches the dilation/transport operator
+
+`L_inf = -P_L[(1-gamma) + gamma y·∇]`
+
+on the tail-subtracted weighted space. The certificate must compute the essential spectral bound for the chosen weight and tail subtraction.
+
+The goal is
+
+`sup Re sigma_ess(L) <= -c_ess < 0`.
+
+If the essential spectrum touches the imaginary axis in `H^8_1`, the perturbation space must be changed or more tail/geometric modes must be modulated.
+
+### Stable gap target
+
+A practical target is
+
+`c >= 0.02`
+
+in discovery. The final proof may accept smaller `c`, but not `c=0` and not a gap smaller than the validated interval uncertainty.
+
+### Semigroup bound
+
+After proving spectral separation, certify
+
+`||e^{sL}P_s|| <= C_s e^{-c s}`.
+
+For a Hilbert realization, use resolvent bounds on `Re z=-c` plus a non-normal semigroup theorem. The certificate must record both `c` and `C_s`, because Lyapunov-Perron closure depends on `C_s`.
+
+### Smallest useful next spectral tool
+
+Add:
+
+`tools/spectrum_projected_axisym.py`.
+
+It should:
+
+1. load a two-chart profile;
+2. construct the true axisymmetric Leray-projected linearized operator;
+3. solve pressure or use a divergence-free basis;
+4. test the geometric modes;
+5. only then print provisional eigenvalues.
+
+This tool is proof-aligned. The existing `tools/linearized_spectrum_probe.py` is not, because it explicitly warns that pressure projection and geometric-mode correctness are not handled.
+
+## 9. Concrete Next 20 Actions
+
+1. Add `validators/tail_formal_recurrence.py` and `tools/validate_tail_recurrence.py`.
+   Command: `python3 tools/validate_tail_recurrence.py --profile work/v117_transcheb_formal_forced.json --gamma 9/20 --B 1 --orders 0,p,2p --out work/tail_recurrence_v117.json`.
+   Expected artifact: `work/tail_recurrence_v117.json`.
+   Success criterion: exact `q^1` exclusion, exact `q^p` recurrence, and a declared legality status for ordinary `q^2`.
+   Failure criterion: any forced coefficient mismatch above `1e-12` or an unclassified leading exponent.
+   Category: validation.
+
+2. Add `tools/tail_leading_exponent.py`.
+   Command: `python3 tools/tail_leading_exponent.py --profile work/v117_transcheb_formal_forced.json --q-max 0.24 --q-min 0.04 --slices 8 --out work/v117_tail_exponent.json`.
+   Expected artifact: `work/v117_tail_exponent.json`.
+   Success criterion: leading residual exponent agrees with the next formal recurrence order.
+   Failure criterion: leading exponent is `1`, illegal `2`, or any exponent not in the validated set.
+   Category: proof-scaffold.
+
+3. Add `tools/profile_project_twochart.py`.
+   Command: `python3 tools/profile_project_twochart.py --input profile-seeds/gamma0p45-forced-tail-sparse-flatbumpFG-v117-ridge-strip.json --gamma 9/20 --B 1 --forced-qp formal --origin-chart RZ --out work/v117_twochart_init.json`.
+   Expected artifact: `work/v117_twochart_init.json`.
+   Success criterion: q=0 trace exact, q1 absent, q^p formal trace exact, origin chart stored as primary coefficients rather than LS metadata.
+   Failure criterion: projection reconstruction error above `1e-5` away from the origin or failed tail recurrence.
+   Category: proof-scaffold.
+
+4. Add `validators/origin_chart.py` with self-tests.
+   Command: `python3 -m validators.origin_chart --self-test --out work/origin_chart_selftest.json`.
+   Expected artifact: `work/origin_chart_selftest.json`.
+   Success criterion: chart consistency through derivative order `4`, fake-smooth rejection, finite origin quotients.
+   Failure criterion: any seam derivative mismatch above `1e-10` in floating self-test.
+   Category: validation.
+
+5. Add `validators/compactified_equations_twochart.py`.
+   Command: `python3 -m validators.compactified_equations_twochart --profile work/v117_twochart_init.json --residual-kind normalized-structural --scan standard,origin,edge --out work/v117_twochart_baseline_residual.json`.
+   Expected artifact: `work/v117_twochart_baseline_residual.json`.
+   Success criterion: away from the origin, residuals reproduce the current jet evaluator within `1e-8`; origin quotients are finite and explicitly reported.
+   Failure criterion: mismatch with old jet evaluator away from the origin above `1e-6` or undefined origin quotient.
+   Category: proof-scaffold.
+
+6. Add `tools/profile_newton_twochart.py`, stage-0 origin/interface solve.
+   Command: `python3 tools/profile_newton_twochart.py --input work/v117_twochart_init.json --out work/twochart_stage0_origin.json --blocks origin,interface --gamma-fixed --B-fixed --residual-kind normalized-structural --max-iter 20`.
+   Expected artifact: `work/twochart_stage0_origin.json`.
+   Success criterion: origin structural max drops from `~1e4` scale to below `1e2` without increasing focused/secondary residuals by more than 25%.
+   Failure criterion: origin residual remains above `5e3` or focused residual doubles.
+   Category: discovery.
+
+7. Run two-chart global Newton, stage 1.
+   Command: `python3 tools/profile_newton_twochart.py --input work/twochart_stage0_origin.json --out work/twochart_stage1_global.json --blocks tail,origin,interface --residual-kind normalized-structural --max-iter 40 --trust 0.05`.
+   Expected artifact: `work/twochart_stage1_global.json`.
+   Success criterion: all standard, focused, secondary, origin, and high-`|b|` structural residuals below `1`.
+   Failure criterion: residual redistributes with any held-out gate above the stage-0 maximum.
+   Category: discovery.
+
+8. Add `tools/profile_linear_correction_cheb.py`.
+   Command: `python3 tools/profile_linear_correction_cheb.py --input work/twochart_stage1_global.json --out work/twochart_stage2_linear_corrected.json --solve quotient --regularity d4 --hard-tail`.
+   Expected artifact: `work/twochart_stage2_linear_corrected.json`.
+   Success criterion: global normalized structural residual below `1e-2`.
+   Failure criterion: linear correction has condition number above `1e12` after geometric constraints are removed, or residual reduction is less than factor `10`.
+   Category: discovery.
+
+9. Run dense held-out residual topology.
+   Command: `python3 -m validators.compactified_equations_twochart --profile work/twochart_stage2_linear_corrected.json --scan dense64 --residual-kind normalized-structural --out work/twochart_stage2_dense64.json`.
+   Expected artifact: `work/twochart_stage2_dense64.json`.
+   Success criterion: dense held-out max below `3e-2` and no hidden origin/axis ridge.
+   Failure criterion: dense max exceeds training max by factor `3` or occurs at a chart seam.
+   Category: validation.
+
+10. Run high-order global Newton to NK-entry scale.
+    Command: `python3 tools/profile_newton_twochart.py --input work/twochart_stage2_linear_corrected.json --out work/twochart_stage3_nk_candidate.json --blocks all --degree-raise 4 --max-iter 60 --target 1e-8`.
+    Expected artifact: `work/twochart_stage3_nk_candidate.json`.
+    Success criterion: discovery normalized structural max below `1e-8` on `32x32`, `48x48`, and seam/origin grids.
+    Failure criterion: stagnation above `1e-5` after degree raising and trust-region reduction.
+    Category: discovery.
+
+11. Add `tools/convert_twochart_to_bernstein.py`.
+    Command: `python3 tools/convert_twochart_to_bernstein.py --input work/twochart_stage3_nk_candidate.json --out work/twochart_stage3_bernstein.json --degree-margin 6`.
+    Expected artifact: `work/twochart_stage3_bernstein.json`.
+    Success criterion: Bernstein reconstruction error below `1e-12` and derivative reconstruction below `1e-10`.
+    Failure criterion: coefficient blow-up or reconstruction error above tolerance.
+    Category: proof-scaffold.
+
+12. Add `tools/validate_profile_nk.py` and `validators/radii_polynomial.py`.
+    Command: `python3 tools/validate_profile_nk.py --profile work/twochart_stage3_bernstein.json --norm weighted-l1 --out certs/profile/profile_nk.json`.
+    Expected artifact: `certs/profile/profile_nk.json`.
+    Success criterion: radii polynomial negative for some `r>0`.
+    Failure criterion: `Z0 >= 1`, no positive interval with negative radii polynomial, or interval residual too large.
+    Category: validation.
+
+13. If action 10 fails, run `tools/profile_gamma_funnel.py`.
+    Command: `python3 tools/profile_gamma_funnel.py --seed work/twochart_stage2_linear_corrected.json --gamma-range 0.42,0.48 --B-range 0.5,2.0 --grid 9,9 --out work/gamma_funnel_01.json`.
+    Expected artifact: `work/gamma_funnel_01.json`.
+    Success criterion: at least one parameter point reaches normalized structural residual below `1e-5` with tail recurrence valid.
+    Failure criterion: no point below `1e-4` or all low-residual points use illegal tail exponents.
+    Category: discovery.
+
+14. Add `tools/validate_indicial_evans_interval.py`.
+    Command: `python3 tools/validate_indicial_evans_interval.py --gamma 9/20 --B 1 --real 0,1.5 --imag 0,4 --box 0.02,0.02 --out certs/tail/indicial_evans_gamma9p20_B1.json`.
+    Expected artifact: `certs/tail/indicial_evans_gamma9p20_B1.json`.
+    Success criterion: all boxes either excluded or isolated; `delta=1` factored and classified geometric.
+    Failure criterion: unresolved boxes touching exponents required by the profile tail.
+    Category: validation.
+
+15. Add `tools/validate_pressure_reconstruction.py`.
+    Command: `python3 tools/validate_pressure_reconstruction.py --profile certs/profile/profile_nk.json --out certs/profile/pressure_certificate.json`.
+    Expected artifact: `certs/profile/pressure_certificate.json`.
+    Success criterion: interval proof that `R(U_*)` is a gradient and reconstructed `P_*` closes the velocity-pressure equation.
+    Failure criterion: curl-free residual not absorbed by the profile ball or pressure bounds fail in `H^8_1`.
+    Category: validation.
+
+16. Add `tools/spectrum_projected_axisym.py`.
+    Command: `python3 tools/spectrum_projected_axisym.py --profile work/twochart_stage3_nk_candidate.json --m 0 --check-geometric --out work/spectrum_axisym_m0_probe.json`.
+    Expected artifact: `work/spectrum_axisym_m0_probe.json`.
+    Success criterion: geometric modes `1`, `gamma`, and `0` are reproduced at discovery tolerance below `1e-6`.
+    Failure criterion: geometric modes missing or pressure projection inconsistency.
+    Category: proof-scaffold.
+
+17. Add `tools/validate_spectrum_geometric.py`.
+    Command: `python3 tools/validate_spectrum_geometric.py --profile certs/profile/profile_nk.json --out certs/spectrum/geometric_modes.json`.
+    Expected artifact: `certs/spectrum/geometric_modes.json`.
+    Success criterion: interval residuals for all geometric modes are absorbed by the profile/spectral balls.
+    Failure criterion: any geometric residual interval excludes zero at required tolerance.
+    Category: validation.
+
+18. Add `tools/validate_spectrum_evans.py` for finite blocks.
+    Command: `python3 tools/validate_spectrum_evans.py --profile certs/profile/profile_nk.json --m-max 6 --contour unstable --out certs/spectrum/finite_blocks.json`.
+    Expected artifact: `certs/spectrum/finite_blocks.json`.
+    Success criterion: validated unstable count per `m`, stable under degree refinement, with geometric modes separated.
+    Failure criterion: contour touches spectrum, unstable count changes with refinement, or non-geometric unstable cluster unresolved.
+    Category: validation.
+
+19. Add `tools/validate_essential_spectrum.py`.
+    Command: `python3 tools/validate_essential_spectrum.py --profile certs/profile/profile_nk.json --space H8_1_tail_subtracted --m-large --out certs/spectrum/essential_gap.json`.
+    Expected artifact: `certs/spectrum/essential_gap.json`.
+    Success criterion: explicit `c_ess>0`, large-`m` exclusion threshold, and resolvent bound for `Re z >= -c_ess`.
+    Failure criterion: essential spectrum reaches `Re z >= 0` or large-`m` exclusion cannot be proved.
+    Category: validation.
+
+20. Add `tools/assemble_theorem_manifest.py`.
+    Command: `python3 tools/assemble_theorem_manifest.py --profile certs/profile/profile_nk.json --pressure certs/profile/pressure_certificate.json --tail certs/tail/indicial_evans_gamma9p20_B1.json --spectrum certs/spectrum/finite_blocks.json --essential certs/spectrum/essential_gap.json --out certs/theorem_manifest.json`.
+    Expected artifact: `certs/theorem_manifest.json`.
+    Success criterion: all dependency gates pass and Lyapunov-Perron constants satisfy the contraction inequalities.
+    Failure criterion: any missing certificate, failed hash check, or nonnegative contraction margin.
+    Category: validation.
+
+## 10. Kill Criteria and Pivot Criteria
+
+Sparse bumps are already abandoned as proof objects. They may seed a projection, but no sparse bump JSON can enter the final theorem manifest except as historical input.
+
+### Residual thresholds
+
+Discovery pre-NK candidate:
+
+global normalized structural max `< 1e-8`,
+origin quotient max `< 1e-8`,
+seam derivative residual through order `3` `< 1e-9`,
+raw residual consistent across `32`, `48`, and `64` grids,
+tail recurrence valid.
+
+Newton-Kantorovich proof candidate:
+
+`Y0 + (Z0 - 1)r + Z2 r^2 < 0`
+
+for some positive `r`. Numeric residual alone is not a proof.
+
+Kill fixed `(9/20,1)` if the two-chart analytic solver stalls above:
+
+`1e-4` global normalized structural residual,
+`1e-5` origin quotient residual,
+or `1e-5` seam derivative residual,
+
+after degree raising and staged linear correction.
+
+### Origin residual thresholds
+
+Continue if:
+
+origin structural residual falls from `~1e4` to `<1e2` in stage 0,
+then `<1` in stage 1,
+then `<1e-4` before NK.
+
+Kill the current origin representation if:
+
+origin quotient remains above `1e2` after hard `(R,Z)` variables and derivative-matched interface are active.
+
+That means the chart or quotient is wrong, not merely under-optimized.
+
+### Tail coefficient tolerances
+
+Discovery tolerance:
+
+`q^1` max `<1e-14`,
+forced `q^p` coefficient error `<1e-12`,
+next illegal exponent coefficient `<1e-12`.
+
+Validation tolerance:
+
+fixed rational gamma: exact rational zero or interval width `<1e-30`;
+free gamma: interval inclusion with denominator singularities excluded.
+
+Any forced-tail mismatch above tolerance rejects the profile, even if the sampled PDE residual improves.
+
+### Indicial failures
+
+Kill the current tail ansatz if the interval Evans/Pluecker validator proves that the exponent needed by the residual is not admissible.
+
+Pivot to parameter search if `(9/20,1)` has no non-geometric admissible roots in the required domain and the profile residual demands one.
+
+Pivot to radial core-tail matching if the admissible roots exist but the compactified two-chart solver cannot match them globally.
+
+### Spectrum failures
+
+Do not attempt final theorem certification if geometric modes are not reproduced.
+
+Reject a spectral computation if:
+
+`mu=1`, `mu=gamma`, or `mu=0` is absent;
+the result depends on truncation;
+pressure projection is omitted;
+unstable eigenvalue count changes under refinement;
+essential spectrum cannot be pushed left of `Re z=0`.
+
+Kill the blow-up theorem for a candidate profile if the stable complement has no gap. A profile without a stable gap may still be mathematically interesting, but it does not close this finite-codimension Navier-Stokes theorem.
+
+### Parameter-search failures
+
+Abandon fixed `(9/20,1)` if the two-chart solver misses the thresholds above.
+
+Abandon the nearby box if no point in
+
+`gamma ∈ [0.42,0.48]`,
+`B ∈ [0.5,2.0]`
+
+reaches `1e-6` discovery residual with valid tail.
+
+Abandon the wider box if no point in
+
+`gamma ∈ [0.405,0.495]`,
+`B ∈ [0.25,4.0]`
+
+reaches `1e-5` discovery residual and the indicial validator excludes the missing modes.
+
+### When to abandon compactified global Chebyshev
+
+Abandon the one-chart compactified global Chebyshev representation now as a proof object. It can remain a projection/interpolation tool. The final object must be two-chart.
+
+Abandon the two-chart compactified representation only if:
+
+origin self-tests pass,
+tail recurrence is validated,
+the analytic Jacobian is implemented,
+parameter search is run,
+
+and the residual still cannot be driven below `1e-5`.
+
+### When to abandon the current ansatz class
+
+Abandon the current axisymmetric-with-swirl branch class if:
+
+the validated tail/indicial package excludes all needed non-geometric modes,
+the two-chart solver cannot find a low residual anywhere in the nearby parameter box,
+and any apparent low-residual profile requires forbidden tail channels.
+
+That is the decisive falsification computation.
+
+## 11. Final Certificate Format
+
+The final proof artifact set should live under:
+
+`certs/`
+
+with every file hash recorded in:
+
+`certs/theorem_manifest.json`.
+
+### Required JSON certificates
+
+`certs/manifest.json`
+
+Contains commit hash, command log, tool versions, precision settings, file hashes, and dependency DAG.
+
+`certs/profile/profile_coefficients.json`
+
+Contains the two-chart profile coefficients, patch maps, `gamma` interval, `B` interval, hard constraints, tail exponents, origin chart, seam definitions, and coefficient norms.
+
+`certs/profile/profile_nk.json`
+
+Contains:
+
+`Y0`,
+`Z0`,
+`Z2`,
+valid radius `r`,
+radii polynomial margin,
+profile ball definition,
+residual quotient maps,
+interval arithmetic logs,
+and proof that an exact profile exists in the ball.
+
+`certs/profile/pressure_certificate.json`
+
+Contains pressure coefficients or pressure operator representation, gauge, Poisson residual, curl-free residual, divergence-free verification, and weighted pressure/Riesz bounds.
+
+`certs/tail/tail_recurrence.json`
+
+Contains exact conical trace, ordinary `q^1` exclusion, forced `q^p` coefficient proof, all included exponents, recurrence residuals, and tail remainder bounds.
+
+`certs/tail/indicial_evans.json`
+
+Contains local analytic plane construction, far-field splitting, interval ODE propagation logs, Pluecker minors, box cover, root isolation, and geometric classification of `delta=1`.
+
+`certs/spectrum/geometric_modes.json`
+
+Contains explicit geometric modes, interval residuals, multiplicities, and block locations.
+
+`certs/spectrum/finite_blocks.json`
+
+Contains finite Galerkin/Evans validation, contours, winding counts, unstable eigenvalue enclosures, and Riesz projection rank.
+
+`certs/spectrum/essential_gap.json`
+
+Contains essential spectrum estimate, large-`m` exclusion, high-frequency resolvent bounds, stable gap `c`, and semigroup constant `C`.
+
+`certs/lp/gluing_constants.json`
+
+Contains moving cutoff constants, Bogovskii repair constants, pressure moment constants, viscous forcing decay, and nonlinear estimates.
+
+`certs/lp/lyapunov_perron.json`
+
+Contains unstable rank, modulation equations, semigroup constants, forcing decay rates, ball radius, Lipschitz constant, and contraction margin.
+
+`certs/theorem_manifest.json`
+
+Contains the final dependency graph:
+
+profile NK -> pressure -> tail -> indicial -> spectrum -> gluing -> Lyapunov-Perron -> finite-codimension blow-up theorem.
+
+### Evidence required to change “Final theorem certificate: 0%” to complete
+
+The theorem remains `0%` until all five stop-condition gates pass:
+
+`F_gamma(U_*,P_*) = 0`,
+`2/5 < gamma < 1/2`,
+`U_*(y)=|y|^(1-1/gamma)H(y/|y|)+faster decay`,
+`rank P_+ < infinity`,
+`sigma(L on stable complement) ⊂ {Re z <= -c < 0}`.
+
+The repo currently has none of these certified.
+
+The honest moment to mark the theorem complete is when `certs/theorem_manifest.json` verifies every dependency with interval certificates, not when a discovery residual gets small. The first hard gate is still the exact profile. The next decisive path is therefore the two-chart formal-tail-pinned solver. That is the narrow bridge across the canyon; everything else is scenery until that bridge holds weight.

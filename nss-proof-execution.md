@@ -2625,6 +2625,106 @@ patch.  Either the origin patch must be solved as part of a genuinely coupled
 C2-compatible rectangular/origin spectral element, or the compactified route
 should pivot to radial core-tail matching once this redesign fails.
 
+The later GPT-Pro update in `gpt-pro-thing` sharpens that conclusion:
+
+```text
+Do not treat the current one-chart compactified Chebyshev plus origin splice as
+the proof object.
+
+Keep the transseries grammar, but build a hard two-chart solver:
+tail chart in (q,x),
+origin chart in (R,Z)=(r^2,z^2),
+overlap/mortar band,
+C3 minimum and preferably C4 interface matching,
+analytic coefficient Jacobian.
+
+Do not pivot to radial core-tail matching until this two-chart solver, tail
+recurrence validation, and then parameter search have failed.
+```
+
+The same update points out a tail-legality issue that the previous structural
+tail checker did not decide: the analytic `q^2` trace in
+
+```text
+F = 1/2 + q^2 F_an + q^p F_frac + ...
+G = B   + q^2 G_an + q^p G_frac + ...
+```
+
+is an ordinary tail channel before the forced exponent
+
+```text
+p=1/gamma=20/9.
+```
+
+Therefore the next gate is not just "q1 is zero and q^p is formal"; it is also
+whether the ordinary `q^2` channel is legal.  The new tools
+
+```text
+validators/tail_formal_recurrence.py
+tools/validate_tail_recurrence.py
+tools/tail_leading_exponent.py
+tools/profile_zero_q2_trace.py
+```
+
+make this explicit.
+
+On both
+
+```text
+work/v117_transcheb_formal_forced.json
+work/v117_transcheb_formal_origin_refit_c2_d6_a.json
+```
+
+the current recurrence gate reports
+
+```text
+ordinary_q1_F_max=0,
+ordinary_q1_G_max=0,
+forced_qp_coeff_error=0,
+ordinary_q2_F_trace_max=1.190284161850e+00,
+ordinary_q2_G_trace_max=5.381997768582e+00,
+status=UNVALIDATED_Q2_TRACE_PRESENT.
+```
+
+The first nonzero audited correction is thus ordinary `q^2`, not the forced
+`q^p` block.  Unless a formal recurrence proves that `q^2` is legal, the proof
+ansatz must set
+
+```text
+F_an(0,x)=0,
+G_an(0,x)=0.
+```
+
+The diagnostic q2-zeroed artifacts
+
+```text
+work/v117_transcheb_formal_forced_q2zero.json
+work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json
+```
+
+reduce the q2 trace to roundoff:
+
+```text
+ordinary_q2_F_trace_max=1.804112415016e-16,
+ordinary_q2_G_trace_max=7.771561172376e-16,
+status=TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL.
+```
+
+At the sampled gates, zeroing q2 does not worsen the focused or strict-tail
+residuals:
+
+```text
+focused normalized-structural max remains 1.016228983517e+01
+for the origin-refit artifact;
+
+strict-tail max remains 2.287165521365e+01.
+```
+
+So the next hard two-chart solver should start from q2-free data unless the
+formal tail recurrence validator later proves the ordinary `q^2` channel is
+admissible.  This is still not a proof certificate; it is a stricter ansatz
+gate that prevents the solver from using an unvalidated escape channel.
+
 The profile validation gates are:
 
 ```text

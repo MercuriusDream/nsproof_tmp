@@ -1,0 +1,34 @@
+{
+  "B": 1.0,
+  "entries": [
+    {
+      "exponent": 1.0,
+      "max_abs": 0.0,
+      "name": "ordinary_q1",
+      "status": "forbidden"
+    },
+    {
+      "exponent": 2.0,
+      "max_abs": 5.381997768581678,
+      "name": "ordinary_q2",
+      "status": "unvalidated"
+    },
+    {
+      "exponent": 2.2222222222222223,
+      "max_abs": 0.0,
+      "name": "forced_qp",
+      "status": "fixed_formal_trace"
+    }
+  ],
+  "gamma": 0.45,
+  "leading_nonzero": {
+    "exponent": 2.0,
+    "max_abs": 5.381997768581678,
+    "name": "ordinary_q2",
+    "status": "unvalidated"
+  },
+  "p": 2.2222222222222223,
+  "profile": "work/v117_transcheb_formal_origin_refit_c2_d6_a.json",
+  "status": "FIRST_NONZERO_TRACE_IS_UNVALIDATED_Q2_BEFORE_FORCED_QP",
+  "tolerance": 1e-12
+}

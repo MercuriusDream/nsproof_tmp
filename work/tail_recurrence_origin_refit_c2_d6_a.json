@@ -1,0 +1,17 @@
+{
+  "B": 1.0,
+  "all_ok": false,
+  "forced_qp_coeff_error": 0.0,
+  "gamma": 0.45,
+  "note": "Nonzero q2 means the analytic q^2 trace is being used. It must be proved legal by a later recurrence theorem or removed from the proof ansatz.",
+  "orders_requested": "0,p,2p",
+  "ordinary_q1_F_max": 0.0,
+  "ordinary_q1_G_max": 0.0,
+  "ordinary_q2_F_trace_max": 1.1902841618500686,
+  "ordinary_q2_G_trace_max": 5.381997768581678,
+  "p": 2.2222222222222223,
+  "profile": "work/v117_transcheb_formal_origin_refit_c2_d6_a.json",
+  "q2_ok": false,
+  "q2_policy": "zero",
+  "status": "UNVALIDATED_Q2_TRACE_PRESENT"
+}
