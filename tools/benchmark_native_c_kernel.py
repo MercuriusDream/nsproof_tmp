@@ -25,11 +25,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from validators.twochart_mortar_jacobian import (  # noqa: E402
+    build_rz_rows,
     cheb_basis_partial,
     cheb_basis_values,
     enumerate_coefficients,
+    grid,
+    native_rz_residuals_for_rows,
     patch_interval,
     point_in_patch,
+    residual_for_row,
     rz_coordinate_jets,
     rz_derivative_indices,
     variable_tail_patch,
@@ -220,6 +224,32 @@ def load_library(path: Path) -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_tail_exact_residual.restype = ctypes.c_int
+
+    lib.nsproof_rz_mortar_residual_terms_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_rz_mortar_residual_terms_batch.restype = ctypes.c_int
 
     return lib
 
@@ -425,6 +455,7 @@ def validate_repeated(lib: ctypes.CDLL, passes: int) -> list[tuple[float, float,
         validate_rz_batch(lib)
         validate_pde_tail_batch(lib)
         validate_tail_exact_residual()
+        validate_rz_mortar_residual_batch()
         validate_prediction_scan(lib)
         validate_error_statuses(lib)
     return cases
@@ -461,6 +492,33 @@ def validate_tail_exact_residual() -> dict[str, float]:
                     f"got={c_value!r} expected={py_value!r}"
                 )
     return {"points": float(len(point_list)), "cases": float(total_cases), "max_abs": max_abs, "max_rel": max_rel}
+
+
+def validate_rz_mortar_residual_batch() -> dict[str, float]:
+    profile_path = ROOT / "work" / "v117_twochart_init.json"
+    with profile_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    q_values = grid(0.84, 0.92, 5)
+    x_values = grid(0.0, 1.0, 5)
+    rows = build_rz_rows(data, [], q_values, x_values, 4, use_native_c=False)
+    expected = [float(residual_for_row(data, row)) for row in rows]
+    got, stats = native_rz_residuals_for_rows(data, rows)
+    max_abs = 0.0
+    max_rel = 0.0
+    for c_value, py_value in zip(got, expected):
+        diff = abs(c_value - py_value)
+        scale = max(1.0, abs(py_value))
+        max_abs = max(max_abs, diff)
+        max_rel = max(max_rel, diff / scale)
+        if diff > 1e-8 * scale:
+            raise AssertionError(f"RZ mortar residual mismatch got={c_value!r} expected={py_value!r}")
+    return {
+        "rows": float(len(rows)),
+        "cases": float(stats.get("cases", 0)),
+        "max_abs": max_abs,
+        "max_rel": max_rel,
+        "seconds": float(stats.get("seconds", 0.0)),
+    }
 
 
 def validate_prediction_scan(lib: ctypes.CDLL) -> None:
@@ -770,6 +828,7 @@ def main() -> int:
         cases = validate_repeated(lib, validation_passes)
         pde_validation = validate_pde_tail_batch(lib)
         tail_exact_validation = validate_tail_exact_residual()
+        rz_mortar_validation = validate_rz_mortar_residual_batch()
 
         patch = {"q_interval": (0.5, 2.5), "x_interval": (-1.25, 1.75)}
         scalar_py, scalar_c, scalar_acc = benchmark_scalar(lib, patch, cases, repeats)
@@ -790,6 +849,14 @@ def main() -> int:
         f"cases={int(tail_exact_validation['cases'])} "
         f"max_abs={tail_exact_validation['max_abs']:.3e} "
         f"max_rel={tail_exact_validation['max_rel']:.3e}"
+    )
+    print(
+        "rz mortar validation: "
+        f"rows={int(rz_mortar_validation['rows'])} "
+        f"cases={int(rz_mortar_validation['cases'])} "
+        f"max_abs={rz_mortar_validation['max_abs']:.3e} "
+        f"max_rel={rz_mortar_validation['max_rel']:.3e} "
+        f"seconds={rz_mortar_validation['seconds']:.6f}s"
     )
     print(f"weighted cases: {len(cases)}")
     print(f"repeats: {repeats}")

@@ -1434,16 +1434,17 @@ def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespac
     return {**vector_metrics(values), "native_c_tail_exact": native_stats}
 
 
-def mortar_audit_metrics(data: dict[str, Any], rows: list[Any]) -> dict[str, Any]:
+def mortar_audit_metrics(data: dict[str, Any], rows: list[Any], use_native_c: bool = False) -> dict[str, Any]:
     if not rows:
         return {"enabled": False, **vector_metrics([])}
-    from validators.twochart_mortar_jacobian import residual_for_row
+    from validators.twochart_mortar_jacobian import residuals_for_rows
 
-    values = [float(residual_for_row(data, row)) for row in rows]
+    values, native_stats = residuals_for_rows(data, rows, use_native_c=use_native_c)
     worst_index, worst_value = max(enumerate(values), key=lambda item: abs(item[1]))
     worst_row = rows[worst_index]
     return {
         "enabled": True,
+        "native_c_rz_mortar": native_stats,
         "worst": {
             "row_index": int(worst_index),
             "component": worst_row.component,
@@ -1996,7 +1997,11 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
         base_metrics = vector_metrics(base_vec)
         base_raw_metrics = system["raw_residual_metrics"]
         base_guard_metrics = guard_point_metrics(current, args, guard_points)
-        base_mortar_audit_metrics = mortar_audit_metrics(current, system.get("mortar_audit_rows", []))
+        base_mortar_audit_metrics = mortar_audit_metrics(
+            current,
+            system.get("mortar_audit_rows", []),
+            use_native_c=bool(args.native_c),
+        )
         block_specs = stage0_block_specs(system["variables"], args.solve_mode, args.block_search_labels)
         line_trials: list[dict[str, Any]] = []
         candidate_previews: list[dict[str, Any]] = []
@@ -2107,7 +2112,11 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     trial_metrics = vector_metrics(trial_system["residual_vector"])
                     trial_raw_metrics = trial_system["raw_residual_metrics"]
                 trial_guard_metrics = guard_point_metrics(trial_data, args, guard_points)
-                trial_mortar_audit_metrics = mortar_audit_metrics(trial_data, system.get("mortar_audit_rows", []))
+                trial_mortar_audit_metrics = mortar_audit_metrics(
+                    trial_data,
+                    system.get("mortar_audit_rows", []),
+                    use_native_c=bool(args.native_c),
+                )
                 raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
                     base_raw_metrics["objective"], 1e-300
                 )

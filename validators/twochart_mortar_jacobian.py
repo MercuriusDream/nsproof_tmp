@@ -589,6 +589,31 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_tail_exact_residual.restype = ctypes.c_int
+    lib.nsproof_rz_mortar_residual_terms_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_rz_mortar_residual_terms_batch.restype = ctypes.c_int
     _NATIVE_C_LIB = lib
     _NATIVE_C_RZ_STATS["available"] = True
     _NATIVE_C_RZ_STATS["compile_seconds"] += time.perf_counter() - start
@@ -692,6 +717,181 @@ def _native_rz_tail_partials(
     return {
         variable.index: tuple(float(out[row * spec_count + col]) for col in range(spec_count))
         for row, (variable, _interval) in enumerate(cases)
+    }
+
+
+def _append_native_tail_residual_terms(
+    terms: list[dict[str, Any]],
+    data: dict[str, Any],
+    row_index: int,
+    component: str,
+    q: float,
+    x: float,
+) -> None:
+    blocks = data["tail_chart"]["blocks"]
+    p = float(data["p"])
+    if component == "F":
+        analytic_block = "F_an"
+        frac_block = "F_frac"
+    elif component == "G":
+        analytic_block = "G_an"
+        frac_block = "G_frac"
+    else:
+        raise ValueError(f"unknown component {component!r}")
+
+    def add_patch_terms(patch: dict[str, Any], alpha: float) -> None:
+        q0, q1, x0, x1 = patch_interval(patch)
+        for kq, coeff_row in enumerate(patch.get("coeffs", [])):
+            for kx, raw_coeff in enumerate(coeff_row):
+                coeff = float(raw_coeff)
+                if coeff == 0.0:
+                    continue
+                terms.append(
+                    {
+                        "row": row_index,
+                        "kind": 0,
+                        "coeff": coeff,
+                        "q0": q0,
+                        "q1": q1,
+                        "x0": x0,
+                        "x1": x1,
+                        "alpha": alpha,
+                        "kq": kq,
+                        "kx": kx,
+                        "r_power": 0,
+                        "z_power": 0,
+                    }
+                )
+
+    analytic_patches = blocks[analytic_block]
+    add_patch_terms(analytic_patches[find_patch_index(analytic_patches, q, x)], 2.0)
+    for frac_index, frac_patches in enumerate(blocks.get(frac_block, []), start=1):
+        add_patch_terms(frac_patches[find_patch_index(frac_patches, q, x)], frac_index * p)
+
+
+def _append_native_origin_residual_terms(
+    terms: list[dict[str, Any]],
+    data: dict[str, Any],
+    row_index: int,
+    component: str,
+) -> None:
+    key = "F_origin_taylor" if component == "F" else "G_origin_taylor"
+    for entry in data["origin_chart"]["blocks"][key].get("basis", []):
+        coeff = float(entry["coeff"])
+        if coeff == 0.0:
+            continue
+        terms.append(
+            {
+                "row": row_index,
+                "kind": 1,
+                "coeff": coeff,
+                "q0": 0.0,
+                "q1": 1.0,
+                "x0": 0.0,
+                "x1": 1.0,
+                "alpha": 0.0,
+                "kq": 0,
+                "kx": 0,
+                "r_power": int(entry["R_power"]),
+                "z_power": int(entry["Z_power"]),
+            }
+        )
+
+
+def native_rz_residuals_for_rows(data: dict[str, Any], rows: list[MortarRow]) -> tuple[list[float], dict[str, Any]]:
+    if not rows:
+        return [], {"enabled": True, "cases": 0, "seconds": 0.0}
+    if any(row.coordinate != "RZ" for row in rows):
+        raise ValueError("native R/Z mortar residual batch requires only RZ rows")
+
+    terms: list[dict[str, Any]] = []
+    for row_index, row in enumerate(rows):
+        _append_native_tail_residual_terms(terms, data, row_index, row.component, row.q, row.x)
+        _append_native_origin_residual_terms(terms, data, row_index, row.component)
+
+    lib = _native_c_library()
+    row_count = len(rows)
+    term_count = len(terms)
+    double_rows = ctypes.c_double * max(row_count, 1)
+    int_rows = ctypes.c_int * max(row_count, 1)
+    double_terms = ctypes.c_double * max(term_count, 1)
+    int_terms = ctypes.c_int * max(term_count, 1)
+
+    row_q = double_rows(*([float(row.q) for row in rows] or [0.0]))
+    row_x = double_rows(*([float(row.x) for row in rows] or [0.0]))
+    row_dR = int_rows(*([int(row.dq_order) for row in rows] or [0]))
+    row_dZ = int_rows(*([int(row.dx_order) for row in rows] or [0]))
+    row_component = int_rows(*([0 if row.component == "F" else 1 for row in rows] or [0]))
+
+    term_row = int_terms(*([int(term["row"]) for term in terms] or [0]))
+    term_kind = int_terms(*([int(term["kind"]) for term in terms] or [0]))
+    coeff = double_terms(*([float(term["coeff"]) for term in terms] or [0.0]))
+    q0_values = double_terms(*([float(term["q0"]) for term in terms] or [0.0]))
+    q1_values = double_terms(*([float(term["q1"]) for term in terms] or [1.0]))
+    x0_values = double_terms(*([float(term["x0"]) for term in terms] or [0.0]))
+    x1_values = double_terms(*([float(term["x1"]) for term in terms] or [1.0]))
+    alpha_values = double_terms(*([float(term["alpha"]) for term in terms] or [0.0]))
+    kq_values = int_terms(*([int(term["kq"]) for term in terms] or [0]))
+    kx_values = int_terms(*([int(term["kx"]) for term in terms] or [0]))
+    r_power_values = int_terms(*([int(term["r_power"]) for term in terms] or [0]))
+    z_power_values = int_terms(*([int(term["z_power"]) for term in terms] or [0]))
+    out = double_rows()
+    statuses = int_terms()
+
+    start = time.perf_counter()
+    rc = lib.nsproof_rz_mortar_residual_terms_batch(
+        row_count,
+        term_count,
+        float(data["B"]),
+        row_q,
+        row_x,
+        row_dR,
+        row_dZ,
+        row_component,
+        term_row,
+        term_kind,
+        coeff,
+        q0_values,
+        q1_values,
+        x0_values,
+        x1_values,
+        alpha_values,
+        kq_values,
+        kx_values,
+        r_power_values,
+        z_power_values,
+        out,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    _NATIVE_C_RZ_STATS["enabled"] = True
+    _NATIVE_C_RZ_STATS["calls"] = int(_NATIVE_C_RZ_STATS.get("calls", 0)) + 1
+    _NATIVE_C_RZ_STATS["cases"] = int(_NATIVE_C_RZ_STATS.get("cases", 0)) + term_count
+    _NATIVE_C_RZ_STATS["seconds"] = float(_NATIVE_C_RZ_STATS.get("seconds", 0.0)) + elapsed
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(term_count)))
+        raise RuntimeError(f"native C RZ mortar residual batch failed rc={rc} statuses={bad_statuses}")
+    return [float(out[index]) for index in range(row_count)], {
+        "enabled": True,
+        "rows": row_count,
+        "cases": term_count,
+        "seconds": elapsed,
+    }
+
+
+def residuals_for_rows(
+    data: dict[str, Any],
+    rows: list[MortarRow],
+    use_native_c: bool = False,
+) -> tuple[list[float], dict[str, Any]]:
+    if use_native_c and rows and all(row.coordinate == "RZ" for row in rows):
+        return native_rz_residuals_for_rows(data, rows)
+    return [float(residual_for_row(data, row)) for row in rows], {
+        "enabled": bool(use_native_c),
+        "rows": len(rows),
+        "cases": 0,
+        "seconds": 0.0,
+        "fallback": "python",
     }
 
 

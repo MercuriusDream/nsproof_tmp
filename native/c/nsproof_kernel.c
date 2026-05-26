@@ -1604,3 +1604,181 @@ NSPROOF_EXPORT int nsproof_tail_exact_residual(
     }
     return NSPROOF_KERNEL_OK;
 }
+
+NSPROOF_EXPORT int nsproof_rz_mortar_residual_terms_batch(
+    int row_count,
+    int term_count,
+    double B,
+    const double *row_q,
+    const double *row_x,
+    const int *row_dR,
+    const int *row_dZ,
+    const int *row_component,
+    const int *term_row,
+    const int *term_kind,
+    const double *coeff,
+    const double *q0,
+    const double *q1,
+    const double *x0,
+    const double *x1,
+    const double *alpha,
+    const int *kq,
+    const int *kx,
+    const int *r_power,
+    const int *z_power,
+    double *out_residual,
+    int *out_status
+) {
+    int row;
+    int term;
+    int first_status = NSPROOF_KERNEL_OK;
+
+    if (row_count < 0 || term_count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (!check_finite(B)) {
+        return NSPROOF_KERNEL_NONFINITE_INPUT;
+    }
+    if (
+        row_count > 0 &&
+        (
+            row_q == NULL ||
+            row_x == NULL ||
+            row_dR == NULL ||
+            row_dZ == NULL ||
+            row_component == NULL ||
+            out_residual == NULL
+        )
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (
+        term_count > 0 &&
+        (
+            term_row == NULL ||
+            term_kind == NULL ||
+            coeff == NULL ||
+            q0 == NULL ||
+            q1 == NULL ||
+            x0 == NULL ||
+            x1 == NULL ||
+            alpha == NULL ||
+            kq == NULL ||
+            kx == NULL ||
+            r_power == NULL ||
+            z_power == NULL
+        )
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+
+    for (row = 0; row < row_count; row++) {
+        if (
+            !check_finite(row_q[row]) ||
+            !check_finite(row_x[row]) ||
+            !check_order(row_dR[row]) ||
+            !check_order(row_dZ[row]) ||
+            row_dR[row] + row_dZ[row] > NSPROOF_JET_MAX_ORDER ||
+            (row_component[row] != 0 && row_component[row] != 1)
+        ) {
+            return NSPROOF_KERNEL_NONFINITE_INPUT;
+        }
+        out_residual[row] = 0.0;
+        if (row_dR[row] == 0 && row_dZ[row] == 0) {
+            out_residual[row] += row_component[row] == 0 ? 0.5 : B;
+        }
+    }
+    if (out_status != NULL) {
+        for (term = 0; term < term_count; term++) {
+            out_status[term] = NSPROOF_KERNEL_OK;
+        }
+    }
+
+    for (term = 0; term < term_count; term++) {
+        int target_row = term_row[term];
+        int kind = term_kind[term];
+        int dR;
+        int dZ;
+        double contribution = 0.0;
+        int status = NSPROOF_KERNEL_OK;
+
+        if (target_row < 0 || target_row >= row_count || (kind != 0 && kind != 1)) {
+            status = NSPROOF_KERNEL_BAD_INDEX;
+        } else if (!check_finite(coeff[term])) {
+            status = NSPROOF_KERNEL_NONFINITE_INPUT;
+        } else {
+            dR = row_dR[target_row];
+            dZ = row_dZ[target_row];
+            if (kind == 0) {
+                NsproofJet2 q_jet;
+                NsproofJet2 x_jet;
+                NsproofJet2 basis;
+                status = make_rz_qx_jets(row_q[target_row], row_x[target_row], dR + dZ, &q_jet, &x_jet);
+                if (status == NSPROOF_KERNEL_OK) {
+                    status = weighted_coeff_jet(
+                        dR + dZ,
+                        q_jet,
+                        x_jet,
+                        q0[term],
+                        q1[term],
+                        x0[term],
+                        x1[term],
+                        alpha[term],
+                        kq[term],
+                        kx[term],
+                        &basis
+                    );
+                }
+                if (status == NSPROOF_KERNEL_OK) {
+                    contribution = coeff[term] * jet_partial(basis, dR, dZ);
+                }
+            } else {
+                double rho0;
+                double R0;
+                double Z0;
+                int r_pow = r_power[term];
+                int z_pow = z_power[term];
+                if (r_pow < 0 || z_pow < 0) {
+                    status = NSPROOF_KERNEL_BAD_INDEX;
+                } else if (!(row_q[target_row] > 0.0) || !(row_q[target_row] < 1.0)) {
+                    status = NSPROOF_KERNEL_NONFINITE_INPUT;
+                } else {
+                    rho0 = 1.0 / (row_q[target_row] * row_q[target_row]) - 1.0;
+                    R0 = rho0 * (1.0 - row_x[target_row]);
+                    Z0 = rho0 * row_x[target_row];
+                    if (!check_finite(rho0) || !check_finite(R0) || !check_finite(Z0)) {
+                        status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+                    } else if (dR <= r_pow && dZ <= z_pow) {
+                        contribution =
+                            -coeff[term] *
+                            falling((double)r_pow, dR) *
+                            falling((double)z_pow, dZ) *
+                            int_power(R0, r_pow - dR) *
+                            int_power(Z0, z_pow - dZ);
+                    }
+                }
+            }
+        }
+        if (status != NSPROOF_KERNEL_OK) {
+            if (out_status != NULL) {
+                out_status[term] = status;
+            }
+            if (first_status == NSPROOF_KERNEL_OK) {
+                first_status = status;
+            }
+            continue;
+        }
+        out_residual[target_row] += contribution;
+        if (!check_finite(out_residual[target_row])) {
+            status = NSPROOF_KERNEL_NONFINITE_OUTPUT;
+            if (out_status != NULL) {
+                out_status[term] = status;
+            }
+            if (first_status == NSPROOF_KERNEL_OK) {
+                first_status = status;
+            }
+        }
+    }
+
+    return first_status;
+}
