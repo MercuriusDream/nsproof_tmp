@@ -63,6 +63,7 @@ def compact_trial(report: dict[str, Any], ridge_relative: float, svd_rcond: floa
         "residual_inf": report["floating_norms"]["residual_inf"],
         "jacobian_row_sum_inf": report["floating_norms"]["jacobian_row_sum_inf"],
         "approximate_inverse_row_sum_inf": report["floating_norms"]["approximate_inverse_row_sum_inf"],
+        "coefficient_coordinate_scaling": report.get("coefficient_coordinate_scaling"),
         "finite_block_hashes": report["finite_block_hashes"],
     }
 
@@ -79,35 +80,45 @@ def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
     rconds = parse_csv_floats(args.svd_rcond)
     trials: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
+    column_scaling_modes = args.column_scaling
     for row_cache in args.row_cache:
-        for ridge in ridges:
-            for rcond in rconds:
-                trial_args = argparse.Namespace(
-                    row_cache=row_cache,
-                    row_labels=args.row_labels,
-                    max_rows=args.max_rows,
-                    ridge_relative=ridge,
-                    svd_rcond=rcond,
-                    summary_only=True,
-                )
-                try:
-                    report = build_report(trial_args)
-                    trials.append(compact_trial(report, ridge, rcond))
-                except Exception as exc:  # noqa: BLE001 - diagnostic sweep should keep going.
-                    failures.append(
-                        {
-                            "row_cache": row_cache,
-                            "ridge_relative": str(ridge),
-                            "svd_rcond": str(rcond),
-                            "error": repr(exc),
-                        }
+        for scaling_mode in column_scaling_modes:
+            for ridge in ridges:
+                for rcond in rconds:
+                    trial_args = argparse.Namespace(
+                        row_cache=row_cache,
+                        row_labels=args.row_labels,
+                        max_rows=args.max_rows,
+                        ridge_relative=ridge,
+                        svd_rcond=rcond,
+                        summary_only=True,
+                        column_scaling=scaling_mode,
+                        column_scale_floor=args.column_scale_floor,
                     )
+                    try:
+                        report = build_report(trial_args)
+                        trials.append(compact_trial(report, ridge, rcond))
+                    except Exception as exc:  # noqa: BLE001 - diagnostic sweep should keep going.
+                        failures.append(
+                            {
+                                "row_cache": row_cache,
+                                "column_scaling": scaling_mode,
+                                "ridge_relative": str(ridge),
+                                "svd_rcond": str(rcond),
+                                "error": repr(exc),
+                            }
+                        )
     best_by_cache: dict[str, dict[str, Any]] = {}
+    best_by_scaling: dict[str, dict[str, Any]] = {}
     for trial in trials:
         key = str(trial["row_cache"])
         current = best_by_cache.get(key)
         if current is None or trial_sort_key(trial) < trial_sort_key(current):
             best_by_cache[key] = trial
+        scaling_key = str((trial.get("coefficient_coordinate_scaling") or {}).get("mode"))
+        current_scaling = best_by_scaling.get(scaling_key)
+        if current_scaling is None or trial_sort_key(trial) < trial_sort_key(current_scaling):
+            best_by_scaling[scaling_key] = trial
     best_overall = min(trials, key=trial_sort_key) if trials else None
     return {
         "schema_version": SCHEMA_VERSION,
@@ -125,10 +136,13 @@ def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
         "svd_rcond_values": rconds,
         "row_labels": args.row_labels,
         "max_rows": args.max_rows,
+        "column_scaling_modes": column_scaling_modes,
+        "column_scale_floor": args.column_scale_floor,
         "trial_count": len(trials),
         "failure_count": len(failures),
         "best_overall": best_overall,
         "best_by_cache": best_by_cache,
+        "best_by_scaling": best_by_scaling,
         "trials": sorted(trials, key=trial_sort_key),
         "failures": failures,
         "blockers": [
@@ -149,9 +163,18 @@ def main() -> None:
     parser.add_argument("--max-rows", type=int)
     parser.add_argument("--ridge-relative", default="1e-6,1e-8,1e-10,1e-12")
     parser.add_argument("--svd-rcond", default="1e-10,1e-12")
+    parser.add_argument(
+        "--column-scaling",
+        action="append",
+        choices=("none", "l2", "inf"),
+        default=None,
+    )
+    parser.add_argument("--column-scale-floor", type=float, default=1e-30)
     args = parser.parse_args()
     if args.max_rows is not None and args.max_rows <= 0:
         parser.error("--max-rows must be positive")
+    if args.column_scaling is None:
+        args.column_scaling = ["none"]
     report = build_sweep(args)
     save_json(args.out, report)
     best = report["best_overall"]

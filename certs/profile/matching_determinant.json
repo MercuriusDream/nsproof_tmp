@@ -17,12 +17,12 @@
       "pass": false,
       "path": "certs/profile/profile_nk.json",
       "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-      "sha256": "358a08e1461bc6ff20d61bb790f09a5d26d1c3f900ea88cfad5f8d76382ad55a"
+      "sha256": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497"
     }
   },
   "dependency_hashes": {
-    "profile_nk": "358a08e1461bc6ff20d61bb790f09a5d26d1c3f900ea88cfad5f8d76382ad55a",
-    "tail_recurrence": "22bdb3ad85c91c868c4e82db554c8c7e3294f841082cba6d3e586d9fc884495a"
+    "profile_nk": "7b63cf76ac7e2482b2d6b5f1ac9d86b0955b54c49bd7707442621b85da589497",
+    "tail_recurrence": "bf44eedac3c77549f2b7879e5a3674d676fddf6d61cf9d9ec251f8eafbdea61b"
   },
   "determinant_interval": null,
   "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
@@ -38,7 +38,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
   "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
-  "repo_commit": "2bf6cf4deb3f373cedc8bad2f0fceda0a4026b38",
+  "repo_commit": "800dea2455acedf24d614c313c0ae9a8af2aa6dd",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "transversality_margin": null

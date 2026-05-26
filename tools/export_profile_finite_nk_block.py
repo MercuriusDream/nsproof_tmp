@@ -108,6 +108,23 @@ def dense_block(rows: list[dict[str, Any]], column_count: int) -> tuple[np.ndarr
     return residual, jacobian
 
 
+def column_scales(jacobian: np.ndarray, mode: str, floor: float) -> np.ndarray:
+    if floor <= 0:
+        raise ValueError("column scale floor must be positive")
+    if mode == "none":
+        return np.ones(jacobian.shape[1], dtype=np.float64)
+    if mode == "l2":
+        norms = np.linalg.norm(jacobian, axis=0)
+    elif mode == "inf":
+        norms = np.max(np.abs(jacobian), axis=0)
+    else:
+        raise ValueError(f"unknown column scaling mode: {mode}")
+    scales = np.ones_like(norms)
+    active = norms > floor
+    scales[active] = 1.0 / norms[active]
+    return scales
+
+
 def ridge_svd_inverse(jacobian: np.ndarray, ridge_relative: float, svd_rcond: float) -> tuple[np.ndarray, dict[str, Any]]:
     if ridge_relative < 0:
         raise ValueError("ridge_relative must be nonnegative")
@@ -159,13 +176,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("no rows selected")
     column_count = int(cache["column_count"])
     residual, jacobian = dense_block(rows, column_count)
-    approximate_inverse, inverse_report = ridge_svd_inverse(jacobian, args.ridge_relative, args.svd_rcond)
+    scales = column_scales(jacobian, args.column_scaling, args.column_scale_floor)
+    scaled_jacobian = jacobian * scales[None, :]
+    approximate_inverse, inverse_report = ridge_svd_inverse(scaled_jacobian, args.ridge_relative, args.svd_rcond)
     if args.summary_only:
-        finite_bounds = finite_nk_bound_summary(residual.tolist(), jacobian.tolist(), approximate_inverse.tolist())
+        finite_bounds = finite_nk_bound_summary(residual.tolist(), scaled_jacobian.tolist(), approximate_inverse.tolist())
     else:
-        finite_bounds = finite_nk_bounds(residual.tolist(), jacobian.tolist(), approximate_inverse.tolist())
+        finite_bounds = finite_nk_bounds(residual.tolist(), scaled_jacobian.tolist(), approximate_inverse.tolist())
     residual_inf = float(np.max(np.abs(residual)))
-    jacobian_inf = float(np.max(np.sum(np.abs(jacobian), axis=1)))
+    jacobian_inf = float(np.max(np.sum(np.abs(scaled_jacobian), axis=1)))
     inverse_inf = float(np.max(np.sum(np.abs(approximate_inverse), axis=1)))
     return {
         "schema_version": SCHEMA_VERSION,
@@ -190,9 +209,21 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "column_count": column_count,
             "max_rows": args.max_rows,
         },
+        "coefficient_coordinate_scaling": {
+            "mode": args.column_scaling,
+            "scale_floor": args.column_scale_floor,
+            "scale_min": float(np.min(scales)),
+            "scale_max": float(np.max(scales)),
+            "nontrivial_scale_count": int(np.count_nonzero(scales != 1.0)),
+            "meaning": (
+                "The finite block is evaluated in scaled coefficient coordinates "
+                "z with h = diag(scales) z.  This is a sampled Banach-norm "
+                "diagnostic, not a validated profile norm."
+            ),
+        },
         "finite_block_hashes": {
             "residual_vector_float64": sha256_array(residual),
-            "jacobian_float64": sha256_array(jacobian),
+            "jacobian_float64": sha256_array(scaled_jacobian),
             "approximate_inverse_float64": sha256_array(approximate_inverse),
         },
         "floating_norms": {
@@ -228,6 +259,8 @@ def main() -> None:
     parser.add_argument("--ridge-relative", type=float, default=1e-8)
     parser.add_argument("--svd-rcond", type=float, default=1e-12)
     parser.add_argument("--summary-only", action="store_true")
+    parser.add_argument("--column-scaling", choices=("none", "l2", "inf"), default="none")
+    parser.add_argument("--column-scale-floor", type=float, default=1e-30)
     args = parser.parse_args()
     if args.max_rows is not None and args.max_rows <= 0:
         parser.error("--max-rows must be positive")
