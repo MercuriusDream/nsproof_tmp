@@ -240,6 +240,24 @@ def variable_tail_patch(data: dict[str, Any], variable: CoefficientVariable) -> 
     return blocks[variable.block][variable.frac_index - 1][variable.patch_index]
 
 
+def active_tail_patch_for_variable(data: dict[str, Any], variable: CoefficientVariable, q: float, x: float) -> dict[str, Any] | None:
+    """Return the variable patch only if it is the evaluator's active patch.
+
+    Patch boundaries are deliberately fuzzy in the floating evaluator.  When a
+    point lies on a shared boundary, the exact profile evaluator uses the first
+    matching patch in storage order.  The PDE Jacobian must make the same
+    choice; otherwise Stage-0 differentiates coefficients that the residual
+    evaluator ignores at chart/patch seams.
+    """
+
+    blocks = data["tail_chart"]["blocks"]
+    patches = blocks[variable.block] if variable.frac_index is None else blocks[variable.block][variable.frac_index - 1]
+    for index, patch in enumerate(patches):
+        if point_in_patch(patch, q, x):
+            return patch if index == variable.patch_index else None
+    return None
+
+
 def delta_total_jet(
     data: dict[str, Any],
     projection: ProjectedProfile,
@@ -257,8 +275,8 @@ def delta_total_jet(
     if variable.chart == "tail":
         if origin.enabled and q_value >= origin.q_min:
             return Jet2.const(0.0)
-        patch = variable_tail_patch(data, variable)
-        if not point_in_patch(patch, q_value, x.value()):
+        patch = active_tail_patch_for_variable(data, variable, q_value, x.value())
+        if patch is None:
             return Jet2.const(0.0)
         q0, q1, x0, x1 = patch_interval(patch)
         basis = cheb_eval_tensor_jet(
@@ -408,8 +426,8 @@ def native_tail_linearized_residuals_with_kind(
             continue
         if variable.component == "G" and projection.g_origin.enabled and q >= projection.g_origin.q_min:
             continue
-        patch = variable_tail_patch(data, variable)
-        if point_in_patch(patch, q, x):
+        patch = active_tail_patch_for_variable(data, variable, q, x)
+        if patch is not None:
             cases.append((variable, patch_interval(patch)))
     if not cases:
         return {}, {"enabled": True, "cases": 0, "seconds": 0.0}
