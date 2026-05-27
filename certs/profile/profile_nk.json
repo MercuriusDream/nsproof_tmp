@@ -11,8 +11,8 @@
   "blockers": [
     "directed-rounding interval backend is not yet attached",
     "validated approximate inverse A is not yet supplied",
-    "sampled quotient residual max 4.363467452839e+02 exceeds entry threshold 1.000000000000e-08",
-    "C0-C4 R/Z mortar max 4.968090999593e+06 exceeds entry threshold 1.000000000000e-08",
+    "sampled quotient residual max 4.363380643040e+02 exceeds entry threshold 1.000000000000e-08",
+    "C0-C4 R/Z mortar max 4.968090464762e+06 exceeds entry threshold 1.000000000000e-08",
     "domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain",
     "validated approximate inverse hash is missing",
     "Z2/tail-complement interval bound is not available for this profile",
@@ -22,7 +22,7 @@
     "Z2/tail complement interval bound is missing",
     "sampled nextafter double intervals are row data only, not continuous-domain enclosures",
     "finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF",
-    "finite-block sampled Z0=1.828082798740e+00 is >= 1",
+    "finite-block sampled Z0=1.828082648721e+00 is >= 1",
     "row cache is floating, not interval residual data",
     "approximate inverse is floating ridge-SVD, not validated",
     "Z2 and infinite complement bounds are missing",
@@ -30,7 +30,7 @@
     "finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
     "best sampled finite-block sweep trial is not a full-block proof-relevant trial",
     "best sampled finite-block sweep Z0=1.160463898840e+00 is >= 1",
-    "best full-block sampled finite-block sweep Z0=1.628883167890e+00 is >= 1",
+    "best full-block sampled finite-block sweep Z0=1.628882966407e+00 is >= 1",
     "sweep is floating and sampled, not interval residual validation",
     "approximate inverses are floating ridge-SVD diagnostics",
     "Z2 and infinite complement bounds are missing",
@@ -38,17 +38,17 @@
   ],
   "certificate_name": "profile_nk",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
   ],
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
-    "exact_residual_audit": "6dfd2575798d57357995dae678fa6485fb139bacf3172f50079f5e88cb64fc1e",
+    "exact_residual_audit": "01e2c24a7984f5c21f1150b5b5215bac2a72466c42937799b34184d506f8b0d6",
     "finite_nk_bounds": "764463de866b761f218a3750b9ff16926fc3207d9ba6059e5ce549ac6f96ce89",
     "interval_backend": "a87cba36b4870f66b987e3683b99ba1006b389a9422cd75cdee7a9bacedbe0c1",
     "native_interval_kernel": "47a32dbc6b006611a05ea2d0dde99bee9436abc2ed116da43de56fb718d73ba2",
-    "sampled_finite_block_report": "73e972e511b698556ef24851e88c114cc805cd098edfea89b3f55404b55e7775",
-    "sampled_finite_block_sweep_0": "18a86da249c23614cd6d0521744dd4e875b88cadbaa69f4f746864171f8efde1",
-    "sampled_interval_residual_rows": "812029af04b77c6cd2d7acfad34b6ec95891d54d2294b8af3d181846da4c893a",
+    "sampled_finite_block_report": "d68f805eb93dc11848565f0853481e459eca6d5c5e69bcc41727cfdeeada495d",
+    "sampled_finite_block_sweep_0": "108e760185af36d16fc40858f6956278a01f4f7b477cfd5690d93730f8ac3477",
+    "sampled_interval_residual_rows": "281e5db62a88a34cf3b755f5dc633c072cb99e327aa2e624210b12dcadee8d97",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "exact_residual_audit": {
@@ -57,18 +57,18 @@
     "blockers": [
       "directed-rounding interval backend is not yet attached",
       "validated approximate inverse A is not yet supplied",
-      "sampled quotient residual max 4.363467452839e+02 exceeds entry threshold 1.000000000000e-08",
-      "C0-C4 R/Z mortar max 4.968090999593e+06 exceeds entry threshold 1.000000000000e-08"
+      "sampled quotient residual max 4.363380643040e+02 exceeds entry threshold 1.000000000000e-08",
+      "C0-C4 R/Z mortar max 4.968090464762e+06 exceeds entry threshold 1.000000000000e-08"
     ],
     "certificate_name": "exact_residual_twochart_audit",
     "commands": [
-      "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+      "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
     ],
     "dependency_hashes": {},
     "entry_ready_for_interval_nk": false,
-    "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363467452839e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090999593e+06 exceeds entry threshold 1.000000000000e-08",
+    "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363380643040e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090464762e+06 exceeds entry threshold 1.000000000000e-08",
     "input_hashes": {
-      "profile": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68"
+      "profile": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e"
     },
     "interval_widths": {
       "max": null,
@@ -81,7 +81,7 @@
         "cases": 659625,
         "enabled": true,
         "rows": 2430,
-        "seconds": 0.9208239999999996
+        "seconds": 0.9261649169999977
       },
       "orders": "C0-C4",
       "overlap_q_range": [
@@ -103,8 +103,8 @@
             "dq_order": 4,
             "dx_order": 0,
             "key": "RZ:F:dRRRR",
-            "max_abs": 4968090.999593385,
-            "rms": 838259.3959744908
+            "max_abs": 4968090.464761761,
+            "rms": 838252.8610115801
           },
           {
             "component": "F",
@@ -114,8 +114,8 @@
             "dq_order": 0,
             "dx_order": 4,
             "key": "RZ:F:dZZZZ",
-            "max_abs": 3301130.6904273755,
-            "rms": 516154.9574527245
+            "max_abs": 3127649.859088852,
+            "rms": 493789.6873822671
           },
           {
             "component": "F",
@@ -125,8 +125,8 @@
             "dq_order": 3,
             "dx_order": 1,
             "key": "RZ:F:dRRRZ",
-            "max_abs": 1517960.096685852,
-            "rms": 275294.61657744576
+            "max_abs": 1517960.0077745349,
+            "rms": 275294.64367335517
           },
           {
             "component": "G",
@@ -137,7 +137,7 @@
             "dx_order": 4,
             "key": "RZ:G:dZZZZ",
             "max_abs": 543131.1633134711,
-            "rms": 105106.62952862497
+            "rms": 105106.62952907266
           },
           {
             "component": "F",
@@ -147,8 +147,8 @@
             "dq_order": 2,
             "dx_order": 2,
             "key": "RZ:F:dRRZZ",
-            "max_abs": 334093.1656269478,
-            "rms": 105244.32340373605
+            "max_abs": 334093.15664014133,
+            "rms": 105244.97308996104
           },
           {
             "component": "G",
@@ -159,7 +159,7 @@
             "dx_order": 3,
             "key": "RZ:G:dRZZZ",
             "max_abs": 283469.5319360751,
-            "rms": 58880.138146868885
+            "rms": 58880.13814647421
           },
           {
             "component": "G",
@@ -169,8 +169,8 @@
             "dq_order": 4,
             "dx_order": 0,
             "key": "RZ:G:dRRRR",
-            "max_abs": 243523.96208774138,
-            "rms": 62547.192925869414
+            "max_abs": 243523.9619343231,
+            "rms": 62547.19291219048
           },
           {
             "component": "G",
@@ -180,8 +180,8 @@
             "dq_order": 3,
             "dx_order": 1,
             "key": "RZ:G:dRRRZ",
-            "max_abs": 192280.73197630962,
-            "rms": 50329.16154051961
+            "max_abs": 192280.73182289134,
+            "rms": 50329.16152854206
           },
           {
             "component": "F",
@@ -191,8 +191,8 @@
             "dq_order": 1,
             "dx_order": 3,
             "key": "RZ:F:dRZZZ",
-            "max_abs": 154696.82268776122,
-            "rms": 62579.454682709125
+            "max_abs": 154696.81910122087,
+            "rms": 62569.60405744663
           },
           {
             "component": "G",
@@ -203,7 +203,7 @@
             "dx_order": 2,
             "key": "RZ:G:dRRZZ",
             "max_abs": 102077.44317791302,
-            "rms": 46210.500220634975
+            "rms": 46210.50021524162
           },
           {
             "component": "F",
@@ -213,8 +213,8 @@
             "dq_order": 3,
             "dx_order": 0,
             "key": "RZ:F:dRRR",
-            "max_abs": 99853.57079810744,
-            "rms": 16185.872010559311
+            "max_abs": 99853.56196785273,
+            "rms": 16185.863016968102
           },
           {
             "component": "F",
@@ -224,8 +224,8 @@
             "dq_order": 0,
             "dx_order": 3,
             "key": "RZ:F:dZZZ",
-            "max_abs": 59421.99110074545,
-            "rms": 11004.899486187349
+            "max_abs": 59421.99065889961,
+            "rms": 10999.679464239107
           },
           {
             "component": "F",
@@ -235,8 +235,8 @@
             "dq_order": 2,
             "dx_order": 1,
             "key": "RZ:F:dRRZ",
-            "max_abs": 26619.60883475232,
-            "rms": 7936.514246656516
+            "max_abs": 26619.60793883461,
+            "rms": 7936.524017869359
           },
           {
             "component": "G",
@@ -247,7 +247,7 @@
             "dx_order": 3,
             "key": "RZ:G:dZZZ",
             "max_abs": 16285.322185601062,
-            "rms": 4135.3225638776
+            "rms": 4135.322563810253
           },
           {
             "component": "F",
@@ -257,8 +257,8 @@
             "dq_order": 1,
             "dx_order": 2,
             "key": "RZ:F:dRZZ",
-            "max_abs": 15054.698660358605,
-            "rms": 5423.502697702527
+            "max_abs": 15054.288287713403,
+            "rms": 5423.439605728478
           },
           {
             "component": "G",
@@ -268,8 +268,8 @@
             "dq_order": 3,
             "dx_order": 0,
             "key": "RZ:G:dRRR",
-            "max_abs": 9088.401127679514,
-            "rms": 3315.6941998971765
+            "max_abs": 9088.401175782037,
+            "rms": 3315.694204605517
           },
           {
             "component": "G",
@@ -280,7 +280,7 @@
             "dx_order": 1,
             "key": "RZ:G:dRRZ",
             "max_abs": 8891.509384641573,
-            "rms": 3325.538892293668
+            "rms": 3325.538894716097
           },
           {
             "component": "G",
@@ -291,7 +291,7 @@
             "dx_order": 2,
             "key": "RZ:G:dRZZ",
             "max_abs": 7365.987253012071,
-            "rms": 3074.315126868319
+            "rms": 3074.315127759651
           },
           {
             "component": "F",
@@ -301,8 +301,8 @@
             "dq_order": 0,
             "dx_order": 2,
             "key": "RZ:F:dZZ",
-            "max_abs": 4214.293835584211,
-            "rms": 700.1450849555648
+            "max_abs": 4214.293668677192,
+            "rms": 700.1457732770721
           },
           {
             "component": "F",
@@ -312,8 +312,8 @@
             "dq_order": 2,
             "dx_order": 0,
             "key": "RZ:F:dRR",
-            "max_abs": 1919.5678904570707,
-            "rms": 519.5210789770738
+            "max_abs": 1919.5678143915272,
+            "rms": 519.522382451947
           },
           {
             "component": "F",
@@ -323,8 +323,8 @@
             "dq_order": 1,
             "dx_order": 1,
             "key": "RZ:F:dRZ",
-            "max_abs": 1213.6952319674897,
-            "rms": 369.8334054028993
+            "max_abs": 1213.6951838739924,
+            "rms": 369.8332846042272
           },
           {
             "component": "G",
@@ -335,7 +335,7 @@
             "dx_order": 2,
             "key": "RZ:G:dZZ",
             "max_abs": 976.2786162163204,
-            "rms": 256.0301566785458
+            "rms": 256.03015667653773
           },
           {
             "component": "G",
@@ -346,7 +346,7 @@
             "dx_order": 0,
             "key": "RZ:G:dRR",
             "max_abs": 646.8384804835716,
-            "rms": 222.29745114826423
+            "rms": 222.2974510617655
           },
           {
             "component": "G",
@@ -357,7 +357,7 @@
             "dx_order": 1,
             "key": "RZ:G:dRZ",
             "max_abs": 569.8318063839646,
-            "rms": 180.43435299824912
+            "rms": 180.4343529623643
           },
           {
             "component": "F",
@@ -367,8 +367,8 @@
             "dq_order": 0,
             "dx_order": 1,
             "key": "RZ:F:dZ",
-            "max_abs": 230.71098909326588,
-            "rms": 35.886809681366024
+            "max_abs": 230.71101013324483,
+            "rms": 35.88684099796933
           },
           {
             "component": "F",
@@ -378,8 +378,8 @@
             "dq_order": 1,
             "dx_order": 0,
             "key": "RZ:F:dR",
-            "max_abs": 75.22522593911015,
-            "rms": 21.39717677448174
+            "max_abs": 75.22525041372074,
+            "rms": 21.397203583110855
           },
           {
             "component": "G",
@@ -390,7 +390,7 @@
             "dx_order": 1,
             "key": "RZ:G:dZ",
             "max_abs": 60.53507022897611,
-            "rms": 12.263293050124611
+            "rms": 12.26329305011735
           },
           {
             "component": "G",
@@ -401,7 +401,7 @@
             "dx_order": 0,
             "key": "RZ:G:dR",
             "max_abs": 32.68736333274805,
-            "rms": 9.400996991594017
+            "rms": 9.400996991637681
           },
           {
             "component": "F",
@@ -411,8 +411,8 @@
             "dq_order": 0,
             "dx_order": 0,
             "key": "RZ:F:value",
-            "max_abs": 9.278453824629182,
-            "rms": 1.32030643558641
+            "max_abs": 9.278456560621706,
+            "rms": 1.3203068424531184
           },
           {
             "component": "G",
@@ -423,13 +423,13 @@
             "dx_order": 0,
             "key": "RZ:G:value",
             "max_abs": 2.5083584725000025,
-            "rms": 0.46127828976281343
+            "rms": 0.4612782897962488
           }
         ],
-        "max_abs": 4968090.999593385,
-        "rms": 190043.3671359654,
+        "max_abs": 4968090.464761761,
+        "rms": 188050.933195971,
         "worst": {
-          "abs_residual": 4968090.999593385,
+          "abs_residual": 4968090.464761761,
           "component": "F",
           "coordinate": "RZ",
           "derivative": "dRRRR",
@@ -437,11 +437,11 @@
           "dx_order": 0,
           "jacobian": [],
           "jacobian_nnz": 0,
-          "origin_value": -83529.3302832346,
+          "origin_value": -83529.3316886709,
           "q": 0.91,
-          "residual_tail_minus_origin": -4968090.999593385,
+          "residual_tail_minus_origin": -4968090.464761761,
           "row_index": 1079,
-          "tail_value": -5051620.329876605,
+          "tail_value": -5051619.796450419,
           "total_order": 4,
           "x": 1.0
         }
@@ -459,11 +459,11 @@
     },
     "pass": false,
     "precision_bits": 53,
-    "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-    "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
-    "repo_commit": "70096bac351413a5dc699e28bbbb533c866bcedc",
+    "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+    "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
+    "repo_commit": "d306e6b4ee2926c907955b44758e75e373880e99",
     "residual_blocks": {
-      "max_abs": 436.3467452838623,
+      "max_abs": 436.33806430395117,
       "scans": {
         "edge": {
           "b_range": [
@@ -480,7 +480,7 @@
           },
           "h": 0.001,
           "label": "edge",
-          "max_abs": 436.3467452838623,
+          "max_abs": 436.33806430395117,
           "mode": "ProjectedProfile.exact_residual_at Taylor jet",
           "note": "Broad near-axis/high-|b| floating diagnostic; exact axes are excluded.",
           "q_range": [
@@ -488,12 +488,12 @@
             0.98
           ],
           "residual_kind": "normalized-structural",
-          "rms": 32.925546912504146,
+          "rms": 32.91873298843777,
           "worst": {
             "b": 0.98,
-            "e_gamma": 0.9132552041627591,
-            "e_psi": 436.3467452838623,
-            "max_abs": 436.3467452838623,
+            "e_gamma": 0.913278128789127,
+            "e_psi": 436.33806430395117,
+            "max_abs": 436.33806430395117,
             "q": 0.8999999999999999,
             "r": 0.09637888196533986,
             "z": 0.4746356627410957
@@ -548,7 +548,7 @@
           },
           "h": 0.001,
           "label": "origin",
-          "max_abs": 91.32495731841728,
+          "max_abs": 91.32496280523227,
           "mode": "ProjectedProfile.exact_residual_at Taylor jet",
           "note": "Origin-chart residual quotient scan.",
           "q_range": [
@@ -556,12 +556,12 @@
             0.98
           ],
           "residual_kind": "normalized-structural",
-          "rms": 30.49829598767878,
+          "rms": 30.498297279674333,
           "worst": {
             "b": 0.05,
-            "e_gamma": 0.599836023826203,
-            "e_psi": 91.32495731841728,
-            "max_abs": 91.32495731841728,
+            "e_gamma": 0.5998360214988371,
+            "e_psi": 91.32496280523227,
+            "max_abs": 91.32496280523227,
             "q": 0.9625,
             "r": 0.281498561946245,
             "z": 0.01409255481442253
@@ -582,7 +582,7 @@
           },
           "h": 0.001,
           "label": "overlap",
-          "max_abs": 323.9718927620109,
+          "max_abs": 323.9718949204196,
           "mode": "ProjectedProfile.exact_residual_at Taylor jet",
           "note": "Samples the stored tail-origin overlap band; may cross the diagnostic origin switch.",
           "q_range": [
@@ -590,12 +590,12 @@
             0.92
           ],
           "residual_kind": "normalized-structural",
-          "rms": 50.04565846217349,
+          "rms": 50.02456108397452,
           "worst": {
             "b": 0.95,
-            "e_gamma": 1.4956061415809103,
-            "e_psi": -323.9718927620109,
-            "max_abs": 323.9718927620109,
+            "e_gamma": 1.4956061436246686,
+            "e_psi": -323.9718949204196,
+            "max_abs": 323.9718949204196,
             "q": 0.9,
             "r": 0.15122952876462445,
             "z": 0.4601059995959599
@@ -756,7 +756,7 @@
       "nk_entry_residual_max": 1e-08
     }
   },
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363467452839e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090999593e+06 exceeds entry threshold 1.000000000000e-08; domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF; exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828082798740e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898840e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.628883167890e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363380643040e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090464762e+06 exceeds entry threshold 1.000000000000e-08; domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF; exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828082648721e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898840e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.628882966407e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
   "finite_nk_backend": {
     "backend": "native-c-outward-rounded-double-interval",
     "input_hashes": {
@@ -773,7 +773,7 @@
     "0.45"
   ],
   "input_hashes": {
-    "profile": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68"
+    "profile": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e"
   },
   "interval_widths": {
     "max": null,
@@ -783,8 +783,8 @@
   "pass": false,
   "patch_mortar_order": 4,
   "precision_bits": null,
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-  "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+  "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
   "radii_polynomial_helper_self_test": {
     "Y0": "0",
     "Z0": "0.1",
@@ -808,62 +808,62 @@
   },
   "radii_polynomial_interval": null,
   "radius_interval": null,
-  "repo_commit": "70096bac351413a5dc699e28bbbb533c866bcedc",
+  "repo_commit": "d306e6b4ee2926c907955b44758e75e373880e99",
   "residual_map_hash_sha256": "f2b28046f8a44ffa41580257015e308032b574a94fdc910902a06da8af871db3",
   "rounding_mode": null,
   "sampled_finite_block_report": {
     "approximate_inverse": {
       "rank_after_cutoff": 81,
-      "ridge_absolute": 628348811700.4623,
+      "ridge_absolute": 628350122694.3066,
       "ridge_relative": 0.0001,
       "singular_value_count": 128,
       "singular_values": {
-        "condition_estimate": 2.6565111379975514e+17,
+        "condition_estimate": 3.9403624566577434e+17,
         "first_12": [
-          79268456.00240125,
-          12421440.868676428,
-          8991492.714064483,
-          5263434.140453313,
-          3037720.205113798,
-          2893538.0412303396,
-          2534016.4809561777,
-          1890792.608058155,
-          1114153.3708101665,
-          870524.9168201024,
-          805841.327848673,
-          632534.304564596
+          79268538.69564562,
+          12421456.592528421,
+          8991492.714209482,
+          5263435.01813015,
+          3037719.866268097,
+          2893534.1588035417,
+          2534016.471879002,
+          1890791.1815189037,
+          1114153.3707673352,
+          870533.6478724686,
+          805841.436578844,
+          632530.474613288
         ],
         "last_12": [
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          7.903542883733754e-09,
-          2.983930873414404e-10
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          7.90355112841768e-09,
+          2.0117067799616085e-10
         ],
-        "max": 79268456.00240125,
-        "min_nonzero": 2.983930873414404e-10
+        "max": 79268538.69564562,
+        "min_nonzero": 2.0117067799616085e-10
       },
       "svd_rcond": 1e-10
     },
     "diagnostic_vs_proof": "Floating sampled row-cache finite block.  Uses native C interval linear algebra for finite Y0/Z0 arithmetic, but the row cache, Jacobian, inverse, and residual are not interval-certified and no Z2/tail-complement bound is supplied.",
     "finite_nk_bounds": {
-      "Y0_infinity_norm_A_r": 0.0014508978728616144,
-      "Z0_infinity_norm_B": 1.8280827987400186,
+      "Y0_infinity_norm_A_r": 0.001450840475993491,
+      "Z0_infinity_norm_B": 1.8280826487213515,
       "backend": "native-c-outward-rounded-double-interval-summary",
       "coefficient_dimension": 128,
       "residual_dimension": 317
     },
     "floating_norms": {
-      "approximate_inverse_row_sum_inf": 1.9572961778900833e-06,
-      "jacobian_row_sum_inf": 101292196.47194248,
-      "residual_inf": 4363.467452819804
+      "approximate_inverse_row_sum_inf": 1.957293473462167e-06,
+      "jacobian_row_sum_inf": 101292371.95196033,
+      "residual_inf": 4363.380643020701
     },
     "pass": false,
     "path": "certs/profile/profile_finite_nk_current_block.json",
@@ -875,15 +875,15 @@
       "max_rows": null,
       "selected_row_count": 317
     },
-    "sha256": "73e972e511b698556ef24851e88c114cc805cd098edfea89b3f55404b55e7775",
+    "sha256": "d68f805eb93dc11848565f0853481e459eca6d5c5e69bcc41727cfdeeada495d",
     "status": "PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF"
   },
   "sampled_finite_block_sweep": {
     "best_by_cache": {
-      "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json": {
-        "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-        "Z0_infinity_norm_B": 1.160463898840385,
-        "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+      "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json": {
+        "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+        "Z0_infinity_norm_B": 1.1604638988404172,
+        "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -894,15 +894,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 99894848100730.5,
+        "condition_estimate": 99894844133502.52,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-          "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-          "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+          "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+          "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+          "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
         },
-        "jacobian_row_sum_inf": 1575125.8351721996,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 1575125.8351722003,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -921,10 +921,10 @@
           "nontrivial_scale_count": 31,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.003086687525496534
+          "scale_min": 0.003086687504931994
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -935,9 +935,9 @@
     },
     "best_by_row_scaling": {
       "combined-inf": {
-        "Y0_infinity_norm_A_r": 4.37176950491075,
-        "Z0_infinity_norm_B": 2.373517593318151,
-        "approximate_inverse_row_sum_inf": 8.094085464836166,
+        "Y0_infinity_norm_A_r": 4.37176957099547,
+        "Z0_infinity_norm_B": 2.3735175933181583,
+        "approximate_inverse_row_sum_inf": 8.094085450788135,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -948,15 +948,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 8272452.453968779,
+        "condition_estimate": 8272452.310875136,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "516530e97190954711f9819587e3605cc269d3ebc69c27e99774acfad7a925fb",
-          "jacobian_float64": "5d208210540f0a98b09e02b6af23fa77f951fe1ccd0747719465e303773faeb9",
-          "residual_vector_float64": "490755abf2abb642698516c395527b9daa0dee0d295900b5f842f84a6b651e61"
+          "approximate_inverse_float64": "9922ebd51e9ff133ab692a5aceeca697e0802abd9074cd789360627af699979a",
+          "jacobian_float64": "22b3c29f44faf892e0b31d5ccedd2814dc29dcbc7560c2a55864e2457c56e6a9",
+          "residual_vector_float64": "a2d5a670c26a30e56f8c8aa51d7e9c3fa176d32adc30734df5bd22ef4b60ab15"
         },
         "jacobian_row_sum_inf": 6.48728295164783,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -974,11 +974,11 @@
           "mode": "combined-inf",
           "nontrivial_scale_count": 23,
           "scale_floor": 1e-30,
-          "scale_max": 0.12771526023978194,
+          "scale_max": 0.12771526529426003,
           "scale_min": 4.902617867753372e-05
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar"
         ],
@@ -986,9 +986,9 @@
         "svd_rcond": 1e-08
       },
       "none": {
-        "Y0_infinity_norm_A_r": 0.00016343648886712794,
-        "Z0_infinity_norm_B": 1.3376807982582832,
-        "approximate_inverse_row_sum_inf": 1.0444611867398118e-06,
+        "Y0_infinity_norm_A_r": 0.00016343648998616087,
+        "Z0_infinity_norm_B": 1.3376808075567377,
+        "approximate_inverse_row_sum_inf": 1.0444611010075102e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -999,15 +999,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 80080456602502.11,
+        "condition_estimate": 80080456604197.9,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "16b66fd913d3c66ccc8440a0ac8944bb02c74426549b3bc2d859ceddf1e01dd9",
-          "jacobian_float64": "bd711e52c48f1013f5939e2cdbe0d82664341738f3f50a6f29c2ad9e4ac76e59",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "b72a6a909651ee56f371f0e75c9e0a1631fbddcc38360a03832fd53814c21144",
+          "jacobian_float64": "7490d854201d9231e4db41c64b372b4b4b191af0a49bfdfa30e83943829ec611",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
         "jacobian_row_sum_inf": 11996759.254775519,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1019,7 +1019,7 @@
         },
         "rank_after_cutoff": 21,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1029,7 +1029,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1038,9 +1038,9 @@
         "svd_rcond": 1e-08
       },
       "residual": {
-        "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-        "Z0_infinity_norm_B": 1.160463898840385,
-        "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+        "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+        "Z0_infinity_norm_B": 1.1604638988404172,
+        "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -1051,15 +1051,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 99894848100730.5,
+        "condition_estimate": 99894844133502.52,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-          "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-          "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+          "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+          "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+          "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
         },
-        "jacobian_row_sum_inf": 1575125.8351721996,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 1575125.8351722003,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1078,10 +1078,10 @@
           "nontrivial_scale_count": 31,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.003086687525496534
+          "scale_min": 0.003086687504931994
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1092,9 +1092,9 @@
     },
     "best_by_scaling": {
       "inf": {
-        "Y0_infinity_norm_A_r": 16.315747667598103,
-        "Z0_infinity_norm_B": 2.216677430649752,
-        "approximate_inverse_row_sum_inf": 3.262607644006426,
+        "Y0_infinity_norm_A_r": 16.315747171347457,
+        "Z0_infinity_norm_B": 2.2166774407824947,
+        "approximate_inverse_row_sum_inf": 3.262607643826425,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "inf",
@@ -1105,15 +1105,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 4785992503377.592,
+        "condition_estimate": 4785992395531.833,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "5a12a4e6d44202565d9ffe6f2d7dc65d31ace738ddb8fa8d499ee8e715d45482",
-          "jacobian_float64": "15165913c419bb33854e6c74df181176b1186cc6d8b1991b44387b23619fc987",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "777741ebb9aeb7d482f3f1ffc4269eaf093c171fa731af9829b87630e524570f",
+          "jacobian_float64": "531894662fdbccfeaf67778a3e363c9145317ac44e7288f2b6dde0ae7af3d466",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
-        "jacobian_row_sum_inf": 68.905968628414,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 68.90596868127683,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1125,7 +1125,7 @@
         },
         "rank_after_cutoff": 27,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1135,7 +1135,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1144,9 +1144,9 @@
         "svd_rcond": 1e-10
       },
       "l2": {
-        "Y0_infinity_norm_A_r": 16.992659987370878,
-        "Z0_infinity_norm_B": 2.206924839802078,
-        "approximate_inverse_row_sum_inf": 3.257984595290564,
+        "Y0_infinity_norm_A_r": 16.9926595164346,
+        "Z0_infinity_norm_B": 2.2069248482714263,
+        "approximate_inverse_row_sum_inf": 3.257984596470727,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "l2",
@@ -1157,15 +1157,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 4711903221081.103,
+        "condition_estimate": 4711902729337.089,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "386c343f650ec91b8ad3dcd44d341a88d4396caaf965f723d7a2eab81e34d57c",
-          "jacobian_float64": "bca14b518aa4ddcf3d591a3dbe920bd8ffdbb4c5b3ea9bfd6b1c6cfd051efcc0",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "7cc98bedb88f9df53f7e186df76af61e035212f3738acc9ae2bbca9636e1e6eb",
+          "jacobian_float64": "660cbf64c10fa6f9d1f32be245b28992314889812eb3c6bb89c52ddc4efb4340",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
-        "jacobian_row_sum_inf": 67.72846133496273,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 67.7284613635609,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1177,7 +1177,7 @@
         },
         "rank_after_cutoff": 27,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1187,7 +1187,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1196,9 +1196,9 @@
         "svd_rcond": 1e-10
       },
       "none": {
-        "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-        "Z0_infinity_norm_B": 1.160463898840385,
-        "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+        "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+        "Z0_infinity_norm_B": 1.1604638988404172,
+        "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -1209,15 +1209,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 99894848100730.5,
+        "condition_estimate": 99894844133502.52,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-          "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-          "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+          "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+          "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+          "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
         },
-        "jacobian_row_sum_inf": 1575125.8351721996,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 1575125.8351722003,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1236,10 +1236,10 @@
           "nontrivial_scale_count": 31,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.003086687525496534
+          "scale_min": 0.003086687504931994
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1250,28 +1250,28 @@
     },
     "best_by_scaling_pair": {
       "row:combined-inf|column:inf": {
-        "Y0_infinity_norm_A_r": 21.235612124131162,
-        "Z0_infinity_norm_B": 2.452873294496737,
-        "approximate_inverse_row_sum_inf": 97.69414144328019,
+        "Y0_infinity_norm_A_r": 21.23561133374322,
+        "Z0_infinity_norm_B": 2.452873274144003,
+        "approximate_inverse_row_sum_inf": 97.69413657904208,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "inf",
-          "nontrivial_scale_count": 104,
+          "nontrivial_scale_count": 106,
           "scale_floor": 1e-30,
           "scale_max": 492.7927693044919,
           "scale_min": 1.0
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 1.428701756563044e+16,
+        "condition_estimate": 1.4287017560781122e+16,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "85ba00f764039d5d39fb731a3e96700a3b92cdabc1f6adbc41b4aa4b4b4a5284",
-          "jacobian_float64": "e337482cdf63dc4b388de300add20a2358a4de34c8ad8b1329be894cec4b78bb",
-          "residual_vector_float64": "b70459cdcd0e75a1df98374093c5a4003ee3a2a1951a47a9e629d52f2b5c2f64"
+          "approximate_inverse_float64": "4405818910b874150952dd23fc203efc1bfcb622502fb6e94c6d792639deb3e0",
+          "jacobian_float64": "888e3498ec1886afc240b0b34544b2106392c370c217632d072206fad2aa08b2",
+          "residual_vector_float64": "c1e94dda342b4cb7656e8df0a5d074c098fe181fc2f0418943077ed40d2ef36e"
         },
-        "jacobian_row_sum_inf": 27.020928359842515,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 27.020928360871437,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1289,19 +1289,19 @@
           "mode": "combined-inf",
           "nontrivial_scale_count": 317,
           "scale_floor": 1e-30,
-          "scale_max": 0.17664647255633925,
-          "scale_min": 2.8394933282425817e-08
+          "scale_max": 0.17664648029239896,
+          "scale_min": 2.8394917049271024e-08
         },
         "ridge_relative": 1e-05,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": "all",
         "selected_row_count": 317,
         "svd_rcond": 1e-08
       },
       "row:combined-inf|column:l2": {
-        "Y0_infinity_norm_A_r": 26.953047891471414,
-        "Z0_infinity_norm_B": 2.427986923880167,
-        "approximate_inverse_row_sum_inf": 74.12933422929677,
+        "Y0_infinity_norm_A_r": 26.953047183949273,
+        "Z0_infinity_norm_B": 2.4279874563994865,
+        "approximate_inverse_row_sum_inf": 74.1293481572944,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "l2",
@@ -1312,15 +1312,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 1.3897606375744314e+16,
+        "condition_estimate": 1.389761007000351e+16,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "d0142ae54cfdcb968cd554d6381e15a7dc4e2390c62cca42da2cb06b7b6a4026",
-          "jacobian_float64": "ab184fba189eeb5c949a2e232d64f434516c799e685c0a49deed9cb38fcfc1cc",
-          "residual_vector_float64": "b70459cdcd0e75a1df98374093c5a4003ee3a2a1951a47a9e629d52f2b5c2f64"
+          "approximate_inverse_float64": "fa7dd6e78187320b7f10e3492860cc4e22c16ae4d18d818ff476d192d8f7c1c3",
+          "jacobian_float64": "d5163e0d96fb638e7864756febe0a0de5ddabcf2dd13865eee7bba1d500820a7",
+          "residual_vector_float64": "c1e94dda342b4cb7656e8df0a5d074c098fe181fc2f0418943077ed40d2ef36e"
         },
-        "jacobian_row_sum_inf": 16.869670504890955,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 16.86967050851103,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1330,7 +1330,7 @@
           "scope": "full_block",
           "selected_all_available_rows": true
         },
-        "rank_after_cutoff": 89,
+        "rank_after_cutoff": 85,
         "residual_dimension": 317,
         "residual_inf": 1.0,
         "residual_row_scaling": {
@@ -1338,19 +1338,19 @@
           "mode": "combined-inf",
           "nontrivial_scale_count": 317,
           "scale_floor": 1e-30,
-          "scale_max": 0.17664647255633925,
-          "scale_min": 2.8394933282425817e-08
+          "scale_max": 0.17664648029239896,
+          "scale_min": 2.8394917049271024e-08
         },
         "ridge_relative": 0.0001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": "all",
         "selected_row_count": 317,
-        "svd_rcond": 1e-12
+        "svd_rcond": 1e-08
       },
       "row:combined-inf|column:none": {
-        "Y0_infinity_norm_A_r": 4.37176950491075,
-        "Z0_infinity_norm_B": 2.373517593318151,
-        "approximate_inverse_row_sum_inf": 8.094085464836166,
+        "Y0_infinity_norm_A_r": 4.37176957099547,
+        "Z0_infinity_norm_B": 2.3735175933181583,
+        "approximate_inverse_row_sum_inf": 8.094085450788135,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -1361,15 +1361,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 8272452.453968779,
+        "condition_estimate": 8272452.310875136,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "516530e97190954711f9819587e3605cc269d3ebc69c27e99774acfad7a925fb",
-          "jacobian_float64": "5d208210540f0a98b09e02b6af23fa77f951fe1ccd0747719465e303773faeb9",
-          "residual_vector_float64": "490755abf2abb642698516c395527b9daa0dee0d295900b5f842f84a6b651e61"
+          "approximate_inverse_float64": "9922ebd51e9ff133ab692a5aceeca697e0802abd9074cd789360627af699979a",
+          "jacobian_float64": "22b3c29f44faf892e0b31d5ccedd2814dc29dcbc7560c2a55864e2457c56e6a9",
+          "residual_vector_float64": "a2d5a670c26a30e56f8c8aa51d7e9c3fa176d32adc30734df5bd22ef4b60ab15"
         },
         "jacobian_row_sum_inf": 6.48728295164783,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1387,11 +1387,11 @@
           "mode": "combined-inf",
           "nontrivial_scale_count": 23,
           "scale_floor": 1e-30,
-          "scale_max": 0.12771526023978194,
+          "scale_max": 0.12771526529426003,
           "scale_min": 4.902617867753372e-05
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar"
         ],
@@ -1399,9 +1399,9 @@
         "svd_rcond": 1e-08
       },
       "row:none|column:inf": {
-        "Y0_infinity_norm_A_r": 16.315747667598103,
-        "Z0_infinity_norm_B": 2.216677430649752,
-        "approximate_inverse_row_sum_inf": 3.262607644006426,
+        "Y0_infinity_norm_A_r": 16.315747171347457,
+        "Z0_infinity_norm_B": 2.2166774407824947,
+        "approximate_inverse_row_sum_inf": 3.262607643826425,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "inf",
@@ -1412,15 +1412,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 4785992503377.592,
+        "condition_estimate": 4785992395531.833,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "5a12a4e6d44202565d9ffe6f2d7dc65d31ace738ddb8fa8d499ee8e715d45482",
-          "jacobian_float64": "15165913c419bb33854e6c74df181176b1186cc6d8b1991b44387b23619fc987",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "777741ebb9aeb7d482f3f1ffc4269eaf093c171fa731af9829b87630e524570f",
+          "jacobian_float64": "531894662fdbccfeaf67778a3e363c9145317ac44e7288f2b6dde0ae7af3d466",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
-        "jacobian_row_sum_inf": 68.905968628414,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 68.90596868127683,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1432,7 +1432,7 @@
         },
         "rank_after_cutoff": 27,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1442,7 +1442,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1451,9 +1451,9 @@
         "svd_rcond": 1e-10
       },
       "row:none|column:l2": {
-        "Y0_infinity_norm_A_r": 16.992659987370878,
-        "Z0_infinity_norm_B": 2.206924839802078,
-        "approximate_inverse_row_sum_inf": 3.257984595290564,
+        "Y0_infinity_norm_A_r": 16.9926595164346,
+        "Z0_infinity_norm_B": 2.2069248482714263,
+        "approximate_inverse_row_sum_inf": 3.257984596470727,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "l2",
@@ -1464,15 +1464,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 4711903221081.103,
+        "condition_estimate": 4711902729337.089,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "386c343f650ec91b8ad3dcd44d341a88d4396caaf965f723d7a2eab81e34d57c",
-          "jacobian_float64": "bca14b518aa4ddcf3d591a3dbe920bd8ffdbb4c5b3ea9bfd6b1c6cfd051efcc0",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "7cc98bedb88f9df53f7e186df76af61e035212f3738acc9ae2bbca9636e1e6eb",
+          "jacobian_float64": "660cbf64c10fa6f9d1f32be245b28992314889812eb3c6bb89c52ddc4efb4340",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
-        "jacobian_row_sum_inf": 67.72846133496273,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 67.7284613635609,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1484,7 +1484,7 @@
         },
         "rank_after_cutoff": 27,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1494,7 +1494,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1503,9 +1503,9 @@
         "svd_rcond": 1e-10
       },
       "row:none|column:none": {
-        "Y0_infinity_norm_A_r": 0.00016343648886712794,
-        "Z0_infinity_norm_B": 1.3376807982582832,
-        "approximate_inverse_row_sum_inf": 1.0444611867398118e-06,
+        "Y0_infinity_norm_A_r": 0.00016343648998616087,
+        "Z0_infinity_norm_B": 1.3376808075567377,
+        "approximate_inverse_row_sum_inf": 1.0444611010075102e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -1516,15 +1516,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 80080456602502.11,
+        "condition_estimate": 80080456604197.9,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "16b66fd913d3c66ccc8440a0ac8944bb02c74426549b3bc2d859ceddf1e01dd9",
-          "jacobian_float64": "bd711e52c48f1013f5939e2cdbe0d82664341738f3f50a6f29c2ad9e4ac76e59",
-          "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+          "approximate_inverse_float64": "b72a6a909651ee56f371f0e75c9e0a1631fbddcc38360a03832fd53814c21144",
+          "jacobian_float64": "7490d854201d9231e4db41c64b372b4b4b191af0a49bfdfa30e83943829ec611",
+          "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
         },
         "jacobian_row_sum_inf": 11996759.254775519,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1536,7 +1536,7 @@
         },
         "rank_after_cutoff": 21,
         "residual_dimension": 31,
-        "residual_inf": 323.9718927620109,
+        "residual_inf": 323.9718949204196,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -1546,7 +1546,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1555,28 +1555,28 @@
         "svd_rcond": 1e-08
       },
       "row:residual|column:inf": {
-        "Y0_infinity_norm_A_r": 293.02366182300335,
-        "Z0_infinity_norm_B": 2.2785788138606033,
-        "approximate_inverse_row_sum_inf": 421.38206079708436,
+        "Y0_infinity_norm_A_r": 292.9926978432681,
+        "Z0_infinity_norm_B": 2.2793129556614056,
+        "approximate_inverse_row_sum_inf": 421.347069647019,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "inf",
           "nontrivial_scale_count": 128,
           "scale_floor": 1e-30,
-          "scale_max": 0.09501164122977535,
-          "scale_min": 8.630143141526741e-07
+          "scale_max": 0.09501164151460913,
+          "scale_min": 8.630143141526735e-07
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 1.1809014310800316e+16,
+        "condition_estimate": 1.1823890696147818e+16,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "c2314cca7ba3c8397df8cd7c724feb2f60f60b7e0f4037119ae79f82ceba5464",
-          "jacobian_float64": "ee832b0ff1ccb091a1eb2d95efe583dbb4e2ccd634a17a33418b9d72288c5f86",
-          "residual_vector_float64": "2b68f3c7bf7425000e3cc4451be8cb97de27f1fa31c40b1c520fb3314bcd1a87"
+          "approximate_inverse_float64": "4dcd661a41da5b00ed6f7369b7f453d03d2e755a82e13ef828b8de77509a0323",
+          "jacobian_float64": "801f4bc93728851f919d4ac2dc081dc55211e7b9baf3b281dbd372dd7b2cb50e",
+          "residual_vector_float64": "fd1d2aead29f44cf43597ef8923c970f65bd33399bbf663b7affbc504f0bf89a"
         },
-        "jacobian_row_sum_inf": 31.68646629408355,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 31.685370445435566,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1595,37 +1595,37 @@
           "nontrivial_scale_count": 317,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.00022917553776040427
+          "scale_min": 0.0002291800972256492
         },
         "ridge_relative": 1e-06,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": "all",
         "selected_row_count": 317,
         "svd_rcond": 1e-12
       },
       "row:residual|column:l2": {
-        "Y0_infinity_norm_A_r": 299.5303434081807,
-        "Z0_infinity_norm_B": 2.3189758375151897,
-        "approximate_inverse_row_sum_inf": 430.2997389668855,
+        "Y0_infinity_norm_A_r": 299.5420851673135,
+        "Z0_infinity_norm_B": 2.31889658406018,
+        "approximate_inverse_row_sum_inf": 430.32538362764444,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "l2",
           "nontrivial_scale_count": 128,
           "scale_floor": 1e-30,
-          "scale_max": 0.07678075895565163,
-          "scale_min": 8.630100580611934e-07
+          "scale_max": 0.07678075976871701,
+          "scale_min": 8.630100580608271e-07
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 1.226371006294151e+16,
+        "condition_estimate": 1.2255935162795134e+16,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "9d1b1c5a8e3b4e3fc3a32960676e6e2c12bcd732788520b4d190b8c38e2929fa",
-          "jacobian_float64": "32c274969241d66bafb0c4b2632f509c755638add03dae4a71f70b4eb32d88d5",
-          "residual_vector_float64": "2b68f3c7bf7425000e3cc4451be8cb97de27f1fa31c40b1c520fb3314bcd1a87"
+          "approximate_inverse_float64": "72a70c80b61bd9266be3840544c9b21df66a231e59d8dae9da1a41c0fe53c26d",
+          "jacobian_float64": "8e3aa87bbf831c6fc051f02571a762bcb72c2d691b774ccd0aff5a2347cc33fd",
+          "residual_vector_float64": "fd1d2aead29f44cf43597ef8923c970f65bd33399bbf663b7affbc504f0bf89a"
         },
-        "jacobian_row_sum_inf": 29.568051733435276,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 29.555488003756288,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1635,7 +1635,7 @@
           "scope": "full_block",
           "selected_all_available_rows": true
         },
-        "rank_after_cutoff": 80,
+        "rank_after_cutoff": 84,
         "residual_dimension": 317,
         "residual_inf": 1.0,
         "residual_row_scaling": {
@@ -1644,18 +1644,18 @@
           "nontrivial_scale_count": 317,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.00022917553776040427
+          "scale_min": 0.0002291800972256492
         },
         "ridge_relative": 1e-06,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": "all",
         "selected_row_count": 317,
-        "svd_rcond": 1e-08
+        "svd_rcond": 1e-10
       },
       "row:residual|column:none": {
-        "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-        "Z0_infinity_norm_B": 1.160463898840385,
-        "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+        "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+        "Z0_infinity_norm_B": 1.1604638988404172,
+        "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -1666,15 +1666,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 99894848100730.5,
+        "condition_estimate": 99894844133502.52,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-          "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-          "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+          "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+          "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+          "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
         },
-        "jacobian_row_sum_inf": 1575125.8351721996,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 1575125.8351722003,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -1693,10 +1693,10 @@
           "nontrivial_scale_count": 31,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.003086687525496534
+          "scale_min": 0.003086687504931994
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -1706,9 +1706,9 @@
       }
     },
     "best_overall": {
-      "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-      "Z0_infinity_norm_B": 1.160463898840385,
-      "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+      "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+      "Z0_infinity_norm_B": 1.1604638988404172,
+      "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
       "coefficient_coordinate_scaling": {
         "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
         "mode": "none",
@@ -1719,15 +1719,15 @@
       },
       "coefficient_dimension": 128,
       "column_count": 128,
-      "condition_estimate": 99894848100730.5,
+      "condition_estimate": 99894844133502.52,
       "finite_block_hashes": {
-        "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-        "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-        "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+        "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+        "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+        "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
       },
-      "jacobian_row_sum_inf": 1575125.8351721996,
-      "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-      "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+      "jacobian_row_sum_inf": 1575125.8351722003,
+      "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+      "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
       "proof_relevance": {
         "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
         "profile_hash_matches": true,
@@ -1746,10 +1746,10 @@
         "nontrivial_scale_count": 31,
         "scale_floor": 1e-30,
         "scale_max": 1.7038668849047234,
-        "scale_min": 0.003086687525496534
+        "scale_min": 0.003086687504931994
       },
       "ridge_relative": 0.001,
-      "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+      "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
       "row_labels": [
         "mortar",
         "pde"
@@ -1758,9 +1758,9 @@
       "svd_rcond": 1e-12
     },
     "best_proof_relevant_full_block": {
-      "Y0_infinity_norm_A_r": 0.0002020694832150226,
-      "Z0_infinity_norm_B": 1.6288831678903397,
-      "approximate_inverse_row_sum_inf": 5.820690630847886e-07,
+      "Y0_infinity_norm_A_r": 0.00020206920255789332,
+      "Z0_infinity_norm_B": 1.6288829664068118,
+      "approximate_inverse_row_sum_inf": 5.820679920811994e-07,
       "coefficient_coordinate_scaling": {
         "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
         "mode": "none",
@@ -1771,15 +1771,15 @@
       },
       "coefficient_dimension": 128,
       "column_count": 128,
-      "condition_estimate": 2.6565111379975514e+17,
+      "condition_estimate": 3.9403624566577434e+17,
       "finite_block_hashes": {
-        "approximate_inverse_float64": "419f72267201934487e7d6aa392b8d35bfd528ac0e2c75846bdc0963f5acedb5",
-        "jacobian_float64": "f276e08dc395feb34ed02c3ac5c6b78a08ada95b31e7316a732a5408aa3d1719",
-        "residual_vector_float64": "dfd6de7680dcba3fd91abe4a773cea66a9f434de72fe26414ff958e41977e17a"
+        "approximate_inverse_float64": "34de2414d904aa5a8fe61709e638542ea55cebeb287cd64965cec95d43c80102",
+        "jacobian_float64": "526b9a2318a1af343d44630042b97de5b26615c4a87193005870cdd2277beb44",
+        "residual_vector_float64": "c256ae59f2c8dfdbe2e3403c9add776cb9371adeb18f50a2bfe9ca98389c78c9"
       },
-      "jacobian_row_sum_inf": 101292196.47194248,
-      "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-      "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+      "jacobian_row_sum_inf": 101292371.95196033,
+      "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+      "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
       "proof_relevance": {
         "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
         "profile_hash_matches": true,
@@ -1791,7 +1791,7 @@
       },
       "rank_after_cutoff": 81,
       "residual_dimension": 317,
-      "residual_inf": 4363.467452819804,
+      "residual_inf": 4363.380643020701,
       "residual_row_scaling": {
         "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
         "mode": "none",
@@ -1801,7 +1801,7 @@
         "scale_min": 1.0
       },
       "ridge_relative": 0.001,
-      "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+      "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
       "row_labels": "all",
       "selected_row_count": 317,
       "svd_rcond": 1e-10
@@ -1820,17 +1820,17 @@
         "row_subset_or_unverified_profile": 324
       }
     },
-    "sha256": "18a86da249c23614cd6d0521744dd4e875b88cadbaa69f4f746864171f8efde1",
+    "sha256": "108e760185af36d16fc40858f6956278a01f4f7b477cfd5690d93730f8ac3477",
     "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
     "trial_count": 432
   },
   "sampled_finite_block_sweeps": [
     {
       "best_by_cache": {
-        "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json": {
-          "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-          "Z0_infinity_norm_B": 1.160463898840385,
-          "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+        "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json": {
+          "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+          "Z0_infinity_norm_B": 1.1604638988404172,
+          "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -1841,15 +1841,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 99894848100730.5,
+          "condition_estimate": 99894844133502.52,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-            "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-            "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+            "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+            "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+            "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
           },
-          "jacobian_row_sum_inf": 1575125.8351721996,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 1575125.8351722003,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -1868,10 +1868,10 @@
             "nontrivial_scale_count": 31,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.003086687525496534
+            "scale_min": 0.003086687504931994
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -1882,9 +1882,9 @@
       },
       "best_by_row_scaling": {
         "combined-inf": {
-          "Y0_infinity_norm_A_r": 4.37176950491075,
-          "Z0_infinity_norm_B": 2.373517593318151,
-          "approximate_inverse_row_sum_inf": 8.094085464836166,
+          "Y0_infinity_norm_A_r": 4.37176957099547,
+          "Z0_infinity_norm_B": 2.3735175933181583,
+          "approximate_inverse_row_sum_inf": 8.094085450788135,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -1895,15 +1895,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 8272452.453968779,
+          "condition_estimate": 8272452.310875136,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "516530e97190954711f9819587e3605cc269d3ebc69c27e99774acfad7a925fb",
-            "jacobian_float64": "5d208210540f0a98b09e02b6af23fa77f951fe1ccd0747719465e303773faeb9",
-            "residual_vector_float64": "490755abf2abb642698516c395527b9daa0dee0d295900b5f842f84a6b651e61"
+            "approximate_inverse_float64": "9922ebd51e9ff133ab692a5aceeca697e0802abd9074cd789360627af699979a",
+            "jacobian_float64": "22b3c29f44faf892e0b31d5ccedd2814dc29dcbc7560c2a55864e2457c56e6a9",
+            "residual_vector_float64": "a2d5a670c26a30e56f8c8aa51d7e9c3fa176d32adc30734df5bd22ef4b60ab15"
           },
           "jacobian_row_sum_inf": 6.48728295164783,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -1921,11 +1921,11 @@
             "mode": "combined-inf",
             "nontrivial_scale_count": 23,
             "scale_floor": 1e-30,
-            "scale_max": 0.12771526023978194,
+            "scale_max": 0.12771526529426003,
             "scale_min": 4.902617867753372e-05
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar"
           ],
@@ -1933,9 +1933,9 @@
           "svd_rcond": 1e-08
         },
         "none": {
-          "Y0_infinity_norm_A_r": 0.00016343648886712794,
-          "Z0_infinity_norm_B": 1.3376807982582832,
-          "approximate_inverse_row_sum_inf": 1.0444611867398118e-06,
+          "Y0_infinity_norm_A_r": 0.00016343648998616087,
+          "Z0_infinity_norm_B": 1.3376808075567377,
+          "approximate_inverse_row_sum_inf": 1.0444611010075102e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -1946,15 +1946,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 80080456602502.11,
+          "condition_estimate": 80080456604197.9,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "16b66fd913d3c66ccc8440a0ac8944bb02c74426549b3bc2d859ceddf1e01dd9",
-            "jacobian_float64": "bd711e52c48f1013f5939e2cdbe0d82664341738f3f50a6f29c2ad9e4ac76e59",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "b72a6a909651ee56f371f0e75c9e0a1631fbddcc38360a03832fd53814c21144",
+            "jacobian_float64": "7490d854201d9231e4db41c64b372b4b4b191af0a49bfdfa30e83943829ec611",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
           "jacobian_row_sum_inf": 11996759.254775519,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -1966,7 +1966,7 @@
           },
           "rank_after_cutoff": 21,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -1976,7 +1976,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -1985,9 +1985,9 @@
           "svd_rcond": 1e-08
         },
         "residual": {
-          "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-          "Z0_infinity_norm_B": 1.160463898840385,
-          "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+          "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+          "Z0_infinity_norm_B": 1.1604638988404172,
+          "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -1998,15 +1998,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 99894848100730.5,
+          "condition_estimate": 99894844133502.52,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-            "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-            "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+            "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+            "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+            "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
           },
-          "jacobian_row_sum_inf": 1575125.8351721996,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 1575125.8351722003,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2025,10 +2025,10 @@
             "nontrivial_scale_count": 31,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.003086687525496534
+            "scale_min": 0.003086687504931994
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2039,9 +2039,9 @@
       },
       "best_by_scaling": {
         "inf": {
-          "Y0_infinity_norm_A_r": 16.315747667598103,
-          "Z0_infinity_norm_B": 2.216677430649752,
-          "approximate_inverse_row_sum_inf": 3.262607644006426,
+          "Y0_infinity_norm_A_r": 16.315747171347457,
+          "Z0_infinity_norm_B": 2.2166774407824947,
+          "approximate_inverse_row_sum_inf": 3.262607643826425,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "inf",
@@ -2052,15 +2052,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 4785992503377.592,
+          "condition_estimate": 4785992395531.833,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "5a12a4e6d44202565d9ffe6f2d7dc65d31ace738ddb8fa8d499ee8e715d45482",
-            "jacobian_float64": "15165913c419bb33854e6c74df181176b1186cc6d8b1991b44387b23619fc987",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "777741ebb9aeb7d482f3f1ffc4269eaf093c171fa731af9829b87630e524570f",
+            "jacobian_float64": "531894662fdbccfeaf67778a3e363c9145317ac44e7288f2b6dde0ae7af3d466",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
-          "jacobian_row_sum_inf": 68.905968628414,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 68.90596868127683,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2072,7 +2072,7 @@
           },
           "rank_after_cutoff": 27,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -2082,7 +2082,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2091,9 +2091,9 @@
           "svd_rcond": 1e-10
         },
         "l2": {
-          "Y0_infinity_norm_A_r": 16.992659987370878,
-          "Z0_infinity_norm_B": 2.206924839802078,
-          "approximate_inverse_row_sum_inf": 3.257984595290564,
+          "Y0_infinity_norm_A_r": 16.9926595164346,
+          "Z0_infinity_norm_B": 2.2069248482714263,
+          "approximate_inverse_row_sum_inf": 3.257984596470727,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "l2",
@@ -2104,15 +2104,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 4711903221081.103,
+          "condition_estimate": 4711902729337.089,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "386c343f650ec91b8ad3dcd44d341a88d4396caaf965f723d7a2eab81e34d57c",
-            "jacobian_float64": "bca14b518aa4ddcf3d591a3dbe920bd8ffdbb4c5b3ea9bfd6b1c6cfd051efcc0",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "7cc98bedb88f9df53f7e186df76af61e035212f3738acc9ae2bbca9636e1e6eb",
+            "jacobian_float64": "660cbf64c10fa6f9d1f32be245b28992314889812eb3c6bb89c52ddc4efb4340",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
-          "jacobian_row_sum_inf": 67.72846133496273,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 67.7284613635609,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2124,7 +2124,7 @@
           },
           "rank_after_cutoff": 27,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -2134,7 +2134,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2143,9 +2143,9 @@
           "svd_rcond": 1e-10
         },
         "none": {
-          "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-          "Z0_infinity_norm_B": 1.160463898840385,
-          "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+          "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+          "Z0_infinity_norm_B": 1.1604638988404172,
+          "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -2156,15 +2156,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 99894848100730.5,
+          "condition_estimate": 99894844133502.52,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-            "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-            "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+            "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+            "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+            "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
           },
-          "jacobian_row_sum_inf": 1575125.8351721996,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 1575125.8351722003,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2183,10 +2183,10 @@
             "nontrivial_scale_count": 31,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.003086687525496534
+            "scale_min": 0.003086687504931994
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2197,28 +2197,28 @@
       },
       "best_by_scaling_pair": {
         "row:combined-inf|column:inf": {
-          "Y0_infinity_norm_A_r": 21.235612124131162,
-          "Z0_infinity_norm_B": 2.452873294496737,
-          "approximate_inverse_row_sum_inf": 97.69414144328019,
+          "Y0_infinity_norm_A_r": 21.23561133374322,
+          "Z0_infinity_norm_B": 2.452873274144003,
+          "approximate_inverse_row_sum_inf": 97.69413657904208,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "inf",
-            "nontrivial_scale_count": 104,
+            "nontrivial_scale_count": 106,
             "scale_floor": 1e-30,
             "scale_max": 492.7927693044919,
             "scale_min": 1.0
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 1.428701756563044e+16,
+          "condition_estimate": 1.4287017560781122e+16,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "85ba00f764039d5d39fb731a3e96700a3b92cdabc1f6adbc41b4aa4b4b4a5284",
-            "jacobian_float64": "e337482cdf63dc4b388de300add20a2358a4de34c8ad8b1329be894cec4b78bb",
-            "residual_vector_float64": "b70459cdcd0e75a1df98374093c5a4003ee3a2a1951a47a9e629d52f2b5c2f64"
+            "approximate_inverse_float64": "4405818910b874150952dd23fc203efc1bfcb622502fb6e94c6d792639deb3e0",
+            "jacobian_float64": "888e3498ec1886afc240b0b34544b2106392c370c217632d072206fad2aa08b2",
+            "residual_vector_float64": "c1e94dda342b4cb7656e8df0a5d074c098fe181fc2f0418943077ed40d2ef36e"
           },
-          "jacobian_row_sum_inf": 27.020928359842515,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 27.020928360871437,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2236,19 +2236,19 @@
             "mode": "combined-inf",
             "nontrivial_scale_count": 317,
             "scale_floor": 1e-30,
-            "scale_max": 0.17664647255633925,
-            "scale_min": 2.8394933282425817e-08
+            "scale_max": 0.17664648029239896,
+            "scale_min": 2.8394917049271024e-08
           },
           "ridge_relative": 1e-05,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": "all",
           "selected_row_count": 317,
           "svd_rcond": 1e-08
         },
         "row:combined-inf|column:l2": {
-          "Y0_infinity_norm_A_r": 26.953047891471414,
-          "Z0_infinity_norm_B": 2.427986923880167,
-          "approximate_inverse_row_sum_inf": 74.12933422929677,
+          "Y0_infinity_norm_A_r": 26.953047183949273,
+          "Z0_infinity_norm_B": 2.4279874563994865,
+          "approximate_inverse_row_sum_inf": 74.1293481572944,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "l2",
@@ -2259,15 +2259,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 1.3897606375744314e+16,
+          "condition_estimate": 1.389761007000351e+16,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "d0142ae54cfdcb968cd554d6381e15a7dc4e2390c62cca42da2cb06b7b6a4026",
-            "jacobian_float64": "ab184fba189eeb5c949a2e232d64f434516c799e685c0a49deed9cb38fcfc1cc",
-            "residual_vector_float64": "b70459cdcd0e75a1df98374093c5a4003ee3a2a1951a47a9e629d52f2b5c2f64"
+            "approximate_inverse_float64": "fa7dd6e78187320b7f10e3492860cc4e22c16ae4d18d818ff476d192d8f7c1c3",
+            "jacobian_float64": "d5163e0d96fb638e7864756febe0a0de5ddabcf2dd13865eee7bba1d500820a7",
+            "residual_vector_float64": "c1e94dda342b4cb7656e8df0a5d074c098fe181fc2f0418943077ed40d2ef36e"
           },
-          "jacobian_row_sum_inf": 16.869670504890955,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 16.86967050851103,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2277,7 +2277,7 @@
             "scope": "full_block",
             "selected_all_available_rows": true
           },
-          "rank_after_cutoff": 89,
+          "rank_after_cutoff": 85,
           "residual_dimension": 317,
           "residual_inf": 1.0,
           "residual_row_scaling": {
@@ -2285,19 +2285,19 @@
             "mode": "combined-inf",
             "nontrivial_scale_count": 317,
             "scale_floor": 1e-30,
-            "scale_max": 0.17664647255633925,
-            "scale_min": 2.8394933282425817e-08
+            "scale_max": 0.17664648029239896,
+            "scale_min": 2.8394917049271024e-08
           },
           "ridge_relative": 0.0001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": "all",
           "selected_row_count": 317,
-          "svd_rcond": 1e-12
+          "svd_rcond": 1e-08
         },
         "row:combined-inf|column:none": {
-          "Y0_infinity_norm_A_r": 4.37176950491075,
-          "Z0_infinity_norm_B": 2.373517593318151,
-          "approximate_inverse_row_sum_inf": 8.094085464836166,
+          "Y0_infinity_norm_A_r": 4.37176957099547,
+          "Z0_infinity_norm_B": 2.3735175933181583,
+          "approximate_inverse_row_sum_inf": 8.094085450788135,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -2308,15 +2308,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 8272452.453968779,
+          "condition_estimate": 8272452.310875136,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "516530e97190954711f9819587e3605cc269d3ebc69c27e99774acfad7a925fb",
-            "jacobian_float64": "5d208210540f0a98b09e02b6af23fa77f951fe1ccd0747719465e303773faeb9",
-            "residual_vector_float64": "490755abf2abb642698516c395527b9daa0dee0d295900b5f842f84a6b651e61"
+            "approximate_inverse_float64": "9922ebd51e9ff133ab692a5aceeca697e0802abd9074cd789360627af699979a",
+            "jacobian_float64": "22b3c29f44faf892e0b31d5ccedd2814dc29dcbc7560c2a55864e2457c56e6a9",
+            "residual_vector_float64": "a2d5a670c26a30e56f8c8aa51d7e9c3fa176d32adc30734df5bd22ef4b60ab15"
           },
           "jacobian_row_sum_inf": 6.48728295164783,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2334,11 +2334,11 @@
             "mode": "combined-inf",
             "nontrivial_scale_count": 23,
             "scale_floor": 1e-30,
-            "scale_max": 0.12771526023978194,
+            "scale_max": 0.12771526529426003,
             "scale_min": 4.902617867753372e-05
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar"
           ],
@@ -2346,9 +2346,9 @@
           "svd_rcond": 1e-08
         },
         "row:none|column:inf": {
-          "Y0_infinity_norm_A_r": 16.315747667598103,
-          "Z0_infinity_norm_B": 2.216677430649752,
-          "approximate_inverse_row_sum_inf": 3.262607644006426,
+          "Y0_infinity_norm_A_r": 16.315747171347457,
+          "Z0_infinity_norm_B": 2.2166774407824947,
+          "approximate_inverse_row_sum_inf": 3.262607643826425,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "inf",
@@ -2359,15 +2359,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 4785992503377.592,
+          "condition_estimate": 4785992395531.833,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "5a12a4e6d44202565d9ffe6f2d7dc65d31ace738ddb8fa8d499ee8e715d45482",
-            "jacobian_float64": "15165913c419bb33854e6c74df181176b1186cc6d8b1991b44387b23619fc987",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "777741ebb9aeb7d482f3f1ffc4269eaf093c171fa731af9829b87630e524570f",
+            "jacobian_float64": "531894662fdbccfeaf67778a3e363c9145317ac44e7288f2b6dde0ae7af3d466",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
-          "jacobian_row_sum_inf": 68.905968628414,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 68.90596868127683,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2379,7 +2379,7 @@
           },
           "rank_after_cutoff": 27,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -2389,7 +2389,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2398,9 +2398,9 @@
           "svd_rcond": 1e-10
         },
         "row:none|column:l2": {
-          "Y0_infinity_norm_A_r": 16.992659987370878,
-          "Z0_infinity_norm_B": 2.206924839802078,
-          "approximate_inverse_row_sum_inf": 3.257984595290564,
+          "Y0_infinity_norm_A_r": 16.9926595164346,
+          "Z0_infinity_norm_B": 2.2069248482714263,
+          "approximate_inverse_row_sum_inf": 3.257984596470727,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "l2",
@@ -2411,15 +2411,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 4711903221081.103,
+          "condition_estimate": 4711902729337.089,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "386c343f650ec91b8ad3dcd44d341a88d4396caaf965f723d7a2eab81e34d57c",
-            "jacobian_float64": "bca14b518aa4ddcf3d591a3dbe920bd8ffdbb4c5b3ea9bfd6b1c6cfd051efcc0",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "7cc98bedb88f9df53f7e186df76af61e035212f3738acc9ae2bbca9636e1e6eb",
+            "jacobian_float64": "660cbf64c10fa6f9d1f32be245b28992314889812eb3c6bb89c52ddc4efb4340",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
-          "jacobian_row_sum_inf": 67.72846133496273,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 67.7284613635609,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2431,7 +2431,7 @@
           },
           "rank_after_cutoff": 27,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -2441,7 +2441,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2450,9 +2450,9 @@
           "svd_rcond": 1e-10
         },
         "row:none|column:none": {
-          "Y0_infinity_norm_A_r": 0.00016343648886712794,
-          "Z0_infinity_norm_B": 1.3376807982582832,
-          "approximate_inverse_row_sum_inf": 1.0444611867398118e-06,
+          "Y0_infinity_norm_A_r": 0.00016343648998616087,
+          "Z0_infinity_norm_B": 1.3376808075567377,
+          "approximate_inverse_row_sum_inf": 1.0444611010075102e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -2463,15 +2463,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 80080456602502.11,
+          "condition_estimate": 80080456604197.9,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "16b66fd913d3c66ccc8440a0ac8944bb02c74426549b3bc2d859ceddf1e01dd9",
-            "jacobian_float64": "bd711e52c48f1013f5939e2cdbe0d82664341738f3f50a6f29c2ad9e4ac76e59",
-            "residual_vector_float64": "025551abd781721f47e34b6506497f49ca469f8e9aaf63117ed42e1de9f8ac99"
+            "approximate_inverse_float64": "b72a6a909651ee56f371f0e75c9e0a1631fbddcc38360a03832fd53814c21144",
+            "jacobian_float64": "7490d854201d9231e4db41c64b372b4b4b191af0a49bfdfa30e83943829ec611",
+            "residual_vector_float64": "4053100fc96c055bbf56eb64dcc389ccf4711c16fefbf121f4119fdcb830db1d"
           },
           "jacobian_row_sum_inf": 11996759.254775519,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2483,7 +2483,7 @@
           },
           "rank_after_cutoff": 21,
           "residual_dimension": 31,
-          "residual_inf": 323.9718927620109,
+          "residual_inf": 323.9718949204196,
           "residual_row_scaling": {
             "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
             "mode": "none",
@@ -2493,7 +2493,7 @@
             "scale_min": 1.0
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2502,28 +2502,28 @@
           "svd_rcond": 1e-08
         },
         "row:residual|column:inf": {
-          "Y0_infinity_norm_A_r": 293.02366182300335,
-          "Z0_infinity_norm_B": 2.2785788138606033,
-          "approximate_inverse_row_sum_inf": 421.38206079708436,
+          "Y0_infinity_norm_A_r": 292.9926978432681,
+          "Z0_infinity_norm_B": 2.2793129556614056,
+          "approximate_inverse_row_sum_inf": 421.347069647019,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "inf",
             "nontrivial_scale_count": 128,
             "scale_floor": 1e-30,
-            "scale_max": 0.09501164122977535,
-            "scale_min": 8.630143141526741e-07
+            "scale_max": 0.09501164151460913,
+            "scale_min": 8.630143141526735e-07
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 1.1809014310800316e+16,
+          "condition_estimate": 1.1823890696147818e+16,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "c2314cca7ba3c8397df8cd7c724feb2f60f60b7e0f4037119ae79f82ceba5464",
-            "jacobian_float64": "ee832b0ff1ccb091a1eb2d95efe583dbb4e2ccd634a17a33418b9d72288c5f86",
-            "residual_vector_float64": "2b68f3c7bf7425000e3cc4451be8cb97de27f1fa31c40b1c520fb3314bcd1a87"
+            "approximate_inverse_float64": "4dcd661a41da5b00ed6f7369b7f453d03d2e755a82e13ef828b8de77509a0323",
+            "jacobian_float64": "801f4bc93728851f919d4ac2dc081dc55211e7b9baf3b281dbd372dd7b2cb50e",
+            "residual_vector_float64": "fd1d2aead29f44cf43597ef8923c970f65bd33399bbf663b7affbc504f0bf89a"
           },
-          "jacobian_row_sum_inf": 31.68646629408355,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 31.685370445435566,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2542,37 +2542,37 @@
             "nontrivial_scale_count": 317,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.00022917553776040427
+            "scale_min": 0.0002291800972256492
           },
           "ridge_relative": 1e-06,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": "all",
           "selected_row_count": 317,
           "svd_rcond": 1e-12
         },
         "row:residual|column:l2": {
-          "Y0_infinity_norm_A_r": 299.5303434081807,
-          "Z0_infinity_norm_B": 2.3189758375151897,
-          "approximate_inverse_row_sum_inf": 430.2997389668855,
+          "Y0_infinity_norm_A_r": 299.5420851673135,
+          "Z0_infinity_norm_B": 2.31889658406018,
+          "approximate_inverse_row_sum_inf": 430.32538362764444,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "l2",
             "nontrivial_scale_count": 128,
             "scale_floor": 1e-30,
-            "scale_max": 0.07678075895565163,
-            "scale_min": 8.630100580611934e-07
+            "scale_max": 0.07678075976871701,
+            "scale_min": 8.630100580608271e-07
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 1.226371006294151e+16,
+          "condition_estimate": 1.2255935162795134e+16,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "9d1b1c5a8e3b4e3fc3a32960676e6e2c12bcd732788520b4d190b8c38e2929fa",
-            "jacobian_float64": "32c274969241d66bafb0c4b2632f509c755638add03dae4a71f70b4eb32d88d5",
-            "residual_vector_float64": "2b68f3c7bf7425000e3cc4451be8cb97de27f1fa31c40b1c520fb3314bcd1a87"
+            "approximate_inverse_float64": "72a70c80b61bd9266be3840544c9b21df66a231e59d8dae9da1a41c0fe53c26d",
+            "jacobian_float64": "8e3aa87bbf831c6fc051f02571a762bcb72c2d691b774ccd0aff5a2347cc33fd",
+            "residual_vector_float64": "fd1d2aead29f44cf43597ef8923c970f65bd33399bbf663b7affbc504f0bf89a"
           },
-          "jacobian_row_sum_inf": 29.568051733435276,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 29.555488003756288,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2582,7 +2582,7 @@
             "scope": "full_block",
             "selected_all_available_rows": true
           },
-          "rank_after_cutoff": 80,
+          "rank_after_cutoff": 84,
           "residual_dimension": 317,
           "residual_inf": 1.0,
           "residual_row_scaling": {
@@ -2591,18 +2591,18 @@
             "nontrivial_scale_count": 317,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.00022917553776040427
+            "scale_min": 0.0002291800972256492
           },
           "ridge_relative": 1e-06,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": "all",
           "selected_row_count": 317,
-          "svd_rcond": 1e-08
+          "svd_rcond": 1e-10
         },
         "row:residual|column:none": {
-          "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-          "Z0_infinity_norm_B": 1.160463898840385,
-          "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+          "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+          "Z0_infinity_norm_B": 1.1604638988404172,
+          "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
           "coefficient_coordinate_scaling": {
             "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
             "mode": "none",
@@ -2613,15 +2613,15 @@
           },
           "coefficient_dimension": 128,
           "column_count": 128,
-          "condition_estimate": 99894848100730.5,
+          "condition_estimate": 99894844133502.52,
           "finite_block_hashes": {
-            "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-            "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-            "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+            "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+            "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+            "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
           },
-          "jacobian_row_sum_inf": 1575125.8351721996,
-          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-          "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+          "jacobian_row_sum_inf": 1575125.8351722003,
+          "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+          "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
           "proof_relevance": {
             "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
             "profile_hash_matches": true,
@@ -2640,10 +2640,10 @@
             "nontrivial_scale_count": 31,
             "scale_floor": 1e-30,
             "scale_max": 1.7038668849047234,
-            "scale_min": 0.003086687525496534
+            "scale_min": 0.003086687504931994
           },
           "ridge_relative": 0.001,
-          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+          "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
           "row_labels": [
             "mortar",
             "pde"
@@ -2653,9 +2653,9 @@
         }
       },
       "best_overall": {
-        "Y0_infinity_norm_A_r": 8.854894101664778e-06,
-        "Z0_infinity_norm_B": 1.160463898840385,
-        "approximate_inverse_row_sum_inf": 8.910046031201984e-06,
+        "Y0_infinity_norm_A_r": 8.854895747288064e-06,
+        "Z0_infinity_norm_B": 1.1604638988404172,
+        "approximate_inverse_row_sum_inf": 8.910047671890465e-06,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -2666,15 +2666,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 99894848100730.5,
+        "condition_estimate": 99894844133502.52,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "52e4538c71f50a8c2696a63cbc2968fe2b9eee3a5a0c1121b6d8970b38b375eb",
-          "jacobian_float64": "cf63c4d8d464532e021ece27d297768f29eafca6959391b36e6bff75598db9fc",
-          "residual_vector_float64": "bfee17e01b6543c7755f45551425dc4be09aaf81d912b59caafb7a86a890088e"
+          "approximate_inverse_float64": "8070b9760a9dee157c832d8725bf5be76512b059429800cd3d96ba3095ef51fb",
+          "jacobian_float64": "6e21c9c6375652c33ff6f396e018178910b9da42ac12a64848bcd857b3bc081e",
+          "residual_vector_float64": "14931b7dd159def51c3fd919e8f1b4757d162125644c9a425b28c01b5ec1de1e"
         },
-        "jacobian_row_sum_inf": 1575125.8351721996,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 1575125.8351722003,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -2693,10 +2693,10 @@
           "nontrivial_scale_count": 31,
           "scale_floor": 1e-30,
           "scale_max": 1.7038668849047234,
-          "scale_min": 0.003086687525496534
+          "scale_min": 0.003086687504931994
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": [
           "mortar",
           "pde"
@@ -2705,9 +2705,9 @@
         "svd_rcond": 1e-12
       },
       "best_proof_relevant_full_block": {
-        "Y0_infinity_norm_A_r": 0.0002020694832150226,
-        "Z0_infinity_norm_B": 1.6288831678903397,
-        "approximate_inverse_row_sum_inf": 5.820690630847886e-07,
+        "Y0_infinity_norm_A_r": 0.00020206920255789332,
+        "Z0_infinity_norm_B": 1.6288829664068118,
+        "approximate_inverse_row_sum_inf": 5.820679920811994e-07,
         "coefficient_coordinate_scaling": {
           "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
           "mode": "none",
@@ -2718,15 +2718,15 @@
         },
         "coefficient_dimension": 128,
         "column_count": 128,
-        "condition_estimate": 2.6565111379975514e+17,
+        "condition_estimate": 3.9403624566577434e+17,
         "finite_block_hashes": {
-          "approximate_inverse_float64": "419f72267201934487e7d6aa392b8d35bfd528ac0e2c75846bdc0963f5acedb5",
-          "jacobian_float64": "f276e08dc395feb34ed02c3ac5c6b78a08ada95b31e7316a732a5408aa3d1719",
-          "residual_vector_float64": "dfd6de7680dcba3fd91abe4a773cea66a9f434de72fe26414ff958e41977e17a"
+          "approximate_inverse_float64": "34de2414d904aa5a8fe61709e638542ea55cebeb287cd64965cec95d43c80102",
+          "jacobian_float64": "526b9a2318a1af343d44630042b97de5b26615c4a87193005870cdd2277beb44",
+          "residual_vector_float64": "c256ae59f2c8dfdbe2e3403c9add776cb9371adeb18f50a2bfe9ca98389c78c9"
         },
-        "jacobian_row_sum_inf": 101292196.47194248,
-        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-        "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+        "jacobian_row_sum_inf": 101292371.95196033,
+        "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+        "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
         "proof_relevance": {
           "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
           "profile_hash_matches": true,
@@ -2738,7 +2738,7 @@
         },
         "rank_after_cutoff": 81,
         "residual_dimension": 317,
-        "residual_inf": 4363.467452819804,
+        "residual_inf": 4363.380643020701,
         "residual_row_scaling": {
           "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
           "mode": "none",
@@ -2748,7 +2748,7 @@
           "scale_min": 1.0
         },
         "ridge_relative": 0.001,
-        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3_cacheonly_rows.json",
+        "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled_cacheonly_rows.json",
         "row_labels": "all",
         "selected_row_count": 317,
         "svd_rcond": 1e-10
@@ -2767,7 +2767,7 @@
           "row_subset_or_unverified_profile": 324
         }
       },
-      "sha256": "18a86da249c23614cd6d0521744dd4e875b88cadbaa69f4f746864171f8efde1",
+      "sha256": "108e760185af36d16fc40858f6956278a01f4f7b477cfd5690d93730f8ac3477",
       "status": "PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF",
       "trial_count": 432
     }
@@ -2776,22 +2776,22 @@
     "backend": "python-math.nextafter-outward-double",
     "failure_reason": "exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures",
     "interval_bounds": {
-      "max_abs_upper": 4968090.9995933855,
+      "max_abs_upper": 4968090.464761762,
       "per_family": {
-        "mortar_group_max_abs": 4968090.9995933855,
-        "mortar_worst": 4968090.9995933855,
-        "residual_scan_worst": 436.34674528386233,
-        "row_cache_guard": 4363.467452819805,
-        "row_cache_mortar": 4214.2938355842125,
-        "row_cache_residual": 323.97189276201095
+        "mortar_group_max_abs": 4968090.464761762,
+        "mortar_worst": 4968090.464761762,
+        "residual_scan_worst": 436.3380643039512,
+        "row_cache_guard": 4363.380643020702,
+        "row_cache_mortar": 4214.293668677195,
+        "row_cache_residual": 323.97189492041963
       },
       "per_source": {
-        "exact_residual_audit": 4968090.9995933855,
-        "row_cache": 4363.467452819805
+        "exact_residual_audit": 4968090.464761762,
+        "row_cache": 4363.380643020702
       },
       "worst_row_id": "mortar:summary:worst"
     },
-    "interval_max_abs_upper_bound": 4968090.9995933855,
+    "interval_max_abs_upper_bound": 4968090.464761762,
     "interval_widths": {
       "count": 994,
       "max": 1.862645149230957e-09,
@@ -2813,7 +2813,7 @@
       "exact_residual_audit": 43,
       "row_cache": 951
     },
-    "sha256": "812029af04b77c6cd2d7acfad34b6ec95891d54d2294b8af3d181846da4c893a",
+    "sha256": "281e5db62a88a34cf3b755f5dc633c072cb99e327aa2e624210b12dcadee8d97",
     "status": "OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF",
     "status_detail": "outward-double interval row data only; not a final interval domain proof"
   },

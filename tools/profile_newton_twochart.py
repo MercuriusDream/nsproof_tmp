@@ -100,6 +100,18 @@ def parse_variable_charts(raw: str) -> tuple[str, ...]:
     return charts
 
 
+def parse_scan_names(raw: str) -> tuple[str, ...]:
+    from validators.compactified_equations_twochart import SCAN_PRESETS
+
+    names = tuple(item.strip() for item in raw.split(",") if item.strip())
+    if not names:
+        raise ValueError("scan list must contain at least one preset")
+    unknown = [name for name in names if name not in SCAN_PRESETS]
+    if unknown:
+        raise ValueError(f"unknown scan preset(s): {', '.join(unknown)}")
+    return names
+
+
 def hook_report() -> HookReport:
     module_name = "validators.compactified_equations_twochart"
     try:
@@ -1459,6 +1471,83 @@ def mortar_audit_metrics(data: dict[str, Any], rows: list[Any], use_native_c: bo
     }
 
 
+def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    if args.max_residual_audit_growth <= 0.0:
+        return {"enabled": False, **vector_metrics([])}
+    from validators.compactified_equations import compactified_residual_defined, qb_to_rz
+    from validators.compactified_equations_twochart import SCAN_PRESETS, projection_from_twochart
+
+    projection = projection_from_twochart(data)
+    scan_raw = args.line_search_residual_audit_scan.strip() or args.scan
+    scan_names = parse_scan_names(scan_raw)
+    h = float(args.line_search_residual_audit_h)
+    values: list[float] = []
+    scan_reports: list[dict[str, Any]] = []
+    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": 0, "cases": 0, "seconds": 0.0}
+    worst: dict[str, Any] = {}
+    for name in scan_names:
+        spec = SCAN_PRESETS[name]
+        scan_values: list[float] = []
+        skipped = 0
+        points = 0
+        scan_worst: dict[str, Any] = {}
+        for q in grid_values(float(spec["q_min"]), float(spec["q_max"]), int(spec["n_q"])):
+            for b in grid_values(float(spec["b_min"]), float(spec["b_max"]), int(spec["n_b"])):
+                r, z = qb_to_rz(q, b)
+                if r <= 2.0 * h or r == 0.0:
+                    skipped += 1
+                    continue
+                if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
+                    skipped += 1
+                    continue
+                residual, point_native = residual_with_optional_native_tail_exact(
+                    data,
+                    projection,
+                    q,
+                    b,
+                    args.residual_kind,
+                    bool(args.native_c),
+                )
+                _merge_native_stat(native_stats, point_native)
+                local_values = [float(residual.e_psi), float(residual.e_gamma)]
+                local_max = max(abs(value) for value in local_values)
+                points += 1
+                scan_values.extend(local_values)
+                values.extend(local_values)
+                if local_max > float(scan_worst.get("max_abs", -1.0)):
+                    scan_worst = {
+                        "q": q,
+                        "b": b,
+                        "r": r,
+                        "z": z,
+                        "e_psi": float(residual.e_psi),
+                        "e_gamma": float(residual.e_gamma),
+                        "max_abs": local_max,
+                    }
+                if local_max > float(worst.get("max_abs", -1.0)):
+                    worst = {"scan": name, **scan_worst}
+        scan_reports.append(
+            {
+                "label": spec["label"],
+                "chart": spec["chart"],
+                "q_range": [spec["q_min"], spec["q_max"]],
+                "b_range": [spec["b_min"], spec["b_max"]],
+                "grid": {"n_q": spec["n_q"], "n_b": spec["n_b"], "points": points, "skipped": skipped},
+                "metrics": vector_metrics(scan_values),
+                "worst": scan_worst,
+            }
+        )
+    return {
+        "enabled": True,
+        "scan": ",".join(scan_names),
+        "h": h,
+        "native_c_tail_exact": native_stats,
+        "scans": scan_reports,
+        "worst": worst,
+        **vector_metrics(values),
+    }
+
+
 def normal_step(
     jacobian_rows: list[list[float]],
     residual_vector: list[float],
@@ -2002,6 +2091,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             system.get("mortar_audit_rows", []),
             use_native_c=bool(args.native_c),
         )
+        base_residual_audit_metrics = residual_audit_metrics(current, args)
         block_specs = stage0_block_specs(system["variables"], args.solve_mode, args.block_search_labels)
         line_trials: list[dict[str, Any]] = []
         candidate_previews: list[dict[str, Any]] = []
@@ -2117,6 +2207,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     system.get("mortar_audit_rows", []),
                     use_native_c=bool(args.native_c),
                 )
+                trial_residual_audit_metrics = residual_audit_metrics(trial_data, args)
                 raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
                     base_raw_metrics["objective"], 1e-300
                 )
@@ -2134,13 +2225,25 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         trial_mortar_audit_metrics["max_abs"]
                         <= args.max_mortar_audit_growth * max(base_mortar_audit_metrics["max_abs"], 1e-300)
                     )
+                residual_audit_growth_ok = True
+                if base_residual_audit_metrics.get("enabled"):
+                    residual_audit_growth_ok = (
+                        trial_residual_audit_metrics["max_abs"]
+                        <= args.max_residual_audit_growth * max(base_residual_audit_metrics["max_abs"], 1e-300)
+                    )
                 objective_decrease = base_metrics["objective"] - trial_metrics["objective"]
                 required_decrease = max(
                     args.min_objective_decrease_abs,
                     args.min_objective_decrease_rel * max(base_metrics["objective"], 1e-300),
                 )
                 improved = objective_decrease > required_decrease
-                accepted_here = improved and raw_growth_ok and guard_growth_ok and mortar_audit_growth_ok
+                accepted_here = (
+                    improved
+                    and raw_growth_ok
+                    and guard_growth_ok
+                    and mortar_audit_growth_ok
+                    and residual_audit_growth_ok
+                )
                 line_trials.append(
                     {
                         **trial_record,
@@ -2154,6 +2257,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "guard_growth_ok": guard_growth_ok,
                         "mortar_audit_metrics": trial_mortar_audit_metrics,
                         "mortar_audit_growth_ok": mortar_audit_growth_ok,
+                        "residual_audit_metrics": trial_residual_audit_metrics,
+                        "residual_audit_growth_ok": residual_audit_growth_ok,
                         "accepted": accepted_here,
                         "tail_gate": tail_gate,
                     }
@@ -2190,6 +2295,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "row_scaling": system["row_scaling"],
                 "base_guard_metrics": base_guard_metrics,
                 "base_mortar_audit_metrics": base_mortar_audit_metrics,
+                "base_residual_audit_metrics": base_residual_audit_metrics,
                 "selected_by_chart": system["selected_by_chart"],
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
@@ -2328,6 +2434,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "line_search_mortar_audit_q_samples": args.line_search_mortar_audit_q_samples,
             "line_search_mortar_audit_x_samples": args.line_search_mortar_audit_x_samples,
             "line_search_mortar_audit_active_count": args.line_search_mortar_audit_active_count,
+            "max_residual_audit_growth": args.max_residual_audit_growth,
+            "line_search_residual_audit_scan": args.line_search_residual_audit_scan,
+            "line_search_residual_audit_h": args.line_search_residual_audit_h,
             "tail_gate_samples_per_patch": args.tail_gate_samples_per_patch,
             "forced_tol": args.forced_tol,
             "q2_tol": args.q2_tol,
@@ -2386,6 +2495,10 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     if isinstance(trial.get("mortar_audit_metrics"), dict)
                     else None,
                     "mortar_audit_growth_ok": trial.get("mortar_audit_growth_ok"),
+                    "residual_audit_max_abs": trial.get("residual_audit_metrics", {}).get("max_abs")
+                    if isinstance(trial.get("residual_audit_metrics"), dict)
+                    else None,
+                    "residual_audit_growth_ok": trial.get("residual_audit_growth_ok"),
                     "max_abs_update": trial.get("max_abs_update"),
                     "delta_norm": trial.get("delta_norm"),
                     "base_objective": base.get("objective"),
@@ -2780,6 +2893,26 @@ def main() -> None:
         default=0,
         help="Keep this many largest-residual held-out mortar audit rows during line search; 0 keeps all.",
     )
+    parser.add_argument(
+        "--max-residual-audit-growth",
+        type=nonnegative_float,
+        default=0.0,
+        help=(
+            "When positive, reject line-search steps whose held-out PDE residual-audit max grows by more "
+            "than this factor. Uses scan presets and native C for tail exact residual points when available."
+        ),
+    )
+    parser.add_argument(
+        "--line-search-residual-audit-scan",
+        default="",
+        help="Comma-separated residual scan presets for line-search residual audit; empty reuses --scan.",
+    )
+    parser.add_argument(
+        "--line-search-residual-audit-h",
+        type=positive_float,
+        default=1e-3,
+        help="Axis skip radius h for line-search residual audit scans.",
+    )
     parser.add_argument("--max-iter", type=positive_int, default=20)
     parser.add_argument("--trust", type=positive_float, default=0.05)
     parser.add_argument("--lm-lambda", type=positive_float, default=1e-8)
@@ -2793,6 +2926,12 @@ def main() -> None:
         parser.error("candidate degree caps must be nonnegative")
     if args.line_search_mortar_audit_order < -1 or args.line_search_mortar_audit_order > 4:
         parser.error("--line-search-mortar-audit-order must be -1 or between 0 and 4")
+    try:
+        parse_scan_names(args.scan)
+        if args.line_search_residual_audit_scan.strip():
+            parse_scan_names(args.line_search_residual_audit_scan)
+    except ValueError as exc:
+        parser.error(str(exc))
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
         parser.error("--line-search must contain positive floats")
     if args.row_scale_min < 0.0:

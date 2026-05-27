@@ -7,7 +7,7 @@
   ],
   "certificate_name": "exponent_admissibility",
   "commands": [
-    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json --out certs/profile/exponent_admissibility.json"
+    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json --out certs/profile/exponent_admissibility.json"
   ],
   "dependency_hashes": {
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
@@ -29,16 +29,16 @@
   },
   "failure_reason": null,
   "input_hashes": {
-    "profile": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+    "profile": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
   },
   "mathematical_statement": "The fixed profile parameter gamma is an exact rational number in the open interval (2/5, 1/2), with exact exponent p=1/gamma. The profile's stored decimal p is checked against this exact value.",
   "pass": true,
   "precision_bits": "exact",
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step14_scaled_trust1e3.json",
-  "profile_hash_sha256": "710447ba1a1a9d650360e61138c850d6332f13e5c0589c63a2965d9857744a68",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
+  "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
   "profile_linkage_scope": "This certificate links only the exact algebraic exponent subclaim to the supplied profile hash. It does not certify that the profile solves the PDE, that the tail recurrence closes, or that pressure reconstruction is valid.",
-  "repo_commit": "70096bac351413a5dc699e28bbbb533c866bcedc",
+  "repo_commit": "d306e6b4ee2926c907955b44758e75e373880e99",
   "rounding_mode": "not-applicable",
   "schema_version": "nsproof-cert-v1"
 }
