@@ -1,41 +1,41 @@
 {
   "approximate_inverse": {
-    "rank_after_cutoff": 81,
-    "ridge_absolute": 628351433744.7781,
+    "rank_after_cutoff": 76,
+    "ridge_absolute": 628192226760.037,
     "ridge_relative": 0.0001,
     "singular_value_count": 128,
     "singular_values": {
-      "condition_estimate": 4.960205030934722e+17,
+      "condition_estimate": 1.339123265586328e+16,
       "first_12": [
-        79268621.39237556,
-        12421472.317055002,
-        8991492.7143545,
-        5263435.895807615,
-        3037719.5274191047,
-        2893530.276278454,
-        2534016.4628018155,
-        1890789.7549252734,
-        1114153.3707245234,
-        870542.3793593914,
-        805841.5453091097,
-        632526.6443619914
+        79258578.51110105,
+        41676913.11196437,
+        12399643.96524255,
+        4867470.543344998,
+        2892895.360164189,
+        2319153.852519614,
+        1876803.8583438601,
+        1114422.1629868143,
+        996046.7380856413,
+        872747.7813441332,
+        631431.5928260841,
+        485713.8653964404
       ],
       "last_12": [
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        7.903559373416027e-09,
-        1.598091629237307e-10
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        7.793139771769119e-09,
+        5.918691770051363e-09
       ],
-      "max": 79268621.39237556,
-      "min_nonzero": 1.598091629237307e-10
+      "max": 79258578.51110105,
+      "min_nonzero": 5.918691770051363e-09
     },
     "svd_rcond": 1e-10
   },
@@ -55,30 +55,30 @@
     "scale_min": 1.0
   },
   "commands": [
-    "tools/export_profile_finite_nk_block.py --row-cache work/twochart_stage0_current_profile_mortaraudit128_step20_resaudit_nativebatch_cacheonly_rows.json --out certs/profile/profile_finite_nk_current_block.json --row-labels all --ridge-relative 1e-4 --svd-rcond 1e-10 --summary-only --row-scaling none --column-scaling none"
+    "tools/export_profile_finite_nk_block.py --row-cache work/twochart_stage0_current_profile_worstpde128_step21_nativebatch_cacheonly_rows.json --out certs/profile/profile_finite_nk_current_block.json --row-labels all --ridge-relative 1e-4 --svd-rcond 1e-10 --summary-only --row-scaling none --column-scaling none"
   ],
   "diagnostic_vs_proof": "Floating sampled row-cache finite block.  Uses native C interval linear algebra for finite Y0/Z0 arithmetic, but the row cache, Jacobian, inverse, and residual are not interval-certified and no Z2/tail-complement bound is supplied.",
   "finite_block_hashes": {
-    "approximate_inverse_float64": "4ed4d8bcdd193b27f23647379f1badc977cfa899012f9d701089fbe668124656",
-    "jacobian_float64": "9e935ab1fc7cda6f6b3631c7e406ca03b61678aa5361dcb2f470c3ba3201b735",
-    "residual_vector_float64": "b9d2f01ff8d48747514f9d1f532f010b0b3f49fc6beed4ae605b8d26b0928ab9"
+    "approximate_inverse_float64": "c4c94744ad53b02cf26b21b861eb1a48a45bde097e5a8fa394015e3b8efa7c81",
+    "jacobian_float64": "0c4592d5e5d684def47780005a4b1e550ad689237909aa8239a794867e175822",
+    "residual_vector_float64": "a05b0875fde8816fdecda136800c1dc88c02bf686e06ad2253e0e35f37ba57b0"
   },
   "finite_nk_bounds": {
-    "Y0_infinity_norm_A_r": 0.0014507830783128768,
-    "Z0_infinity_norm_B": 1.8280824986886326,
+    "Y0_infinity_norm_A_r": 0.0014536249199903852,
+    "Z0_infinity_norm_B": 1.776220882418123,
     "backend": "native-c-outward-rounded-double-interval-summary",
     "coefficient_dimension": 128,
     "residual_dimension": 317
   },
   "finite_nk_payload": "summary_only",
   "floating_norms": {
-    "approximate_inverse_row_sum_inf": 1.95729076877442e-06,
-    "jacobian_row_sum_inf": 101292547.43897384,
-    "residual_inf": 4363.293832061378
+    "approximate_inverse_row_sum_inf": 1.958222487506094e-06,
+    "jacobian_row_sum_inf": 99291753.66203508,
+    "residual_inf": 4362.578130059098
   },
   "pass": false,
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step20_resaudit_nativebatch.json",
-  "profile_hash_sha256": "3e81f21074a2d9bf2aaf062d910b718179e24f545988ce18470ad933218c687d",
+  "profile": "work/twochart_stage0_current_profile_worstpde128_step21_nativebatch.json",
+  "profile_hash_sha256": "a481dd54f3afd687fdc6b5c0c44de4820dc262846b03a15ae0ce1ecb8be3373f",
   "proof_relevance": {
     "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
     "profile_hash_matches": true,
@@ -88,7 +88,7 @@
     "scope": "full_block",
     "selected_all_available_rows": true
   },
-  "repo_commit": "76582114c86daf92d1bbafb8ef5395d8218ac2a7",
+  "repo_commit": "5491e13844a3ad7eb28982161a546b27f0031f3f",
   "residual_row_scaling": {
     "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
     "mode": "none",
@@ -97,8 +97,8 @@
     "scale_max": 1.0,
     "scale_min": 1.0
   },
-  "row_cache": "work/twochart_stage0_current_profile_mortaraudit128_step20_resaudit_nativebatch_cacheonly_rows.json",
-  "row_cache_sha256": "61737ac724ca69e09c1dfbd971038ed00b4beb349e9178da26ce1aa2c0994be1",
+  "row_cache": "work/twochart_stage0_current_profile_worstpde128_step21_nativebatch_cacheonly_rows.json",
+  "row_cache_sha256": "15b1e3be12c6e64d8b5fb55b0ace7955c9aa25d45915ab4bf00cd54ae1db15fe",
   "row_selection": {
     "available_row_count": 317,
     "column_count": 128,
