@@ -50,6 +50,7 @@ def compact_trial(report: dict[str, Any], ridge_relative: float, svd_rcond: floa
         "row_cache": report["row_cache"],
         "profile": report.get("profile"),
         "profile_hash_sha256": report.get("profile_hash_sha256"),
+        "proof_relevance": report.get("proof_relevance"),
         "row_labels": report["row_selection"]["labels"],
         "ridge_relative": ridge_relative,
         "svd_rcond": svd_rcond,
@@ -75,6 +76,26 @@ def trial_sort_key(trial: dict[str, Any]) -> tuple[float, float]:
         float(trial["Z0_infinity_norm_B"]),
         float(trial["Y0_infinity_norm_A_r"]),
     )
+
+
+def sweep_proof_relevance(trials: list[dict[str, Any]]) -> dict[str, Any]:
+    scope_counts: dict[str, int] = {}
+    full_block_trial_count = 0
+    for trial in trials:
+        relevance = trial.get("proof_relevance") or {}
+        scope = str(relevance.get("scope") or "unknown")
+        scope_counts[scope] = scope_counts.get(scope, 0) + 1
+        if relevance.get("proof_relevant_full_block") is True:
+            full_block_trial_count += 1
+    return {
+        "scope_counts": scope_counts,
+        "full_block_trial_count": full_block_trial_count,
+        "row_subset_or_unverified_trial_count": len(trials) - full_block_trial_count,
+        "meaning": (
+            "Compact trials carry proof_relevance.scope so full-block diagnostics "
+            "can be separated from row subsets or stale/missing profile hashes."
+        ),
+    }
 
 
 def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
@@ -160,6 +181,7 @@ def build_sweep(args: argparse.Namespace) -> dict[str, Any]:
         "column_scale_floor": args.column_scale_floor,
         "row_scaling_modes": row_scaling_modes,
         "row_scale_floor": args.row_scale_floor,
+        "proof_relevance": sweep_proof_relevance(trials),
         "trial_count": len(trials),
         "failure_count": len(failures),
         "best_overall": best_overall,

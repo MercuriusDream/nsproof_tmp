@@ -95,6 +95,55 @@ def selected_rows(row_cache: dict[str, Any], labels: set[str] | None) -> list[di
     return [row for row in rows if str(row.get("label")) in labels or str(row.get("row_type")) in labels]
 
 
+def profile_hash_status(row_cache: dict[str, Any]) -> dict[str, Any]:
+    profile = row_cache.get("profile") or ""
+    recorded_hash = row_cache.get("profile_hash_sha256") or ""
+    if not profile:
+        return {
+            "matches_profile_file": None,
+            "status": "missing_profile_path",
+        }
+    full_profile = resolve(str(profile))
+    if not os.path.exists(full_profile):
+        return {
+            "matches_profile_file": None,
+            "status": "profile_file_not_found",
+        }
+    actual_hash = sha256_file(full_profile)
+    return {
+        "matches_profile_file": bool(recorded_hash and recorded_hash == actual_hash),
+        "status": "matched" if recorded_hash == actual_hash else "mismatched",
+    }
+
+
+def proof_relevance_summary(
+    *,
+    row_cache: dict[str, Any],
+    labels: set[str] | None,
+    selected_row_count: int,
+    max_rows: int | None,
+) -> dict[str, Any]:
+    available_row_count = int(row_cache.get("row_count", len(row_cache.get("rows", []))))
+    uses_all_labels = labels is None
+    uses_all_rows = uses_all_labels and max_rows is None and selected_row_count == available_row_count
+    hash_status = profile_hash_status(row_cache)
+    hash_matches = hash_status["matches_profile_file"] is True
+    return {
+        "scope": "full_block" if uses_all_rows and hash_matches else "row_subset_or_unverified_profile",
+        "row_labels_all": uses_all_labels,
+        "selected_all_available_rows": uses_all_rows,
+        "profile_hash_matches": hash_status["matches_profile_file"],
+        "profile_hash_status": hash_status["status"],
+        "proof_relevant_full_block": bool(uses_all_rows and hash_matches),
+        "meaning": (
+            "Full-block diagnostics require row_labels=all, no max_rows truncation, "
+            "all cached rows selected, and a row-cache profile hash matching the "
+            "current profile file. Otherwise this is a row-subset or profile-stale "
+            "diagnostic."
+        ),
+    }
+
+
 def dense_block(rows: list[dict[str, Any]], column_count: int) -> tuple[np.ndarray, np.ndarray]:
     residual = np.zeros(len(rows), dtype=np.float64)
     jacobian = np.zeros((len(rows), column_count), dtype=np.float64)
@@ -222,6 +271,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     residual_inf = float(np.max(np.abs(row_scaled_residual)))
     jacobian_inf = float(np.max(np.sum(np.abs(scaled_jacobian), axis=1)))
     inverse_inf = float(np.max(np.sum(np.abs(approximate_inverse), axis=1)))
+    proof_relevance = proof_relevance_summary(
+        row_cache=cache,
+        labels=labels,
+        selected_row_count=len(rows),
+        max_rows=args.max_rows,
+    )
     return {
         "schema_version": SCHEMA_VERSION,
         "certificate_name": "profile_finite_nk_block",
@@ -245,6 +300,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "column_count": column_count,
             "max_rows": args.max_rows,
         },
+        "proof_relevance": proof_relevance,
         "coefficient_coordinate_scaling": {
             "mode": args.column_scaling,
             "scale_floor": args.column_scale_floor,

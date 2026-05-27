@@ -116,20 +116,52 @@ def finite_sweep_blockers(report: dict[str, Any] | None, expected_profile_hash: 
         return []
     blockers = [f"finite-block sweep is diagnostic-only: {report.get('status')}"]
     best = report.get("best_overall") or {}
+    best_full = best_full_block_trial(report)
     best_profile_hash = best.get("profile_hash_sha256")
     if expected_profile_hash and best_profile_hash and best_profile_hash != expected_profile_hash:
         blockers.append(
             "finite-block sweep best profile hash does not match profile_nk profile hash: "
             f"{best_profile_hash} != {expected_profile_hash}"
         )
+    best_relevance = best.get("proof_relevance") or {}
+    if best and best_relevance.get("proof_relevant_full_block") is not True:
+        blockers.append("best sampled finite-block sweep trial is not a full-block proof-relevant trial")
     z0 = best.get("Z0_infinity_norm_B")
     if z0 is None:
         blockers.append("finite-block sweep does not contain a best Z0")
     elif float(z0) >= 1.0:
         blockers.append(f"best sampled finite-block sweep Z0={float(z0):.12e} is >= 1")
+    if best_full is None:
+        blockers.append("finite-block sweep contains no full-block proof-relevant trial")
+    elif float(best_full.get("Z0_infinity_norm_B", float("inf"))) >= 1.0:
+        blockers.append(
+            "best full-block sampled finite-block sweep "
+            f"Z0={float(best_full['Z0_infinity_norm_B']):.12e} is >= 1"
+        )
     if not report.get("pass", False):
         blockers.extend(str(item) for item in report.get("blockers", []))
     return blockers
+
+
+def best_full_block_trial(report: dict[str, Any]) -> dict[str, Any] | None:
+    trials = report.get("trials")
+    if not isinstance(trials, list):
+        return None
+    candidates = [
+        trial
+        for trial in trials
+        if isinstance(trial, dict)
+        and (trial.get("proof_relevance") or {}).get("proof_relevant_full_block") is True
+    ]
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda trial: (
+            float(trial.get("Z0_infinity_norm_B", float("inf"))),
+            float(trial.get("Y0_infinity_norm_A_r", float("inf"))),
+        ),
+    )
 
 
 def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -193,7 +225,9 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
             "diagnostic_vs_proof": finite_sweep_report.get("diagnostic_vs_proof"),
             "trial_count": finite_sweep_report.get("trial_count"),
             "failure_count": finite_sweep_report.get("failure_count"),
+            "proof_relevance": finite_sweep_report.get("proof_relevance"),
             "best_overall": finite_sweep_report.get("best_overall"),
+            "best_proof_relevant_full_block": best_full_block_trial(finite_sweep_report),
             "best_by_cache": finite_sweep_report.get("best_by_cache"),
             "best_by_scaling": finite_sweep_report.get("best_by_scaling"),
             "best_by_row_scaling": finite_sweep_report.get("best_by_row_scaling"),
