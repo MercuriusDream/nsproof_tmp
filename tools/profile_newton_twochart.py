@@ -1475,22 +1475,21 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
     if args.max_residual_audit_growth <= 0.0:
         return {"enabled": False, **vector_metrics([])}
     from validators.compactified_equations import compactified_residual_defined, qb_to_rz
-    from validators.compactified_equations_twochart import SCAN_PRESETS, projection_from_twochart
+    from validators.compactified_equations_twochart import (
+        SCAN_PRESETS,
+        native_tail_exact_residuals_with_kind,
+        projection_from_twochart,
+    )
 
     projection = projection_from_twochart(data)
     scan_raw = args.line_search_residual_audit_scan.strip() or args.scan
     scan_names = parse_scan_names(scan_raw)
     h = float(args.line_search_residual_audit_h)
-    values: list[float] = []
-    scan_reports: list[dict[str, Any]] = []
-    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": 0, "cases": 0, "seconds": 0.0}
-    worst: dict[str, Any] = {}
-    for name in scan_names:
+    audit_points: list[dict[str, Any]] = []
+    skipped_by_scan: list[int] = []
+    for scan_index, name in enumerate(scan_names):
         spec = SCAN_PRESETS[name]
-        scan_values: list[float] = []
         skipped = 0
-        points = 0
-        scan_worst: dict[str, Any] = {}
         for q in grid_values(float(spec["q_min"]), float(spec["q_max"]), int(spec["n_q"])):
             for b in grid_values(float(spec["b_min"]), float(spec["b_max"]), int(spec["n_b"])):
                 r, z = qb_to_rz(q, b)
@@ -1500,41 +1499,74 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
                 if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
                     skipped += 1
                     continue
-                residual, point_native = residual_with_optional_native_tail_exact(
-                    data,
-                    projection,
-                    q,
-                    b,
-                    args.residual_kind,
-                    bool(args.native_c),
+                audit_points.append(
+                    {"scan_index": scan_index, "q": q, "b": b, "r": r, "z": z}
                 )
-                _merge_native_stat(native_stats, point_native)
-                local_values = [float(residual.e_psi), float(residual.e_gamma)]
-                local_max = max(abs(value) for value in local_values)
-                points += 1
-                scan_values.extend(local_values)
-                values.extend(local_values)
-                if local_max > float(scan_worst.get("max_abs", -1.0)):
-                    scan_worst = {
-                        "q": q,
-                        "b": b,
-                        "r": r,
-                        "z": z,
-                        "e_psi": float(residual.e_psi),
-                        "e_gamma": float(residual.e_gamma),
-                        "max_abs": local_max,
-                    }
-                if local_max > float(worst.get("max_abs", -1.0)):
-                    worst = {"scan": name, **scan_worst}
+        skipped_by_scan.append(skipped)
+    native_residuals: dict[int, Any] = {}
+    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": False, "points": 0, "cases": 0, "seconds": 0.0}
+    if args.native_c and audit_points:
+        native_residuals, native_stats = native_tail_exact_residuals_with_kind(
+            data,
+            projection,
+            [(float(point["q"]), float(point["b"])) for point in audit_points],
+            args.residual_kind,
+        )
+    values: list[float] = []
+    scan_values_by_index: list[list[float]] = [[] for _name in scan_names]
+    scan_points_by_index = [0 for _name in scan_names]
+    scan_worst_by_index: list[dict[str, Any]] = [{} for _name in scan_names]
+    worst: dict[str, Any] = {}
+    for point_index, point in enumerate(audit_points):
+        q = float(point["q"])
+        b = float(point["b"])
+        if point_index in native_residuals:
+            residual = native_residuals[point_index]
+        else:
+            residual, point_native = residual_with_optional_native_tail_exact(
+                data,
+                projection,
+                q,
+                b,
+                args.residual_kind,
+                False,
+            )
+            _merge_native_stat(native_stats, point_native)
+        scan_index = int(point["scan_index"])
+        local_values = [float(residual.e_psi), float(residual.e_gamma)]
+        local_max = max(abs(value) for value in local_values)
+        scan_points_by_index[scan_index] += 1
+        scan_values_by_index[scan_index].extend(local_values)
+        values.extend(local_values)
+        if local_max > float(scan_worst_by_index[scan_index].get("max_abs", -1.0)):
+            scan_worst_by_index[scan_index] = {
+                "q": q,
+                "b": b,
+                "r": float(point["r"]),
+                "z": float(point["z"]),
+                "e_psi": float(residual.e_psi),
+                "e_gamma": float(residual.e_gamma),
+                "max_abs": local_max,
+            }
+        if local_max > float(worst.get("max_abs", -1.0)):
+            worst = {"scan": scan_names[scan_index], **scan_worst_by_index[scan_index]}
+    scan_reports: list[dict[str, Any]] = []
+    for scan_index, name in enumerate(scan_names):
+        spec = SCAN_PRESETS[name]
         scan_reports.append(
             {
                 "label": spec["label"],
                 "chart": spec["chart"],
                 "q_range": [spec["q_min"], spec["q_max"]],
                 "b_range": [spec["b_min"], spec["b_max"]],
-                "grid": {"n_q": spec["n_q"], "n_b": spec["n_b"], "points": points, "skipped": skipped},
-                "metrics": vector_metrics(scan_values),
-                "worst": scan_worst,
+                "grid": {
+                    "n_q": spec["n_q"],
+                    "n_b": spec["n_b"],
+                    "points": scan_points_by_index[scan_index],
+                    "skipped": skipped_by_scan[scan_index],
+                },
+                "metrics": vector_metrics(scan_values_by_index[scan_index]),
+                "worst": scan_worst_by_index[scan_index],
             }
         )
     return {

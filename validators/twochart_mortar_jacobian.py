@@ -685,6 +685,30 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_tail_exact_residual.restype = ctypes.c_int
+    lib.nsproof_tail_exact_residual_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_tail_exact_residual_batch.restype = ctypes.c_int
     lib.nsproof_rz_mortar_residual_terms_batch.argtypes = [
         ctypes.c_int,
         ctypes.c_int,

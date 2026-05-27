@@ -554,6 +554,105 @@ def native_tail_exact_residual_with_kind(
     }
 
 
+def native_tail_exact_residuals_with_kind(
+    data: dict[str, Any],
+    projection: ProjectedProfile,
+    points: list[tuple[float, float]],
+    residual_kind: str,
+) -> tuple[dict[int, Residual], dict[str, Any]]:
+    if residual_kind not in PDE_RESIDUAL_KIND_IDS:
+        raise ValueError(f"unknown residual kind {residual_kind!r}")
+    origin_q_min = min(
+        projection.f_origin.q_min if projection.f_origin.enabled else 2.0,
+        projection.g_origin.q_min if projection.g_origin.enabled else 2.0,
+    )
+    blocks = data["tail_chart"]["blocks"]
+    native_point_indexes: list[int] = []
+    native_q_values: list[float] = []
+    native_b_values: list[float] = []
+    term_offsets = [0]
+    cases: list[tuple[float, float, float, float, float, float, int, int, int]] = []
+    for point_index, (q, b) in enumerate(points):
+        if q >= origin_q_min:
+            continue
+        x = b * b
+        native_point_indexes.append(point_index)
+        native_q_values.append(float(q))
+        native_b_values.append(float(b))
+        _append_tail_coeff_cases(cases, blocks.get("F_an", []), q, x, 2.0, 0)
+        _append_tail_coeff_cases(cases, blocks.get("G_an", []), q, x, 2.0, 1)
+        for block_index, patches in enumerate(blocks.get("F_frac", []), start=1):
+            _append_tail_coeff_cases(cases, patches, q, x, float(block_index) * float(projection.p), 0)
+        for block_index, patches in enumerate(blocks.get("G_frac", []), start=1):
+            _append_tail_coeff_cases(cases, patches, q, x, float(block_index) * float(projection.p), 1)
+        term_offsets.append(len(cases))
+    point_count = len(native_point_indexes)
+    term_count = len(cases)
+    if point_count == 0:
+        return {}, {"enabled": True, "used": False, "points": 0, "cases": 0, "seconds": 0.0}
+
+    double_points = ctypes.c_double * point_count
+    double_terms = ctypes.c_double * max(term_count, 1)
+    int_points_plus_one = ctypes.c_int * (point_count + 1)
+    int_points = ctypes.c_int * point_count
+    int_terms = ctypes.c_int * max(term_count, 1)
+    q_values = double_points(*native_q_values)
+    b_values = double_points(*native_b_values)
+    offsets = int_points_plus_one(*term_offsets)
+    coeff_values = double_terms(*([case[0] for case in cases] or [0.0]))
+    q0_values = double_terms(*([case[1] for case in cases] or [0.0]))
+    q1_values = double_terms(*([case[2] for case in cases] or [1.0]))
+    x0_values = double_terms(*([case[3] for case in cases] or [0.0]))
+    x1_values = double_terms(*([case[4] for case in cases] or [1.0]))
+    alpha_values = double_terms(*([case[5] for case in cases] or [0.0]))
+    kq_values = int_terms(*([case[6] for case in cases] or [0]))
+    kx_values = int_terms(*([case[7] for case in cases] or [0]))
+    component_values = int_terms(*([case[8] for case in cases] or [0]))
+    out_e_psi = double_points()
+    out_e_gamma = double_points()
+    statuses = int_points()
+    lib = native_c_library()
+    start = time.perf_counter()
+    rc = lib.nsproof_tail_exact_residual_batch(
+        point_count,
+        term_count,
+        PDE_RESIDUAL_KIND_IDS[residual_kind],
+        float(projection.gamma),
+        float(projection.p),
+        float(projection.B),
+        q_values,
+        b_values,
+        offsets,
+        coeff_values,
+        q0_values,
+        q1_values,
+        x0_values,
+        x1_values,
+        alpha_values,
+        kq_values,
+        kx_values,
+        component_values,
+        out_e_psi,
+        out_e_gamma,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(point_count)))
+        raise RuntimeError(f"native C tail exact residual batch failed rc={rc} statuses={bad_statuses}")
+    out = {
+        source_index: Residual(e_psi=float(out_e_psi[native_index]), e_gamma=float(out_e_gamma[native_index]))
+        for native_index, source_index in enumerate(native_point_indexes)
+    }
+    return out, {
+        "enabled": True,
+        "used": True,
+        "points": point_count,
+        "cases": term_count,
+        "seconds": elapsed,
+    }
+
+
 def perturb_variable(data: dict[str, Any], variable: CoefficientVariable, delta: float) -> dict[str, Any]:
     out = json.loads(json.dumps(data))
     set_path(out, variable.path, float(get_path(out, variable.path)) + delta)

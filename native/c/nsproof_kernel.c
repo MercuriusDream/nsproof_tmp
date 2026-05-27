@@ -2396,6 +2396,101 @@ NSPROOF_EXPORT int nsproof_tail_exact_residual(
     return NSPROOF_KERNEL_OK;
 }
 
+NSPROOF_EXPORT int nsproof_tail_exact_residual_batch(
+    int point_count,
+    int term_count,
+    int residual_kind,
+    double gamma_value,
+    double p,
+    double B,
+    const double *point_q,
+    const double *point_b,
+    const int *term_offsets,
+    const double *coeff,
+    const double *q0,
+    const double *q1,
+    const double *x0,
+    const double *x1,
+    const double *alpha,
+    const int *kq,
+    const int *kx,
+    const int *component,
+    double *out_e_psi,
+    double *out_e_gamma,
+    int *out_status
+) {
+    int point;
+    int first_status = NSPROOF_KERNEL_OK;
+
+    if (point_count < 0 || term_count < 0) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    if (point_count == 0) {
+        return NSPROOF_KERNEL_OK;
+    }
+    if (
+        point_q == NULL || point_b == NULL || term_offsets == NULL ||
+        out_e_psi == NULL || out_e_gamma == NULL || out_status == NULL
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (
+        term_count > 0 &&
+        (
+            coeff == NULL ||
+            q0 == NULL ||
+            q1 == NULL ||
+            x0 == NULL ||
+            x1 == NULL ||
+            alpha == NULL ||
+            kq == NULL ||
+            kx == NULL ||
+            component == NULL
+        )
+    ) {
+        return NSPROOF_KERNEL_NULL_POINTER;
+    }
+    if (term_offsets[0] != 0 || term_offsets[point_count] != term_count) {
+        return NSPROOF_KERNEL_BAD_INDEX;
+    }
+    for (point = 0; point < point_count; point++) {
+        int start = term_offsets[point];
+        int stop = term_offsets[point + 1];
+        int count = stop - start;
+        int status = NSPROOF_KERNEL_OK;
+        if (start < 0 || stop < start || stop > term_count) {
+            status = NSPROOF_KERNEL_BAD_INDEX;
+        } else {
+            status = nsproof_tail_exact_residual(
+                count,
+                residual_kind,
+                gamma_value,
+                p,
+                B,
+                point_q[point],
+                point_b[point],
+                count > 0 ? coeff + start : NULL,
+                count > 0 ? q0 + start : NULL,
+                count > 0 ? q1 + start : NULL,
+                count > 0 ? x0 + start : NULL,
+                count > 0 ? x1 + start : NULL,
+                count > 0 ? alpha + start : NULL,
+                count > 0 ? kq + start : NULL,
+                count > 0 ? kx + start : NULL,
+                count > 0 ? component + start : NULL,
+                out_e_psi + point,
+                out_e_gamma + point,
+                &status
+            );
+        }
+        out_status[point] = status;
+        if (status != NSPROOF_KERNEL_OK && first_status == NSPROOF_KERNEL_OK) {
+            first_status = status;
+        }
+    }
+    return first_status;
+}
+
 NSPROOF_EXPORT int nsproof_rz_mortar_residual_terms_batch(
     int row_count,
     int term_count,
