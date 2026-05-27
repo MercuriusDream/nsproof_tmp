@@ -242,6 +242,7 @@ def variable_tail_patch(data: dict[str, Any], variable: CoefficientVariable) -> 
 
 def delta_total_jet(
     data: dict[str, Any],
+    projection: ProjectedProfile,
     variable: CoefficientVariable,
     component: str,
     r: Jet2,
@@ -251,9 +252,13 @@ def delta_total_jet(
 ) -> Jet2:
     if variable.component != component:
         return Jet2.const(0.0)
+    origin = projection.f_origin if component == "F" else projection.g_origin
+    q_value = q.value()
     if variable.chart == "tail":
+        if origin.enabled and q_value >= origin.q_min:
+            return Jet2.const(0.0)
         patch = variable_tail_patch(data, variable)
-        if not point_in_patch(patch, q.value(), x.value()):
+        if not point_in_patch(patch, q_value, x.value()):
             return Jet2.const(0.0)
         q0, q1, x0, x1 = patch_interval(patch)
         basis = cheb_eval_tensor_jet(
@@ -267,6 +272,8 @@ def delta_total_jet(
         )
         return q.pow(float(variable.alpha)) * basis
     if variable.chart == "origin":
+        if not origin.enabled or q_value < origin.q_min:
+            return Jet2.const(0.0)
         R = r * r
         Z = z * z
         return (R ** int(variable.r_power)) * (Z ** int(variable.z_power))
@@ -287,8 +294,8 @@ def delta_field_jets(
         raise ValueError("PDE Jacobian rows are undefined at the physical origin")
     q = (1.0 + rho2).pow(-0.5)
     x = (z * z) / rho2
-    dF = delta_total_jet(data, variable, "F", r, z, q, x)
-    dG = delta_total_jet(data, variable, "G", r, z, q, x)
+    dF = delta_total_jet(data, projection, variable, "F", r, z, q, x)
+    dG = delta_total_jet(data, projection, variable, "G", r, z, q, x)
     dpsi = r * r * z * q.pow(projection.p) * dF
     dgamma = r * r * q.pow(projection.p) * dG
     return dpsi, dgamma
@@ -396,6 +403,10 @@ def native_tail_linearized_residuals_with_kind(
     cases: list[tuple[CoefficientVariable, tuple[float, float, float, float]]] = []
     for variable in variables:
         if variable.chart != "tail":
+            continue
+        if variable.component == "F" and projection.f_origin.enabled and q >= projection.f_origin.q_min:
+            continue
+        if variable.component == "G" and projection.g_origin.enabled and q >= projection.g_origin.q_min:
             continue
         patch = variable_tail_patch(data, variable)
         if point_in_patch(patch, q, x):

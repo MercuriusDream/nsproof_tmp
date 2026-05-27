@@ -239,6 +239,10 @@ def dedupe_qb_points(points: list[tuple[float, float]]) -> list[tuple[float, flo
     return out
 
 
+def qb_key(q: float, b: float) -> tuple[float, float]:
+    return (round(float(q), 15), round(float(b), 15))
+
+
 def generated_guard_qb_points(args: argparse.Namespace) -> list[tuple[float, float]]:
     if args.guard_grid == "none":
         return []
@@ -981,7 +985,7 @@ def build_stage0_point_rows(
 
 
 def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: tuple[str, ...]) -> dict[str, Any]:
-    from validators.compactified_equations import compactified_residual_defined, qb_to_rz, residual_with_kind
+    from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
         linearized_residual_with_kind,
         native_tail_linearized_residuals_with_kind,
@@ -1000,7 +1004,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     reset_native_c_rz_stats()
     all_variables = enumerate_coefficients(data)
     all_variables_by_index = {variable.index: variable for variable in all_variables}
-    manual_pde_points = parse_qb_points(args.pde_qb_points)
+    manual_pde_points = [] if args.no_default_pde_points and not args.pde_qb_points.strip() else parse_qb_points(args.pde_qb_points)
     pde_scan_active_report = residual_scan_active_qb_points(data, args)
     pde_points = dedupe_qb_points(manual_pde_points + list(pde_scan_active_report.get("points", [])))
     variable_charts = parse_variable_charts(args.variable_charts)
@@ -1156,16 +1160,202 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             )
 
     pde_rows: list[dict[str, Any]] = []
-    variable_scores = {variable.index: 0.0 for variable in candidate_variables}
-    native_c_pde_prescore = {"enabled": False, "cases": 0, "seconds": 0.0}
+    pde_component_selection: dict[tuple[float, float], set[str]] = {}
+    pde_point_residuals: list[dict[str, Any]] = []
     for q, b in pde_points:
         if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
             continue
         r, z = qb_to_rz(q, b)
         raw = projection.exact_residual_at(r, z)
         residual = residual_with_kind(raw, q, b, projection.p, args.residual_kind)
-        pde_rows.append({"q": q, "b": b, "component": "e_psi", "residual": residual.e_psi})
-        pde_rows.append({"q": q, "b": b, "component": "e_gamma", "residual": residual.e_gamma})
+        pde_point_residuals.append(
+            {
+                "q": q,
+                "b": b,
+                "e_psi": float(residual.e_psi),
+                "e_gamma": float(residual.e_gamma),
+                "worst_component": "e_psi"
+                if abs(float(residual.e_psi)) >= abs(float(residual.e_gamma))
+                else "e_gamma",
+                "max_abs": max(abs(float(residual.e_psi)), abs(float(residual.e_gamma))),
+            }
+        )
+    if args.pde_component_mode == "both":
+        for record in pde_point_residuals:
+            pde_component_selection[qb_key(record["q"], record["b"])] = {"e_psi", "e_gamma"}
+    elif args.pde_component_mode == "worst-per-point":
+        for record in pde_point_residuals:
+            pde_component_selection[qb_key(record["q"], record["b"])] = {str(record["worst_component"])}
+    elif args.pde_component_mode == "worst-global":
+        if pde_point_residuals:
+            worst_record = max(pde_point_residuals, key=lambda item: float(item["max_abs"]))
+            pde_component_selection[qb_key(worst_record["q"], worst_record["b"])] = {
+                str(worst_record["worst_component"])
+            }
+    else:  # pragma: no cover - argparse choices enforce this.
+        raise ValueError(f"unknown pde component mode {args.pde_component_mode!r}")
+
+    residual_by_point = {qb_key(record["q"], record["b"]): record for record in pde_point_residuals}
+    injected_pde_candidates: list[dict[str, Any]] = []
+    native_c_pde_injection = {"enabled": False, "cases": 0, "seconds": 0.0}
+    if args.pde_jacobian_candidate_count > 0 and pde_component_selection:
+        pde_variable_pool = [
+            variable
+            for variable in all_variables
+            if variable_allowed_for_blocks(variable, blocks)
+            and variable_allowed_for_chart_filter(variable, variable_charts)
+            and (args.include_origin_constants or not variable_is_origin_constant(variable))
+            and variable_relevant_for_samples(data, variable, pde_points, [])
+            and variable_under_candidate_caps(variable, args)
+            and not tail_variable_is_gate_locked(data, variable)
+        ]
+        injection_scores: dict[int, float] = {}
+        injection_best: dict[int, dict[str, Any]] = {}
+        row_local_records: dict[tuple[float, float, str], list[dict[str, Any]]] = {}
+        for q, b in pde_points:
+            key = qb_key(q, b)
+            selected_components = pde_component_selection.get(key, set())
+            record = residual_by_point.get(key)
+            if not selected_components or record is None:
+                continue
+            native_tail_columns: dict[int, Any] = {}
+            if args.native_c:
+                native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+                    data,
+                    projection,
+                    pde_variable_pool,
+                    q,
+                    b,
+                    args.residual_kind,
+                )
+                if native_stats.get("enabled"):
+                    native_c_pde_injection["enabled"] = True
+                    native_c_pde_injection["cases"] += int(native_stats.get("cases", 0))
+                    native_c_pde_injection["seconds"] += float(native_stats.get("seconds", 0.0))
+            for variable in pde_variable_pool:
+                if args.native_c and variable.chart == "tail":
+                    column = native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
+                else:
+                    column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
+                component_scores: list[tuple[str, float, float, float]] = []
+                if "e_psi" in selected_components:
+                    jac = float(column.e_psi)
+                    score = abs(args.pde_weight * jac * float(record["e_psi"]))
+                    component_scores.append(("e_psi", score, jac, float(record["e_psi"])))
+                    if math.isfinite(score) and score > 0.0:
+                        row_local_records.setdefault((float(q), float(b), "e_psi"), []).append(
+                            {
+                                "var_index": variable.index,
+                                "score": score,
+                                "q": float(q),
+                                "b": float(b),
+                                "component": "e_psi",
+                                "jacobian_value": jac,
+                                "residual": float(record["e_psi"]),
+                            }
+                        )
+                if "e_gamma" in selected_components:
+                    jac = float(column.e_gamma)
+                    score = abs(args.pde_weight * jac * float(record["e_gamma"]))
+                    component_scores.append(("e_gamma", score, jac, float(record["e_gamma"])))
+                    if math.isfinite(score) and score > 0.0:
+                        row_local_records.setdefault((float(q), float(b), "e_gamma"), []).append(
+                            {
+                                "var_index": variable.index,
+                                "score": score,
+                                "q": float(q),
+                                "b": float(b),
+                                "component": "e_gamma",
+                                "jacobian_value": jac,
+                                "residual": float(record["e_gamma"]),
+                            }
+                        )
+                finite_scores = [item for item in component_scores if math.isfinite(item[1]) and item[1] > 0.0]
+                if not finite_scores:
+                    continue
+                score_sum = sum(item[1] for item in finite_scores)
+                injection_scores[variable.index] = injection_scores.get(variable.index, 0.0) + score_sum
+                best_component = max(finite_scores, key=lambda item: item[1])
+                current_best = injection_best.get(variable.index)
+                if current_best is None or best_component[1] > float(current_best["score"]):
+                    injection_best[variable.index] = {
+                        "q": float(q),
+                        "b": float(b),
+                        "component": best_component[0],
+                        "score": best_component[1],
+                        "jacobian_value": best_component[2],
+                        "residual": best_component[3],
+                    }
+
+        prioritized_pde_indexes: set[int] = set()
+
+        def prioritize_pde_candidate(var_index: int, score: float, best: dict[str, Any], selection_mode: str) -> bool:
+            if len(injected_pde_candidates) >= args.pde_jacobian_candidate_count:
+                return False
+            if var_index in prioritized_pde_indexes:
+                return False
+            variable = all_variables_by_index[var_index]
+            if var_index not in candidate_by_index:
+                candidate_variables.append(variable)
+                candidate_by_index[var_index] = variable
+            prioritized_pde_indexes.add(var_index)
+            injected_pde_candidates.append(
+                {
+                    "variable": variable.label,
+                    "var_index": var_index,
+                    "chart": variable.chart,
+                    "component": variable.component,
+                    "block": variable.block,
+                    "score": score,
+                    "best_row_q": best.get("q"),
+                    "best_row_b": best.get("b"),
+                    "best_row_component": best.get("component"),
+                    "best_row_score": best.get("score"),
+                    "best_row_residual": best.get("residual"),
+                    "jacobian_value": best.get("jacobian_value"),
+                    "selection_mode": selection_mode,
+                }
+            )
+            return True
+
+        row_keys = sorted(
+            row_local_records,
+            key=lambda key: abs(float(row_local_records[key][0].get("residual", 0.0))) if row_local_records[key] else 0.0,
+            reverse=True,
+        )
+        per_row_budget = max(1, args.pde_jacobian_candidate_count // max(1, len(row_keys))) if row_keys else 0
+        for row_key in row_keys:
+            added_for_row = 0
+            for record in sorted(row_local_records[row_key], key=lambda item: float(item["score"]), reverse=True):
+                if added_for_row >= per_row_budget:
+                    break
+                if prioritize_pde_candidate(
+                    int(record["var_index"]),
+                    float(record["score"]),
+                    record,
+                    "pde_jacobian_row_local",
+                ):
+                    added_for_row += 1
+
+        for var_index, score in sorted(injection_scores.items(), key=lambda item: item[1], reverse=True):
+            if len(injected_pde_candidates) >= args.pde_jacobian_candidate_count:
+                break
+            best = injection_best.get(var_index, {})
+            prioritize_pde_candidate(var_index, score, best, "pde_jacobian_global")
+
+    variable_scores = {variable.index: 0.0 for variable in candidate_variables}
+    native_c_pde_prescore = {"enabled": False, "cases": 0, "seconds": 0.0}
+    for q, b in pde_points:
+        key = qb_key(q, b)
+        record = residual_by_point.get(key)
+        if record is None:
+            continue
+        selected_components = pde_component_selection.get(key, set())
+        if not selected_components:
+            continue
+        for component in ("e_psi", "e_gamma"):
+            if component in selected_components:
+                pde_rows.append({"q": q, "b": b, "component": component, "residual": record[component]})
         native_tail_columns: dict[int, Any] = {}
         if args.native_c:
             native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
@@ -1182,10 +1372,13 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
                 native_c_pde_prescore["seconds"] += float(native_stats.get("seconds", 0.0))
         for variable in candidate_variables:
             if args.native_c and variable.chart == "tail":
-                column = native_tail_columns.get(variable.index, residual.__class__(e_psi=0.0, e_gamma=0.0))
+                column = native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
             else:
                 column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
-            variable_scores[variable.index] += abs(column.e_psi * residual.e_psi) + abs(column.e_gamma * residual.e_gamma)
+            if "e_psi" in selected_components:
+                variable_scores[variable.index] += abs(column.e_psi * float(record["e_psi"]))
+            if "e_gamma" in selected_components:
+                variable_scores[variable.index] += abs(column.e_gamma * float(record["e_gamma"]))
 
     mortar_rows = []
     mortar_rows_available = 0
@@ -1216,7 +1409,19 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
                         row_norm=row_norm,
                     )
 
-    ranked = sorted(candidate_variables, key=lambda variable: variable_scores.get(variable.index, 0.0), reverse=True)
+    pde_injected_priority = {
+        int(record["var_index"]): len(injected_pde_candidates) - index
+        for index, record in enumerate(injected_pde_candidates)
+    }
+    ranked = sorted(
+        candidate_variables,
+        key=lambda variable: (
+            1 if variable.index in pde_injected_priority else 0,
+            pde_injected_priority.get(variable.index, 0),
+            variable_scores.get(variable.index, 0.0),
+        ),
+        reverse=True,
+    )
     selected = [variable for variable in ranked if variable_scores.get(variable.index, 0.0) > 0.0]
     selected = select_active_variables(selected, args.max_variables, args.chart_balanced_selection)
     selected_index = {variable.index: column for column, variable in enumerate(selected)}
@@ -1230,6 +1435,10 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     row_groups: dict[str, int] = {"pde": 0, "mortar": 0, "active_guard": 0}
     parallel_fallbacks: list[dict[str, Any]] = []
     native_c_pde = dict(native_c_pde_prescore)
+    if native_c_pde_injection.get("enabled"):
+        native_c_pde["enabled"] = True
+        native_c_pde["cases"] += int(native_c_pde_injection.get("cases", 0))
+        native_c_pde["seconds"] += float(native_c_pde_injection.get("seconds", 0.0))
 
     pde_point_rows = build_stage0_point_rows(
         data,
@@ -1255,7 +1464,10 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             native_c_pde["seconds"] += float(point_native.get("seconds", 0.0))
         q = float(point_row["q"])
         b = float(point_row["b"])
+        selected_components = pde_component_selection.get(qb_key(q, b), set())
         for component in ("e_psi", "e_gamma"):
+            if component not in selected_components:
+                continue
             residual_raw = float(point_row["residuals"][component])
             residual_vector.append(args.pde_weight * residual_raw)
             jacobian_rows.append(list(point_row["jacobian_rows"][component]))
@@ -1384,6 +1596,11 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "objective_pde_rows": pde_rows,
         "manual_pde_points": [[q, b] for q, b in manual_pde_points],
         "pde_points": [[q, b] for q, b in pde_points],
+        "pde_component_mode": args.pde_component_mode,
+        "pde_component_selection": [
+            {"q": key[0], "b": key[1], "components": sorted(components)}
+            for key, components in sorted(pde_component_selection.items())
+        ],
         "pde_scan_active": {
             **pde_scan_active_report,
             "points": [[q, b] for q, b in pde_scan_active_report.get("points", [])],
@@ -1402,6 +1619,8 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "pre_score_candidate_count": pre_score_candidate_count,
         "post_pool_candidate_count": len(candidate_variables),
         "injected_mortar_candidates": injected_mortar_candidates,
+        "injected_pde_candidates": injected_pde_candidates,
+        "native_c_pde_injection": native_c_pde_injection,
         "variable_score_preview": [
             {"variable": variable.label, "score": variable_scores.get(variable.index, 0.0)}
             for variable in selected[:12]
@@ -1615,7 +1834,7 @@ def residual_scan_active_qb_points(data: dict[str, Any], args: argparse.Namespac
     points: list[tuple[float, float]] = []
     seen: set[tuple[float, float]] = set()
     for record in sorted(audit["records"], key=lambda item: float(item["max_abs"]), reverse=True):
-        key = (round(float(record["q"]), 15), round(float(record["b"]), 15))
+        key = qb_key(float(record["q"]), float(record["b"]))
         if key in seen:
             continue
         seen.add(key)
@@ -2115,6 +2334,8 @@ def write_stage0_row_cache(args: argparse.Namespace, system: dict[str, Any], ite
             "mortar_rows_unfiltered_max_abs": system.get("mortar_rows_unfiltered_max_abs", 0.0),
             "mortar_rows_unfiltered_worst": system.get("mortar_rows_unfiltered_worst", {}),
             "pde_points": system.get("pde_points", []),
+            "pde_component_mode": system.get("pde_component_mode"),
+            "pde_component_selection": system.get("pde_component_selection", []),
             "pde_scan_active": system.get("pde_scan_active", {}),
         },
     )
@@ -2159,6 +2380,27 @@ def stage0_block_specs(variables: list[Any], solve_mode: str, labels_raw: str = 
     return specs
 
 
+def line_search_accept_metric_value(
+    metric: str,
+    sampled_metrics: dict[str, Any],
+    residual_audit_metrics: dict[str, Any],
+    mortar_audit_metrics: dict[str, Any],
+) -> float:
+    if metric == "objective":
+        return float(sampled_metrics["objective"])
+    if metric == "max-abs":
+        return float(sampled_metrics["max_abs"])
+    if metric == "residual-audit-max":
+        if not residual_audit_metrics.get("enabled"):
+            raise ValueError("--line-search-accept-metric residual-audit-max requires --max-residual-audit-growth > 0")
+        return float(residual_audit_metrics["max_abs"])
+    if metric == "mortar-audit-max":
+        if not mortar_audit_metrics.get("enabled"):
+            raise ValueError("--line-search-accept-metric mortar-audit-max requires --max-mortar-audit-growth > 0")
+        return float(mortar_audit_metrics["max_abs"])
+    raise ValueError(f"unknown line-search accept metric {metric!r}")
+
+
 def attach_stage0_tail_gate(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
     report = tail_gate_report_twochart(data, args)
     data["tail_legality"] = {
@@ -2199,6 +2441,12 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             use_native_c=bool(args.native_c),
         )
         base_residual_audit_metrics = residual_audit_metrics(current, args)
+        base_accept_metric_value = line_search_accept_metric_value(
+            args.line_search_accept_metric,
+            base_metrics,
+            base_residual_audit_metrics,
+            base_mortar_audit_metrics,
+        )
         block_specs = stage0_block_specs(system["variables"], args.solve_mode, args.block_search_labels)
         line_trials: list[dict[str, Any]] = []
         candidate_previews: list[dict[str, Any]] = []
@@ -2338,12 +2586,19 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         trial_residual_audit_metrics["max_abs"]
                         <= args.max_residual_audit_growth * max(base_residual_audit_metrics["max_abs"], 1e-300)
                     )
+                trial_accept_metric_value = line_search_accept_metric_value(
+                    args.line_search_accept_metric,
+                    trial_metrics,
+                    trial_residual_audit_metrics,
+                    trial_mortar_audit_metrics,
+                )
                 objective_decrease = base_metrics["objective"] - trial_metrics["objective"]
+                accept_metric_decrease = base_accept_metric_value - trial_accept_metric_value
                 required_decrease = max(
                     args.min_objective_decrease_abs,
-                    args.min_objective_decrease_rel * max(base_metrics["objective"], 1e-300),
+                    args.min_objective_decrease_rel * max(abs(base_accept_metric_value), 1e-300),
                 )
-                improved = objective_decrease > required_decrease
+                improved = accept_metric_decrease > required_decrease
                 accepted_here = (
                     improved
                     and raw_growth_ok
@@ -2356,6 +2611,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         **trial_record,
                         **trial_metrics,
                         "objective_decrease": objective_decrease,
+                        "accept_metric": args.line_search_accept_metric,
+                        "base_accept_metric_value": base_accept_metric_value,
+                        "trial_accept_metric_value": trial_accept_metric_value,
+                        "accept_metric_decrease": accept_metric_decrease,
                         "required_objective_decrease": required_decrease,
                         "raw_objective": trial_raw_metrics["objective"],
                         "raw_max_abs": trial_raw_metrics["max_abs"],
@@ -2372,12 +2631,13 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 )
                 if accepted_here and (
                     best_accepted is None
-                    or trial_metrics["objective"] < best_accepted["trial_metrics"]["objective"]
+                    or trial_accept_metric_value < best_accepted["accept_metric_value"]
                 ):
                     best_accepted = {
                         "block": block_spec["label"],
                         "trial_data": trial_data,
                         "trial_metrics": trial_metrics,
+                        "accept_metric_value": trial_accept_metric_value,
                         "update_metrics": update_metrics,
                         "alpha": alpha,
                     }
@@ -2392,6 +2652,10 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             {
                 "iteration": iteration,
                 "base": base_metrics,
+                "base_accept_metric": {
+                    "metric": args.line_search_accept_metric,
+                    "value": base_accept_metric_value,
+                },
                 "solve_mode": args.solve_mode,
                 "accepted_block": best_accepted["block"] if best_accepted is not None else "",
                 "accepted_alpha": best_accepted["alpha"] if best_accepted is not None else 0.0,
@@ -2419,6 +2683,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 else {},
                 "active_guard_weight": args.active_guard_weight,
                 "pde_points": system.get("pde_points", []),
+                "pde_component_mode": system.get("pde_component_mode"),
+                "pde_component_selection": system.get("pde_component_selection", []),
                 "pde_scan_active": system.get("pde_scan_active", {}),
                 "active_guard_rows": system["active_guard_rows"],
                 "active_guard_points": system["active_guard_points"],
@@ -2430,6 +2696,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
+                "injected_pde_candidates": system.get("injected_pde_candidates", [])[:12],
+                "native_c_pde_injection": system.get("native_c_pde_injection", {}),
                 "variable_score_preview": system["variable_score_preview"],
                 "line_trials": line_trials,
                 "accepted": accepted,
@@ -2475,7 +2743,16 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_x_samples": args.mortar_x_samples,
             "mortar_active_count": args.mortar_active_count,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
-            "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
+            "pde_qb_points": [
+                [q, b]
+                for q, b in (
+                    []
+                    if args.no_default_pde_points and not args.pde_qb_points.strip()
+                    else parse_qb_points(args.pde_qb_points)
+                )
+            ],
+            "no_default_pde_points": args.no_default_pde_points,
+            "pde_component_mode": args.pde_component_mode,
             "pde_scan_active_count": args.pde_scan_active_count,
             "pde_scan_active_scan": args.pde_scan_active_scan,
             "pde_scan_active_h": args.pde_scan_active_h,
@@ -2529,11 +2806,13 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "candidate_origin_degree_max": args.candidate_origin_degree_max,
             "candidate_pool_limit": args.candidate_pool_limit,
             "mortar_jacobian_candidate_count": args.mortar_jacobian_candidate_count,
+            "pde_jacobian_candidate_count": args.pde_jacobian_candidate_count,
             "mortar_score_normalization": args.mortar_score_normalization,
             "pde_weight": args.pde_weight,
             "mortar_weight": args.mortar_weight,
             "line_search": args.line_search,
             "line_search_eval": args.line_search_eval,
+            "line_search_accept_metric": args.line_search_accept_metric,
             "include_origin_constants": args.include_origin_constants,
             "chart_balanced_selection": args.chart_balanced_selection,
             "row_normalization": args.row_normalization,
@@ -2776,6 +3055,17 @@ def main() -> None:
     parser.add_argument("--overlap-q-max", type=float, default=0.92)
     parser.add_argument("--pde-qb-points", default="")
     parser.add_argument(
+        "--no-default-pde-points",
+        action="store_true",
+        help="When --pde-qb-points is empty, use no legacy default PDE points; intended for scan-selected rows.",
+    )
+    parser.add_argument(
+        "--pde-component-mode",
+        choices=("both", "worst-per-point", "worst-global"),
+        default="both",
+        help="Which PDE components become Stage-0 objective rows at selected q,b points.",
+    )
+    parser.add_argument(
         "--pde-scan-active-count",
         type=nonnegative_int,
         default=0,
@@ -2874,6 +3164,15 @@ def main() -> None:
         help="Inject this many extra variables by largest active mortar-row Jacobian score, ignoring degree caps.",
     )
     parser.add_argument(
+        "--pde-jacobian-candidate-count",
+        type=nonnegative_int,
+        default=0,
+        help=(
+            "Inject this many extra variables by largest active PDE-row Jacobian score, "
+            "bypassing --candidate-pool-limit while respecting degree caps and tail gates."
+        ),
+    )
+    parser.add_argument(
         "--mortar-score-normalization",
         choices=("raw", "row-norm"),
         default="raw",
@@ -2892,6 +3191,12 @@ def main() -> None:
             "row set without rebuilding candidate selection/Jacobians. Requires "
             "--row-normalization none."
         ),
+    )
+    parser.add_argument(
+        "--line-search-accept-metric",
+        choices=("objective", "max-abs", "residual-audit-max", "mortar-audit-max"),
+        default="objective",
+        help="Scalar metric that must decrease for line-search acceptance.",
     )
     parser.add_argument(
         "--guarded-kkt-primary-labels",
@@ -3074,6 +3379,10 @@ def main() -> None:
         parser.error("--row-scale-min must be <= --row-scale-max")
     if args.line_search_eval == "objective-only" and args.row_normalization != "none":
         parser.error("--line-search-eval objective-only requires --row-normalization none")
+    if args.line_search_accept_metric == "residual-audit-max" and args.max_residual_audit_growth <= 0.0:
+        parser.error("--line-search-accept-metric residual-audit-max requires --max-residual-audit-growth > 0")
+    if args.line_search_accept_metric == "mortar-audit-max" and args.max_mortar_audit_growth <= 0.0:
+        parser.error("--line-search-accept-metric mortar-audit-max requires --max-mortar-audit-growth > 0")
     if args.guard_q_max <= args.guard_q_min:
         parser.error("--guard-q-max must be greater than --guard-q-min")
     if args.guard_b_max <= args.guard_b_min:
