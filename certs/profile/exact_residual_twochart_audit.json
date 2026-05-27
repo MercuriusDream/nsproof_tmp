@@ -9,7 +9,7 @@
   ],
   "certificate_name": "exact_residual_twochart_audit",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
   ],
   "dependency_hashes": {},
   "entry_ready_for_interval_nk": false,
@@ -28,7 +28,7 @@
       "cases": 659625,
       "enabled": true,
       "rows": 2430,
-      "seconds": 0.9284530419999975
+      "seconds": 0.9292950829999995
     },
     "orders": "C0-C4",
     "overlap_q_range": [
@@ -408,7 +408,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_current_profile_mortaraudit128_step2.json",
   "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
-  "repo_commit": "8bb761aa8218fb507d63d3671bcfe7b6ecd85af0",
+  "repo_commit": "6b018745048f5547d9a797b39867467b9c91ea0e",
   "residual_blocks": {
     "max_abs": 444.01783759267335,
     "scans": {

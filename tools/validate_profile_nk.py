@@ -67,11 +67,11 @@ def load_optional_json(path: str | None) -> dict[str, Any] | None:
         return None
     full = resolve(path)
     if not os.path.exists(full):
-        raise FileNotFoundError(f"finite block report not found: {path}")
+        raise FileNotFoundError(f"JSON report not found: {path}")
     with open(full, "r", encoding="utf-8") as fh:
         data = json.load(fh)
     if not isinstance(data, dict):
-        raise ValueError(f"finite block report must be a JSON object: {path}")
+        raise ValueError(f"JSON report must be an object: {path}")
     data = dict(data)
     data["_path"] = path
     data["_sha256"] = sha256_file(full)
@@ -82,6 +82,42 @@ def load_optional_jsons(paths: list[str] | None) -> list[dict[str, Any]]:
     if not paths:
         return []
     return [report for report in (load_optional_json(path) for path in paths) if report is not None]
+
+
+def interval_row_blockers(report: dict[str, Any] | None, expected_profile_hash: str | None) -> list[str]:
+    if report is None:
+        return ["interval residual row ledger is missing"]
+    blockers = [f"interval residual row ledger is not a domain proof: {report.get('status')}"]
+    report_profile_hash = report.get("profile_hash_sha256")
+    if expected_profile_hash and report_profile_hash and report_profile_hash != expected_profile_hash:
+        blockers.append(
+            "interval residual row ledger profile hash does not match profile_nk profile hash: "
+            f"{report_profile_hash} != {expected_profile_hash}"
+        )
+    if not report.get("pass", False):
+        blockers.extend(str(item) for item in report.get("blockers", []))
+    return blockers
+
+
+def interval_row_summary(report: dict[str, Any] | None, expected_profile_hash: str | None) -> dict[str, Any] | None:
+    if report is None:
+        return None
+    return {
+        "path": report["_path"],
+        "sha256": report["_sha256"],
+        "profile_hash_matches_certificate": report.get("profile_hash_sha256") == expected_profile_hash,
+        "status": report.get("status"),
+        "pass": bool(report.get("pass", False)),
+        "status_detail": report.get("status_detail"),
+        "backend": report.get("backend"),
+        "row_count": report.get("row_count"),
+        "row_counts_by_source": report.get("row_counts_by_source"),
+        "row_counts_by_family": report.get("row_counts_by_family"),
+        "interval_bounds": report.get("interval_bounds"),
+        "interval_max_abs_upper_bound": report.get("interval_max_abs_upper_bound"),
+        "interval_widths": report.get("interval_widths"),
+        "failure_reason": report.get("failure_reason"),
+    }
 
 
 def finite_block_blockers(report: dict[str, Any] | None, expected_profile_hash: str | None) -> list[str]:
@@ -183,15 +219,23 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
 
     finite_block_report = load_optional_json(args.finite_block_report)
     finite_sweep_reports = load_optional_jsons(args.finite_sweep_report)
+    interval_row_report = load_optional_json(args.interval_row_ledger)
     expected_profile_hash = exact_audit["profile_hash_sha256"]
     blockers = list(exact_audit.get("blockers", []))
+    interval_residual_blocker = (
+        "domain interval residual evaluator is not implemented; sampled interval row ledger is attached "
+        "but does not enclose the continuous compactified residual domain"
+        if interval_row_report is not None
+        else "interval residual evaluator is not implemented"
+    )
     blockers.extend(
         [
-            "interval residual evaluator is not implemented",
+            interval_residual_blocker,
             "validated approximate inverse hash is missing",
             "Z2/tail-complement interval bound is not available for this profile",
         ]
     )
+    blockers.extend(interval_row_blockers(interval_row_report, expected_profile_hash))
     blockers.extend(finite_block_blockers(finite_block_report, expected_profile_hash))
     for finite_sweep_report in finite_sweep_reports:
         blockers.extend(finite_sweep_blockers(finite_sweep_report, expected_profile_hash))
@@ -209,6 +253,8 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
     }
     if finite_block_report is not None:
         dependency_hashes["sampled_finite_block_report"] = finite_block_report["_sha256"]
+    if interval_row_report is not None:
+        dependency_hashes["sampled_interval_residual_rows"] = interval_row_report["_sha256"]
     for index, finite_sweep_report in enumerate(finite_sweep_reports):
         dependency_hashes[f"sampled_finite_block_sweep_{index}"] = finite_sweep_report["_sha256"]
 
@@ -261,6 +307,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
         "Z0_interval": None,
         "Z2_interval": None,
         "finite_nk_backend": finite_backend,
+        "sampled_interval_residual_rows": interval_row_summary(interval_row_report, expected_profile_hash),
         "sampled_finite_block_report": None
         if finite_block_report is None
         else {
@@ -310,6 +357,7 @@ def main() -> None:
     parser.add_argument("--residual-threshold", type=float, default=1e-8)
     parser.add_argument("--mortar-threshold", type=float, default=1e-8)
     parser.add_argument("--native-c", action="store_true")
+    parser.add_argument("--interval-row-ledger")
     parser.add_argument("--finite-block-report")
     parser.add_argument("--finite-sweep-report", action="append")
     args = parser.parse_args()

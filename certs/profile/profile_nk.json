@@ -13,9 +13,14 @@
     "validated approximate inverse A is not yet supplied",
     "sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08",
     "C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08",
-    "interval residual evaluator is not implemented",
+    "domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain",
     "validated approximate inverse hash is missing",
     "Z2/tail-complement interval bound is not available for this profile",
+    "interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF",
+    "exact residual audit stores scan/mortar summaries, not full domain interval residual rows",
+    "domain Bernstein/Arb residual bounds are missing for compactified residual equations",
+    "Z2/tail complement interval bound is missing",
+    "sampled nextafter double intervals are row data only, not continuous-domain enclosures",
     "finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF",
     "finite-block sampled Z0=1.828087495130e+00 is >= 1",
     "row cache is floating, not interval residual data",
@@ -33,16 +38,17 @@
   ],
   "certificate_name": "profile_nk",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
   ],
   "dependency_hashes": {
     "basis": "d9bbbc715c4631d39ef3205a1f673ae5561b51237f4db1f45383ffd198cdd49c",
-    "exact_residual_audit": "51959e4cc3c9a6fb275c9ae30090d6a2dad2a946ad388c1509fc28e2801a71f8",
+    "exact_residual_audit": "52205dcd8b8dcadb399c0affa68a1fa747b2627676c44276dbfb80fcf901fbd5",
     "finite_nk_bounds": "764463de866b761f218a3750b9ff16926fc3207d9ba6059e5ce549ac6f96ce89",
     "interval_backend": "a87cba36b4870f66b987e3683b99ba1006b389a9422cd75cdee7a9bacedbe0c1",
     "native_interval_kernel": "47a32dbc6b006611a05ea2d0dde99bee9436abc2ed116da43de56fb718d73ba2",
     "sampled_finite_block_report": "bb60425433509826ac7af2ab73abf1f04ea422b34a65424854a79cb7dc92c9ea",
     "sampled_finite_block_sweep_0": "acc980c82e6feb19892e643e2c02475e7a4ae429eb8ae9b61d8e2a51ad8b6a38",
+    "sampled_interval_residual_rows": "71e4ae5d2a3bd561cf60eb9f49ef79139d66070e1df16b6c63f392cbe309ff3b",
     "tail_policy": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
   },
   "exact_residual_audit": {
@@ -56,7 +62,7 @@
     ],
     "certificate_name": "exact_residual_twochart_audit",
     "commands": [
-      "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+      "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
     ],
     "dependency_hashes": {},
     "entry_ready_for_interval_nk": false,
@@ -75,7 +81,7 @@
         "cases": 659625,
         "enabled": true,
         "rows": 2430,
-        "seconds": 0.9284530419999975
+        "seconds": 0.9292950829999995
       },
       "orders": "C0-C4",
       "overlap_q_range": [
@@ -455,7 +461,7 @@
     "precision_bits": 53,
     "profile": "work/twochart_stage0_current_profile_mortaraudit128_step2.json",
     "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
-    "repo_commit": "8bb761aa8218fb507d63d3671bcfe7b6ecd85af0",
+    "repo_commit": "6b018745048f5547d9a797b39867467b9c91ea0e",
     "residual_blocks": {
       "max_abs": 444.01783759267335,
       "scans": {
@@ -750,7 +756,7 @@
       "nk_entry_residual_max": 1e-08
     }
   },
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF; exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
   "finite_nk_backend": {
     "backend": "native-c-outward-rounded-double-interval",
     "input_hashes": {
@@ -802,7 +808,7 @@
   },
   "radii_polynomial_interval": null,
   "radius_interval": null,
-  "repo_commit": "8bb761aa8218fb507d63d3671bcfe7b6ecd85af0",
+  "repo_commit": "6b018745048f5547d9a797b39867467b9c91ea0e",
   "residual_map_hash_sha256": "f2b28046f8a44ffa41580257015e308032b574a94fdc910902a06da8af871db3",
   "rounding_mode": null,
   "sampled_finite_block_report": {
@@ -2766,6 +2772,51 @@
       "trial_count": 432
     }
   ],
+  "sampled_interval_residual_rows": {
+    "backend": "python-math.nextafter-outward-double",
+    "failure_reason": "exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures",
+    "interval_bounds": {
+      "max_abs_upper": 4968784.594306024,
+      "per_family": {
+        "mortar_group_max_abs": 4968784.594306024,
+        "mortar_worst": 4968784.594306024,
+        "residual_scan_worst": 444.0178375926734,
+        "row_cache_guard": 4440.178375902219,
+        "row_cache_mortar": 4214.438752619199,
+        "row_cache_residual": 323.9718884451821
+      },
+      "per_source": {
+        "exact_residual_audit": 4968784.594306024,
+        "row_cache": 4440.178375902219
+      },
+      "worst_row_id": "mortar:summary:worst"
+    },
+    "interval_max_abs_upper_bound": 4968784.594306024,
+    "interval_widths": {
+      "count": 994,
+      "max": 1.862645149230957e-09,
+      "median": 3.552713678800501e-15
+    },
+    "pass": false,
+    "path": "certs/profile/interval_residual_rows.json",
+    "profile_hash_matches_certificate": true,
+    "row_count": 994,
+    "row_counts_by_family": {
+      "mortar_group_max_abs": 30,
+      "mortar_worst": 1,
+      "residual_scan_worst": 12,
+      "row_cache_guard": 858,
+      "row_cache_mortar": 69,
+      "row_cache_residual": 24
+    },
+    "row_counts_by_source": {
+      "exact_residual_audit": 43,
+      "row_cache": 951
+    },
+    "sha256": "71e4ae5d2a3bd561cf60eb9f49ef79139d66070e1df16b6c63f392cbe309ff3b",
+    "status": "OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF",
+    "status_detail": "outward-double interval row data only; not a final interval domain proof"
+  },
   "schema_version": "nsproof-cert-v1",
   "tail_inverse_bound": null,
   "tail_policy_hash_sha256": "d82a8f01a06a4130e283c1357d4f082a61cb92975af47276f44602beef8aa495"
