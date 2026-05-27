@@ -1050,18 +1050,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     candidate_by_index = {variable.index: variable for variable in candidate_variables}
     injected_mortar_candidates: list[dict[str, Any]] = []
 
-    def build_mortar_rows(variables: list[Any]) -> list[Any]:
-        if args.mortar_coordinates == "RZ":
-            return build_rz_rows(data, variables, q_values, x_values, args.mortar_order, use_native_c=args.native_c)
-        if args.mortar_coordinates == "qx":
-            return build_rows(data, variables, q_values, x_values, args.mortar_order)
-        return build_rows(data, variables, q_values, x_values, args.mortar_order) + build_rz_rows(
-            data, variables, q_values, x_values, args.mortar_order, use_native_c=args.native_c
-        )
-
-    def build_mortar_audit_rows() -> list[Any]:
-        if "interface" not in blocks or args.max_mortar_audit_growth <= 0.0:
-            return []
+    def mortar_audit_grid() -> tuple[int, list[float], list[float]]:
         audit_order = args.line_search_mortar_audit_order
         if audit_order < 0:
             audit_order = args.mortar_order
@@ -1085,6 +1074,41 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             else grid(args.overlap_q_min, args.overlap_q_max, audit_q_samples)
         )
         audit_x_values = explicit_audit_x_values if explicit_audit_x_values else grid(0.0, 1.0, audit_x_samples)
+        return audit_order, audit_q_values, audit_x_values
+
+    def build_mortar_rows(
+        variables: list[Any],
+        row_q_values: list[float] | None = None,
+        row_x_values: list[float] | None = None,
+        row_order: int | None = None,
+    ) -> list[Any]:
+        active_q_values = q_values if row_q_values is None else row_q_values
+        active_x_values = x_values if row_x_values is None else row_x_values
+        active_order = args.mortar_order if row_order is None else row_order
+        if args.mortar_coordinates == "RZ":
+            return build_rz_rows(
+                data,
+                variables,
+                active_q_values,
+                active_x_values,
+                active_order,
+                use_native_c=args.native_c,
+            )
+        if args.mortar_coordinates == "qx":
+            return build_rows(data, variables, active_q_values, active_x_values, active_order)
+        return build_rows(data, variables, active_q_values, active_x_values, active_order) + build_rz_rows(
+            data,
+            variables,
+            active_q_values,
+            active_x_values,
+            active_order,
+            use_native_c=args.native_c,
+        )
+
+    def build_mortar_audit_rows() -> list[Any]:
+        if "interface" not in blocks or args.max_mortar_audit_growth <= 0.0:
+            return []
+        audit_order, audit_q_values, audit_x_values = mortar_audit_grid()
         if args.mortar_coordinates == "RZ":
             rows = build_rz_rows(data, [], audit_q_values, audit_x_values, audit_order, use_native_c=False)
         elif args.mortar_coordinates == "qx":
@@ -1100,6 +1124,78 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         return rows
 
     mortar_audit_rows = build_mortar_audit_rows()
+    mortar_source_order = args.mortar_order
+    mortar_source_q_values = q_values
+    mortar_source_x_values = x_values
+    if args.mortar_active_source == "audit":
+        mortar_source_order, mortar_source_q_values, mortar_source_x_values = mortar_audit_grid()
+
+    def select_mortar_active_rows(rows: list[Any]) -> tuple[list[Any], dict[str, Any]]:
+        if not rows:
+            return [], {
+                "source": args.mortar_active_source,
+                "available": 0,
+                "selected": 0,
+                "per_q": args.mortar_active_per_q,
+                "per_derivative": args.mortar_active_per_derivative,
+                "active_count": args.mortar_active_count,
+            }
+        sorted_rows = sorted(enumerate(rows), key=lambda item: abs(item[1].residual), reverse=True)
+        selected_indexes: set[int] = set()
+
+        def add_row(row_index: int) -> None:
+            selected_indexes.add(int(row_index))
+
+        if args.mortar_active_per_q > 0:
+            by_q: dict[str, list[tuple[int, Any]]] = {}
+            for row_index, row in sorted_rows:
+                by_q.setdefault(f"{float(row.q):.17g}", []).append((row_index, row))
+            for q_key in sorted(by_q):
+                for row_index, _row in by_q[q_key][: args.mortar_active_per_q]:
+                    add_row(row_index)
+        if args.mortar_active_per_derivative > 0:
+            by_derivative: dict[str, list[tuple[int, Any]]] = {}
+            for row_index, row in sorted_rows:
+                key = f"{row.coordinate}:{row.component}:{row.derivative_label}"
+                by_derivative.setdefault(key, []).append((row_index, row))
+            for derivative_key in sorted(by_derivative):
+                for row_index, _row in by_derivative[derivative_key][: args.mortar_active_per_derivative]:
+                    add_row(row_index)
+        if args.mortar_active_count > 0:
+            for row_index, _row in sorted_rows:
+                if len(selected_indexes) >= args.mortar_active_count:
+                    break
+                add_row(row_index)
+            selected_rows = [row for row_index, row in sorted_rows if row_index in selected_indexes]
+            if len(selected_rows) > args.mortar_active_count:
+                selected_rows = selected_rows[: args.mortar_active_count]
+        elif selected_indexes:
+            selected_rows = [row for row_index, row in sorted_rows if row_index in selected_indexes]
+        else:
+            selected_rows = [row for _row_index, row in sorted_rows]
+        selected_rows = sorted(selected_rows, key=lambda row: abs(row.residual), reverse=True)
+        selected_by_q: dict[str, int] = {}
+        selected_by_derivative: dict[str, int] = {}
+        for row in selected_rows:
+            q_key = f"{float(row.q):.17g}"
+            derivative_key = f"{row.coordinate}:{row.component}:{row.derivative_label}"
+            selected_by_q[q_key] = selected_by_q.get(q_key, 0) + 1
+            selected_by_derivative[derivative_key] = selected_by_derivative.get(derivative_key, 0) + 1
+        worst = sorted_rows[0][1]
+        return selected_rows, {
+            "source": args.mortar_active_source,
+            "available": len(rows),
+            "selected": len(selected_rows),
+            "active_count": args.mortar_active_count,
+            "per_q": args.mortar_active_per_q,
+            "per_derivative": args.mortar_active_per_derivative,
+            "source_order": mortar_source_order,
+            "source_q_values": mortar_source_q_values,
+            "source_x_values": mortar_source_x_values,
+            "worst": worst.as_json(),
+            "selected_by_q": selected_by_q,
+            "selected_by_derivative": selected_by_derivative,
+        }
 
     if "interface" in blocks and args.mortar_jacobian_candidate_count > 0:
         mortar_variable_pool = [
@@ -1111,11 +1207,13 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             and variable_relevant_for_samples(data, variable, pde_points, mortar_points)
             and not tail_variable_is_gate_locked(data, variable)
         ]
-        exploratory_rows = build_mortar_rows(mortar_variable_pool)
-        if args.mortar_active_count > 0 and len(exploratory_rows) > args.mortar_active_count:
-            exploratory_rows = sorted(exploratory_rows, key=lambda row: abs(row.residual), reverse=True)[
-                : args.mortar_active_count
-            ]
+        exploratory_rows_all = build_mortar_rows(
+            mortar_variable_pool,
+            mortar_source_q_values,
+            mortar_source_x_values,
+            mortar_source_order,
+        )
+        exploratory_rows, _exploratory_selection_report = select_mortar_active_rows(exploratory_rows_all)
         highest_order_rows = [
             row for row in exploratory_rows if int(row.dq_order) + int(row.dx_order) == int(args.mortar_order)
         ]
@@ -1424,18 +1522,27 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     mortar_rows_available = 0
     mortar_rows_unfiltered_max_abs = 0.0
     mortar_rows_unfiltered_worst: dict[str, Any] = {}
+    mortar_active_selection_report: dict[str, Any] = {
+        "source": args.mortar_active_source,
+        "available": 0,
+        "selected": 0,
+        "active_count": args.mortar_active_count,
+        "per_q": args.mortar_active_per_q,
+        "per_derivative": args.mortar_active_per_derivative,
+    }
     if "interface" in blocks:
-        mortar_rows_all = build_mortar_rows(candidate_variables)
+        mortar_rows_all = build_mortar_rows(
+            candidate_variables,
+            mortar_source_q_values,
+            mortar_source_x_values,
+            mortar_source_order,
+        )
         mortar_rows_available = len(mortar_rows_all)
         if mortar_rows_all:
             worst_mortar = max(mortar_rows_all, key=lambda row: abs(row.residual))
             mortar_rows_unfiltered_max_abs = abs(worst_mortar.residual)
             mortar_rows_unfiltered_worst = worst_mortar.as_json()
-        mortar_rows = mortar_rows_all
-        if args.mortar_active_count > 0 and len(mortar_rows) > args.mortar_active_count:
-            mortar_rows = sorted(mortar_rows, key=lambda row: abs(row.residual), reverse=True)[
-                : args.mortar_active_count
-            ]
+        mortar_rows, mortar_active_selection_report = select_mortar_active_rows(mortar_rows_all)
         candidate_indexes = {variable.index for variable in candidate_variables}
         for row in mortar_rows:
             row_norm = mortar_row_jacobian_norm(row)
@@ -1654,6 +1761,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "mortar_rows_active": len(mortar_rows),
         "mortar_rows_unfiltered_max_abs": mortar_rows_unfiltered_max_abs,
         "mortar_rows_unfiltered_worst": mortar_rows_unfiltered_worst,
+        "mortar_active_selection": mortar_active_selection_report,
         "mortar_audit_rows": mortar_audit_rows,
         "mortar_audit_rows_count": len(mortar_audit_rows),
         "pre_score_candidate_count": pre_score_candidate_count,
@@ -1671,11 +1779,17 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
 def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespace, system: dict[str, Any]) -> dict[str, Any]:
     from validators.compactified_equations import compactified_residual_defined
     from validators.compactified_equations_twochart import projection_from_twochart
-    from validators.twochart_mortar_jacobian import residual_for_row
+    from validators.twochart_mortar_jacobian import residuals_for_rows
 
     projection = projection_from_twochart(data)
     values: list[float] = []
     native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": 0, "cases": 0, "seconds": 0.0}
+    mortar_native_stats: dict[str, Any] = {
+        "enabled": bool(args.native_c),
+        "rows": 0,
+        "cases": 0,
+        "seconds": 0.0,
+    }
     for row in system["objective_pde_rows"]:
         q = float(row["q"])
         b = float(row["b"])
@@ -1693,8 +1807,14 @@ def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespac
         component = str(row["component"])
         value = residual.e_psi if component == "e_psi" else residual.e_gamma
         values.append(args.pde_weight * value)
-    for row in system["objective_mortar_rows"]:
-        values.append(args.mortar_weight * residual_for_row(data, row))
+    objective_mortar_rows = system["objective_mortar_rows"]
+    if objective_mortar_rows:
+        mortar_values, mortar_native_stats = residuals_for_rows(
+            data,
+            objective_mortar_rows,
+            use_native_c=bool(args.native_c),
+        )
+        values.extend(args.mortar_weight * value for value in mortar_values)
     if args.active_guard_weight > 0.0:
         for q, b in system["objective_active_guard_points"]:
             if not compactified_residual_defined(q, b, projection.p, args.residual_kind):
@@ -1710,7 +1830,11 @@ def evaluate_stage0_objective_only(data: dict[str, Any], args: argparse.Namespac
             _merge_native_stat(native_stats, point_native)
             values.append(args.active_guard_weight * residual.e_psi)
             values.append(args.active_guard_weight * residual.e_gamma)
-    return {**vector_metrics(values), "native_c_tail_exact": native_stats}
+    return {
+        **vector_metrics(values),
+        "native_c_tail_exact": native_stats,
+        "native_c_rz_mortar": mortar_native_stats,
+    }
 
 
 def mortar_audit_metrics(data: dict[str, Any], rows: list[Any], use_native_c: bool = False) -> dict[str, Any]:
@@ -2803,6 +2927,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "mortar_rows_active": system["mortar_rows_active"],
                 "mortar_rows_unfiltered_max_abs": system["mortar_rows_unfiltered_max_abs"],
                 "mortar_rows_unfiltered_worst": system["mortar_rows_unfiltered_worst"],
+                "mortar_active_selection": system.get("mortar_active_selection", {}),
                 "mortar_audit_rows_count": system.get("mortar_audit_rows_count", 0),
                 "rank_report_summary": {
                     "coverage": rank_report.get("coverage", {}) if rank_report else {},
@@ -2874,6 +2999,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_q_values": parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0),
             "mortar_x_values": parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0),
             "mortar_active_count": args.mortar_active_count,
+            "mortar_active_source": args.mortar_active_source,
+            "mortar_active_per_q": args.mortar_active_per_q,
+            "mortar_active_per_derivative": args.mortar_active_per_derivative,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [
                 [q, b]
@@ -3127,6 +3255,9 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_order": args.mortar_order,
             "mortar_coordinates": args.mortar_coordinates,
             "mortar_active_count": args.mortar_active_count,
+            "mortar_active_source": args.mortar_active_source,
+            "mortar_active_per_q": args.mortar_active_per_q,
+            "mortar_active_per_derivative": args.mortar_active_per_derivative,
             "mortar_q_values": parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0),
             "mortar_x_values": parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0),
             "chart_balanced_selection": args.chart_balanced_selection,
@@ -3214,6 +3345,31 @@ def main() -> None:
         help="Use native C for R/Z tail coefficient Jacobian jets when mortar-coordinates includes RZ.",
     )
     parser.add_argument("--mortar-active-count", type=int, default=0)
+    parser.add_argument(
+        "--mortar-active-source",
+        choices=("objective", "audit"),
+        default="objective",
+        help=(
+            "Grid used for objective mortar active-row selection. 'objective' uses "
+            "--mortar-q/x-*; 'audit' uses the line-search mortar audit grid so dense "
+            "C4 blockers can be promoted without hand-editing q values."
+        ),
+    )
+    parser.add_argument(
+        "--mortar-active-per-q",
+        type=nonnegative_int,
+        default=0,
+        help="When selecting active mortar rows, force up to this many top rows per q value before global fill.",
+    )
+    parser.add_argument(
+        "--mortar-active-per-derivative",
+        type=nonnegative_int,
+        default=0,
+        help=(
+            "When selecting active mortar rows, force up to this many top rows per "
+            "coordinate/component/derivative bucket before global fill."
+        ),
+    )
     parser.add_argument("--mortar-q-samples", type=positive_int, default=3)
     parser.add_argument("--mortar-x-samples", type=positive_int, default=5)
     parser.add_argument(

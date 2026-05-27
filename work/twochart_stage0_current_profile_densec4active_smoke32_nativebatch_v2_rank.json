@@ -1,0 +1,356 @@
+{
+  "diagnostic_vs_proof": "floating rank/angle diagnostics only; no interval proof",
+  "format": "twochart_guarded_kkt_rank_reports_v1",
+  "input": "work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json",
+  "out": "work/twochart_stage0_current_profile_densec4active_smoke32_nativebatch_v2.json",
+  "reports": [
+    {
+      "angle": {
+        "best_feasible_step_metrics": {
+          "count": 32,
+          "l2": 5.878324619211945e-09,
+          "max_abs": 2.7105999160118833e-09,
+          "rms": 1.039150800065149e-09
+        },
+        "predicted_best_factor_inf": 1.0,
+        "projected_change_metrics": {
+          "count": 13,
+          "l2": 6126.551692677623,
+          "max_abs": 5431.310910258471,
+          "rms": 1699.1997130561435
+        },
+        "rho_grad": 0.9999999999995199,
+        "rho_range": 0.1277640966690217
+      },
+      "columns": 32,
+      "constraint_labels": [
+        "active_guard"
+      ],
+      "constraint_space": {
+        "nullity": 22,
+        "rank": 10,
+        "residual_metrics": {
+          "count": 18,
+          "l2": 11655.324553617571,
+          "max_abs": 9179.704240179746,
+          "rms": 2747.1863429310183
+        },
+        "singular_values": [
+          4342275.259688783,
+          698545.6818431568,
+          9334.39052428579,
+          599.3214401523762,
+          37.401098705424424,
+          1.433411586856503,
+          0.29358521936109344,
+          0.060363393720984586,
+          0.005210055400238659,
+          0.00047587690905788026,
+          4.2115990961479554e-11,
+          1.3145611198405312e-14,
+          6.454434521148563e-16,
+          3.499931186732085e-17,
+          1.3710785547210894e-18,
+          2.1012058936794186e-19,
+          9.442674122377391e-20,
+          1.4441088611632338e-25
+        ]
+      },
+      "coverage": {
+        "active_primary_raw_max": 4328283.2180320835,
+        "coverage": 1.0,
+        "coverage_min": 0.5,
+        "coverage_ok": true,
+        "heldout_global_mortar_max": 4328283.2180320835,
+        "note": "coverage uses unweighted raw residual metadata when provided"
+      },
+      "diagnostic_vs_proof": "floating guarded-KKT rank/angle diagnostic only; no interval proof",
+      "iteration": 0,
+      "linear_algebra_backend": "numpy_svd_lstsq",
+      "mortar_rows_active": 12,
+      "mortar_rows_available": 270,
+      "mortar_rows_unfiltered_worst": {
+        "abs_residual": 4328283.2180320835,
+        "component": "F",
+        "coordinate": "RZ",
+        "derivative": "dRRRR",
+        "dq_order": 4,
+        "dx_order": 0,
+        "jacobian": [
+          {
+            "value": 10.425322901367176,
+            "var_index": 4235
+          },
+          {
+            "value": 12.793060171744884,
+            "var_index": 8591
+          },
+          {
+            "value": -24.0,
+            "var_index": 26150
+          },
+          {
+            "value": 176938.67332582522,
+            "var_index": 4236
+          },
+          {
+            "value": 55.93698311004803,
+            "var_index": 12947
+          },
+          {
+            "value": -4.3553875236294886,
+            "var_index": 26155
+          },
+          {
+            "value": 273.99051750155616,
+            "var_index": 4246
+          },
+          {
+            "value": 176918.18656930988,
+            "var_index": 8592
+          },
+          {
+            "value": -0.7903916867078087,
+            "var_index": 26161
+          },
+          {
+            "value": 8692858.365701685,
+            "var_index": 4237
+          },
+          {
+            "value": 176530.4099066059,
+            "var_index": 12948
+          },
+          {
+            "value": 174631.2810031064,
+            "var_index": 4247
+          },
+          {
+            "value": 306.53123332014945,
+            "var_index": 8602
+          },
+          {
+            "value": 6935.185427061982,
+            "var_index": 4257
+          },
+          {
+            "value": 722.0996856995886,
+            "var_index": 12958
+          },
+          {
+            "value": 2958839053723.3223,
+            "var_index": 4245
+          },
+          {
+            "value": 2734095840236.746,
+            "var_index": 4344
+          },
+          {
+            "value": -2896741797984.2627,
+            "var_index": 4355
+          }
+        ],
+        "jacobian_nnz": 18,
+        "origin_value": -88261.28370082323,
+        "q": 0.92,
+        "residual_tail_minus_origin": -4328283.2180320835,
+        "row_index": 134,
+        "tail_value": -4416544.501732906,
+        "total_order": 4,
+        "x": 1.0
+      },
+      "primary_labels": [
+        "mortar",
+        "pde"
+      ],
+      "primary_space": {
+        "rank": 6,
+        "rank_projected": 2,
+        "residual_metrics": {
+          "count": 13,
+          "l2": 47952.060495905316,
+          "max_abs": 43282.83218032084,
+          "rms": 13299.508683241369
+        },
+        "singular_values": [
+          130598205204843.38,
+          478338252504.0335,
+          256638610.71035284,
+          24730275.234161083,
+          1987.817429358636,
+          331.08498982928165,
+          0.8401386464852795,
+          0.24404797055775376,
+          0.2408818449498397,
+          0.23999999999999996,
+          0.06411658076618933,
+          0.05240762554055721,
+          0.04050047926897372
+        ],
+        "singular_values_projected": [
+          130598205204843.38,
+          478338252504.0333,
+          0.5472512452760988,
+          0.23967049020600073,
+          0.21777109164131875,
+          0.08930267966070525,
+          0.044564561764522406,
+          0.014889138555609704,
+          0.0074343708193581794,
+          0.006187443641155644,
+          0.0030173841063441433,
+          6.459779560529633e-06,
+          1.6194449839273472e-12
+        ]
+      },
+      "provided_step": {
+        "constraint_change_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "max_signed_constraint_growth": 0.0,
+        "metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "positive_signed_constraint_growth_count": 0,
+        "predicted_constraint_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "present": false,
+        "signed_constraint_growth_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        }
+      },
+      "rank_obstruction": false,
+      "row_space_note": "uses the residual/Jacobian rows supplied by the caller, typically post row-scaling",
+      "rows": {
+        "constraints": 18,
+        "primary": 13,
+        "total": 31
+      },
+      "status": "GUARDED_KKT_RANK_DIAGNOSTIC_NOT_PROOF",
+      "top_variables": [
+        {
+          "column": 8,
+          "gradient": 2.2370143973804778e+17,
+          "leverage": 41031354846399.45,
+          "projected_gradient": 2.2370143973804797e+17,
+          "score": 2.2370143973804797e+17,
+          "step": 0.0,
+          "variable": "tail.G_an[p30].c[10,10]"
+        },
+        {
+          "column": 10,
+          "gradient": -2.2300567004496496e+17,
+          "leverage": 40957340122656.1,
+          "projected_gradient": -2.2300567004496502e+17,
+          "score": 2.2300567004496502e+17,
+          "step": 0.0,
+          "variable": "tail.G_an[p30].c[0,10]"
+        },
+        {
+          "column": 12,
+          "gradient": 2.196201403639029e+17,
+          "leverage": 40282237909420.26,
+          "projected_gradient": 2.1962014036390294e+17,
+          "score": 2.1962014036390294e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f1][p30].c[10,10]"
+        },
+        {
+          "column": 14,
+          "gradient": -2.1893722012822563e+17,
+          "leverage": 40209595151005.53,
+          "projected_gradient": -2.1893722012822554e+17,
+          "score": 2.1893722012822563e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f1][p30].c[0,10]"
+        },
+        {
+          "column": 16,
+          "gradient": 2.1391359375615747e+17,
+          "leverage": 39383270839885.14,
+          "projected_gradient": 2.1391359375615744e+17,
+          "score": 2.1391359375615747e+17,
+          "step": 0.0,
+          "variable": "tail.G_an[p30].c[7,10]"
+        },
+        {
+          "column": 18,
+          "gradient": -2.1151109565760986e+17,
+          "leverage": 38790068046657.44,
+          "projected_gradient": -2.1151109565760986e+17,
+          "score": 2.1151109565760986e+17,
+          "step": 0.0,
+          "variable": "tail.G_an[p30].c[3,10]"
+        },
+        {
+          "column": 20,
+          "gradient": 2.1001127486004685e+17,
+          "leverage": 38664294718338.875,
+          "projected_gradient": 2.1001127486004685e+17,
+          "score": 2.1001127486004685e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f1][p30].c[7,10]"
+        },
+        {
+          "column": 22,
+          "gradient": -2.076521940760925e+17,
+          "leverage": 38081870721146.97,
+          "projected_gradient": -2.076521940760925e+17,
+          "score": 2.076521940760925e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f1][p30].c[3,10]"
+        },
+        {
+          "column": 24,
+          "gradient": 1.826862497591623e+17,
+          "leverage": 33503548461889.49,
+          "projected_gradient": 1.826862497591623e+17,
+          "score": 1.826862497591623e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f2][p30].c[10,10]"
+        },
+        {
+          "column": 26,
+          "gradient": 1.8212890114709542e+17,
+          "leverage": 33574885256423.23,
+          "projected_gradient": 1.8212890114709542e+17,
+          "score": 1.8212890114709542e+17,
+          "step": 0.0,
+          "variable": "tail.G_an[p30].c[4,10]"
+        },
+        {
+          "column": 28,
+          "gradient": -1.8211947043108003e+17,
+          "leverage": 33443301807152.38,
+          "projected_gradient": -1.8211947043108003e+17,
+          "score": 1.8211947043108003e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f2][p30].c[0,10]"
+        },
+        {
+          "column": 30,
+          "gradient": 1.788065346405239e+17,
+          "leverage": 32961961508259.586,
+          "projected_gradient": 1.788065346405239e+17,
+          "score": 1.788065346405239e+17,
+          "step": 0.0,
+          "variable": "tail.G_frac[f1][p30].c[4,10]"
+        }
+      ]
+    }
+  ],
+  "status": "TWOCHART_NEWTON_STAGE0_NO_IMPROVEMENT_NOT_PROOF"
+}

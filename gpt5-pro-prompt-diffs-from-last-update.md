@@ -299,3 +299,94 @@ interpretation:
   change should promote dense-audit worst C4 rows into the objective
   automatically, with a separate held-out dense C4 audit.
 ```
+
+### Follow-up Delta: Automatic Dense C4 Active-Row Promotion
+
+Code changes:
+
+```text
+tools/profile_newton_twochart.py:
+  added --mortar-active-source objective|audit
+  added --mortar-active-per-q
+  added --mortar-active-per-derivative
+  active mortar selection can now use the line-search audit grid as the
+  objective row source, instead of manually listing q rows.
+  active row selection reports selected_by_q and selected_by_derivative.
+  --mortar-active-count is a hard cap after quota seeding.
+  objective-only line-search now evaluates objective R/Z mortar rows through
+  residuals_for_rows(..., use_native_c=args.native_c), so all-RZ objective
+  mortar residuals use the existing native C batch path.
+```
+
+Verification:
+
+```text
+python3 -m py_compile tools/profile_newton_twochart.py
+
+smoke artifact:
+  work/twochart_stage0_current_profile_densec4active_smoke32_nativebatch_v2*
+
+smoke setup:
+  --mortar-active-source audit
+  --mortar-active-count 12
+  --mortar-active-per-q 2
+  --mortar-active-per-derivative 1
+  --native-c
+
+smoke result:
+  no AttributeError
+  selected_by_chart = tail:16, origin:16
+  mortar_active_selection.selected = 12
+  objective row_groups.mortar = 11 after active-entry filtering
+  trial native_c_rz_mortar rows = 11, cases = 3160
+```
+
+Dense active-row diagnostic:
+
+```text
+artifact:
+  work/twochart_stage0_current_profile_densec4active160_step33_nativebatch*
+
+input:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json
+
+setup:
+  --mortar-active-source audit
+  --line-search-mortar-audit-order 4
+  --line-search-mortar-audit-q-samples 9
+  --line-search-mortar-audit-x-samples 9
+  --mortar-active-count 96
+  --mortar-active-per-q 4
+  --mortar-active-per-derivative 2
+  --max-variables 160
+  --raw-growth-metric max-abs
+
+selection:
+  selected_by_chart = tail:106, origin:54
+  selected_by_block includes tail.G_an:6 and tail.G_frac:7
+  mortar active source rows available = 2430
+  mortar active selected = 96
+  row_groups = pde:2, mortar:96, active_guard:242
+
+rank:
+  coverage = 1.0
+  constraint rank/nullity = 67/93
+  primary rank/projected primary rank = 26/10
+  rho_grad = 5.100044997547549e-1
+  rho_range = 4.055716822512374e-1
+  predicted_best_factor_inf = 9.999916809043151e-1
+
+result:
+  accepted_any_step = false
+  representative alpha=0.015625 F/F_frac trials are rejected by:
+    accept_metric_decrease
+    guard_growth
+    residual_audit_growth
+  dense C4 audit itself does not grow, but no descent survives the edge guard.
+
+interpretation:
+  This is the first clean automatic dense-C4 promoted-row obstruction. It is
+  not a branch kill, but it is stronger than manual q-row chasing: with the
+  dense 9x9 C4 blockers promoted, the feasible projected primary space has
+  weak effective descent and no accepted nonlinear step.
+```

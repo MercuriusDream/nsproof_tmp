@@ -1,0 +1,2207 @@
+{
+  "cache_schema": "twochart-row-cache-v1",
+  "column_count": 32,
+  "diagnostic_vs_proof": "floating sampled row cache only; no interval proof",
+  "extra": {
+    "constraint_labels": [
+      "active_guard"
+    ],
+    "iteration": 0,
+    "mortar_rows_unfiltered_max_abs": 4328283.2180320835,
+    "mortar_rows_unfiltered_worst": {
+      "abs_residual": 4328283.2180320835,
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRRR",
+      "dq_order": 4,
+      "dx_order": 0,
+      "jacobian": [
+        {
+          "value": 10.425322901367176,
+          "var_index": 4235
+        },
+        {
+          "value": 12.793060171744884,
+          "var_index": 8591
+        },
+        {
+          "value": -24.0,
+          "var_index": 26150
+        },
+        {
+          "value": 176938.67332582522,
+          "var_index": 4236
+        },
+        {
+          "value": 55.93698311004803,
+          "var_index": 12947
+        },
+        {
+          "value": -4.3553875236294886,
+          "var_index": 26155
+        },
+        {
+          "value": 273.99051750155616,
+          "var_index": 4246
+        },
+        {
+          "value": 176918.18656930988,
+          "var_index": 8592
+        },
+        {
+          "value": -0.7903916867078087,
+          "var_index": 26161
+        },
+        {
+          "value": 8692858.365701685,
+          "var_index": 4237
+        },
+        {
+          "value": 176530.4099066059,
+          "var_index": 12948
+        },
+        {
+          "value": 174631.2810031064,
+          "var_index": 4247
+        },
+        {
+          "value": 306.53123332014945,
+          "var_index": 8602
+        },
+        {
+          "value": 6935.185427061982,
+          "var_index": 4257
+        },
+        {
+          "value": 722.0996856995886,
+          "var_index": 12958
+        },
+        {
+          "value": 2958839053723.3223,
+          "var_index": 4245
+        },
+        {
+          "value": 2734095840236.746,
+          "var_index": 4344
+        },
+        {
+          "value": -2896741797984.2627,
+          "var_index": 4355
+        }
+      ],
+      "jacobian_nnz": 18,
+      "origin_value": -88261.28370082323,
+      "q": 0.92,
+      "residual_tail_minus_origin": -4328283.2180320835,
+      "row_index": 134,
+      "tail_value": -4416544.501732906,
+      "total_order": 4,
+      "x": 1.0
+    },
+    "pde_component_mode": "worst-per-point",
+    "pde_component_selection": [
+      {
+        "b": 0.98,
+        "components": [
+          "e_psi"
+        ],
+        "q": 0.9
+      },
+      {
+        "b": 0.99,
+        "components": [
+          "e_psi"
+        ],
+        "q": 0.9
+      }
+    ],
+    "pde_points": [
+      [
+        0.8999999999999999,
+        0.98
+      ],
+      [
+        0.8999999999999999,
+        0.99
+      ]
+    ],
+    "pde_scan_active": {
+      "enabled": false,
+      "points": [],
+      "selected": []
+    },
+    "primary_labels": [
+      "mortar",
+      "pde"
+    ],
+    "solve_mode": "guarded-ineq-kkt"
+  },
+  "profile": "work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json",
+  "profile_hash_sha256": "97416d91c0ef0c059412adbd45737999f5d84778fb3d54115cb0389def55671b",
+  "row_count": 31,
+  "row_scaling": {
+    "groups": {},
+    "row_normalization": "none",
+    "scale_max": 1.0,
+    "scale_min": 1.0
+  },
+  "rows": [
+    {
+      "b": 0.98,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -227864.12039671477
+        ],
+        [
+          2,
+          -221574.9273972027
+        ],
+        [
+          4,
+          -244619.644461219
+        ],
+        [
+          6,
+          -238448.28411090886
+        ]
+      ],
+      "label": "pde",
+      "q": 0.8999999999999999,
+      "residual_after_scaling": 432.6812264740243,
+      "residual_raw": 432.6812264740243,
+      "residual_weighted_before_scaling": 432.6812264740243,
+      "row_id": "pde:0",
+      "row_index": 0,
+      "row_type": "pde",
+      "weight": 1.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          518587.3319142335
+        ],
+        [
+          2,
+          506722.2908605013
+        ],
+        [
+          4,
+          382309.069285805
+        ],
+        [
+          6,
+          373667.4221945957
+        ]
+      ],
+      "label": "pde",
+      "q": 0.8999999999999999,
+      "residual_after_scaling": 1015.2983039805835,
+      "residual_raw": 1015.2983039805835,
+      "residual_weighted_before_scaling": 1015.2983039805835,
+      "row_id": "pde:1",
+      "row_index": 1,
+      "row_type": "pde",
+      "weight": 1.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRRR",
+      "dq_order": 4,
+      "dx_order": 0,
+      "jacobian_nnz_active": 3,
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          -0.24
+        ],
+        [
+          9,
+          -0.043553875236294885
+        ],
+        [
+          21,
+          -0.007903916867078087
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -43282.83218032084,
+      "residual_raw": -4328283.2180320835,
+      "residual_weighted_before_scaling": -43282.83218032084,
+      "row_id": "mortar:2",
+      "row_index": 2,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRRZ",
+      "dq_order": 3,
+      "dx_order": 1,
+      "jacobian_nnz_active": 3,
+      "jacobian_sparse_after_scaling": [
+        [
+          13,
+          -0.06
+        ],
+        [
+          17,
+          -0.021776937618147443
+        ],
+        [
+          27,
+          -0.005927937650308566
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -13792.840379137855,
+      "residual_raw": -1379284.0379137855,
+      "residual_weighted_before_scaling": -13792.840379137855,
+      "row_id": "mortar:3",
+      "row_index": 3,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dZZZZ",
+      "dq_order": 0,
+      "dx_order": 4,
+      "jacobian_nnz_active": 3,
+      "jacobian_sparse_after_scaling": [
+        [
+          3,
+          -0.24
+        ],
+        [
+          15,
+          -0.06991735537190084
+        ],
+        [
+          23,
+          -0.020368485759169466
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.88,
+      "residual_after_scaling": 11400.775386326539,
+      "residual_raw": 1140077.538632654,
+      "residual_weighted_before_scaling": 11400.775386326539,
+      "row_id": "mortar:4",
+      "row_index": 4,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 0.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dZZZZ",
+      "dq_order": 0,
+      "dx_order": 4,
+      "jacobian_nnz_active": 7,
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -2244.223017136732
+        ],
+        [
+          2,
+          -2125.348987563734
+        ],
+        [
+          3,
+          -0.24
+        ],
+        [
+          4,
+          -2548.0063752493948
+        ],
+        [
+          5,
+          -0.6267018371974645
+        ],
+        [
+          6,
+          -2463.3721124971335
+        ],
+        [
+          7,
+          -0.5006802721088437
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.84,
+      "residual_after_scaling": 6048.959413928333,
+      "residual_raw": 604895.9413928333,
+      "residual_weighted_before_scaling": 6048.959413928333,
+      "row_id": "mortar:5",
+      "row_index": 5,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "G",
+      "coordinate": "RZ",
+      "derivative": "dZZZZ",
+      "dq_order": 0,
+      "dx_order": 4,
+      "jacobian_nnz_active": 14,
+      "jacobian_sparse_after_scaling": [
+        [
+          8,
+          -41030250397871.94
+        ],
+        [
+          10,
+          40956870174787.09
+        ],
+        [
+          11,
+          -0.24
+        ],
+        [
+          12,
+          -40281146106976.26
+        ],
+        [
+          14,
+          40209128835562.914
+        ],
+        [
+          16,
+          -39383270655388.46
+        ],
+        [
+          18,
+          38788946196234.26
+        ],
+        [
+          20,
+          -38664294426308.66
+        ],
+        [
+          22,
+          38080762002593.2
+        ],
+        [
+          24,
+          -33502576706546.465
+        ],
+        [
+          25,
+          -0.043553875236294885
+        ],
+        [
+          26,
+          -33574790409798.938
+        ],
+        [
+          28,
+          33442871630923.26
+        ],
+        [
+          30,
+          -32961870446554.44
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -5431.310910258449,
+      "residual_raw": -543131.0910258449,
+      "residual_weighted_before_scaling": -5431.310910258449,
+      "row_id": "mortar:6",
+      "row_index": 6,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 0.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRZZ",
+      "dq_order": 2,
+      "dx_order": 2,
+      "jacobian_nnz_active": 2,
+      "jacobian_sparse_after_scaling": [
+        [
+          23,
+          -0.007903916867078087
+        ],
+        [
+          31,
+          -0.04
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -3276.267105747883,
+      "residual_raw": -327626.7105747883,
+      "residual_weighted_before_scaling": -3276.267105747883,
+      "row_id": "mortar:7",
+      "row_index": 7,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "G",
+      "coordinate": "RZ",
+      "derivative": "dRZZZ",
+      "dq_order": 1,
+      "dx_order": 3,
+      "jacobian_nnz_active": 13,
+      "jacobian_sparse_after_scaling": [
+        [
+          8,
+          -301052850970.80383
+        ],
+        [
+          10,
+          196202468310.0965
+        ],
+        [
+          12,
+          -296579330982.456
+        ],
+        [
+          14,
+          193650439892.1211
+        ],
+        [
+          16,
+          -3812107737.942589
+        ],
+        [
+          18,
+          295011948839.2491
+        ],
+        [
+          20,
+          -4752082171.086147
+        ],
+        [
+          22,
+          290590646794.6356
+        ],
+        [
+          24,
+          -255173588264.21115
+        ],
+        [
+          26,
+          79805513965.55669
+        ],
+        [
+          28,
+          169625593203.56335
+        ],
+        [
+          29,
+          -0.06
+        ],
+        [
+          30,
+          77479910605.12383
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -2834.6952991738544,
+      "residual_raw": -283469.52991738543,
+      "residual_weighted_before_scaling": -2834.6952991738544,
+      "row_id": "mortar:8",
+      "row_index": 8,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 0.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRRZ",
+      "dq_order": 3,
+      "dx_order": 1,
+      "jacobian_nnz_active": 7,
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -129135147.99017185
+        ],
+        [
+          2,
+          -125517979.87921917
+        ],
+        [
+          4,
+          -130929285.35925
+        ],
+        [
+          6,
+          -127425276.64506342
+        ],
+        [
+          13,
+          -0.06
+        ],
+        [
+          17,
+          -0.03495867768595042
+        ],
+        [
+          27,
+          -0.0152763643193771
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.88,
+      "residual_after_scaling": -2769.4899580566916,
+      "residual_raw": -276948.99580566917,
+      "residual_weighted_before_scaling": -2769.4899580566916,
+      "row_id": "mortar:9",
+      "row_index": 9,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRRRZ",
+      "dq_order": 3,
+      "dx_order": 1,
+      "jacobian_nnz_active": 7,
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -9025741.483656926
+        ],
+        [
+          2,
+          -8760970.815801617
+        ],
+        [
+          4,
+          16209712.812515022
+        ],
+        [
+          6,
+          15576642.13263378
+        ],
+        [
+          13,
+          -0.06
+        ],
+        [
+          17,
+          -0.050068027210884374
+        ],
+        [
+          27,
+          -0.031335091859873224
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.84,
+      "residual_after_scaling": -2363.414789748272,
+      "residual_raw": -236341.47897482722,
+      "residual_weighted_before_scaling": -2363.414789748272,
+      "row_id": "mortar:10",
+      "row_index": 10,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "G",
+      "coordinate": "RZ",
+      "derivative": "dRRRR",
+      "dq_order": 4,
+      "dx_order": 0,
+      "jacobian_nnz_active": 1,
+      "jacobian_sparse_after_scaling": [
+        [
+          19,
+          -0.24
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.92,
+      "residual_after_scaling": -2050.0666774509546,
+      "residual_raw": -205006.66774509544,
+      "residual_weighted_before_scaling": -2050.0666774509546,
+      "row_id": "mortar:11",
+      "row_index": 11,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 1.0
+    },
+    {
+      "component": "F",
+      "coordinate": "RZ",
+      "derivative": "dRZZZ",
+      "dq_order": 1,
+      "dx_order": 3,
+      "jacobian_nnz_active": 3,
+      "jacobian_sparse_after_scaling": [
+        [
+          15,
+          -0.050068027210884374
+        ],
+        [
+          23,
+          -0.020890061239915485
+        ],
+        [
+          27,
+          -0.007833772964968306
+        ]
+      ],
+      "label": "mortar",
+      "q": 0.84,
+      "residual_after_scaling": -1497.105931025352,
+      "residual_raw": -149710.5931025352,
+      "residual_weighted_before_scaling": -1497.105931025352,
+      "row_id": "mortar:12",
+      "row_index": 12,
+      "row_type": "mortar",
+      "weight": 0.01,
+      "x": 0.5
+    },
+    {
+      "b": 0.9,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -1594395.1303397464
+        ],
+        [
+          2,
+          -1542253.4004053252
+        ],
+        [
+          4,
+          -473289.87144074857
+        ],
+        [
+          6,
+          -461372.5898971842
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": 36.152009982717445,
+      "residual_raw": 3.6152009982717446,
+      "residual_weighted_before_scaling": 36.152009982717445,
+      "row_id": "active_guard:13",
+      "row_index": 13,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -102.2517439236759
+        ],
+        [
+          2,
+          -98.88141574300184
+        ],
+        [
+          4,
+          281.23993592179676
+        ],
+        [
+          6,
+          271.7714557740828
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": 29.02284822556355,
+      "residual_raw": 2.902284822556355,
+      "residual_weighted_before_scaling": 29.02284822556355,
+      "row_id": "active_guard:14",
+      "row_index": 14,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          239080.12210896128
+        ],
+        [
+          2,
+          231489.27475719884
+        ],
+        [
+          4,
+          -51282.074610185264
+        ],
+        [
+          6,
+          -48702.471595923955
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": -125.3951161926891,
+      "residual_raw": -12.539511619268911,
+      "residual_weighted_before_scaling": -125.3951161926891,
+      "row_id": "active_guard:15",
+      "row_index": 15,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          136.11577299030318
+        ],
+        [
+          2,
+          131.62924971361855
+        ],
+        [
+          4,
+          262.6362995508238
+        ],
+        [
+          6,
+          254.24419282040736
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": 27.115927449594803,
+      "residual_raw": 2.7115927449594803,
+      "residual_weighted_before_scaling": 27.115927449594803,
+      "row_id": "active_guard:16",
+      "row_index": 16,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          407270.43835445854
+        ],
+        [
+          2,
+          394143.84085446154
+        ],
+        [
+          4,
+          102104.68387716112
+        ],
+        [
+          6,
+          99753.08508113655
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": 6610.171335852854,
+      "residual_raw": 661.0171335852854,
+      "residual_weighted_before_scaling": 6610.171335852854,
+      "row_id": "active_guard:17",
+      "row_index": 17,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -53.512959509645974
+        ],
+        [
+          2,
+          -51.74911442475082
+        ],
+        [
+          4,
+          64.30707807254446
+        ],
+        [
+          6,
+          62.08350457634523
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.86,
+      "residual_after_scaling": -0.33458858604522185,
+      "residual_raw": -0.03345885860452218,
+      "residual_weighted_before_scaling": -0.33458858604522185,
+      "row_id": "active_guard:18",
+      "row_index": 18,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          2393685.526328058
+        ],
+        [
+          2,
+          2337052.0810341146
+        ],
+        [
+          4,
+          846118.4488204508
+        ],
+        [
+          6,
+          829768.5716667626
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": -46.259137159060614,
+      "residual_raw": -4.625913715906061,
+      "residual_weighted_before_scaling": -46.259137159060614,
+      "row_id": "active_guard:19",
+      "row_index": 19,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -231.66522506332342
+        ],
+        [
+          2,
+          -225.5889017913935
+        ],
+        [
+          4,
+          -383.85339904183746
+        ],
+        [
+          6,
+          -373.848267766725
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": 29.94413569482895,
+      "residual_raw": 2.9944135694828953,
+      "residual_weighted_before_scaling": 29.94413569482895,
+      "row_id": "active_guard:20",
+      "row_index": 20,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          40897.311333453246
+        ],
+        [
+          2,
+          37984.96560218306
+        ],
+        [
+          4,
+          430027.2231366638
+        ],
+        [
+          6,
+          417467.2787041497
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": -646.7025981920891,
+      "residual_raw": -64.67025981920891,
+      "residual_weighted_before_scaling": -646.7025981920891,
+      "row_id": "active_guard:21",
+      "row_index": 21,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -310.846271107794
+        ],
+        [
+          2,
+          -303.0938471284536
+        ],
+        [
+          4,
+          -268.88439646777465
+        ],
+        [
+          6,
+          -262.2528974859824
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": 27.990701556217058,
+      "residual_raw": 2.7990701556217057,
+      "residual_weighted_before_scaling": 27.990701556217058,
+      "row_id": "active_guard:22",
+      "row_index": 22,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -528538.7599397912
+        ],
+        [
+          2,
+          -517150.28972958593
+        ],
+        [
+          4,
+          110728.4275512527
+        ],
+        [
+          6,
+          105845.12508478672
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": 9179.704240179746,
+      "residual_raw": 917.9704240179746,
+      "residual_weighted_before_scaling": 9179.704240179746,
+      "row_id": "active_guard:23",
+      "row_index": 23,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          0,
+          -42.25863316949958
+        ],
+        [
+          2,
+          -41.109848177871484
+        ],
+        [
+          4,
+          -94.8295646861287
+        ],
+        [
+          6,
+          -92.31984126968975
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.89,
+      "residual_after_scaling": -1.9609622253938395,
+      "residual_raw": -0.19609622253938394,
+      "residual_weighted_before_scaling": -1.9609622253938395,
+      "row_id": "active_guard:24",
+      "row_index": 24,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          0.2384477637294459
+        ],
+        [
+          3,
+          18.018063176892024
+        ],
+        [
+          5,
+          1.1382440441289476
+        ],
+        [
+          7,
+          4.728450778580172
+        ],
+        [
+          9,
+          0.04331903768567892
+        ],
+        [
+          11,
+          0.5876607646173441
+        ],
+        [
+          13,
+          0.6458147561417825
+        ],
+        [
+          15,
+          1.0782246482577158
+        ],
+        [
+          17,
+          0.12191706094556028
+        ],
+        [
+          19,
+          7.981886960988128e-05
+        ],
+        [
+          21,
+          0.00778229085579334
+        ],
+        [
+          23,
+          0.06995505819649962
+        ],
+        [
+          25,
+          0.020262632035199145
+        ],
+        [
+          27,
+          0.02296834579747997
+        ],
+        [
+          29,
+          0.10493087217466938
+        ],
+        [
+          31,
+          1.6545204771880369
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 796.074578175324,
+      "residual_raw": 79.60745781753239,
+      "residual_weighted_before_scaling": 796.074578175324,
+      "row_id": "active_guard:25",
+      "row_index": 25,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          6.759473791082473e-05
+        ],
+        [
+          3,
+          -0.06630949296369662
+        ],
+        [
+          5,
+          -0.0021443226241255123
+        ],
+        [
+          7,
+          -0.012167455466911805
+        ],
+        [
+          9,
+          2.6086414979602744e-06
+        ],
+        [
+          11,
+          0.030339167274142008
+        ],
+        [
+          13,
+          2.170762314267192e-06
+        ],
+        [
+          15,
+          -0.0020900409433035265
+        ],
+        [
+          17,
+          -3.091878039955363e-05
+        ],
+        [
+          19,
+          8.703003971926058e-05
+        ],
+        [
+          21,
+          -6.936309804155511e-07
+        ],
+        [
+          23,
+          -6.529577064960907e-05
+        ],
+        [
+          25,
+          0.0012478006121530193
+        ],
+        [
+          27,
+          -9.13667513548255e-06
+        ],
+        [
+          29,
+          0.0070232359814780205
+        ],
+        [
+          31,
+          -0.0012099929890016818
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 16.535211361486525,
+      "residual_raw": 1.6535211361486526,
+      "residual_weighted_before_scaling": 16.535211361486525,
+      "row_id": "active_guard:26",
+      "row_index": 26,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          0.04525753192763062
+        ],
+        [
+          3,
+          22.778989431195903
+        ],
+        [
+          5,
+          1.5791175865992537
+        ],
+        [
+          7,
+          6.18298115953237
+        ],
+        [
+          9,
+          0.008544476625375077
+        ],
+        [
+          11,
+          0.8358639000040118
+        ],
+        [
+          13,
+          0.22183775093579722
+        ],
+        [
+          15,
+          0.9727277598543942
+        ],
+        [
+          17,
+          0.04313307435767327
+        ],
+        [
+          19,
+          7.448272496988438e-06
+        ],
+        [
+          21,
+          0.001602153159028097
+        ],
+        [
+          23,
+          0.042086863280474354
+        ],
+        [
+          25,
+          0.01622682024098524
+        ],
+        [
+          27,
+          0.00836214106990812
+        ],
+        [
+          29,
+          0.07617905320684054
+        ],
+        [
+          31,
+          0.9870752914114455
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 1482.7891043088316,
+      "residual_raw": 148.27891043088317,
+      "residual_weighted_before_scaling": 1482.7891043088316,
+      "row_id": "active_guard:27",
+      "row_index": 27,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.9450000000000001,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          7.499285015832755e-06
+        ],
+        [
+          3,
+          -0.10508686466145543
+        ],
+        [
+          5,
+          -0.004138076676120947
+        ],
+        [
+          7,
+          -0.021282268942942
+        ],
+        [
+          9,
+          3.3986896743957537e-07
+        ],
+        [
+          11,
+          0.037060504381860676
+        ],
+        [
+          13,
+          1.7938857639720288e-06
+        ],
+        [
+          15,
+          -0.0018626133857227573
+        ],
+        [
+          17,
+          -7.017723093337305e-06
+        ],
+        [
+          19,
+          9.756254136955854e-06
+        ],
+        [
+          21,
+          -8.680090386435332e-08
+        ],
+        [
+          23,
+          -3.271422883652657e-05
+        ],
+        [
+          25,
+          0.0009050740121367842
+        ],
+        [
+          27,
+          -2.32171626316381e-06
+        ],
+        [
+          29,
+          0.004748543855386113
+        ],
+        [
+          31,
+          -0.0004926651218033085
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 18.03779828886713,
+      "residual_raw": 1.803779828886713,
+      "residual_weighted_before_scaling": 18.03779828886713,
+      "row_id": "active_guard:28",
+      "row_index": 28,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_psi",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          0.0002876314434007015
+        ],
+        [
+          3,
+          21.245791639181235
+        ],
+        [
+          5,
+          1.4114066960148242
+        ],
+        [
+          7,
+          5.532328536653333
+        ],
+        [
+          9,
+          5.405690557891503e-05
+        ],
+        [
+          11,
+          1.1854548492575028
+        ],
+        [
+          13,
+          0.007065105614158141
+        ],
+        [
+          15,
+          0.4315579821623099
+        ],
+        [
+          17,
+          0.0013488270748542187
+        ],
+        [
+          19,
+          8.298794278076411e-09
+        ],
+        [
+          21,
+          1.0154789754516146e-05
+        ],
+        [
+          23,
+          0.005488419068496649
+        ],
+        [
+          25,
+          0.004281083069983999
+        ],
+        [
+          27,
+          0.00025745821897288053
+        ],
+        [
+          29,
+          0.018300011724445273
+        ],
+        [
+          31,
+          0.14187381336396623
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 2147.3817121765105,
+      "residual_raw": 214.73817121765103,
+      "residual_weighted_before_scaling": 2147.3817121765105,
+      "row_id": "active_guard:29",
+      "row_index": 29,
+      "row_type": "active_guard",
+      "weight": 10.0
+    },
+    {
+      "b": 0.99,
+      "component": "e_gamma",
+      "jacobian_sparse_after_scaling": [
+        [
+          1,
+          9.926059621332864e-09
+        ],
+        [
+          3,
+          -0.1688703947357365
+        ],
+        [
+          5,
+          -0.008019386664540926
+        ],
+        [
+          7,
+          -0.03756160976965315
+        ],
+        [
+          9,
+          4.864436422446999e-10
+        ],
+        [
+          11,
+          0.02983667328930651
+        ],
+        [
+          13,
+          1.3273486907802552e-08
+        ],
+        [
+          15,
+          -0.000557460995427961
+        ],
+        [
+          17,
+          -6.063328894086152e-08
+        ],
+        [
+          19,
+          1.2886195781580339e-08
+        ],
+        [
+          21,
+          -1.4097304748773894e-10
+        ],
+        [
+          23,
+          -1.8239921949118262e-06
+        ],
+        [
+          25,
+          0.00016212724577829933
+        ],
+        [
+          27,
+          -2.1988764761499967e-08
+        ],
+        [
+          29,
+          0.0008392263085250403
+        ],
+        [
+          31,
+          -2.277003448257523e-05
+        ]
+      ],
+      "label": "active_guard",
+      "q": 0.92,
+      "residual_after_scaling": 18.799471826480108,
+      "residual_raw": 1.879947182648011,
+      "residual_weighted_before_scaling": 18.799471826480108,
+      "row_id": "active_guard:30",
+      "row_index": 30,
+      "row_type": "active_guard",
+      "weight": 10.0
+    }
+  ],
+  "status": "TWOCHART_ROW_CACHE_FLOATING_NOT_PROOF",
+  "variables": [
+    {
+      "alpha": 2.0,
+      "block": "F_an",
+      "chart": "tail",
+      "component": "F",
+      "index": 3605,
+      "kq": 8,
+      "kx": 8,
+      "label": "tail.F_an[p29].c[8,8]",
+      "local_column": 0,
+      "patch_index": 29,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "F_an",
+        29,
+        "coeffs",
+        8,
+        8
+      ],
+      "value": 1.0051078579013873e-10
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26150,
+      "label": "origin.F_origin_taylor[4,0]",
+      "local_column": 1,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        14,
+        "coeff"
+      ],
+      "r_power": 4,
+      "value": -2372.1895190916275,
+      "z_power": 0
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "F_frac",
+      "chart": "tail",
+      "component": "F",
+      "frac_index": 1,
+      "index": 7961,
+      "kq": 8,
+      "kx": 8,
+      "label": "tail.F_frac[f1][p29].c[8,8]",
+      "local_column": 2,
+      "patch_index": 29,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "F_frac",
+        0,
+        29,
+        "coeffs",
+        8,
+        8
+      ],
+      "value": -1.0401906059518909e-10
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26146,
+      "label": "origin.F_origin_taylor[0,4]",
+      "local_column": 3,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        10,
+        "coeff"
+      ],
+      "r_power": 0,
+      "value": -2366.9150548086855,
+      "z_power": 4
+    },
+    {
+      "alpha": 2.0,
+      "block": "F_an",
+      "chart": "tail",
+      "component": "F",
+      "index": 3594,
+      "kq": 7,
+      "kx": 8,
+      "label": "tail.F_an[p29].c[7,8]",
+      "local_column": 4,
+      "patch_index": 29,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "F_an",
+        29,
+        "coeffs",
+        7,
+        8
+      ],
+      "value": 5.987902217579839e-13
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26157,
+      "label": "origin.F_origin_taylor[0,6]",
+      "local_column": 5,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        21,
+        "coeff"
+      ],
+      "r_power": 0,
+      "value": -17773.10145524837,
+      "z_power": 6
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "F_frac",
+      "chart": "tail",
+      "component": "F",
+      "frac_index": 1,
+      "index": 7950,
+      "kq": 7,
+      "kx": 8,
+      "label": "tail.F_frac[f1][p29].c[7,8]",
+      "local_column": 6,
+      "patch_index": 29,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "F_frac",
+        0,
+        29,
+        "coeffs",
+        7,
+        8
+      ],
+      "value": -3.6244019784463373e-20
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26151,
+      "label": "origin.F_origin_taylor[0,5]",
+      "local_column": 7,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        15,
+        "coeff"
+      ],
+      "r_power": 0,
+      "value": 11299.66502678884,
+      "z_power": 5
+    },
+    {
+      "alpha": 2.0,
+      "block": "G_an",
+      "chart": "tail",
+      "component": "G",
+      "index": 16818,
+      "kq": 10,
+      "kx": 10,
+      "label": "tail.G_an[p30].c[10,10]",
+      "local_column": 8,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_an",
+        30,
+        "coeffs",
+        10,
+        10
+      ],
+      "value": -2.470246229790973e-17
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26155,
+      "label": "origin.F_origin_taylor[4,1]",
+      "local_column": 9,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        19,
+        "coeff"
+      ],
+      "r_power": 4,
+      "value": -20083.221448707896,
+      "z_power": 1
+    },
+    {
+      "alpha": 2.0,
+      "block": "G_an",
+      "chart": "tail",
+      "component": "G",
+      "index": 16708,
+      "kq": 0,
+      "kx": 10,
+      "label": "tail.G_an[p30].c[0,10]",
+      "local_column": 10,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_an",
+        30,
+        "coeffs",
+        0,
+        10
+      ],
+      "value": -3.555489236362064e-16
+    },
+    {
+      "block": "G_origin_taylor",
+      "chart": "origin",
+      "component": "G",
+      "index": 26174,
+      "label": "origin.G_origin_taylor[0,4]",
+      "local_column": 11,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "G_origin_taylor",
+        "basis",
+        10,
+        "coeff"
+      ],
+      "r_power": 0,
+      "value": 1462.1512429092602,
+      "z_power": 4
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 1,
+      "index": 21174,
+      "kq": 10,
+      "kx": 10,
+      "label": "tail.G_frac[f1][p30].c[10,10]",
+      "local_column": 12,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        0,
+        30,
+        "coeffs",
+        10,
+        10
+      ],
+      "value": -3.242039092246769e-24
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26149,
+      "label": "origin.F_origin_taylor[3,1]",
+      "local_column": 13,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        13,
+        "coeff"
+      ],
+      "r_power": 3,
+      "value": 5092.782646320239,
+      "z_power": 1
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 1,
+      "index": 21064,
+      "kq": 0,
+      "kx": 10,
+      "label": "tail.G_frac[f1][p30].c[0,10]",
+      "local_column": 14,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        0,
+        30,
+        "coeffs",
+        0,
+        10
+      ],
+      "value": -9.93141799896072e-25
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26152,
+      "label": "origin.F_origin_taylor[1,4]",
+      "local_column": 15,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        16,
+        "coeff"
+      ],
+      "r_power": 1,
+      "value": -27932.757592058177,
+      "z_power": 4
+    },
+    {
+      "alpha": 2.0,
+      "block": "G_an",
+      "chart": "tail",
+      "component": "G",
+      "index": 16785,
+      "kq": 7,
+      "kx": 10,
+      "label": "tail.G_an[p30].c[7,10]",
+      "local_column": 16,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_an",
+        30,
+        "coeffs",
+        7,
+        10
+      ],
+      "value": 6.327054942631653e-19
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26154,
+      "label": "origin.F_origin_taylor[3,2]",
+      "local_column": 17,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        18,
+        "coeff"
+      ],
+      "r_power": 3,
+      "value": -38857.082879737565,
+      "z_power": 2
+    },
+    {
+      "alpha": 2.0,
+      "block": "G_an",
+      "chart": "tail",
+      "component": "G",
+      "index": 16741,
+      "kq": 3,
+      "kx": 10,
+      "label": "tail.G_an[p30].c[3,10]",
+      "local_column": 18,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_an",
+        30,
+        "coeffs",
+        3,
+        10
+      ],
+      "value": -1.2308890672341916e-16
+    },
+    {
+      "block": "G_origin_taylor",
+      "chart": "origin",
+      "component": "G",
+      "index": 26178,
+      "label": "origin.G_origin_taylor[4,0]",
+      "local_column": 19,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "G_origin_taylor",
+        "basis",
+        14,
+        "coeff"
+      ],
+      "r_power": 4,
+      "value": 947.1359959835137,
+      "z_power": 0
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 1,
+      "index": 21141,
+      "kq": 7,
+      "kx": 10,
+      "label": "tail.G_frac[f1][p30].c[7,10]",
+      "local_column": 20,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        0,
+        30,
+        "coeffs",
+        7,
+        10
+      ],
+      "value": 7.764148461911109e-24
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26161,
+      "label": "origin.F_origin_taylor[4,2]",
+      "local_column": 21,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        25,
+        "coeff"
+      ],
+      "r_power": 4,
+      "value": 71029.94355015359,
+      "z_power": 2
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 1,
+      "index": 21097,
+      "kq": 3,
+      "kx": 10,
+      "label": "tail.G_frac[f1][p30].c[3,10]",
+      "local_column": 22,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        0,
+        30,
+        "coeffs",
+        3,
+        10
+      ],
+      "value": 1.179399622302328e-23
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26159,
+      "label": "origin.F_origin_taylor[2,4]",
+      "local_column": 23,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        23,
+        "coeff"
+      ],
+      "r_power": 2,
+      "value": 114839.00995917866,
+      "z_power": 4
+    },
+    {
+      "alpha": 4.444444444444445,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 2,
+      "index": 25530,
+      "kq": 10,
+      "kx": 10,
+      "label": "tail.G_frac[f2][p30].c[10,10]",
+      "local_column": 24,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        1,
+        30,
+        "coeffs",
+        10,
+        10
+      ],
+      "value": 0.0
+    },
+    {
+      "block": "G_origin_taylor",
+      "chart": "origin",
+      "component": "G",
+      "index": 26180,
+      "label": "origin.G_origin_taylor[1,4]",
+      "local_column": 25,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "G_origin_taylor",
+        "basis",
+        16,
+        "coeff"
+      ],
+      "r_power": 1,
+      "value": -7292.124605312412,
+      "z_power": 4
+    },
+    {
+      "alpha": 2.0,
+      "block": "G_an",
+      "chart": "tail",
+      "component": "G",
+      "index": 16752,
+      "kq": 4,
+      "kx": 10,
+      "label": "tail.G_an[p30].c[4,10]",
+      "local_column": 26,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_an",
+        30,
+        "coeffs",
+        4,
+        10
+      ],
+      "value": -9.51058255274849e-18
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26160,
+      "label": "origin.F_origin_taylor[3,3]",
+      "local_column": 27,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        24,
+        "coeff"
+      ],
+      "r_power": 3,
+      "value": 110942.37598381423,
+      "z_power": 3
+    },
+    {
+      "alpha": 4.444444444444445,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 2,
+      "index": 25420,
+      "kq": 0,
+      "kx": 10,
+      "label": "tail.G_frac[f2][p30].c[0,10]",
+      "local_column": 28,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        1,
+        30,
+        "coeffs",
+        0,
+        10
+      ],
+      "value": 0.0
+    },
+    {
+      "block": "G_origin_taylor",
+      "chart": "origin",
+      "component": "G",
+      "index": 26175,
+      "label": "origin.G_origin_taylor[1,3]",
+      "local_column": 29,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "G_origin_taylor",
+        "basis",
+        11,
+        "coeff"
+      ],
+      "r_power": 1,
+      "value": -40.618179825138434,
+      "z_power": 3
+    },
+    {
+      "alpha": 2.2222222222222223,
+      "block": "G_frac",
+      "chart": "tail",
+      "component": "G",
+      "frac_index": 1,
+      "index": 21108,
+      "kq": 4,
+      "kx": 10,
+      "label": "tail.G_frac[f1][p30].c[4,10]",
+      "local_column": 30,
+      "patch_index": 30,
+      "path": [
+        "tail_chart",
+        "blocks",
+        "G_frac",
+        0,
+        30,
+        "coeffs",
+        4,
+        10
+      ],
+      "value": -1.347661136801611e-23
+    },
+    {
+      "block": "F_origin_taylor",
+      "chart": "origin",
+      "component": "F",
+      "index": 26148,
+      "label": "origin.F_origin_taylor[2,2]",
+      "local_column": 31,
+      "path": [
+        "origin_chart",
+        "blocks",
+        "F_origin_taylor",
+        "basis",
+        12,
+        "coeff"
+      ],
+      "r_power": 2,
+      "value": 10009.52024532945,
+      "z_power": 2
+    }
+  ]
+}

@@ -168,7 +168,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics through `work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, max-norm raw gates, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. Step32 reduces held-out edge to `4.284755945898e2`, but dense C0-C4 R/Z mortar worsens to `5.913592917574e6`; this is not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics through `work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch_*`; automatic dense-C4 active-row diagnostic `work/twochart_stage0_current_profile_densec4active160_step33_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, max-norm raw gates, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. Step32 reduces held-out edge to `4.284755945898e2`, but dense C0-C4 R/Z mortar worsens to `5.913592917574e6`. Step33 promotes dense C4 rows automatically and accepts no step (`predicted_best_factor_inf=9.999916809043151e-1`). This is not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
 | Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
@@ -828,6 +828,87 @@ interpretation:
   q=0.89/0.90/0.91/0.92 audit, but dense C4 damage moves again, now to q=0.87.
   Manual q-row chasing is no longer the right loop. The next solver change
   should promote dense-audit worst C4 rows into the objective automatically.
+```
+
+Automatic dense-C4 active-row promotion:
+
+```text
+code change:
+  tools/profile_newton_twochart.py now supports:
+    --mortar-active-source objective|audit
+    --mortar-active-per-q
+    --mortar-active-per-derivative
+
+  With --mortar-active-source audit, objective mortar active rows are selected
+  from the line-search C4 audit grid instead of a hand-listed q grid. The report
+  records selected_by_q and selected_by_derivative. --mortar-active-count is a
+  hard cap after quota seeding.
+
+  objective-only line search now evaluates objective R/Z mortar rows through
+  residuals_for_rows(..., use_native_c=args.native_c), so all-RZ objective
+  mortar residuals use the existing native C batch path.
+
+verification:
+  python3 -m py_compile tools/profile_newton_twochart.py
+
+smoke artifact:
+  work/twochart_stage0_current_profile_densec4active_smoke32_nativebatch_v2*
+
+smoke result:
+  no AttributeError
+  selected_by_chart = tail:16, origin:16
+  mortar_active_selection.selected = 12
+  objective row_groups.mortar = 11 after active-entry filtering
+  trial native_c_rz_mortar rows = 11, cases = 3160
+```
+
+Dense active-row diagnostic:
+
+```text
+artifact:
+  work/twochart_stage0_current_profile_densec4active160_step33_nativebatch*
+
+input:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json
+
+setup:
+  --mortar-active-source audit
+  --line-search-mortar-audit-order 4
+  --line-search-mortar-audit-q-samples 9
+  --line-search-mortar-audit-x-samples 9
+  --mortar-active-count 96
+  --mortar-active-per-q 4
+  --mortar-active-per-derivative 2
+  --max-variables 160
+  --raw-growth-metric max-abs
+
+selection:
+  selected_by_chart = tail:106, origin:54
+  mortar source rows available = 2430
+  active mortar rows selected = 96
+  row_groups = pde:2, mortar:96, active_guard:242
+
+rank:
+  coverage = 1.0
+  constraint rank/nullity = 67/93
+  primary rank/projected primary rank = 26/10
+  rho_grad = 5.100044997547549e-1
+  rho_range = 4.055716822512374e-1
+  predicted_best_factor_inf = 9.999916809043151e-1
+
+result:
+  accepted_any_step = false
+  representative alpha=0.015625 F/F_frac trials are rejected by:
+    accept_metric_decrease
+    guard_growth
+    residual_audit_growth
+  dense C4 audit itself does not grow, but no descent survives the edge guard.
+
+interpretation:
+  This is the first clean automatic dense-C4 promoted-row obstruction. It is
+  not a branch kill, but it is stronger than manual q-row chasing: with the
+  dense 9x9 C4 blockers promoted, the feasible projected primary space has
+  weak effective descent and no accepted nonlinear step.
 ```
 
 Performance direction from `AGENTS.md`:
