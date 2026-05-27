@@ -13,7 +13,7 @@
     "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
   },
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_mortaraudit128_step18_resaudit_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "delta_domain": {
     "im": [
@@ -26,12 +26,12 @@
     ]
   },
   "dependency_hashes": {
-    "tail_recurrence": "2f8cbd1ccd29c0898e2aa008e5ba2a9f77e820f383d6c8e16b16a252a17349f6"
+    "tail_recurrence": "873eaa7b05001cb31d3380a258197abcdc6ada2acb849de716322fcf603bbd78"
   },
   "exterior_exclusion": null,
   "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
   "input_hashes": {
-    "profile": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e"
+    "profile": "21e55ec8569de14587f059823995bcf20061fdad1afe6ee286e2ad18e890cfd6"
   },
   "interval_widths": {
     "max": null,
@@ -44,9 +44,9 @@
   "mathematical_statement": "Only the geometric/removable delta=1 indicial root is admissible in the dangerous domain, and all non-geometric dangerous roots are excluded by an interval Pluecker/Evans cover plus exterior estimates.",
   "pass": false,
   "precision_bits": 53,
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
-  "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
-  "repo_commit": "d306e6b4ee2926c907955b44758e75e373880e99",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step18_resaudit_scaled.json",
+  "profile_hash_sha256": "21e55ec8569de14587f059823995bcf20061fdad1afe6ee286e2ad18e890cfd6",
+  "repo_commit": "4c809503c3bc59b60ae003da405313bcdb46778e",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1"
 }

@@ -11,27 +11,27 @@
     "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
   },
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_mortaraudit128_step18_resaudit_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "dependencies": {
     "profile_nk": {
       "certificate_name": "profile_nk",
       "exists": true,
-      "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363380643040e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090464762e+06 exceeds entry threshold 1.000000000000e-08; domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF; exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828082648721e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898840e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.628882966407e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+      "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.363351706182e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968090286485e+06 exceeds entry threshold 1.000000000000e-08; domain interval residual evaluator is not implemented; sampled interval row ledger is attached but does not enclose the continuous compactified residual domain; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; interval residual row ledger is not a domain proof: OUTWARD_DOUBLE_INTERVAL_ROWS_NOT_DOMAIN_PROOF; exact residual audit stores scan/mortar summaries, not full domain interval residual rows; domain Bernstein/Arb residual bounds are missing for compactified residual equations; Z2/tail complement interval bound is missing; sampled nextafter double intervals are row data only, not continuous-domain enclosures; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828082598712e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898840e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.628882899244e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
       "pass": false,
       "path": "certs/profile/profile_nk.json",
-      "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
-      "sha256": "fd0ea36f3014c1d019df9991324f86873a4da59681a19dbea49ecea39faec41d"
+      "profile_hash_sha256": "21e55ec8569de14587f059823995bcf20061fdad1afe6ee286e2ad18e890cfd6",
+      "sha256": "20bff044d6905700b1a6533480d649db07ecbdff5c31d2415aaeff16f88c8eab"
     }
   },
   "dependency_hashes": {
-    "profile_nk": "fd0ea36f3014c1d019df9991324f86873a4da59681a19dbea49ecea39faec41d",
-    "tail_recurrence": "2f8cbd1ccd29c0898e2aa008e5ba2a9f77e820f383d6c8e16b16a252a17349f6"
+    "profile_nk": "20bff044d6905700b1a6533480d649db07ecbdff5c31d2415aaeff16f88c8eab",
+    "tail_recurrence": "873eaa7b05001cb31d3380a258197abcdc6ada2acb849de716322fcf603bbd78"
   },
   "determinant_interval": null,
   "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
   "input_hashes": {
-    "profile": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e"
+    "profile": "21e55ec8569de14587f059823995bcf20061fdad1afe6ee286e2ad18e890cfd6"
   },
   "interval_widths": {
     "max": null,
@@ -40,9 +40,9 @@
   "mathematical_statement": "The profile matching and admissibility equations are transverse, so the certified profile is isolated modulo gauges and compatible with the certified tail class.",
   "pass": false,
   "precision_bits": 53,
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step17_resaudit_scaled.json",
-  "profile_hash_sha256": "0bfe5a3656a79f8a3617367ad1ee03afb47b5f1af4c6e3131d2a0029a7e4c89e",
-  "repo_commit": "d306e6b4ee2926c907955b44758e75e373880e99",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step18_resaudit_scaled.json",
+  "profile_hash_sha256": "21e55ec8569de14587f059823995bcf20061fdad1afe6ee286e2ad18e890cfd6",
+  "repo_commit": "4c809503c3bc59b60ae003da405313bcdb46778e",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "transversality_margin": null
