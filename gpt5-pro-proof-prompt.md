@@ -133,21 +133,22 @@ background.
 Latest repo update in this prompt:
 
 ```text
-Fix seam-patch PDE Jacobian selection, record corrected 256-variable
-post-fix Stage-0 diagnostics, and keep theorem certificate at 0/5.
+Add coupled audit acceptance, target the explicit worst edge/C4 rows, record
+64/128 native Stage-0 diagnostics, and keep theorem certificate at 0/5.
 ```
 
 Latest commits:
 
 ```text
+1e0aaf3 Target explicit edge and C4 mortar rows
+ceeda01 Add coupled audit Stage-0 metric
+1b8877b Update GPT Pro prompt with patchfix diagnostics
 73b7a07 Fix seam patch PDE Jacobian selection
 54b02bc Record guard-only PDE Stage-0 failure
 8c27990 Refresh theorem ledgers for current profile hash
 15fdd45 Record 256-row residual NK blocker
 1d419b9 Expose finite NK proof relevance in profile ledger
 047d954 Require meaningful Stage-0 accept metric decrease
-9510051 Prioritize PDE rows in native Stage-0
-10853f3 Auto-select worst PDE rows in Stage-0
 ```
 
 Current progress ledger:
@@ -162,7 +163,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; corrected constrained 256 diagnostics `work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json`; corrected guard-only 256 diagnostics `work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, and prediction diagnostics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`; corrected post-fix 256 runs accept no nonlinear step. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json`; and `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`; targeted 64/128 native runs accept no nonlinear step. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
 | Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
@@ -374,6 +375,172 @@ misreported as profile progress. The latest post-fix diagnostics use this
 firewall and report accepted_any_step=false.
 ```
 
+Coupled audit acceptance metric added in `ceeda01`:
+
+```text
+tools/profile_newton_twochart.py now supports:
+  --line-search-accept-metric coupled-audit-max
+
+The metric is:
+  max(trial_residual_audit_max/base_residual_audit_max,
+      trial_mortar_audit_max/base_mortar_audit_max)
+
+It requires both:
+  --max-residual-audit-growth > 0
+  --max-mortar-audit-growth > 0
+
+Prediction/actual reports now include:
+  accept_metric,
+  base_accept_metric_value,
+  trial_accept_metric_value,
+  accept_metric_decrease,
+  required_accept_metric_decrease,
+  coupled_audit_value,
+  coupled_audit_limiter,
+  coupled_residual_ratio,
+  coupled_mortar_ratio.
+
+Purpose:
+  Do not accept a Stage-0 step that improves a selected sampled objective while
+  the held-out worst edge residual or held-out C4 mortar remains pinned or grows.
+```
+
+Explicit worst-row targeting added in `1e0aaf3`:
+
+```text
+tools/profile_newton_twochart.py now supports:
+  --mortar-q-values
+  --mortar-x-values
+  --line-search-mortar-audit-q-values
+  --line-search-mortar-audit-x-values
+
+These explicit values override sample-count grids for selected objective rows
+and line-search audit rows. They are meant to target known worst physical rows
+directly instead of paying for broad Python-side grids or missing the exact
+row that blocks proof entry.
+```
+
+Latest targeted explicit-row diagnostic:
+
+```text
+Base profile:
+  work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json
+
+Targeted rows:
+  PDE edge objective point:
+    q = 0.8999999999999999
+    b = 0.98
+    worst component = e_psi
+    base residual audit max = 4.3625781300704136e2
+
+  C4 mortar objective/audit point:
+    q = 0.91
+    x = 1.0
+    worst row = RZ:F:dRRRR
+    base mortar audit max = 4.963232981363504e6
+
+Shared setup:
+  solve_mode = guarded-ineq-kkt
+  accept metric = coupled-audit-max
+  native C enabled
+  stage0-workers = 8
+  q2-policy = zero
+  explicit mortar q/x objective and audit values
+```
+
+Targeted 64-variable run:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_report.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_rank.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_rows.json
+
+accepted_any_step = false
+row_groups = active_guard:198, mortar:8, pde:1
+selected_by_chart = tail:64
+selected_by_block = tail.F_an:23, tail.F_frac:41
+
+rank diagnostic:
+  predicted_best_factor_inf = 3.9089330092908066e-16
+  rho_range approximately 1
+  rho_grad approximately 1.45e-13
+  best_feasible_step_l2 = 1.099436872e9
+  best_feasible_step_max_abs = 5.227650386e8
+
+line search:
+  best full/chart-tail alpha=1 coupled_audit_value = 0.9999999932561865
+  accept_metric_decrease = 6.743813507625873e-09
+  residual ratio = 0.9991565287420843
+  mortar ratio = 0.9999999932561865
+  rejected because required decrease = 1e-6
+
+interpretation:
+  The selected tail-only tangent can formally kill the single projected PDE row,
+  but the nonlinear coupled audit is essentially pinned by the C4 mortar row.
+```
+
+Targeted 128-variable run:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_report.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_rank.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_rows.json
+
+accepted_any_step = false
+row_groups = active_guard:198, mortar:8, pde:1
+selected_by_chart = tail:128
+selected_by_block = tail.F_an:44, tail.F_frac:84
+
+rank diagnostic:
+  predicted_best_factor_inf = 1.3029776697636022e-16
+  rho_range approximately 1
+  rho_grad approximately 1.13e-13
+  best_feasible_step_l2 = 1.413568268e9
+  best_feasible_step_max_abs = 4.921761800e8
+
+line search:
+  accepted_any_step = false
+  best coupled audit remains approximately 1.0
+  no meaningful held-out edge/C4 improvement
+
+interpretation:
+  The explicit row test is a sharper negative result for tail-only variable
+  selection. It is not yet a fixed-branch kill because no origin variables were
+  selected, so the coupled tail-origin tangent has not been cleanly tested.
+```
+
+Performance direction from `AGENTS.md`:
+
+```text
+Do not rewrite the whole solver before solver semantics settle.
+Python remains the orchestration/report layer.
+Move stable hot kernels to C first, with deterministic JSON-facing or ctypes
+boundaries:
+  row and Jacobian evaluation for compactified two-chart residuals,
+  mortar and edge/seam guard row generation,
+  active-set KKT/SVD wrappers where stable,
+  batched prediction-vs-actual line-search scans,
+  Bernstein/exact residual interval kernels where applicable.
+
+GPU is not the first target for the current workload, including on Mac. The
+current bottleneck is mostly CPU-side row assembly, scalar profile evaluation,
+small-to-medium dense linear algebra, and repeated guard scans. Use native C
+batched APIs before GPU work.
+
+Every C kernel must be cross-checked repeatedly against the Python evaluator on
+deterministic cases before Stage-0 use. Do not run Python cross-checks on every
+production invocation after a kernel has passed; use fast C-side status checks
+and batched production calls. Return explicit status codes for invalid orders,
+degenerate intervals, null buffers, nonfinite inputs, and overflow-sensitive
+paths. Prefer batched C calls over scalar ctypes loops.
+```
+
 Current interpretation:
 
 ```text
@@ -393,11 +560,15 @@ What is established:
      an accepted nonlinear step.
   6. Guard-only 256-variable inequality KKT can reduce edge residual by about
      1e-2 only by blowing C4 mortar from about 4.96e6 to about 1e9.
+  7. Explicitly targeting the known worst C4 row at q=0.91,x=1.0 removes the
+     ambiguity that the objective missed the blocker.
+  8. Targeted 64/128 native runs show linear formal ability to kill the single
+     selected PDE row, but line search still cannot reduce the coupled audit.
 
 What is not established:
   1. Fixed (9/20,1) is mathematically impossible.
-  2. Freeing (gamma,B) is justified before the shifted-schedule corrected
-     tests run.
+  2. Freeing (gamma,B) is justified before the shifted-schedule and coupled
+     tail-origin selection tests run.
   3. q2 is legal or needed.
   4. Any theorem gate has passed.
 ```
@@ -408,52 +579,119 @@ Current branch status:
 fixed (9/20,1): alive but under serious corrected negative evidence
 current exact profile gate: blocked by residual max 4.36e2 and C4 mortar 4.96e6
 current profile NK gate: blocked by pass=false and finite sampled Z0>1
-current solver issue: corrected edge/seam tangent appears pinned on this schedule
-most credible immediate fork: shifted seam schedules + minimax/top-row PDE and
-  C4 mortar coupled objective, using corrected patch-side Jacobians
-do not free (gamma,B) until corrected 128/256 shifted schedules fail cleanly
+current solver issue: targeted tail-only edge/C4 tangent appears pinned
+most credible immediate fork: force a genuine coupled tail-origin variable
+  selection on the same explicit rows, then run shifted seam schedules
+do not free (gamma,B) until corrected 128/256 shifted schedules and coupled
+  tail-origin selection fail cleanly
 do not unlock q2 without tail recurrence certificate
 ```
 
 Question GPT-5 Pro should answer now:
 
 ```text
-Given the corrected seam-patch Jacobian fix and the two post-fix 256 diagnostics,
-what is the most proof-relevant next move?
+Given the corrected seam-patch Jacobian fix, the coupled-audit firewall, and
+the explicit worst-edge/worst-C4 64/128 diagnostics above, what is the most
+direct proof-producing next move?
 
-Decide among:
-  A. implement a minimax/top-row objective that directly targets the current
-     worst PDE edge row and worst C4 R/Z mortar row as coupled hard rows;
-  B. run corrected shifted-schedule 128/256 diagnostics at seam q=0.88,0.90,0.92
-     before changing objective geometry;
-  C. declare this fixed schedule pinned and specify the exact branch-kill
-     evidence still required before freeing (gamma,B);
-  D. change the profile representation or row norm before further Stage-0
-     solving.
+Specifically answer:
+  1. Is the next experiment a chart-balanced or quota-forced tail-origin
+     variable selection on the same explicit rows?
+  2. What is the minimal variable/row quota that actually tests the coupled
+     tail-origin tangent without returning to broad slow Python grids?
+  3. If the coupled tail-origin explicit-row diagnostic still pins the coupled
+     audit at 1.0, what exact shifted schedules or parameter funnel should run
+     next?
+  4. What would count as a rigorous floating branch-kill precursor before
+     interval matching or parameter-funnel certificates?
+  5. Which native C kernel should be ported next to reach the proof-relevant
+     diagnostics fastest?
 
-The answer must give concrete commands or mathematical diagnostics, not a
-generic plan. It should explicitly use the fact that the pre-fix descent was
-partly a chart-side Jacobian artifact, while the post-fix guard-only cone only
-improves PDE rows by causing catastrophic C4 mortar damage.
+You must distinguish:
+  - a corrected local tail-only tangent obstruction,
+  - an untested coupled tail-origin tangent,
+  - a chart-switch sampling artifact,
+  - a reason to free (gamma,B),
+  - and a reason to pivot to radial matching.
 ```
 
 Immediate local commands still worth running after this prompt:
 
 ```bash
-# 1. Re-run the corrected constrained and guard-only diagnostics under shifted
-#    seam schedules q=0.88,0.90,0.92, but use the fixed
-#    active_tail_patch_for_variable path.
+# 1. First test whether existing chart-balanced selection already pulls origin
+#    variables into the explicit worst-edge/worst-C4 problem.
 
-# 2. Add a row objective that can report max-row/minimax progress on:
-#    - worst PDE edge row near q=0.90,b=0.98,
-#    - nearby shifted edge rows,
-#    - worst C4 R/Z mortar row RZ:F:dRRRR at q=0.91,x=1.0,
-#    - old C2 seam row RZ:F:dZZ near q=0.84,x=1.0.
+python3 tools/profile_newton_twochart.py \
+  --input work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json \
+  --out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch.json \
+  --report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_report.json \
+  --rank-report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rank.json \
+  --row-cache-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rows.json \
+  --prediction-actual-report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_prediction.json \
+  --blocks tail,origin,interface \
+  --variable-charts tail,origin \
+  --solve-mode guarded-ineq-kkt \
+  --gamma-fixed --B-fixed \
+  --residual-kind normalized-structural \
+  --q2-policy zero \
+  --pde-qb-points '0.8999999999999999,0.98' \
+  --no-default-pde-points \
+  --pde-component-mode worst-per-point \
+  --pde-jacobian-candidate-count 16 \
+  --mortar-coordinates RZ \
+  --mortar-order 4 \
+  --mortar-q-values 0.91 \
+  --mortar-x-values 1.0 \
+  --line-search-mortar-audit-q-values 0.91 \
+  --line-search-mortar-audit-x-values 1.0 \
+  --mortar-active-count 16 \
+  --mortar-jacobian-candidate-count 256 \
+  --guard-grid edge \
+  --guard-q-min 0.74 --guard-q-max 0.94 \
+  --guard-b-min 0.08 --guard-b-max 0.99 \
+  --guard-q-samples 11 --guard-b-samples 11 \
+  --active-guard-weight 10 \
+  --guarded-kkt-primary-labels pde,mortar \
+  --guarded-kkt-constraint-labels active_guard \
+  --guarded-kkt-max-constraints 128 \
+  --guarded-ineq-max-active 128 \
+  --guarded-ineq-tolerance 1e-10 \
+  --guarded-ineq-target nonincrease \
+  --line-search-eval objective-only \
+  --line-search-accept-metric coupled-audit-max \
+  --residual-audit-scan edge \
+  --residual-audit-q-samples 9 \
+  --residual-audit-b-samples 9 \
+  --max-residual-audit-growth 1 \
+  --max-mortar-audit-growth 1 \
+  --max-raw-objective-growth 1 \
+  --max-guard-objective-growth 1 \
+  --max-guard-max-growth 1 \
+  --min-accept-metric-decrease-abs 1e-6 \
+  --row-normalization residual-jacobian \
+  --row-normalization-floor 1e-12 \
+  --row-scale-max 1e8 \
+  --max-variables 128 \
+  --chart-balanced-selection \
+  --candidate-origin-degree-max 12 \
+  --candidate-kq-max 12 \
+  --candidate-kx-max 12 \
+  --candidate-pool-limit 1024 \
+  --max-iter 1 \
+  --trust 0.001 \
+  --lm-lambda 1e-6 \
+  --pde-weight 1 \
+  --mortar-weight 0.01 \
+  --native-c \
+  --stage0-workers 8 \
+  --line-search 1,0.25,0.0625,0.015625,0.00390625,0.0009765625
 
-# 3. Regenerate certs/profile/profile_nk.json and
-#    certs/final_theorem_manifest.json after the patchfix commit so the ledger
-#    hashes record the corrected residual/Jacobian code path, while preserving
-#    pass=false.
+# 2. If selected_by_chart is still tail-only, implement explicit chart/source
+#    quotas before interpreting the run as coupled-tail-origin evidence.
+
+# 3. If balanced or quota-forced 128 still pins the coupled audit, repeat at
+#    seam switches q=0.88,0.90,0.92 and then decide whether fixed (9/20,1) is
+#    ready for a parameter-funnel test.
 ```
 
 ## 1D. Historical Stage-0 Trace (Superseded by 1C)
