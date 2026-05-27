@@ -2385,6 +2385,8 @@ def line_search_accept_metric_value(
     sampled_metrics: dict[str, Any],
     residual_audit_metrics: dict[str, Any],
     mortar_audit_metrics: dict[str, Any],
+    base_residual_audit_metrics: dict[str, Any] | None = None,
+    base_mortar_audit_metrics: dict[str, Any] | None = None,
 ) -> float:
     if metric == "objective":
         return float(sampled_metrics["objective"])
@@ -2398,7 +2400,49 @@ def line_search_accept_metric_value(
         if not mortar_audit_metrics.get("enabled"):
             raise ValueError("--line-search-accept-metric mortar-audit-max requires --max-mortar-audit-growth > 0")
         return float(mortar_audit_metrics["max_abs"])
+    if metric == "coupled-audit-max":
+        report = coupled_audit_metric_report(
+            residual_audit_metrics,
+            mortar_audit_metrics,
+            base_residual_audit_metrics or residual_audit_metrics,
+            base_mortar_audit_metrics or mortar_audit_metrics,
+        )
+        if not report.get("enabled"):
+            raise ValueError(
+                "--line-search-accept-metric coupled-audit-max requires "
+                "--max-residual-audit-growth > 0 and --max-mortar-audit-growth > 0"
+            )
+        return float(report["value"])
     raise ValueError(f"unknown line-search accept metric {metric!r}")
+
+
+def coupled_audit_metric_report(
+    residual_audit_metrics: dict[str, Any],
+    mortar_audit_metrics: dict[str, Any],
+    base_residual_audit_metrics: dict[str, Any],
+    base_mortar_audit_metrics: dict[str, Any],
+) -> dict[str, Any]:
+    if not residual_audit_metrics.get("enabled") or not mortar_audit_metrics.get("enabled"):
+        return {"enabled": False}
+    base_residual = max(float(base_residual_audit_metrics["max_abs"]), 1e-300)
+    base_mortar = max(float(base_mortar_audit_metrics["max_abs"]), 1e-300)
+    residual_max_abs = float(residual_audit_metrics["max_abs"])
+    mortar_max_abs = float(mortar_audit_metrics["max_abs"])
+    residual_ratio = residual_max_abs / base_residual
+    mortar_ratio = mortar_max_abs / base_mortar
+    value = max(residual_ratio, mortar_ratio)
+    return {
+        "enabled": True,
+        "mode": "normalized-minimax",
+        "value": value,
+        "limiting_audit": "residual" if residual_ratio >= mortar_ratio else "mortar",
+        "residual_ratio": residual_ratio,
+        "mortar_ratio": mortar_ratio,
+        "residual_max_abs": residual_max_abs,
+        "mortar_max_abs": mortar_max_abs,
+        "base_residual_max_abs": base_residual,
+        "base_mortar_max_abs": base_mortar,
+    }
 
 
 def attach_stage0_tail_gate(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
@@ -2441,9 +2485,17 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             use_native_c=bool(args.native_c),
         )
         base_residual_audit_metrics = residual_audit_metrics(current, args)
+        base_coupled_audit_metric = coupled_audit_metric_report(
+            base_residual_audit_metrics,
+            base_mortar_audit_metrics,
+            base_residual_audit_metrics,
+            base_mortar_audit_metrics,
+        )
         base_accept_metric_value = line_search_accept_metric_value(
             args.line_search_accept_metric,
             base_metrics,
+            base_residual_audit_metrics,
+            base_mortar_audit_metrics,
             base_residual_audit_metrics,
             base_mortar_audit_metrics,
         )
@@ -2563,6 +2615,12 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     use_native_c=bool(args.native_c),
                 )
                 trial_residual_audit_metrics = residual_audit_metrics(trial_data, args)
+                trial_coupled_audit_metric = coupled_audit_metric_report(
+                    trial_residual_audit_metrics,
+                    trial_mortar_audit_metrics,
+                    base_residual_audit_metrics,
+                    base_mortar_audit_metrics,
+                )
                 raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
                     base_raw_metrics["objective"], 1e-300
                 )
@@ -2591,6 +2649,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     trial_metrics,
                     trial_residual_audit_metrics,
                     trial_mortar_audit_metrics,
+                    base_residual_audit_metrics,
+                    base_mortar_audit_metrics,
                 )
                 objective_decrease = base_metrics["objective"] - trial_metrics["objective"]
                 accept_metric_decrease = base_accept_metric_value - trial_accept_metric_value
@@ -2628,6 +2688,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "mortar_audit_growth_ok": mortar_audit_growth_ok,
                         "residual_audit_metrics": trial_residual_audit_metrics,
                         "residual_audit_growth_ok": residual_audit_growth_ok,
+                        "coupled_audit_metric": trial_coupled_audit_metric,
                         "accepted": accepted_here,
                         "tail_gate": tail_gate,
                     }
@@ -2670,6 +2731,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "base_guard_metrics": base_guard_metrics,
                 "base_mortar_audit_metrics": base_mortar_audit_metrics,
                 "base_residual_audit_metrics": base_residual_audit_metrics,
+                "base_coupled_audit_metric": base_coupled_audit_metric,
                 "selected_by_chart": system["selected_by_chart"],
                 "selected_by_block": system["selected_by_block"],
                 "mortar_rows_available": system["mortar_rows_available"],
@@ -2862,6 +2924,9 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
             native_prediction = trial.get("native_linear_prediction")
             if not isinstance(native_prediction, dict):
                 native_prediction = {}
+            coupled_metric = trial.get("coupled_audit_metric")
+            if not isinstance(coupled_metric, dict):
+                coupled_metric = {}
             native_objective = native_prediction.get("objective")
             native_improvement = (
                 float(base.get("objective", 0.0) or 0.0) - float(native_objective)
@@ -2895,6 +2960,15 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     if isinstance(trial.get("residual_audit_metrics"), dict)
                     else None,
                     "residual_audit_growth_ok": trial.get("residual_audit_growth_ok"),
+                    "accept_metric": trial.get("accept_metric"),
+                    "base_accept_metric_value": trial.get("base_accept_metric_value"),
+                    "trial_accept_metric_value": trial.get("trial_accept_metric_value"),
+                    "accept_metric_decrease": trial.get("accept_metric_decrease"),
+                    "required_accept_metric_decrease": trial.get("required_accept_metric_decrease"),
+                    "coupled_audit_value": coupled_metric.get("value"),
+                    "coupled_audit_limiter": coupled_metric.get("limiting_audit"),
+                    "coupled_residual_ratio": coupled_metric.get("residual_ratio"),
+                    "coupled_mortar_ratio": coupled_metric.get("mortar_ratio"),
                     "max_abs_update": trial.get("max_abs_update"),
                     "delta_norm": trial.get("delta_norm"),
                     "base_objective": base.get("objective"),
@@ -3214,9 +3288,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--line-search-accept-metric",
-        choices=("objective", "max-abs", "residual-audit-max", "mortar-audit-max"),
+        choices=("objective", "max-abs", "residual-audit-max", "mortar-audit-max", "coupled-audit-max"),
         default="objective",
-        help="Scalar metric that must decrease for line-search acceptance.",
+        help=(
+            "Scalar metric that must decrease for line-search acceptance. "
+            "'coupled-audit-max' uses max(residual_audit/base_residual_audit, "
+            "mortar_audit/base_mortar_audit), so both held-out defects must improve."
+        ),
     )
     parser.add_argument(
         "--guarded-kkt-primary-labels",
@@ -3403,6 +3481,13 @@ def main() -> None:
         parser.error("--line-search-accept-metric residual-audit-max requires --max-residual-audit-growth > 0")
     if args.line_search_accept_metric == "mortar-audit-max" and args.max_mortar_audit_growth <= 0.0:
         parser.error("--line-search-accept-metric mortar-audit-max requires --max-mortar-audit-growth > 0")
+    if args.line_search_accept_metric == "coupled-audit-max" and (
+        args.max_residual_audit_growth <= 0.0 or args.max_mortar_audit_growth <= 0.0
+    ):
+        parser.error(
+            "--line-search-accept-metric coupled-audit-max requires "
+            "--max-residual-audit-growth > 0 and --max-mortar-audit-growth > 0"
+        )
     if args.guard_q_max <= args.guard_q_min:
         parser.error("--guard-q-max must be greater than --guard-q-min")
     if args.guard_b_max <= args.guard_b_min:
