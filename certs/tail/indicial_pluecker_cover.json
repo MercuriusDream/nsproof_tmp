@@ -13,7 +13,7 @@
     "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
   },
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_worstpde128_step21_nativebatch.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "delta_domain": {
     "im": [
@@ -26,12 +26,12 @@
     ]
   },
   "dependency_hashes": {
-    "tail_recurrence": "4e1575b26b0ec07e00e13ba1f399ecf32c80d0c45f8b3d78f8b93936043d2343"
+    "tail_recurrence": "40d1b56d5115df6696ba8135cd6411980fc0fecb7f70625e68f2fb9f887f1eb7"
   },
   "exterior_exclusion": null,
   "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
   "input_hashes": {
-    "profile": "a481dd54f3afd687fdc6b5c0c44de4820dc262846b03a15ae0ce1ecb8be3373f"
+    "profile": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a"
   },
   "interval_widths": {
     "max": null,
@@ -44,9 +44,9 @@
   "mathematical_statement": "Only the geometric/removable delta=1 indicial root is admissible in the dangerous domain, and all non-geometric dangerous roots are excluded by an interval Pluecker/Evans cover plus exterior estimates.",
   "pass": false,
   "precision_bits": 53,
-  "profile": "work/twochart_stage0_current_profile_worstpde128_step21_nativebatch.json",
-  "profile_hash_sha256": "a481dd54f3afd687fdc6b5c0c44de4820dc262846b03a15ae0ce1ecb8be3373f",
-  "repo_commit": "5491e13844a3ad7eb28982161a546b27f0031f3f",
+  "profile": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
+  "profile_hash_sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
+  "repo_commit": "15fdd45468d9b22a4731107de8f7624c0e911d1a",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1"
 }

@@ -28,7 +28,7 @@
       "cases": 662085,
       "enabled": true,
       "rows": 2430,
-      "seconds": 0.9971541250000016
+      "seconds": 0.9712441250000019
     },
     "orders": "C0-C4",
     "overlap_q_range": [
@@ -408,7 +408,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
   "profile_hash_sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
-  "repo_commit": "047d95456a6abef8c3aa39952599abd988599a90",
+  "repo_commit": "15fdd45468d9b22a4731107de8f7624c0e911d1a",
   "residual_blocks": {
     "max_abs": 436.2578130070414,
     "scans": {

@@ -7,7 +7,7 @@
   ],
   "certificate_name": "exponent_admissibility",
   "commands": [
-    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_worstpde128_step21_nativebatch.json --out certs/profile/exponent_admissibility.json"
+    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json --out certs/profile/exponent_admissibility.json"
   ],
   "dependency_hashes": {
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
@@ -29,16 +29,16 @@
   },
   "failure_reason": null,
   "input_hashes": {
-    "profile": "a481dd54f3afd687fdc6b5c0c44de4820dc262846b03a15ae0ce1ecb8be3373f",
+    "profile": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
   },
   "mathematical_statement": "The fixed profile parameter gamma is an exact rational number in the open interval (2/5, 1/2), with exact exponent p=1/gamma. The profile's stored decimal p is checked against this exact value.",
   "pass": true,
   "precision_bits": "exact",
-  "profile": "work/twochart_stage0_current_profile_worstpde128_step21_nativebatch.json",
-  "profile_hash_sha256": "a481dd54f3afd687fdc6b5c0c44de4820dc262846b03a15ae0ce1ecb8be3373f",
+  "profile": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
+  "profile_hash_sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
   "profile_linkage_scope": "This certificate links only the exact algebraic exponent subclaim to the supplied profile hash. It does not certify that the profile solves the PDE, that the tail recurrence closes, or that pressure reconstruction is valid.",
-  "repo_commit": "5491e13844a3ad7eb28982161a546b27f0031f3f",
+  "repo_commit": "15fdd45468d9b22a4731107de8f7624c0e911d1a",
   "rounding_mode": "not-applicable",
   "schema_version": "nsproof-cert-v1"
 }
