@@ -192,6 +192,16 @@ def parse_float_list(raw: str) -> list[float]:
     return [float(item.strip()) for item in raw.split(",") if item.strip()]
 
 
+def parse_coordinate_values(raw: str, name: str, lo: float, hi: float) -> list[float]:
+    values = parse_float_list(raw)
+    for value in values:
+        if not math.isfinite(value):
+            raise ValueError(f"{name} contains non-finite value {value!r}")
+        if value < lo or value > hi:
+            raise ValueError(f"{name} values must lie in [{lo}, {hi}]; got {value!r}")
+    return values
+
+
 def parse_qb_points(raw: str) -> list[tuple[float, float]]:
     if not raw.strip():
         return [(0.45, 0.30), (0.61, 0.24), (0.93, 0.35), (0.90, 0.95)]
@@ -1008,8 +1018,22 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     pde_scan_active_report = residual_scan_active_qb_points(data, args)
     pde_points = dedupe_qb_points(manual_pde_points + list(pde_scan_active_report.get("points", [])))
     variable_charts = parse_variable_charts(args.variable_charts)
-    q_values = grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples) if "interface" in blocks else []
-    x_values = grid(0.0, 1.0, args.mortar_x_samples) if "interface" in blocks else []
+    explicit_mortar_q_values = parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0)
+    explicit_mortar_x_values = parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0)
+    q_values = (
+        explicit_mortar_q_values
+        if "interface" in blocks and explicit_mortar_q_values
+        else grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples)
+        if "interface" in blocks
+        else []
+    )
+    x_values = (
+        explicit_mortar_x_values
+        if "interface" in blocks and explicit_mortar_x_values
+        else grid(0.0, 1.0, args.mortar_x_samples)
+        if "interface" in blocks
+        else []
+    )
     mortar_points = [(q, x) for q in q_values for x in x_values]
     candidate_variables = [
         variable
@@ -1041,10 +1065,26 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         audit_order = args.line_search_mortar_audit_order
         if audit_order < 0:
             audit_order = args.mortar_order
+        explicit_audit_q_values = parse_coordinate_values(
+            args.line_search_mortar_audit_q_values,
+            "--line-search-mortar-audit-q-values",
+            0.0,
+            1.0,
+        )
+        explicit_audit_x_values = parse_coordinate_values(
+            args.line_search_mortar_audit_x_values,
+            "--line-search-mortar-audit-x-values",
+            0.0,
+            1.0,
+        )
         audit_q_samples = args.line_search_mortar_audit_q_samples or max(args.mortar_q_samples, 9)
         audit_x_samples = args.line_search_mortar_audit_x_samples or max(args.mortar_x_samples, 9)
-        audit_q_values = grid(args.overlap_q_min, args.overlap_q_max, audit_q_samples)
-        audit_x_values = grid(0.0, 1.0, audit_x_samples)
+        audit_q_values = (
+            explicit_audit_q_values
+            if explicit_audit_q_values
+            else grid(args.overlap_q_min, args.overlap_q_max, audit_q_samples)
+        )
+        audit_x_values = explicit_audit_x_values if explicit_audit_x_values else grid(0.0, 1.0, audit_x_samples)
         if args.mortar_coordinates == "RZ":
             rows = build_rz_rows(data, [], audit_q_values, audit_x_values, audit_order, use_native_c=False)
         elif args.mortar_coordinates == "qx":
@@ -2806,6 +2846,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "native_c": args.native_c,
             "mortar_q_samples": args.mortar_q_samples,
             "mortar_x_samples": args.mortar_x_samples,
+            "mortar_q_values": parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0),
+            "mortar_x_values": parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0),
             "mortar_active_count": args.mortar_active_count,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [
@@ -2891,6 +2933,18 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "line_search_mortar_audit_order": args.line_search_mortar_audit_order,
             "line_search_mortar_audit_q_samples": args.line_search_mortar_audit_q_samples,
             "line_search_mortar_audit_x_samples": args.line_search_mortar_audit_x_samples,
+            "line_search_mortar_audit_q_values": parse_coordinate_values(
+                args.line_search_mortar_audit_q_values,
+                "--line-search-mortar-audit-q-values",
+                0.0,
+                1.0,
+            ),
+            "line_search_mortar_audit_x_values": parse_coordinate_values(
+                args.line_search_mortar_audit_x_values,
+                "--line-search-mortar-audit-x-values",
+                0.0,
+                1.0,
+            ),
             "line_search_mortar_audit_active_count": args.line_search_mortar_audit_active_count,
             "max_residual_audit_growth": args.max_residual_audit_growth,
             "line_search_residual_audit_scan": args.line_search_residual_audit_scan,
@@ -3043,6 +3097,8 @@ def build_plan(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_order": args.mortar_order,
             "mortar_coordinates": args.mortar_coordinates,
             "mortar_active_count": args.mortar_active_count,
+            "mortar_q_values": parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0),
+            "mortar_x_values": parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0),
             "chart_balanced_selection": args.chart_balanced_selection,
             "guard_qb_points": [[q, b] for q, b in guard_point_report["combined"]],
             "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
@@ -3130,6 +3186,16 @@ def main() -> None:
     parser.add_argument("--mortar-active-count", type=int, default=0)
     parser.add_argument("--mortar-q-samples", type=positive_int, default=3)
     parser.add_argument("--mortar-x-samples", type=positive_int, default=5)
+    parser.add_argument(
+        "--mortar-q-values",
+        default="",
+        help="Comma-separated explicit q values for objective mortar rows; overrides --mortar-q-samples when set.",
+    )
+    parser.add_argument(
+        "--mortar-x-values",
+        default="",
+        help="Comma-separated explicit x values for objective mortar rows; overrides --mortar-x-samples when set.",
+    )
     parser.add_argument("--overlap-q-min", type=float, default=0.84)
     parser.add_argument("--overlap-q-max", type=float, default=0.92)
     parser.add_argument("--pde-qb-points", default="")
@@ -3423,6 +3489,22 @@ def main() -> None:
         help="x sample count for line-search mortar audit; 0 uses max(--mortar-x-samples, 9).",
     )
     parser.add_argument(
+        "--line-search-mortar-audit-q-values",
+        default="",
+        help=(
+            "Comma-separated explicit q values for line-search mortar audit rows; "
+            "overrides --line-search-mortar-audit-q-samples when set."
+        ),
+    )
+    parser.add_argument(
+        "--line-search-mortar-audit-x-values",
+        default="",
+        help=(
+            "Comma-separated explicit x values for line-search mortar audit rows; "
+            "overrides --line-search-mortar-audit-x-samples when set."
+        ),
+    )
+    parser.add_argument(
         "--line-search-mortar-audit-active-count",
         type=nonnegative_int,
         default=0,
@@ -3471,6 +3553,13 @@ def main() -> None:
         parser.error(str(exc))
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
         parser.error("--line-search must contain positive floats")
+    try:
+        parse_coordinate_values(args.mortar_q_values, "--mortar-q-values", 0.0, 1.0)
+        parse_coordinate_values(args.mortar_x_values, "--mortar-x-values", 0.0, 1.0)
+        parse_coordinate_values(args.line_search_mortar_audit_q_values, "--line-search-mortar-audit-q-values", 0.0, 1.0)
+        parse_coordinate_values(args.line_search_mortar_audit_x_values, "--line-search-mortar-audit-x-values", 0.0, 1.0)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.row_scale_min < 0.0:
         parser.error("--row-scale-min must be nonnegative")
     if args.row_scale_min > args.row_scale_max:
