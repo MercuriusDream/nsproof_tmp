@@ -2597,6 +2597,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 required_decrease = max(
                     args.min_objective_decrease_abs,
                     args.min_objective_decrease_rel * max(abs(base_accept_metric_value), 1e-300),
+                    args.min_accept_metric_decrease_abs,
+                    args.min_accept_metric_decrease_rel * max(abs(base_accept_metric_value), 1e-300),
                 )
                 improved = accept_metric_decrease > required_decrease
                 accepted_here = (
@@ -2616,6 +2618,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "trial_accept_metric_value": trial_accept_metric_value,
                         "accept_metric_decrease": accept_metric_decrease,
                         "required_objective_decrease": required_decrease,
+                        "required_accept_metric_decrease": required_decrease,
                         "raw_objective": trial_raw_metrics["objective"],
                         "raw_max_abs": trial_raw_metrics["max_abs"],
                         "raw_growth_ok": raw_growth_ok,
@@ -2777,6 +2780,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "active_guard_weight": args.active_guard_weight,
             "min_objective_decrease_abs": args.min_objective_decrease_abs,
             "min_objective_decrease_rel": args.min_objective_decrease_rel,
+            "min_accept_metric_decrease_abs": args.min_accept_metric_decrease_abs,
+            "min_accept_metric_decrease_rel": args.min_accept_metric_decrease_rel,
             "guarded_kkt_primary_labels": args.guarded_kkt_primary_labels,
             "guarded_kkt_constraint_labels": args.guarded_kkt_constraint_labels,
             "guarded_kkt_constraint_damping": args.guarded_kkt_constraint_damping,
@@ -3130,6 +3135,21 @@ def main() -> None:
         type=nonnegative_float,
         default=0.0,
         help="Require at least this relative sampled-objective decrease for line-search acceptance.",
+    )
+    parser.add_argument(
+        "--min-accept-metric-decrease-abs",
+        type=nonnegative_float,
+        default=0.0,
+        help=(
+            "Require at least this absolute decrease in --line-search-accept-metric. "
+            "Use this to prevent promotion of roundoff-scale residual-audit or mortar-audit changes."
+        ),
+    )
+    parser.add_argument(
+        "--min-accept-metric-decrease-rel",
+        type=nonnegative_float,
+        default=0.0,
+        help="Require at least this relative decrease in --line-search-accept-metric.",
     )
     parser.add_argument(
         "--active-guard-weight",
