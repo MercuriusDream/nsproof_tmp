@@ -350,6 +350,60 @@ def variable_under_candidate_caps(variable: Any, args: argparse.Namespace) -> bo
     return False
 
 
+def ensure_origin_candidate_degree(data: dict[str, Any], degree: int) -> dict[str, Any]:
+    """Add zero origin Taylor monomials up to ``degree`` for Stage-0 candidates.
+
+    The candidate degree cap is meant to enlarge the legal coefficient space.
+    Earlier runs only filtered already-present origin coefficients, so asking
+    for degree 12 on a degree-6 profile silently added tail variables only.
+    """
+
+    if degree < 0:
+        raise ValueError("origin candidate degree must be nonnegative")
+    origin_chart = data.get("origin_chart", {})
+    blocks = origin_chart.get("blocks", {}) if isinstance(origin_chart, dict) else {}
+    report: dict[str, Any] = {"target_degree": degree, "blocks": {}}
+    for block_name in ("F_origin_taylor", "G_origin_taylor"):
+        block = blocks.get(block_name)
+        if not isinstance(block, dict) or not block.get("enabled", False):
+            report["blocks"][block_name] = {"enabled": False, "added": 0}
+            continue
+        basis = block.setdefault("basis", [])
+        if not isinstance(basis, list):
+            raise ValueError(f"origin block {block_name} basis must be a list")
+        existing: set[tuple[int, int]] = set()
+        for entry in basis:
+            if not isinstance(entry, dict):
+                raise ValueError(f"origin block {block_name} basis entries must be objects")
+            existing.add((int(entry["R_power"]), int(entry["Z_power"])))
+        added = 0
+        for total_degree in range(degree + 1):
+            for r_power in range(total_degree + 1):
+                z_power = total_degree - r_power
+                key = (r_power, z_power)
+                if key in existing:
+                    continue
+                basis.append({"R_power": r_power, "Z_power": z_power, "coeff": 0.0})
+                existing.add(key)
+                added += 1
+        old_degree = int(block.get("degree", -1))
+        block["degree"] = max(old_degree, degree)
+        if added:
+            block["candidate_degree_extension"] = {
+                "added_zero_coefficients": added,
+                "target_degree": degree,
+                "diagnostic_vs_proof": "floating Stage-0 candidate basis extension only",
+            }
+        report["blocks"][block_name] = {
+            "enabled": True,
+            "old_degree": old_degree,
+            "new_degree": int(block["degree"]),
+            "added": added,
+            "basis_count": len(basis),
+        }
+    return report
+
+
 def tail_variable_is_gate_locked(data: dict[str, Any], variable: Any) -> bool:
     if variable.chart != "tail":
         return False
@@ -1043,6 +1097,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         reset_native_c_rz_stats,
     )
 
+    origin_degree_extension_report = ensure_origin_candidate_degree(data, args.candidate_origin_degree_max)
     projection = projection_from_twochart(data)
     reset_native_c_rz_stats()
     all_variables = enumerate_coefficients(data)
@@ -1819,6 +1874,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "mortar_audit_rows_count": len(mortar_audit_rows),
         "pre_score_candidate_count": pre_score_candidate_count,
         "post_pool_candidate_count": len(candidate_variables),
+        "origin_degree_extension": origin_degree_extension_report,
         "injected_mortar_candidates": injected_mortar_candidates,
         "injected_pde_candidates": injected_pde_candidates,
         "native_c_pde_injection": native_c_pde_injection,
@@ -3003,6 +3059,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 "native_c_prediction": native_c_prediction,
                 "pre_score_candidate_count": system["pre_score_candidate_count"],
                 "post_pool_candidate_count": system["post_pool_candidate_count"],
+                "origin_degree_extension": system.get("origin_degree_extension", {}),
                 "injected_mortar_candidates": system["injected_mortar_candidates"][:12],
                 "injected_pde_candidates": system.get("injected_pde_candidates", [])[:12],
                 "native_c_pde_injection": system.get("native_c_pde_injection", {}),

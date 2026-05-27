@@ -125,3 +125,89 @@ interval Newton entry. It does show that the native C coupled tail-origin path
 is wired and can move the dense C4 blocker and edge blocker together in one
 accepted 128-variable diagnostic.
 ```
+
+### Origin Degree-12 Coupled Diagnostics
+
+Implemented `ensure_origin_candidate_degree(...)` in
+`tools/profile_newton_twochart.py`.
+
+Reason:
+
+```text
+Previous 192-variable runs with --candidate-origin-degree-max 12 did not
+actually add origin directions because the current profile only contained
+degree-6 origin Taylor blocks. Larger spaces only added tail coefficients.
+```
+
+Behavior:
+
+```text
+Before coefficient enumeration, Stage-0 now appends zero origin Taylor
+monomials through the requested candidate degree and records
+origin_degree_extension in reports.
+```
+
+Direct check:
+
+```text
+degree 6 -> degree 8:
+  F_origin_taylor added 17, basis_count 45
+  G_origin_taylor added 17, basis_count 45
+```
+
+Diagnostic without all guard constraints:
+
+```text
+artifact:
+  work/twochart_stage0_current_profile_originD12_densec4active192_step36_nativebatch*
+
+origin_degree_extension:
+  F_origin_taylor: added 63, old_degree 6, new_degree 12, basis_count 91
+  G_origin_taylor: added 63, old_degree 6, new_degree 12, basis_count 91
+
+selected_by_chart = tail:96, origin:96
+selected_by_block:
+  origin.F_origin_taylor = 64
+  origin.G_origin_taylor = 32
+  tail.F_an = 34
+  tail.F_frac = 62
+
+rank:
+  coverage = 1.0
+  constraint rank/nullity = 54/138
+  rho_grad = 8.224658078556173e-1
+  rho_range = 9.862599240658366e-1
+  predicted_best_factor_inf = 1.6538055228309306e-1
+
+result:
+  accepted_any_step = false
+  best coupled audit = 9.994560603005692e-1
+  rejection = guard_growth
+  best trial guard max = 1025.1139500857532
+  base guard max = 1012.8832119698444
+```
+
+Diagnostic with all active guards allowed in active-set cap:
+
+```text
+artifact:
+  work/twochart_stage0_current_profile_originD12_densec4active192_allguards_step37_nativebatch*
+
+--guarded-kkt-max-constraints 256
+--guarded-ineq-max-active 256
+
+selected_by_chart = tail:96, origin:96
+accepted_any_step = false
+best coupled audit = 9.994560881279618e-1
+rejection = guard_growth
+worst guard remains q=0.8999999999999999, b=0.9899999999999999, e_psi
+```
+
+Interpretation:
+
+```text
+The degree-12 origin extension makes the 192-variable test a true coupled
+tail-origin diagnostic. It still does not produce an accepted nonlinear step.
+The obstruction is now sharper: predicted seam freedom exists in the expanded
+space, but the best nonlinear audit-decreasing steps grow the high-b edge guard.
+```
