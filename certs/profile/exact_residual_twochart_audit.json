@@ -4,18 +4,18 @@
   "blockers": [
     "directed-rounding interval backend is not yet attached",
     "validated approximate inverse A is not yet supplied",
-    "sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08",
-    "C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08"
+    "sampled quotient residual max 4.421737369090e+02 exceeds entry threshold 1.000000000000e-08",
+    "C0-C4 R/Z mortar max 4.968505350047e+06 exceeds entry threshold 1.000000000000e-08"
   ],
   "certificate_name": "exact_residual_twochart_audit",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_mortaraudit128_step5_trust2e4.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
   ],
   "dependency_hashes": {},
   "entry_ready_for_interval_nk": false,
-  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08",
+  "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.421737369090e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968505350047e+06 exceeds entry threshold 1.000000000000e-08",
   "input_hashes": {
-    "profile": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
+    "profile": "07586d9f924f62f1454ffb7f1979542c69882fe397adcf27e9415ef75b3d765d"
   },
   "interval_widths": {
     "max": null,
@@ -28,7 +28,7 @@
       "cases": 659625,
       "enabled": true,
       "rows": 2430,
-      "seconds": 0.9292950829999995
+      "seconds": 0.9330699999999972
     },
     "orders": "C0-C4",
     "overlap_q_range": [
@@ -50,8 +50,8 @@
           "dq_order": 4,
           "dx_order": 0,
           "key": "RZ:F:dRRRR",
-          "max_abs": 4968784.594306023,
-          "rms": 848857.7067217553
+          "max_abs": 4968505.350046919,
+          "rms": 844439.9336194379
         },
         {
           "component": "F",
@@ -61,8 +61,8 @@
           "dq_order": 0,
           "dx_order": 4,
           "key": "RZ:F:dZZZZ",
-          "max_abs": 2678710.209271462,
-          "rms": 432323.7128289228
+          "max_abs": 3646437.471372757,
+          "rms": 575938.063201117
         },
         {
           "component": "F",
@@ -72,8 +72,8 @@
           "dq_order": 3,
           "dx_order": 1,
           "key": "RZ:F:dRRRZ",
-          "max_abs": 1518053.878101893,
-          "rms": 276068.3570379908
+          "max_abs": 1518021.0068812328,
+          "rms": 275538.8054465701
         },
         {
           "component": "G",
@@ -84,7 +84,7 @@
           "dx_order": 4,
           "key": "RZ:G:dZZZZ",
           "max_abs": 543131.1633134711,
-          "rms": 105106.62949294358
+          "rms": 105106.62949331217
         },
         {
           "component": "F",
@@ -94,8 +94,8 @@
           "dq_order": 2,
           "dx_order": 2,
           "key": "RZ:F:dRRZZ",
-          "max_abs": 334100.2736560576,
-          "rms": 105483.15356529386
+          "max_abs": 334098.50003416644,
+          "rms": 105545.20117548842
         },
         {
           "component": "G",
@@ -106,7 +106,7 @@
           "dx_order": 3,
           "key": "RZ:G:dRZZZ",
           "max_abs": 283469.5319360751,
-          "rms": 58880.138178325804
+          "rms": 58880.138178000845
         },
         {
           "component": "G",
@@ -116,8 +116,8 @@
           "dq_order": 4,
           "dx_order": 0,
           "key": "RZ:G:dRRRR",
-          "max_abs": 243523.97431559686,
-          "rms": 62547.19401611696
+          "max_abs": 243523.97418927713,
+          "rms": 62547.19400485417
         },
         {
           "component": "G",
@@ -127,8 +127,8 @@
           "dq_order": 3,
           "dx_order": 1,
           "key": "RZ:G:dRRRZ",
-          "max_abs": 192280.74420416506,
-          "rms": 50329.16249516333
+          "max_abs": 192280.74407784536,
+          "rms": 50329.16248530139
         },
         {
           "component": "F",
@@ -138,8 +138,8 @@
           "dq_order": 1,
           "dx_order": 3,
           "key": "RZ:F:dRZZZ",
-          "max_abs": 154696.8298608634,
-          "rms": 57993.41329082076
+          "max_abs": 155686.83038245767,
+          "rms": 59483.386647275875
         },
         {
           "component": "G",
@@ -150,7 +150,7 @@
           "dx_order": 2,
           "key": "RZ:G:dRRZZ",
           "max_abs": 102077.44317791302,
-          "rms": 46210.5006505002
+          "rms": 46210.50064605949
         },
         {
           "component": "F",
@@ -160,8 +160,8 @@
           "dq_order": 3,
           "dx_order": 0,
           "key": "RZ:F:dRRR",
-          "max_abs": 99863.16502097742,
-          "rms": 16239.050191189388
+          "max_abs": 99859.87488834508,
+          "rms": 16207.97232801774
         },
         {
           "component": "F",
@@ -171,8 +171,8 @@
           "dq_order": 0,
           "dx_order": 3,
           "key": "RZ:F:dZZZ",
-          "max_abs": 59422.37459049479,
-          "rms": 10966.787935585298
+          "max_abs": 59422.29055755005,
+          "rms": 10972.094536265042
         },
         {
           "component": "F",
@@ -182,8 +182,8 @@
           "dq_order": 2,
           "dx_order": 1,
           "key": "RZ:F:dRRZ",
-          "max_abs": 26620.344610696906,
-          "rms": 7928.625586050748
+          "max_abs": 26620.164869037922,
+          "rms": 7928.968068897861
         },
         {
           "component": "G",
@@ -194,7 +194,7 @@
           "dx_order": 3,
           "key": "RZ:G:dZZZ",
           "max_abs": 16285.322185601062,
-          "rms": 4135.322569245407
+          "rms": 4135.322569189954
         },
         {
           "component": "F",
@@ -204,8 +204,8 @@
           "dq_order": 1,
           "dx_order": 2,
           "key": "RZ:F:dRZZ",
-          "max_abs": 15051.712706279963,
-          "rms": 5437.130170094658
+          "max_abs": 15051.85940098796,
+          "rms": 5440.0994840973735
         },
         {
           "component": "G",
@@ -215,8 +215,8 @@
           "dq_order": 3,
           "dx_order": 0,
           "key": "RZ:G:dRRR",
-          "max_abs": 9088.397293777522,
-          "rms": 3315.69382462973
+          "max_abs": 9088.397333383607,
+          "rms": 3315.6938285064257
         },
         {
           "component": "G",
@@ -227,7 +227,7 @@
           "dx_order": 1,
           "key": "RZ:G:dRRZ",
           "max_abs": 8891.509384641573,
-          "rms": 3325.538699219621
+          "rms": 3325.5387012141696
         },
         {
           "component": "G",
@@ -238,7 +238,7 @@
           "dx_order": 2,
           "key": "RZ:G:dRZZ",
           "max_abs": 7365.987253012071,
-          "rms": 3074.315055826789
+          "rms": 3074.315056560681
         },
         {
           "component": "F",
@@ -248,8 +248,8 @@
           "dq_order": 0,
           "dx_order": 2,
           "key": "RZ:F:dZZ",
-          "max_abs": 4214.438752619197,
-          "rms": 700.1658763432474
+          "max_abs": 4214.405010171709,
+          "rms": 700.1591558755283
         },
         {
           "component": "F",
@@ -259,8 +259,8 @@
           "dq_order": 2,
           "dx_order": 0,
           "key": "RZ:F:dRR",
-          "max_abs": 1919.6339231828554,
-          "rms": 518.7045050811578
+          "max_abs": 1919.6185538154161,
+          "rms": 518.7506826554464
         },
         {
           "component": "F",
@@ -270,8 +270,8 @@
           "dq_order": 1,
           "dx_order": 1,
           "key": "RZ:F:dRZ",
-          "max_abs": 1213.7369821362709,
-          "rms": 369.90542697996216
+          "max_abs": 1213.7272651519697,
+          "rms": 369.89217918668174
         },
         {
           "component": "G",
@@ -282,7 +282,7 @@
           "dx_order": 2,
           "key": "RZ:G:dZZ",
           "max_abs": 976.2786162163204,
-          "rms": 256.0301568386009
+          "rms": 256.0301568369474
         },
         {
           "component": "G",
@@ -293,7 +293,7 @@
           "dx_order": 0,
           "key": "RZ:G:dRR",
           "max_abs": 646.8384804835716,
-          "rms": 222.29745804244916
+          "rms": 222.29745797122885
         },
         {
           "component": "G",
@@ -304,7 +304,7 @@
           "dx_order": 1,
           "key": "RZ:G:dRZ",
           "max_abs": 569.8318063839646,
-          "rms": 180.43435585837233
+          "rms": 180.4343558288258
         },
         {
           "component": "F",
@@ -314,8 +314,8 @@
           "dq_order": 0,
           "dx_order": 1,
           "key": "RZ:F:dZ",
-          "max_abs": 230.6927629613058,
-          "rms": 35.883465092502576
+          "max_abs": 230.6965932770952,
+          "rms": 35.884588512086914
         },
         {
           "component": "F",
@@ -325,8 +325,8 @@
           "dq_order": 1,
           "dx_order": 0,
           "key": "RZ:F:dR",
-          "max_abs": 75.18342261138218,
-          "rms": 21.372962482436304
+          "max_abs": 75.20232250411141,
+          "rms": 21.378403727030893
         },
         {
           "component": "G",
@@ -337,7 +337,7 @@
           "dx_order": 1,
           "key": "RZ:G:dZ",
           "max_abs": 60.53507022897611,
-          "rms": 12.263293050703567
+          "rms": 12.263293050697586
         },
         {
           "component": "G",
@@ -348,7 +348,7 @@
           "dx_order": 0,
           "key": "RZ:G:dR",
           "max_abs": 32.68736333274805,
-          "rms": 9.400996988113965
+          "rms": 9.400996988149915
         },
         {
           "component": "F",
@@ -358,8 +358,8 @@
           "dq_order": 0,
           "dx_order": 0,
           "key": "RZ:F:value",
-          "max_abs": 9.276400659826336,
-          "rms": 1.3199761984459195
+          "max_abs": 9.276671620321451,
+          "rms": 1.3200279201590983
         },
         {
           "component": "G",
@@ -370,13 +370,13 @@
           "dx_order": 0,
           "key": "RZ:G:value",
           "max_abs": 2.5083584725000025,
-          "rms": 0.46127828709792384
+          "rms": 0.46127828712545355
         }
       ],
-      "max_abs": 4968784.594306023,
-      "rms": 184552.4119492162,
+      "max_abs": 4968505.350046919,
+      "rms": 196553.91205606717,
       "worst": {
-        "abs_residual": 4968784.594306023,
+        "abs_residual": 4968505.350046919,
         "component": "F",
         "coordinate": "RZ",
         "derivative": "dRRRR",
@@ -384,11 +384,11 @@
         "dx_order": 0,
         "jacobian": [],
         "jacobian_nnz": 0,
-        "origin_value": -83529.32747243516,
+        "origin_value": -83529.32747238534,
         "q": 0.91,
-        "residual_tail_minus_origin": -4968784.594306023,
+        "residual_tail_minus_origin": -4968505.350046919,
         "row_index": 1079,
-        "tail_value": -5052313.921778449,
+        "tail_value": -5052034.677519288,
         "total_order": 4,
         "x": 1.0
       }
@@ -406,11 +406,11 @@
   },
   "pass": false,
   "precision_bits": 53,
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step2.json",
-  "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
-  "repo_commit": "6b018745048f5547d9a797b39867467b9c91ea0e",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step5_trust2e4.json",
+  "profile_hash_sha256": "07586d9f924f62f1454ffb7f1979542c69882fe397adcf27e9415ef75b3d765d",
+  "repo_commit": "904fab99776d0454207793bf252c2099027bd20a",
   "residual_blocks": {
-    "max_abs": 444.01783759267335,
+    "max_abs": 442.1737369089632,
     "scans": {
       "edge": {
         "b_range": [
@@ -427,7 +427,7 @@
         },
         "h": 0.001,
         "label": "edge",
-        "max_abs": 444.01783759267335,
+        "max_abs": 442.1737369089632,
         "mode": "ProjectedProfile.exact_residual_at Taylor jet",
         "note": "Broad near-axis/high-|b| floating diagnostic; exact axes are excluded.",
         "q_range": [
@@ -435,12 +435,12 @@
           0.98
         ],
         "residual_kind": "normalized-structural",
-        "rms": 31.690746809436313,
+        "rms": 33.75738838086534,
         "worst": {
           "b": 0.98,
-          "e_gamma": 0.8969270011273671,
-          "e_psi": 444.01783759267335,
-          "max_abs": 444.01783759267335,
+          "e_gamma": 0.8992407000557758,
+          "e_psi": 442.1737369089632,
+          "max_abs": 442.1737369089632,
           "q": 0.8999999999999999,
           "r": 0.09637888196533986,
           "z": 0.4746356627410957
@@ -469,7 +469,7 @@
           0.495
         ],
         "residual_kind": "normalized-structural",
-        "rms": 5.866086181158238,
+        "rms": 5.8660861734249305,
         "worst": {
           "b": 0.18,
           "e_gamma": 0.7931121221045325,
@@ -495,7 +495,7 @@
         },
         "h": 0.001,
         "label": "origin",
-        "max_abs": 91.32494634475921,
+        "max_abs": 91.32494634482464,
         "mode": "ProjectedProfile.exact_residual_at Taylor jet",
         "note": "Origin-chart residual quotient scan.",
         "q_range": [
@@ -503,12 +503,12 @@
           0.98
         ],
         "residual_kind": "normalized-structural",
-        "rms": 30.498293403698433,
+        "rms": 30.49829340371312,
         "worst": {
           "b": 0.05,
-          "e_gamma": 0.5998360284809658,
-          "e_psi": 91.32494634475921,
-          "max_abs": 91.32494634475921,
+          "e_gamma": 0.5998360284809126,
+          "e_psi": 91.32494634482464,
+          "max_abs": 91.32494634482464,
           "q": 0.9625,
           "r": 0.281498561946245,
           "z": 0.01409255481442253
@@ -529,7 +529,7 @@
         },
         "h": 0.001,
         "label": "overlap",
-        "max_abs": 323.97188844518206,
+        "max_abs": 353.87478528008535,
         "mode": "ProjectedProfile.exact_residual_at Taylor jet",
         "note": "Samples the stored tail-origin overlap band; may cross the diagnostic origin switch.",
         "q_range": [
@@ -537,15 +537,15 @@
           0.92
         ],
         "residual_kind": "normalized-structural",
-        "rms": 45.59605650590351,
+        "rms": 53.08007078292041,
         "worst": {
-          "b": 0.95,
-          "e_gamma": 1.4956061374934038,
-          "e_psi": -323.97188844518206,
-          "max_abs": 323.97188844518206,
-          "q": 0.9,
-          "r": 0.15122952876462445,
-          "z": 0.4601059995959599
+          "b": 0.4437499999999999,
+          "e_gamma": 0.9968774510865419,
+          "e_psi": 353.87478528008535,
+          "max_abs": 353.87478528008535,
+          "q": 0.895,
+          "r": 0.4466396062581346,
+          "z": 0.22116407709609734
         }
       },
       "secondary": {
@@ -563,7 +563,7 @@
         },
         "h": 0.001,
         "label": "secondary",
-        "max_abs": 14.228254385636866,
+        "max_abs": 14.228254355795158,
         "mode": "ProjectedProfile.exact_residual_at Taylor jet",
         "note": "Secondary tail/interior lobe near q ~= 0.608 and |b| ~= 0.241.",
         "q_range": [
@@ -571,12 +571,12 @@
           0.64
         ],
         "residual_kind": "normalized-structural",
-        "rms": 8.449486244688583,
+        "rms": 8.449486239147488,
         "worst": {
           "b": 0.20583333333333334,
-          "e_gamma": 0.5307560144505635,
-          "e_psi": -14.228254385636866,
-          "max_abs": 14.228254385636866,
+          "e_gamma": 0.5307560144487545,
+          "e_psi": -14.228254355795158,
+          "max_abs": 14.228254355795158,
           "q": 0.64,
           "r": 1.1748777259351024,
           "z": 0.247120576038424
@@ -605,7 +605,7 @@
           0.495
         ],
         "residual_kind": "normalized-structural",
-        "rms": 5.866086181158238,
+        "rms": 5.8660861734249305,
         "worst": {
           "b": 0.18,
           "e_gamma": 0.7931121221045325,

@@ -7,7 +7,7 @@
   ],
   "certificate_name": "exponent_admissibility",
   "commands": [
-    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_mortaraudit128_step2.json --out certs/profile/exponent_admissibility.json"
+    "tools/validate_exponent_admissibility.py --profile work/twochart_stage0_current_profile_mortaraudit128_step5_trust2e4.json --out certs/profile/exponent_admissibility.json"
   ],
   "dependency_hashes": {
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
@@ -29,16 +29,16 @@
   },
   "failure_reason": null,
   "input_hashes": {
-    "profile": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
+    "profile": "07586d9f924f62f1454ffb7f1979542c69882fe397adcf27e9415ef75b3d765d",
     "tools/validate_exponent_admissibility.py": "713dcbe3d36271a47684dabde00ab5e997d03f287ff9bac4796ecd2f9f8ad70b"
   },
   "mathematical_statement": "The fixed profile parameter gamma is an exact rational number in the open interval (2/5, 1/2), with exact exponent p=1/gamma. The profile's stored decimal p is checked against this exact value.",
   "pass": true,
   "precision_bits": "exact",
-  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step2.json",
-  "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128_step5_trust2e4.json",
+  "profile_hash_sha256": "07586d9f924f62f1454ffb7f1979542c69882fe397adcf27e9415ef75b3d765d",
   "profile_linkage_scope": "This certificate links only the exact algebraic exponent subclaim to the supplied profile hash. It does not certify that the profile solves the PDE, that the tail recurrence closes, or that pressure reconstruction is valid.",
-  "repo_commit": "8bb761aa8218fb507d63d3671bcfe7b6ecd85af0",
+  "repo_commit": "904fab99776d0454207793bf252c2099027bd20a",
   "rounding_mode": "not-applicable",
   "schema_version": "nsproof-cert-v1"
 }
