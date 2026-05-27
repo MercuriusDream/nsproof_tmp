@@ -9,7 +9,7 @@
   ],
   "certificate_name": "exact_residual_twochart_audit",
   "commands": [
-    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report certs/profile/profile_finite_nk_current_block.json --finite-sweep-report certs/profile/profile_finite_nk_current_sweep.json"
+    "tools/validate_profile_nk.py --profile work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json --out certs/profile/profile_nk.json --exact-residual-out certs/profile/exact_residual_twochart_audit.json --residual-kind normalized-structural --scan standard,focused,secondary,origin,edge,overlap --h 1e-3 --mortar-order 4 --mortar-q-samples 9 --mortar-x-samples 9 --overlap-q-min 0.84 --overlap-q-max 0.92 --residual-threshold 1e-8 --mortar-threshold 1e-8 --native-c --interval-row-ledger certs/profile/interval_residual_rows.json --finite-block-report work/profile_finite_nk_top16pde256_full_block.json --finite-sweep-report work/profile_finite_nk_top16pde256_sweep.json"
   ],
   "dependency_hashes": {},
   "entry_ready_for_interval_nk": false,
@@ -28,7 +28,7 @@
       "cases": 662085,
       "enabled": true,
       "rows": 2430,
-      "seconds": 0.9246072090000013
+      "seconds": 0.9971541250000016
     },
     "orders": "C0-C4",
     "overlap_q_range": [
@@ -408,7 +408,7 @@
   "precision_bits": 53,
   "profile": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
   "profile_hash_sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
-  "repo_commit": "10853f380c57ceb2eceb5effbdae667cfe407bcc",
+  "repo_commit": "047d95456a6abef8c3aa39952599abd988599a90",
   "residual_blocks": {
     "max_abs": 436.2578130070414,
     "scans": {

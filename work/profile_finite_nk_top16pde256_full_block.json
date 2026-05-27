@@ -1,0 +1,111 @@
+{
+  "approximate_inverse": {
+    "rank_after_cutoff": 140,
+    "ridge_absolute": 2.3666370024428357e-06,
+    "ridge_relative": 1e-08,
+    "singular_value_count": 256,
+    "singular_values": {
+      "condition_estimate": 4.847167845290589e+16,
+      "first_12": [
+        15.383877932572254,
+        13.453105230982452,
+        13.17292082376509,
+        11.448788508592354,
+        10.885721940583187,
+        10.836935659477588,
+        10.651111830176191,
+        10.199372110185722,
+        10.074871044842038,
+        10.044208492910007,
+        9.554908020763502,
+        9.3245268803877
+      ],
+      "last_12": [
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        9.604304375516012e-16,
+        8.308154763677429e-16,
+        6.002236334890268e-16,
+        3.322119902918128e-16,
+        3.1737869253937474e-16
+      ],
+      "max": 15.383877932572254,
+      "min_nonzero": 3.1737869253937474e-16
+    },
+    "svd_rcond": 1e-10
+  },
+  "blockers": [
+    "row cache is floating, not interval residual data",
+    "approximate inverse is floating ridge-SVD, not validated",
+    "Z2 and infinite complement bounds are missing",
+    "profile residual/mortar is far above NK entry scale"
+  ],
+  "certificate_name": "profile_finite_nk_block",
+  "coefficient_coordinate_scaling": {
+    "meaning": "The finite block is evaluated in scaled coefficient coordinates z with h = diag(scales) z.  This is a sampled Banach-norm diagnostic, not a validated profile norm.",
+    "mode": "inf",
+    "nontrivial_scale_count": 232,
+    "scale_floor": 1e-30,
+    "scale_max": 46292.46531809502,
+    "scale_min": 1.0
+  },
+  "commands": [
+    "tools/export_profile_finite_nk_block.py --row-cache work/twochart_stage0_current_profile_top16pde256_rowlocal_step23_nativebatch_rows.json --out work/profile_finite_nk_top16pde256_full_block.json --row-labels all --ridge-relative 1e-8 --svd-rcond 1e-10 --summary-only --row-scaling combined-inf --column-scaling inf"
+  ],
+  "diagnostic_vs_proof": "Floating sampled row-cache finite block.  Uses native C interval linear algebra for finite Y0/Z0 arithmetic, but the row cache, Jacobian, inverse, and residual are not interval-certified and no Z2/tail-complement bound is supplied.",
+  "finite_block_hashes": {
+    "approximate_inverse_float64": "918fe733e2e3b7f388e4445816f8bf2f96db7e244b408fa2c252bce6580363b6",
+    "jacobian_float64": "10e00884957a343145b2c47f1d967c5db259dfb91f1bae0d82bcebdac03dfd8f",
+    "residual_vector_float64": "735408692f9f5e03d4354eed742875129452cc1207395e3da6a4c672c6cb7064"
+  },
+  "finite_nk_bounds": {
+    "Y0_infinity_norm_A_r": 377.6931277590535,
+    "Z0_infinity_norm_B": 3.925969187521621,
+    "backend": "native-c-outward-rounded-double-interval-summary",
+    "coefficient_dimension": 256,
+    "residual_dimension": 430
+  },
+  "finite_nk_payload": "summary_only",
+  "floating_norms": {
+    "approximate_inverse_row_sum_inf": 1801.7866476154477,
+    "jacobian_row_sum_inf": 115.20680358193056,
+    "residual_inf": 1.0
+  },
+  "pass": false,
+  "profile": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
+  "profile_hash_sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a",
+  "proof_relevance": {
+    "meaning": "Full-block diagnostics require row_labels=all, no max_rows truncation, all cached rows selected, and a row-cache profile hash matching the current profile file. Otherwise this is a row-subset or profile-stale diagnostic.",
+    "profile_hash_matches": true,
+    "profile_hash_status": "matched",
+    "proof_relevant_full_block": true,
+    "row_labels_all": true,
+    "scope": "full_block",
+    "selected_all_available_rows": true
+  },
+  "repo_commit": "047d95456a6abef8c3aa39952599abd988599a90",
+  "residual_row_scaling": {
+    "meaning": "The finite residual block is left-multiplied by diag(row_scales) before constructing the sampled inverse.  This is finite-row preconditioning only, not a validated residual-space norm.",
+    "mode": "combined-inf",
+    "nontrivial_scale_count": 430,
+    "scale_floor": 1e-30,
+    "scale_max": 0.43321143566226294,
+    "scale_min": 1.8074431057767267e-11
+  },
+  "row_cache": "work/twochart_stage0_current_profile_top16pde256_rowlocal_step23_nativebatch_rows.json",
+  "row_cache_sha256": "4a56f5c9c99a718b9c921421cfa817fe97b7f2789b93894ba29aa13f7dc71add",
+  "row_selection": {
+    "available_row_count": 430,
+    "column_count": 256,
+    "labels": "all",
+    "max_rows": null,
+    "selected_row_count": 430
+  },
+  "schema_version": "nsproof-cert-v1",
+  "status": "PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF"
+}
