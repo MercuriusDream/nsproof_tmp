@@ -48,6 +48,9 @@ Rules for the loop:
 ```text
 Do not rely on earlier chat context.
 Do not send a partial prompt.
+Maintain gpt5-pro-prompt-diffs-from-last-update.md as a compact delta ledger
+between full GPT-5 Pro handoffs. When a GPT-5 Pro response is pasted back,
+clear that delta file and start accumulating only the new post-response diffs.
 Do not omit the current proof percentage, latest commit/artifacts, or the
 DeepMind/Google-paper method-transfer context.
 Do not ask GPT-5 Pro for vibes; ask for definite paths, kill criteria, and
@@ -133,8 +136,10 @@ background.
 Latest repo update in this prompt:
 
 ```text
-Add coupled audit acceptance, target the explicit worst edge/C4 rows, record
-64/128 native Stage-0 diagnostics, and keep theorem certificate at 0/5.
+Add coupled audit acceptance, target explicit edge/C4 rows, run chart-balanced
+tail-origin diagnostics, catch one-point C4 overfit with a broad native audit,
+and record a small two-q broad-audit Stage-0 improvement. The theorem
+certificate remains 0/5.
 ```
 
 Latest commits:
@@ -163,7 +168,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json`; and `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`; targeted 64/128 native runs accept no nonlinear step. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_*`, `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_*`; chart-balanced broad-audit diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_*`; and two-q broad-audit diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. The latest two-q broad-audit step is small floating progress, not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
 | Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
@@ -515,6 +520,136 @@ interpretation:
   selected, so the coupled tail-origin tangent has not been cleanly tested.
 ```
 
+Chart-balanced tail-origin follow-up after GPT Pro review:
+
+```text
+First chart-balanced explicit-row run:
+  artifacts:
+    work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch.json
+    work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_report.json
+    work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rank.json
+    work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_prediction.json
+    work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rows.json
+
+  selected_by_chart = tail:92, origin:36
+  selected_by_block = tail.F_an:33, tail.F_frac:59,
+                      origin.F_origin_taylor:18, origin.G_origin_taylor:18
+  accepted_any_step = true
+  accepted_block = block:F_an
+  objective rows = PDE edge q=0.8999999999999999,b=0.98 and C4 mortar q=0.91,x=1.0
+  line-search audit used only the explicit q=0.91,x=1.0 C4 point.
+
+  targeted audit at alpha=1:
+    edge residual audit max: 4.3625781300704136e2 -> 3.1348631998536905e2
+    explicit q=0.91,x=1.0 C4 mortar max: 4.963232981363504e6 -> 1.0988322874909114e5
+
+  held-out post-audit:
+    standard = 1.016228983517e1
+    secondary = 1.422825435582e1
+    origin = 9.132497540774e1
+    edge = 3.134429061482e2
+    overlap = 3.239711929243e2
+    full C0-C4 R/Z mortar max = 1.080945313983e9
+
+  interpretation:
+    This is not profile progress. It is a one-point C4 mortar overfit:
+    the targeted q=0.91 row improves, but nearby C4 rows explode.
+```
+
+One-q broad-audit rerun:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_report.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_rank.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_rows.json
+
+setup:
+  same explicit objective q=0.91,x=1.0
+  line-search C4 mortar audit = 5 q samples x 9 x samples x C0-C4 R/Z rows
+  broad mortar audit rows = 1350
+  base broad C4 audit max = 4.364062941499776e6 at q=0.92,x=1.0,RZ:F:dRRRR
+
+result:
+  selected_by_chart = tail:92, origin:36
+  accepted_any_step = false
+
+best PDE-improving trial:
+  alpha=1:
+    edge residual ratio = 0.7185804142384706
+    broad C4 mortar ratio = 250.58372800852717
+    broad C4 mortar max = 1.093563161144873e9
+    rejected
+
+smallest listed alpha:
+  alpha=0.0009765625:
+    edge residual ratio = 0.9990234432973227
+    broad C4 mortar ratio = 1.2437341093833272
+    rejected
+
+interpretation:
+  The broad audit correctly rejects the one-point overfit. The missing C4 row
+  in the objective was q=0.92,x=1.0.
+```
+
+Two-q broad-audit run:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_report.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_rank.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_rows.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_residual.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_mortar_c4.json
+
+setup:
+  objective C4 q-values = 0.91,0.92
+  objective C4 x-values = 1.0
+  line-search C4 mortar audit = same 1350-row broad native audit
+  selected_by_chart = tail:95, origin:33
+  selected_by_block = tail.F_an:34, tail.F_frac:61,
+                      origin.F_origin_taylor:17, origin.G_origin_taylor:16
+  accepted_any_step = true
+  accepted_block = block:F_frac
+
+rank diagnostic:
+  coverage = 1.0
+  constraint rank/nullity = 39/89
+  primary rank/projected rank = 18/14
+  rho_grad = 9.999999999999873e-1
+  rho_range = 9.998289222102589e-1
+  predicted_best_factor_inf = 1.4228699996405914e-2
+  best feasible step l2 = 9.906137462865317e4
+  best feasible step max_abs = 7.213518557979033e4
+
+accepted trial:
+  best accepted alpha = 0.015625
+  coupled audit value = 0.9972256083949639
+  edge residual audit max: 4.3625781300704136e2 -> 4.350474629930032e2
+  broad C4 mortar audit max: 4.364062941499776e6 -> 4.351955117770506e6
+
+held-out post-audit:
+  standard = 1.016228983517e1
+  focused = 1.016228983517e1
+  secondary = 1.422825435582e1
+  origin = 9.132497540774e1
+  edge = 4.326812264740e2
+  overlap = 3.239711929243e2
+  full 9x9 C0-C4 R/Z mortar max = 4.922540831420e6
+  5x9 overlap-only C0-C4 R/Z mortar max = 4.328283218032e6
+  tail gate remains q1-free, forced q^p OK, q2-zero OK at the floating gate.
+
+interpretation:
+  This is the first small but real coupled tail-origin improvement under broad
+  native C4 audit. It is far from Stage-0 success and nowhere near NK entry,
+  but it means the corrected coupled tangent is not completely pinned once the
+  q=0.92 C4 row is included.
+```
+
 Performance direction from `AGENTS.md`:
 
 ```text
@@ -564,6 +699,11 @@ What is established:
      ambiguity that the objective missed the blocker.
   8. Targeted 64/128 native runs show linear formal ability to kill the single
      selected PDE row, but line search still cannot reduce the coupled audit.
+  9. Chart-balanced tail-origin selection does pull origin variables, but a
+     one-point C4 audit can accept a false step that explodes nearby C4 rows.
+ 10. A broad 1350-row native C4 audit catches that overfit.
+ 11. Adding the schedule-nearby q=0.92 C4 row to the objective gives a small
+     real coupled improvement under broad audit.
 
 What is not established:
   1. Fixed (9/20,1) is mathematically impossible.
@@ -579,11 +719,13 @@ Current branch status:
 fixed (9/20,1): alive but under serious corrected negative evidence
 current exact profile gate: blocked by residual max 4.36e2 and C4 mortar 4.96e6
 current profile NK gate: blocked by pass=false and finite sampled Z0>1
-current solver issue: targeted tail-only edge/C4 tangent appears pinned
-most credible immediate fork: force a genuine coupled tail-origin variable
-  selection on the same explicit rows, then run shifted seam schedules
-do not free (gamma,B) until corrected 128/256 shifted schedules and coupled
-  tail-origin selection fail cleanly
+current solver issue: coupled tail-origin descent exists but is tiny and very
+  sensitive to missing nearby C4 rows
+most credible immediate fork: continue fixed (9/20,1) with broad native C4
+  audit always enabled; expand objective q rows to cover q=0.90,0.91,0.92 and
+  raise variables to 160/192 before shifted schedules
+do not free (gamma,B) until corrected 160/192/256 broad-audit shifted schedules
+  fail cleanly
 do not unlock q2 without tail recurrence certificate
 ```
 
@@ -591,25 +733,28 @@ Question GPT-5 Pro should answer now:
 
 ```text
 Given the corrected seam-patch Jacobian fix, the coupled-audit firewall, and
-the explicit worst-edge/worst-C4 64/128 diagnostics above, what is the most
-direct proof-producing next move?
+the explicit worst-edge/worst-C4 diagnostics above, including the small
+two-q broad-audit improvement, what is the most direct proof-producing next
+move?
 
 Specifically answer:
-  1. Is the next experiment a chart-balanced or quota-forced tail-origin
-     variable selection on the same explicit rows?
-  2. What is the minimal variable/row quota that actually tests the coupled
-     tail-origin tangent without returning to broad slow Python grids?
-  3. If the coupled tail-origin explicit-row diagnostic still pins the coupled
-     audit at 1.0, what exact shifted schedules or parameter funnel should run
-     next?
-  4. What would count as a rigorous floating branch-kill precursor before
+  1. Should the next fixed-branch run iterate from the accepted two-q candidate,
+     or restart from the promoted profile with a three-q objective
+     q=0.90,0.91,0.92?
+  2. What is the minimal C4 q/x objective row set that prevents mobile C4
+     overfit while avoiding broad slow objective grids?
+  3. Should variable count now increase to 160/192, or should row/column
+     scaling and native origin PDE columns come first?
+  4. What exact shifted schedules should run if the three-q broad-audit run
+     stalls?
+  5. What would count as a rigorous floating branch-kill precursor before
      interval matching or parameter-funnel certificates?
-  5. Which native C kernel should be ported next to reach the proof-relevant
+  6. Which native C kernel should be ported next to reach the proof-relevant
      diagnostics fastest?
 
 You must distinguish:
-  - a corrected local tail-only tangent obstruction,
-  - an untested coupled tail-origin tangent,
+  - one-point C4 row overfit,
+  - a real but tiny broad-audit coupled descent,
   - a chart-switch sampling artifact,
   - a reason to free (gamma,B),
   - and a reason to pivot to radial matching.
@@ -618,16 +763,17 @@ You must distinguish:
 Immediate local commands still worth running after this prompt:
 
 ```bash
-# 1. First test whether existing chart-balanced selection already pulls origin
-#    variables into the explicit worst-edge/worst-C4 problem.
+# 1. Continue the corrected fixed branch with broad native C4 audit always
+#    enabled. The next surgical run should include q=0.90,0.91,0.92 in the C4
+#    objective or iterate once from the accepted two-q candidate.
 
 python3 tools/profile_newton_twochart.py \
-  --input work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json \
-  --out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch.json \
-  --report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_report.json \
-  --rank-report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rank.json \
-  --row-cache-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_rows.json \
-  --prediction-actual-report-out work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_step26_nativebatch_prediction.json \
+  --input work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json \
+  --out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch.json \
+  --report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_report.json \
+  --rank-report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rank.json \
+  --row-cache-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rows.json \
+  --prediction-actual-report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_prediction.json \
   --blocks tail,origin,interface \
   --variable-charts tail,origin \
   --solve-mode guarded-ineq-kkt \
@@ -640,12 +786,13 @@ python3 tools/profile_newton_twochart.py \
   --pde-jacobian-candidate-count 16 \
   --mortar-coordinates RZ \
   --mortar-order 4 \
-  --mortar-q-values 0.91 \
+  --mortar-q-values 0.90,0.91,0.92 \
   --mortar-x-values 1.0 \
-  --line-search-mortar-audit-q-values 0.91 \
-  --line-search-mortar-audit-x-values 1.0 \
-  --mortar-active-count 16 \
-  --mortar-jacobian-candidate-count 256 \
+  --line-search-mortar-audit-order 4 \
+  --line-search-mortar-audit-q-samples 5 \
+  --line-search-mortar-audit-x-samples 9 \
+  --mortar-active-count 32 \
+  --mortar-jacobian-candidate-count 512 \
   --guard-grid edge \
   --guard-q-min 0.74 --guard-q-max 0.94 \
   --guard-b-min 0.08 --guard-b-max 0.99 \
@@ -659,24 +806,20 @@ python3 tools/profile_newton_twochart.py \
   --guarded-ineq-target nonincrease \
   --line-search-eval objective-only \
   --line-search-accept-metric coupled-audit-max \
-  --residual-audit-scan edge \
-  --residual-audit-q-samples 9 \
-  --residual-audit-b-samples 9 \
+  --line-search-residual-audit-scan edge \
   --max-residual-audit-growth 1 \
   --max-mortar-audit-growth 1 \
   --max-raw-objective-growth 1 \
   --max-guard-objective-growth 1 \
   --max-guard-max-growth 1 \
   --min-accept-metric-decrease-abs 1e-6 \
-  --row-normalization residual-jacobian \
-  --row-normalization-floor 1e-12 \
-  --row-scale-max 1e8 \
-  --max-variables 128 \
+  --row-normalization none \
+  --max-variables 160 \
   --chart-balanced-selection \
   --candidate-origin-degree-max 12 \
   --candidate-kq-max 12 \
   --candidate-kx-max 12 \
-  --candidate-pool-limit 1024 \
+  --candidate-pool-limit 1536 \
   --max-iter 1 \
   --trust 0.001 \
   --lm-lambda 1e-6 \
@@ -686,12 +829,12 @@ python3 tools/profile_newton_twochart.py \
   --stage0-workers 8 \
   --line-search 1,0.25,0.0625,0.015625,0.00390625,0.0009765625
 
-# 2. If selected_by_chart is still tail-only, implement explicit chart/source
-#    quotas before interpreting the run as coupled-tail-origin evidence.
+# 2. Accept only if the broad 1350-row C4 audit and edge audit improve together.
+#    Ignore one-point C4 improvements unless the broad audit also improves.
 
-# 3. If balanced or quota-forced 128 still pins the coupled audit, repeat at
-#    seam switches q=0.88,0.90,0.92 and then decide whether fixed (9/20,1) is
-#    ready for a parameter-funnel test.
+# 3. If q=0.90,0.91,0.92 at 160/192 variables stalls, then run shifted seam
+#    schedules q_switch=0.88,0.90,0.92 under the same broad audit before
+#    freeing (gamma,B).
 ```
 
 ## 1D. Historical Stage-0 Trace (Superseded by 1C)
