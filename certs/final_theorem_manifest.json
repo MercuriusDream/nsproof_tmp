@@ -91,22 +91,22 @@
         {
           "certificate_name": "profile_nk",
           "exists": true,
-          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
           "pass": false,
           "path": "certs/profile/profile_nk.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "af0280d9f3f6d1f74862b839287d3e3075aa78bf789317f6c26911932fa35bb4"
+          "sha256": "770ef9a8d5b3d04e38ebfc0665c2901b337d1af588a39a9f0ff5c7c0abc51c30"
         },
         {
           "certificate_name": "pressure_reconstruction",
           "exists": true,
-          "failure_reason": "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate",
+          "failure_reason": "profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate",
           "pass": false,
           "path": "certs/profile/pressure_reconstruction.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "43ce8d217f7c6e22e996e1b54a748e7cfea43600b03cff90fbeb9987609e6ca2"
+          "sha256": "3c9b50e5bf2f88580d139df8185742b92affe011179f5be6d0cf2e1b2c4a6c7e"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -114,7 +114,7 @@
       "pass": false,
       "profile_hash_consistency": {
         "hashes": [
-          "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+          "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
         ],
         "pass": true
       },
@@ -128,19 +128,19 @@
           "failure_reason": null,
           "pass": true,
           "path": "certs/profile/exponent_admissibility.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "888c26c507fb80ddbce6282183dc31ac693afb346cb669014f13cf0cbc4e4c1f"
+          "sha256": "1e03b8035d227efabe78a38813d2b4037f93d6d0b4eec3c00cfe470b39b54578"
         },
         {
           "certificate_name": "profile_nk",
           "exists": true,
-          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
+          "failure_reason": "directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale",
           "pass": false,
           "path": "certs/profile/profile_nk.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "af0280d9f3f6d1f74862b839287d3e3075aa78bf789317f6c26911932fa35bb4"
+          "sha256": "770ef9a8d5b3d04e38ebfc0665c2901b337d1af588a39a9f0ff5c7c0abc51c30"
         },
         {
           "certificate_name": "tail_recurrence",
@@ -148,9 +148,9 @@
           "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
           "pass": false,
           "path": "certs/tail/tail_recurrence.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "cbb397ee5bab6670071075c28883640e25c1528c5cd0765af8edd21bdfbb770f"
+          "sha256": "f773b6a9e7ad7d0cdbe0ffefc0c90a2b822768d80d284ddf46650495a5e6c874"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -158,7 +158,7 @@
       "pass": false,
       "profile_hash_consistency": {
         "hashes": [
-          "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+          "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
         ],
         "pass": true
       },
@@ -172,9 +172,9 @@
           "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
           "pass": false,
           "path": "certs/tail/tail_recurrence.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "cbb397ee5bab6670071075c28883640e25c1528c5cd0765af8edd21bdfbb770f"
+          "sha256": "f773b6a9e7ad7d0cdbe0ffefc0c90a2b822768d80d284ddf46650495a5e6c874"
         },
         {
           "certificate_name": "indicial_pluecker_cover",
@@ -182,9 +182,9 @@
           "failure_reason": "tail recurrence certificate is not passing; interval Pluecker/Evans box cover is not implemented; large-Im(delta) exterior exclusion is missing; delta=1 geometric/removable factorization is not interval-linked to the profile ball",
           "pass": false,
           "path": "certs/tail/indicial_pluecker_cover.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "20c1ae8474b763b8eeb18f87e98b8cd8e5efe318ed7b4669afb7c9686e30062b"
+          "sha256": "b8cc2c2278f2a34e68347e295b7290adfd1f691132fecb435582c623deb40b71"
         },
         {
           "certificate_name": "matching_determinant",
@@ -192,9 +192,9 @@
           "failure_reason": "profile NK certificate is not passing; tail recurrence certificate is not passing; interval matching determinant/transversality calculation is missing",
           "pass": false,
           "path": "certs/profile/matching_determinant.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "bf2ecf512f3147a73e41bcf90ff3321012cba1ba7ac92081ae46e026b396e8bf"
+          "sha256": "2ca74af85bb6db0c0d1999f79f0a2f1c8db0d65036f1925b23edb257856fd7ec"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -202,7 +202,7 @@
       "pass": false,
       "profile_hash_consistency": {
         "hashes": [
-          "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+          "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
         ],
         "pass": true
       },
@@ -213,12 +213,12 @@
         {
           "certificate_name": "projected_spectrum",
           "exists": true,
-          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/projected_spectrum.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "97c91194db1b02ac8fa1756289c28c5c34083964b3dba3fc3d346f0cec07e4cf"
+          "sha256": "85ccfda97f93f0d7ade5ffc80ccd2c12ffb1b5482269a2ff70af8a6dab5a60dd"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -226,7 +226,7 @@
       "pass": false,
       "profile_hash_consistency": {
         "hashes": [
-          "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+          "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
         ],
         "pass": true
       },
@@ -237,22 +237,22 @@
         {
           "certificate_name": "high_frequency_exclusion",
           "exists": true,
-          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/high_frequency_exclusion.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "e23cfb2ed00d9ce0a8b4967a8131d3fdd48be548f84c4199c807f5283e76f507"
+          "sha256": "1c1cfac442afb533a641e830f4d36386da3974e6a801b9476818c2737e39a005"
         },
         {
           "certificate_name": "stable_semigroup",
           "exists": true,
-          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.483101949002e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.969440220445e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828091122496e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898888e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471633995586e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
+          "failure_reason": "profile NK certificate is not passing: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction certificate is not passing: profile_nk pass=false: directed-rounding interval backend is not yet attached; validated approximate inverse A is not yet supplied; sampled quotient residual max 4.440178375927e+02 exceeds entry threshold 1.000000000000e-08; C0-C4 R/Z mortar max 4.968784594306e+06 exceeds entry threshold 1.000000000000e-08; interval residual evaluator is not implemented; validated approximate inverse hash is missing; Z2/tail-complement interval bound is not available for this profile; finite-block report is diagnostic-only: PROFILE_FINITE_NK_BLOCK_FLOATING_NOT_PROOF; finite-block sampled Z0=1.828087495130e+00 is >= 1; row cache is floating, not interval residual data; approximate inverse is floating ridge-SVD, not validated; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; finite-block sweep is diagnostic-only: PROFILE_FINITE_NK_SWEEP_FLOATING_NOT_PROOF; best sampled finite-block sweep trial is not a full-block proof-relevant trial; best sampled finite-block sweep Z0=1.160463898887e+00 is >= 1; best full-block sampled finite-block sweep Z0=1.471650606286e+00 is >= 1; sweep is floating and sampled, not interval residual validation; approximate inverses are floating ridge-SVD diagnostics; Z2 and infinite complement bounds are missing; profile residual/mortar is far above NK entry scale; pressure reconstruction interval backend is not implemented; exact one-form/pressure interval bounds are not available; velocity_from_streamfunction_swirl not validated: interval Taylor-jet evaluator for psi, Gamma, and U; theta_residual_zero not validated: outward-rounded interval bound for R^theta; one_form_closedness not validated: outward-rounded interval bound for one-form curl; pressure_potential_equations not validated: directed-rounding pressure integration/potential backend; chart_pressure_matching not validated: interval chart-overlap pressure matching certificate; pressure_tail not validated: pressure tail interval certificate; true Leray projection missing; geometric mode recovery missing; interval resolvent/large-m/high-frequency bounds missing",
           "pass": false,
           "path": "certs/spectrum/stable_semigroup.json",
-          "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
+          "profile_hash_sha256": "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408",
           "schema_version": "nsproof-cert-v1",
-          "sha256": "2a4ad43ebbec1d925c91ea812cbb4e4a42ce9b2215f244959f87957b876aebe2"
+          "sha256": "18d6d4863681be218969d5f184d30980fd9f64188a8e8450cdbd93a6105f9cd2"
         }
       ],
       "failure_reason": "one or more required interval/exact certificates are missing or failing",
@@ -260,7 +260,7 @@
       "pass": false,
       "profile_hash_consistency": {
         "hashes": [
-          "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+          "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
         ],
         "pass": true
       },
@@ -318,10 +318,10 @@
   "pass": false,
   "profile_hash_consistency": {
     "hashes": [
-      "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
+      "6ed5f8f6469e10fae986e7a6ea100edf366cb3373294c387e0ac3ec7b9651408"
     ],
     "pass": true
   },
-  "repo_commit": "de7eacd5dc13713c268cd88310a2bff69c3b4572",
+  "repo_commit": "8bb761aa8218fb507d63d3671bcfe7b6ecd85af0",
   "schema_version": "nsproof-cert-v1"
 }
