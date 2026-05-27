@@ -318,6 +318,7 @@ def build_profile_nk_certificate(args: argparse.Namespace) -> tuple[dict[str, An
             "status": finite_block_report.get("status"),
             "pass": bool(finite_block_report.get("pass", False)),
             "diagnostic_vs_proof": finite_block_report.get("diagnostic_vs_proof"),
+            "proof_relevance": finite_block_report.get("proof_relevance"),
             "row_selection": finite_block_report.get("row_selection"),
             "floating_norms": finite_block_report.get("floating_norms"),
             "approximate_inverse": finite_block_report.get("approximate_inverse"),
