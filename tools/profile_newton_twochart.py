@@ -2590,6 +2590,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     {
                         "block": block_spec["label"],
                         "rejected_by_solver": True,
+                        "rejection_reasons": ["solver_error"],
                         "error": str(exc),
                     }
                 )
@@ -2637,6 +2638,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         {
                             **trial_record,
                             "rejected_by_tail_gate": True,
+                            "rejection_reasons": ["tail_gate"],
                             "tail_gate": tail_gate,
                         }
                     )
@@ -2661,8 +2663,16 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     base_residual_audit_metrics,
                     base_mortar_audit_metrics,
                 )
-                raw_growth_ok = trial_raw_metrics["objective"] <= args.max_raw_objective_growth * max(
-                    base_raw_metrics["objective"], 1e-300
+                if args.raw_growth_metric == "objective":
+                    base_raw_growth_value = base_raw_metrics["objective"]
+                    trial_raw_growth_value = trial_raw_metrics["objective"]
+                elif args.raw_growth_metric == "max-abs":
+                    base_raw_growth_value = base_raw_metrics["max_abs"]
+                    trial_raw_growth_value = trial_raw_metrics["max_abs"]
+                else:
+                    raise ValueError(f"unknown raw growth metric {args.raw_growth_metric!r}")
+                raw_growth_ok = trial_raw_growth_value <= args.max_raw_objective_growth * max(
+                    base_raw_growth_value, 1e-300
                 )
                 guard_growth_ok = True
                 if guard_points:
@@ -2708,6 +2718,17 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                     and mortar_audit_growth_ok
                     and residual_audit_growth_ok
                 )
+                rejection_reasons: list[str] = []
+                if not improved:
+                    rejection_reasons.append("accept_metric_decrease")
+                if not raw_growth_ok:
+                    rejection_reasons.append(f"raw_{args.raw_growth_metric}_growth")
+                if not guard_growth_ok:
+                    rejection_reasons.append("guard_growth")
+                if not mortar_audit_growth_ok:
+                    rejection_reasons.append("mortar_audit_growth")
+                if not residual_audit_growth_ok:
+                    rejection_reasons.append("residual_audit_growth")
                 line_trials.append(
                     {
                         **trial_record,
@@ -2721,6 +2742,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "required_accept_metric_decrease": required_decrease,
                         "raw_objective": trial_raw_metrics["objective"],
                         "raw_max_abs": trial_raw_metrics["max_abs"],
+                        "raw_growth_metric": args.raw_growth_metric,
+                        "base_raw_growth_value": base_raw_growth_value,
+                        "trial_raw_growth_value": trial_raw_growth_value,
                         "raw_growth_ok": raw_growth_ok,
                         "guard_metrics": trial_guard_metrics,
                         "guard_growth_ok": guard_growth_ok,
@@ -2730,6 +2754,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                         "residual_audit_growth_ok": residual_audit_growth_ok,
                         "coupled_audit_metric": trial_coupled_audit_metric,
                         "accepted": accepted_here,
+                        "rejection_reasons": [] if accepted_here else rejection_reasons,
                         "tail_gate": tail_gate,
                     }
                 )
@@ -2928,6 +2953,7 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "row_normalization_floor": args.row_normalization_floor,
             "row_scale_min": args.row_scale_min,
             "row_scale_max": args.row_scale_max,
+            "raw_growth_metric": args.raw_growth_metric,
             "max_raw_objective_growth": args.max_raw_objective_growth,
             "max_mortar_audit_growth": args.max_mortar_audit_growth,
             "line_search_mortar_audit_order": args.line_search_mortar_audit_order,
@@ -2994,6 +3020,7 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     "alpha": trial.get("alpha"),
                     "alpha_applied": trial.get("alpha_applied"),
                     "accepted": trial.get("accepted", False),
+                    "rejection_reasons": trial.get("rejection_reasons", []),
                     "predicted_primary_objective_improvement": predicted_improvement,
                     "actual_sampled_objective_improvement": actual_improvement,
                     "actual_over_predicted": ratio,
@@ -3001,6 +3028,9 @@ def prediction_actual_report(args: argparse.Namespace, run_report: dict[str, Any
                     "native_linear_objective_improvement": native_improvement,
                     "native_linear_max_abs": native_prediction.get("max_abs"),
                     "raw_max_abs": trial.get("raw_max_abs"),
+                    "raw_growth_metric": trial.get("raw_growth_metric"),
+                    "base_raw_growth_value": trial.get("base_raw_growth_value"),
+                    "trial_raw_growth_value": trial.get("trial_raw_growth_value"),
                     "guard_max_abs": trial.get("guard_metrics", {}).get("max_abs")
                     if isinstance(trial.get("guard_metrics"), dict)
                     else None,
@@ -3456,10 +3486,20 @@ def main() -> None:
     parser.add_argument("--row-scale-min", type=float, default=0.0)
     parser.add_argument("--row-scale-max", type=positive_float, default=1e6)
     parser.add_argument(
+        "--raw-growth-metric",
+        choices=("objective", "max-abs"),
+        default="objective",
+        help=(
+            "Raw sampled-row gate used with --max-raw-objective-growth. "
+            "Default preserves the historical l2 objective gate; max-abs is useful "
+            "for max-norm edge/mortar descent diagnostics."
+        ),
+    )
+    parser.add_argument(
         "--max-raw-objective-growth",
         type=positive_float,
         default=1.0,
-        help="Reject line-search steps whose unnormalized sampled objective grows by more than this factor.",
+        help="Reject line-search steps whose selected raw growth metric grows by more than this factor.",
     )
     parser.add_argument(
         "--max-mortar-audit-growth",

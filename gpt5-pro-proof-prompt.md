@@ -168,7 +168,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit64_pde16_step25_nativebatch_*`, `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_pde16_step25_nativebatch_*`; chart-balanced broad-audit diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_coupledaudit128_balanced_broadaudit_step27_nativebatch_*`; and two-q broad-audit diagnostics `work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. The latest two-q broad-audit step is small floating progress, not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics through `work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, max-norm raw gates, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. Step32 reduces held-out edge to `4.284755945898e2`, but dense C0-C4 R/Z mortar worsens to `5.913592917574e6`; this is not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
 | Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
@@ -650,6 +650,186 @@ interpretation:
   q=0.92 C4 row is included.
 ```
 
+Three-q broad-audit continuation:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_report.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rank.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rows.json
+
+setup:
+  input = two-q broad-audit step28 candidate
+  objective C4 q-values = 0.90,0.91,0.92
+  broad native C4 audit rows = 1350
+  max_variables = 160
+  selected_by_chart = tail:128, origin:32
+  selected_by_block = tail.F_an:46, tail.F_frac:82,
+                      origin.F_origin_taylor:17, origin.G_origin_taylor:15
+  accepted_any_step = false
+
+rank diagnostic:
+  coverage = 1.0
+  constraint rank/nullity = 57/103
+  primary rank/projected rank = 22/21
+  rho_grad = 8.089475942616127e-1
+  rho_range = 9.997655112981494e-1
+  predicted_best_factor_inf = 2.0015248944221704e-2
+
+base audits:
+  edge residual audit max = 4.326812264740244e2
+  broad C4 audit max = 4.328283218032057e6
+
+best improving but rejected trial:
+  alpha = 0.015625
+  edge residual audit max = 4.3198405405916975e2
+  broad C4 audit max = 4.32130957175972e6
+  coupled audit value = 0.9983888193260357
+  rejected because guard_growth_ok=false
+  guard max grows from 1.0152983039805788e3 to 1.0221510615264315e3
+  worst guard row = q=0.8999999999999999,b=0.99,e_psi
+
+interpretation:
+  The three-q objective finds a direction that improves both broad edge and
+  broad C4 audits, but the adjacent b=0.99 edge guard blocks acceptance. The
+  next surgical test should include q=0.8999999999999999,b=0.99 as a primary
+  PDE row, not weaken the guard.
+```
+
+Guard-aware q=0.90/0.91/0.92 run:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_edge990_broadaudit160_step30_nativebatch*
+
+setup:
+  input = two-q broad-audit step28 candidate
+  primary PDE points = (q=0.8999999999999999,b=0.98),
+                       (q=0.8999999999999999,b=0.99)
+  objective C4 q-values = 0.90,0.91,0.92
+  broad native C4 audit rows = 1350
+  max_variables = 160
+  selected_by_chart = tail:128, origin:32
+  accepted_any_step = false
+
+rank diagnostic:
+  coverage = 1.0
+  constraint rank/nullity = 57/103
+  primary rank/projected rank = 23/21
+  rho_grad = 8.097016142990042e-1
+  rho_range = 9.996733799524907e-1
+  predicted_best_factor_inf = 2.06254920673346e-2
+
+best audit-improving trial:
+  block = component:F
+  alpha = 0.015625
+  coupled audit value = 0.9983998727995577
+  edge residual audit max: 4.326812264740244e2 -> 4.319888330338395e2
+  broad C4 audit max: 4.328283218032057e6 -> 4.321357414323666e6
+  guard max: 1.0152983039805788e3 -> 1.0136729692850924e3
+  rejected only because raw l2 sampled objective grew:
+    objective = 3.054638861620e9 -> 3.361715416663e9
+
+interpretation:
+  Adding the b=0.99 PDE row removes the guard-growth blocker. The remaining
+  rejection is an acceptance-geometry issue: the worst-row and broad audits
+  improve, but selected-row l2 objective redistributes upward.
+```
+
+Max-norm raw gate and dense-audit checks:
+
+```text
+code change:
+  tools/profile_newton_twochart.py now supports:
+    --raw-growth-metric objective|max-abs
+  default remains objective, preserving old behavior.
+  line-search trials now record rejection_reasons and raw growth values.
+
+step31 artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q909192_edge990_broadaudit160_step31_rawmax_nativebatch*
+
+step31 setup:
+  same as step30, but --raw-growth-metric max-abs.
+
+step31 accepted:
+  accepted_any_step = true
+  accepted_block = component:F
+  accepted_alpha = 0.015625
+  coupled audit value = 0.9983998727995577
+  selected raw max: 4.922540831420477e4 -> 4.9146641399183085e4
+  edge line-search audit: 4.326812264740244e2 -> 4.319888330338395e2
+  broad line-search C4 audit: 4.328283218032057e6 -> 4.321357414323666e6
+  guard max decreases to 1.0136729692850924e3
+
+step31 posthoc held-out:
+  standard = 1.016228983517e1
+  focused = 1.016228983517e1
+  secondary = 1.422825435582e1
+  origin = 9.132497540620e1
+  edge = 4.319888330338e2
+  overlap = 3.239711929196e2
+  full 9x9 C0-C4 R/Z mortar max = 5.817536665279e6
+  worst dense C4 row = RZ:F:dRRRR at q=0.89,x=1.0
+
+interpretation:
+  Step31 is not promotable. It is real edge improvement, but the line-search
+  C4 audit missed a mobile q=0.89 C4 spike that worsened in dense audit.
+```
+
+Explicit q=0.89/0.90/0.91/0.92 audit:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch*
+
+setup:
+  input = two-q broad-audit step28 candidate
+  primary PDE points = (q=0.8999999999999999,b=0.98),
+                       (q=0.8999999999999999,b=0.99)
+  objective C4 q-values = 0.89,0.90,0.91,0.92
+  line-search C4 audit q-values = 0.89,0.90,0.91,0.92
+  line-search C4 audit x-samples = 9
+  max_variables = 160
+  --raw-growth-metric max-abs
+  selected_by_chart = tail:128, origin:32
+  accepted_any_step = true
+  accepted_block = block:F_frac
+  accepted_alpha = 0.015625
+
+rank diagnostic:
+  coverage = 1.0
+  constraint rank/nullity = 57/103
+  primary rank/projected rank = 28/26
+  rho_grad = 7.938650466603936e-1
+  rho_range = 9.996315621235334e-1
+  predicted_best_factor_inf = 2.6949023210853285e-2
+
+accepted trial:
+  coupled audit value = 0.9975758737729583
+  explicit-audit C4 max: 4.922540831420457e6 -> 4.910607971087327e6
+  edge line-search audit: 4.326812264740244e2 -> 4.3163004500890224e2
+  selected raw max: 4.922540831420477e4 -> 4.9106079710873135e4
+  guard max = 1.0128392951084201e3
+
+step32 posthoc held-out:
+  standard = 1.016228983517e1
+  focused = 1.016228983517e1
+  secondary = 1.422825435582e1
+  origin = 9.132497540774e1
+  edge = 4.284755945898e2
+  overlap = 3.239711929243e2
+  full 9x9 C0-C4 R/Z mortar max = 5.913592917574e6
+  worst dense C4 row = RZ:F:dRRRR at q=0.87,x=1.0
+
+interpretation:
+  Step32 is also not promotable. It confirms real edge descent under the
+  q=0.89/0.90/0.91/0.92 audit, but dense C4 damage moves again, now to q=0.87.
+  Manual q-row chasing is no longer the right loop. The next solver change
+  should promote dense-audit worst C4 rows into the objective automatically.
+```
+
 Performance direction from `AGENTS.md`:
 
 ```text
@@ -704,6 +884,16 @@ What is established:
  10. A broad 1350-row native C4 audit catches that overfit.
  11. Adding the schedule-nearby q=0.92 C4 row to the objective gives a small
      real coupled improvement under broad audit.
+ 12. Extending the C4 objective to q=0.90,0.91,0.92 after that improvement
+     exposes the next blocker: adjacent edge guard growth at q=0.9,b=0.99.
+ 13. Adding q=0.9,b=0.99 as a primary PDE row removes that guard-growth
+     blocker; the remaining step30 rejection is raw selected-row l2 growth.
+ 14. A max-norm raw gate can accept the same edge/C4 local descent, but the
+     dense 9x9 C4 audit then reveals mobile high-order mortar spikes.
+ 15. Including q=0.89,0.90,0.91,0.92 explicitly still leaves the dense C4
+     maximum mobile; the worst row moves to q=0.87,x=1.0 and worsens.
+     Therefore manual q-row chasing should stop in favor of automatic dense
+     C4 active-row promotion.
 
 What is not established:
   1. Fixed (9/20,1) is mathematically impossible.
@@ -720,10 +910,11 @@ fixed (9/20,1): alive but under serious corrected negative evidence
 current exact profile gate: blocked by residual max 4.36e2 and C4 mortar 4.96e6
 current profile NK gate: blocked by pass=false and finite sampled Z0>1
 current solver issue: coupled tail-origin descent exists but is tiny and very
-  sensitive to missing nearby C4 rows
-most credible immediate fork: continue fixed (9/20,1) with broad native C4
-  audit always enabled; expand objective q rows to cover q=0.90,0.91,0.92 and
-  raise variables to 160/192 before shifted schedules
+  sensitive to missing nearby C4 and edge guard rows; step31/step32 show that
+  manually adding q rows can move the dense C4 spike instead of controlling it
+most credible immediate fork: continue fixed (9/20,1), but replace manual
+  q-row chasing with automatic dense C4 active-row promotion into the objective,
+  while keeping broad/native C4 audit and edge guards active
 do not free (gamma,B) until corrected 160/192/256 broad-audit shifted schedules
   fail cleanly
 do not unlock q2 without tail recurrence certificate
@@ -732,109 +923,71 @@ do not unlock q2 without tail recurrence certificate
 Question GPT-5 Pro should answer now:
 
 ```text
-Given the corrected seam-patch Jacobian fix, the coupled-audit firewall, and
-the explicit worst-edge/worst-C4 diagnostics above, including the small
-two-q broad-audit improvement, what is the most direct proof-producing next
-move?
+Given the corrected seam-patch Jacobian fix, the coupled-audit firewall, the
+small two-q broad-audit improvement, and the step31/step32 evidence that manual
+C4 q-row chasing moves the dense C4 spike from q=0.89 to q=0.87, what is the
+most direct proof-producing next move?
 
 Specifically answer:
-  1. Should the next fixed-branch run iterate from the accepted two-q candidate,
-     or restart from the promoted profile with a three-q objective
-     q=0.90,0.91,0.92?
-  2. What is the minimal C4 q/x objective row set that prevents mobile C4
-     overfit while avoiding broad slow objective grids?
-  3. Should variable count now increase to 160/192, or should row/column
-     scaling and native origin PDE columns come first?
-  4. What exact shifted schedules should run if the three-q broad-audit run
-     stalls?
-  5. What would count as a rigorous floating branch-kill precursor before
+  1. Should the next fixed-branch run promote dense 9x9 C4 worst rows into the
+     objective automatically, or should it switch to a Chebyshev/Bernstein
+     C4 mortar objective over the whole overlap edge?
+  2. If automatic dense-row promotion is right, what exact active-row rule is
+     least likely to overfit: top-k by absolute C4 residual, per-q top rows,
+     per-derivative top rows, or a minimax epigraph/slack formulation?
+  3. Should the next candidate iterate from step28, step31, step32, or restart
+     from the promoted profile?
+  4. Should `--raw-growth-metric max-abs` remain allowed for this max-norm
+     phase, or should acceptance require both max-abs and l2 objective
+     nonincrease?
+  5. Should variable count now increase to 192/256, or should native origin
+     PDE/guard columns and automatic dense C4 active-row selection come first?
+  6. What exact shifted schedules should run after dense C4 active-row
+     promotion?
+  7. What would count as a rigorous floating branch-kill precursor before
      interval matching or parameter-funnel certificates?
-  6. Which native C kernel should be ported next to reach the proof-relevant
+  8. Which native C kernel should be ported next to reach proof-relevant
      diagnostics fastest?
 
 You must distinguish:
   - one-point C4 row overfit,
   - a real but tiny broad-audit coupled descent,
+  - mobile dense C4 spike migration under manual q-row additions,
+  - max-norm acceptance versus l2 objective acceptance,
   - a chart-switch sampling artifact,
   - a reason to free (gamma,B),
   - and a reason to pivot to radial matching.
 ```
 
-Immediate local commands still worth running after this prompt:
+Immediate local work still worth doing after this prompt:
 
-```bash
-# 1. Continue the corrected fixed branch with broad native C4 audit always
-#    enabled. The next surgical run should include q=0.90,0.91,0.92 in the C4
-#    objective or iterate once from the accepted two-q candidate.
+```text
+1. Implement automatic C4 active-row promotion:
+   - generate a dense C0-C4 R/Z mortar audit on the candidate;
+   - select top rows by absolute residual with per-q and per-derivative quotas;
+   - add those rows to the next Stage-0 objective;
+   - keep a separate denser held-out C4 audit that is not in the objective.
 
-python3 tools/profile_newton_twochart.py \
-  --input work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json \
-  --out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch.json \
-  --report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_report.json \
-  --rank-report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rank.json \
-  --row-cache-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_rows.json \
-  --prediction-actual-report-out work/twochart_stage0_current_profile_targeted_edge_c4_q909192_broadaudit160_step29_nativebatch_prediction.json \
-  --blocks tail,origin,interface \
-  --variable-charts tail,origin \
-  --solve-mode guarded-ineq-kkt \
-  --gamma-fixed --B-fixed \
-  --residual-kind normalized-structural \
-  --q2-policy zero \
-  --pde-qb-points '0.8999999999999999,0.98' \
-  --no-default-pde-points \
-  --pde-component-mode worst-per-point \
-  --pde-jacobian-candidate-count 16 \
-  --mortar-coordinates RZ \
-  --mortar-order 4 \
-  --mortar-q-values 0.90,0.91,0.92 \
-  --mortar-x-values 1.0 \
-  --line-search-mortar-audit-order 4 \
-  --line-search-mortar-audit-q-samples 5 \
-  --line-search-mortar-audit-x-samples 9 \
-  --mortar-active-count 32 \
-  --mortar-jacobian-candidate-count 512 \
-  --guard-grid edge \
-  --guard-q-min 0.74 --guard-q-max 0.94 \
-  --guard-b-min 0.08 --guard-b-max 0.99 \
-  --guard-q-samples 11 --guard-b-samples 11 \
-  --active-guard-weight 10 \
-  --guarded-kkt-primary-labels pde,mortar \
-  --guarded-kkt-constraint-labels active_guard \
-  --guarded-kkt-max-constraints 128 \
-  --guarded-ineq-max-active 128 \
-  --guarded-ineq-tolerance 1e-10 \
-  --guarded-ineq-target nonincrease \
-  --line-search-eval objective-only \
-  --line-search-accept-metric coupled-audit-max \
-  --line-search-residual-audit-scan edge \
-  --max-residual-audit-growth 1 \
-  --max-mortar-audit-growth 1 \
-  --max-raw-objective-growth 1 \
-  --max-guard-objective-growth 1 \
-  --max-guard-max-growth 1 \
-  --min-accept-metric-decrease-abs 1e-6 \
-  --row-normalization none \
-  --max-variables 160 \
-  --chart-balanced-selection \
-  --candidate-origin-degree-max 12 \
-  --candidate-kq-max 12 \
-  --candidate-kx-max 12 \
-  --candidate-pool-limit 1536 \
-  --max-iter 1 \
-  --trust 0.001 \
-  --lm-lambda 1e-6 \
-  --pde-weight 1 \
-  --mortar-weight 0.01 \
-  --native-c \
-  --stage0-workers 8 \
-  --line-search 1,0.25,0.0625,0.015625,0.00390625,0.0009765625
+2. Do not promote step31 or step32 as the current profile:
+   - step31 dense C4 max = 5.817536665279e6 at q=0.89,x=1.0;
+   - step32 dense C4 max = 5.913592917574e6 at q=0.87,x=1.0.
 
-# 2. Accept only if the broad 1350-row C4 audit and edge audit improve together.
-#    Ignore one-point C4 improvements unless the broad audit also improves.
+3. Restart the next active-row test from the step28 candidate unless there is
+   a specific reason to use step32:
+   work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json
 
-# 3. If q=0.90,0.91,0.92 at 160/192 variables stalls, then run shifted seam
-#    schedules q_switch=0.88,0.90,0.92 under the same broad audit before
-#    freeing (gamma,B).
+4. Keep these acceptance gates:
+   - q1-free, forced-q^p, q2-zero;
+   - edge guard nonincrease;
+   - held-out residual audit nonincrease;
+   - held-out dense C4 mortar audit nonincrease;
+   - max-norm raw gate may be used only as a diagnostic until GPT-5 Pro weighs
+     in on max-norm versus l2 objective acceptance.
+
+5. Native C kernel priority:
+   native origin PDE/guard columns plus dense C4 active-row scoring. The next
+   bottleneck is not GPU; it is repeated CPU-side row generation and active-row
+   selection.
 ```
 
 ## 1D. Historical Stage-0 Trace (Superseded by 1C)

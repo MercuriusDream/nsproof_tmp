@@ -1,0 +1,121 @@
+{
+  "diagnostic_vs_proof": "sampled floating residual baseline only; no interval or proof claim",
+  "format": "twochart_profile_projection_v1",
+  "mortar_summary": {
+    "coordinate_derivatives": "R,Z",
+    "max_abs_diff": 5817536.665278851,
+    "orders": "C0-C4",
+    "sample_shape": {
+      "q_samples": 9,
+      "x_samples": 9
+    },
+    "status": "DIAGNOSTIC_TWOCHART_MORTAR_BASELINE_NOT_PROOF"
+  },
+  "overall": {
+    "all_finite": true,
+    "combined_rms": 50.01688811439015,
+    "max_abs": 323.97119291958467,
+    "worst_scan": "overlap"
+  },
+  "profile": "work/twochart_stage0_current_profile_targeted_edge_c4_q909192_edge990_broadaudit160_step31_rawmax_nativebatch.json",
+  "projection_parameters": {
+    "B": 1.0,
+    "gamma": 0.45,
+    "p": 2.2222222222222223
+  },
+  "requested_options": {
+    "B_override": "1",
+    "forced_qp": "formal",
+    "gamma_override": "9/20",
+    "origin_chart": "RZ",
+    "q2_policy": "zero"
+  },
+  "residual_kind": "normalized-structural",
+  "scan_executed": [
+    "overlap"
+  ],
+  "scan_request": [
+    "overlap"
+  ],
+  "scans": {
+    "overlap": {
+      "b_range": [
+        0.05,
+        0.95
+      ],
+      "chart": "overlap",
+      "finite": true,
+      "grid": {
+        "n_b": 17,
+        "n_q": 17,
+        "points": 289,
+        "skipped": 0
+      },
+      "h": 0.001,
+      "label": "overlap",
+      "max_abs": 323.97119291958467,
+      "mode": "ProjectedProfile.exact_residual_at Taylor jet",
+      "note": "Samples the stored tail-origin overlap band; may cross the diagnostic origin switch.",
+      "q_range": [
+        0.84,
+        0.92
+      ],
+      "residual_kind": "normalized-structural",
+      "rms": 50.01688811439015,
+      "worst": {
+        "b": 0.95,
+        "e_gamma": 1.4956322177085324,
+        "e_psi": -323.97119291958467,
+        "max_abs": 323.97119291958467,
+        "q": 0.9,
+        "r": 0.15122952876462445,
+        "z": 0.4601059995959599
+      }
+    }
+  },
+  "source_forward_compare": {
+    "overlap": {
+      "compared": 289,
+      "max_abs": 293.80507626437145,
+      "max_e_gamma_abs": 0.034859451349843695,
+      "max_e_psi_abs": 293.80507626437145,
+      "skipped": 0,
+      "status": "SOURCE_FORWARD_COMPARE_MISMATCH_NOT_PROOF",
+      "tolerance": 1e-08,
+      "worst": {
+        "b": 0.4437499999999999,
+        "diff_e_gamma": 0.008133441683804588,
+        "diff_e_psi": -293.80507626437145,
+        "max_abs": 293.80507626437145,
+        "q": 0.895,
+        "r": 0.4466396062581346,
+        "source_e_gamma": 1.0086684106947343,
+        "source_e_psi": -6.3852021232812435,
+        "twochart_e_gamma": 1.016801852378539,
+        "twochart_e_psi": -300.1902783876527,
+        "z": 0.22116407709609734
+      }
+    }
+  },
+  "source_profile_json": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+  "status": "DIAGNOSTIC_TWOCHART_RESIDUAL_BASELINE_NOT_PROOF",
+  "tail_legality": {
+    "B": 1.0,
+    "all_ok": true,
+    "forced_qp_F_sample_error": 8.881784197001252e-16,
+    "forced_qp_G_sample_error": 5.551115123125783e-16,
+    "forced_qp_coeff_error": 8.881784197001252e-16,
+    "gamma": 0.45,
+    "note": "Floating structural two-chart tail gate; this is not interval validation.",
+    "p": 2.2222222222222223,
+    "path": "work/v117_transcheb_formal_origin_refit_c2_d6_a_q2zero.json",
+    "q1_f_max": 0.0,
+    "q1_g_max": 0.0,
+    "q2_f_trace_max": 1.8041124150158794e-16,
+    "q2_g_trace_max": 7.771561172376096e-16,
+    "q2_ok": true,
+    "q2_policy": "zero",
+    "samples_per_patch": 9,
+    "status": "TAIL_FORMAL_RECURRENCE_GATE_OK_NOT_INTERVAL"
+  }
+}
