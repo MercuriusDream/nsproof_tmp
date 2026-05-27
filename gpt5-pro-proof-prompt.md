@@ -124,7 +124,339 @@ Gate | Current artifact | Evidence type: floating / exact algebraic / interval |
 Every row must name the missing certificate that would make the gate pass. Do
 not substitute narrative confidence for the evidence type.
 
-## 1C. Latest Repository Update
+## 1C. Latest Repository Update (Authoritative, 2026-05-27)
+
+This section supersedes the historical Stage-0 trace in section 1D. Use this
+section as the current repository state and treat section 1D only as older
+background.
+
+Latest repo update in this prompt:
+
+```text
+Fix seam-patch PDE Jacobian selection, record corrected 256-variable
+post-fix Stage-0 diagnostics, and keep theorem certificate at 0/5.
+```
+
+Latest commits:
+
+```text
+73b7a07 Fix seam patch PDE Jacobian selection
+54b02bc Record guard-only PDE Stage-0 failure
+8c27990 Refresh theorem ledgers for current profile hash
+15fdd45 Record 256-row residual NK blocker
+1d419b9 Expose finite NK proof relevance in profile ledger
+047d954 Require meaningful Stage-0 accept metric decrease
+9510051 Prioritize PDE rows in native Stage-0
+10853f3 Auto-select worst PDE rows in Stage-0
+```
+
+Current progress ledger:
+
+```text
+Final theorem certificate: 0%
+Certified stop-condition gates: 0/5
+Proof-engineering scaffold: about 35%
+```
+
+Current stop-condition ledger:
+
+| Gate | Current artifact | Evidence type | Status | Blocking certificate |
+| --- | --- | --- | --- | --- |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; corrected constrained 256 diagnostics `work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json`; corrected guard-only 256 diagnostics `work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_report.json`, `_rank.json`, `_prediction.json`, `_rows.json` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, and prediction diagnostics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`; corrected post-fix 256 runs accept no nonlinear step. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
+| Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
+| Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
+| Stable-complement spectral gap | No proof-grade artifact. | Floating/incomplete. | Not certified. No large-`m`, high-frequency, essential-spectrum, or stable-semigroup certificate exists. | `certs/spectrum/high_frequency_exclusion.json`, `certs/spectrum/stable_semigroup.json`. |
+
+Current promoted profile:
+
+```text
+work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json
+profile_hash_sha256 = ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a
+```
+
+Current exact-audit blocker:
+
+```text
+artifact = certs/profile/exact_residual_twochart_audit.json
+pass = false
+sampled quotient residual max = 4.362578130070414e2
+entry threshold = 1e-8
+C0-C4 physical R/Z mortar max = 4.963232981363504e6
+entry threshold = 1e-8
+worst mortar row = RZ:F:dRRRR at q=0.91, x=1.0
+tail legality = floating OK: q1 zero, forced q^p trace error <= 8.9e-16,
+                q2 trace max <= 7.8e-16
+```
+
+Current profile NK scaffold blocker:
+
+```text
+artifact = certs/profile/profile_nk.json
+pass = false
+profile_hash_sha256 = ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a
+sampled residual and C4 mortar are far above NK entry scale.
+directed-rounding interval residual backend is missing.
+validated approximate inverse A is missing.
+Z2 / tail-complement interval bound is missing.
+sampled interval row ledger is not a continuous-domain proof.
+finite-block diagnostics are floating ridge-SVD diagnostics, not proof.
+```
+
+Finite sampled NK diagnostics from the current promoted profile:
+
+```text
+artifact = work/profile_finite_nk_top16pde256_full_block.json
+finite full 430x256 block:
+  Y0 = 3.776931277590535e2
+  Z0 = 3.925969187521621
+  rank_after_cutoff = 140
+  diagnostic only, not proof
+
+artifact = work/profile_finite_nk_top16pde256_sweep.json
+best overall sampled subset:
+  subset = pde only
+  Y0 = 2.785084932431439e2
+  Z0 = 2.7889567207415005
+best proof-relevant full block:
+  Y0 = 5.063311698881507e-6
+  Z0 = 3.136513964448309
+All Z0 values are >= 1, so this is not close to an NK certificate.
+```
+
+Critical implementation fix since the previous prompt:
+
+```text
+Bug:
+  At q=0.8999999999999999, the exact residual evaluator chooses the first
+  matching tail patch on the seam boundary, but the PDE Jacobian path also
+  differentiated variables from the adjacent seam patch.
+
+Concrete failure before fix:
+  tail.F_an[p35].c[10,0] at q=0.8999999999999999,b=0.98
+    analytic/native derivative was about -5.865984e6
+    finite-difference derivative was 0.0
+    F_total did not change even after a large coefficient perturbation
+
+Fix:
+  validators/compactified_equations_twochart.py now has
+  active_tail_patch_for_variable(data, variable, q, x).
+  delta_total_jet and native_tail_linearized_residuals_with_kind use a tail
+  variable only if that variable's patch is the evaluator's first matching
+  active patch.
+
+Post-fix validation:
+  inactive p35 variables now have analytic/native/finite-difference derivative
+  equal to zero at the seam-side row.
+  active p29 variable tail.F_an[p29].c[10,0] has analytic derivative
+  865903.191438036 and finite-difference agreement to roundoff.
+  work/twochart_stage0_current_profile_patchfix_pde_jacobian_smoke.json:
+    max_abs_diff = 3.379932778103e-09
+    max_relative_diff = 6.631918795494e-10
+  work/twochart_stage0_current_profile_patchfix_residual_edge_smoke.json:
+    edge max remains 4.362578130070414e2 at the current promoted profile.
+```
+
+Interpretation of the fix:
+
+```text
+The old pre-fix 256 report overstated available seam/PDE motion because some
+Jacobian columns belonged to a patch that the residual evaluator ignored.
+After the fix, the fake strong descent mostly disappears.
+```
+
+Corrected post-fix constrained 256 diagnostic:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_report.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_rank.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_step23_nativebatch_rows.json
+
+mode:
+  primary rows = top PDE edge residual rows
+  constraints = active_guard + mortar
+  variables = 256
+  solve_mode = guarded-ineq-kkt
+  native C enabled
+  accepted_any_step = false
+
+rank/angle:
+  coverage metric = 8.789791143094675e-05
+  coverage_ok = false
+  note: this coverage is relative to held-out C4 mortar max while the primary
+        rows are PDE rows, so it should not be read as worst-mortar coverage.
+  constraint rank/nullity = 100 / 156
+  primary rank/projected rank = 16 / 15
+  rho_grad = 8.493769262767957e-1
+  rho_range = 9.189032342669498e-1
+  predicted_best_factor_inf = 9.707145209846123e-1
+  best feasible step l2 = 2.1041355568239692e5
+  best feasible step max_abs = 1.2491956258383344e5
+
+line search:
+  no accepted entry
+  full alpha=1 improves sampled objective but violates guard growth:
+    residual audit max = 4.3625781400267107e2
+    C4 mortar audit max = 4.963232893925096e6
+    max_abs_update = 6.623971113038143e2
+    guard_growth_ok = false
+  smaller full alphas keep C4 mortar under audit but still fail guard growth
+  and do not reduce the worst residual max meaningfully.
+
+conclusion:
+  With corrected patch-side Jacobians and mortar constraints active, the
+  256-variable tangent does not produce a nonlinear accepted step. The old
+  pre-fix apparent best factor near 1e-3 is not reliable; the corrected
+  constrained factor is about 0.9707.
+```
+
+Corrected post-fix guard-only 256 diagnostic:
+
+```text
+artifacts:
+  work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_report.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_rank.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_prediction.json
+  work/twochart_stage0_current_profile_top16pde256_patchfix_guardonly_step23_nativebatch_rows.json
+
+mode:
+  primary rows = top PDE edge residual rows
+  constraints = active_guard only
+  C4 mortar is still audited during line search
+  variables = 256
+  solve_mode = guarded-ineq-kkt
+  native C enabled
+  accepted_any_step = false
+
+rank/angle:
+  constraint rank/nullity = 93 / 163
+  primary rank/projected rank = 16 / 14
+  rho_grad = 9.775966000931403e-1
+  rho_range = 8.958555555479408e-1
+  predicted_best_factor_inf = 1.0000001329897399
+  best feasible step l2 = 1.3431701181075428e5
+  best feasible step max_abs = 7.068674163503468e4
+
+line search:
+  no accepted entry
+  looser cone can move the PDE residual only by catastrophic C4 mortar damage.
+  full alpha=0.25:
+    residual audit max improves to 4.3624960522314586e2
+    decrease from baseline about 8.2077838955e-3
+    C4 mortar audit max = 9.856317551084331e8
+    mortar_audit_growth_ok = false
+  full alpha=0.0009765625:
+    C4 mortar audit max = 4.963232881225964e6
+    residual audit max = 4.362578128817711e2
+    improvement is only about 1.2527e-7, far below meaningful Stage-0 scale
+  chart-tail and full large-alpha variants show the same pattern:
+    small PDE-edge improvement only appears with huge C4 mortar blowup.
+
+conclusion:
+  If C4 mortar is not a hard constraint, the solver can lower the edge PDE max
+  slightly, but it destroys the physical R/Z seam. If C4 mortar is enforced,
+  the corrected tangent is pinned for this schedule.
+```
+
+Meaningful acceptance threshold:
+
+```text
+tools/profile_newton_twochart.py now supports:
+  --min-accept-metric-decrease-abs
+  --min-accept-metric-decrease-rel
+
+This prevents roundoff-scale or bookkeeping-scale accepted steps from being
+misreported as profile progress. The latest post-fix diagnostics use this
+firewall and report accepted_any_step=false.
+```
+
+Current interpretation:
+
+```text
+The fixed (gamma,B)=(9/20,1) branch is not killed yet.
+The corrected evidence does kill the pre-fix claim that the 256-variable
+Jacobian saw a strong feasible descent direction.
+
+What is established:
+  1. The origin chart can fit the seam algebraically if PDE constraints are
+     ignored.
+  2. That origin-only seam fit destroys PDE residuals.
+  3. Tail/high-degree directions can move selected rows but tend to create
+     low-b edge or high-order C4 mortar damage.
+  4. The old seam-boundary PDE Jacobian had a real chart-side bug; it is now
+     fixed and checked against finite differences.
+  5. After the fix, constrained 256-variable inequality KKT does not produce
+     an accepted nonlinear step.
+  6. Guard-only 256-variable inequality KKT can reduce edge residual by about
+     1e-2 only by blowing C4 mortar from about 4.96e6 to about 1e9.
+
+What is not established:
+  1. Fixed (9/20,1) is mathematically impossible.
+  2. Freeing (gamma,B) is justified before the shifted-schedule corrected
+     tests run.
+  3. q2 is legal or needed.
+  4. Any theorem gate has passed.
+```
+
+Current branch status:
+
+```text
+fixed (9/20,1): alive but under serious corrected negative evidence
+current exact profile gate: blocked by residual max 4.36e2 and C4 mortar 4.96e6
+current profile NK gate: blocked by pass=false and finite sampled Z0>1
+current solver issue: corrected edge/seam tangent appears pinned on this schedule
+most credible immediate fork: shifted seam schedules + minimax/top-row PDE and
+  C4 mortar coupled objective, using corrected patch-side Jacobians
+do not free (gamma,B) until corrected 128/256 shifted schedules fail cleanly
+do not unlock q2 without tail recurrence certificate
+```
+
+Question GPT-5 Pro should answer now:
+
+```text
+Given the corrected seam-patch Jacobian fix and the two post-fix 256 diagnostics,
+what is the most proof-relevant next move?
+
+Decide among:
+  A. implement a minimax/top-row objective that directly targets the current
+     worst PDE edge row and worst C4 R/Z mortar row as coupled hard rows;
+  B. run corrected shifted-schedule 128/256 diagnostics at seam q=0.88,0.90,0.92
+     before changing objective geometry;
+  C. declare this fixed schedule pinned and specify the exact branch-kill
+     evidence still required before freeing (gamma,B);
+  D. change the profile representation or row norm before further Stage-0
+     solving.
+
+The answer must give concrete commands or mathematical diagnostics, not a
+generic plan. It should explicitly use the fact that the pre-fix descent was
+partly a chart-side Jacobian artifact, while the post-fix guard-only cone only
+improves PDE rows by causing catastrophic C4 mortar damage.
+```
+
+Immediate local commands still worth running after this prompt:
+
+```bash
+# 1. Re-run the corrected constrained and guard-only diagnostics under shifted
+#    seam schedules q=0.88,0.90,0.92, but use the fixed
+#    active_tail_patch_for_variable path.
+
+# 2. Add a row objective that can report max-row/minimax progress on:
+#    - worst PDE edge row near q=0.90,b=0.98,
+#    - nearby shifted edge rows,
+#    - worst C4 R/Z mortar row RZ:F:dRRRR at q=0.91,x=1.0,
+#    - old C2 seam row RZ:F:dZZ near q=0.84,x=1.0.
+
+# 3. Regenerate certs/profile/profile_nk.json and
+#    certs/final_theorem_manifest.json after the patchfix commit so the ledger
+#    hashes record the corrected residual/Jacobian code path, while preserving
+#    pass=false.
+```
+
+## 1D. Historical Stage-0 Trace (Superseded by 1C)
 
 Latest repo update in this prompt:
 
