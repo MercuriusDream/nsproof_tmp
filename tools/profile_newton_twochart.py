@@ -1000,7 +1000,9 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     reset_native_c_rz_stats()
     all_variables = enumerate_coefficients(data)
     all_variables_by_index = {variable.index: variable for variable in all_variables}
-    pde_points = parse_qb_points(args.pde_qb_points)
+    manual_pde_points = parse_qb_points(args.pde_qb_points)
+    pde_scan_active_report = residual_scan_active_qb_points(data, args)
+    pde_points = dedupe_qb_points(manual_pde_points + list(pde_scan_active_report.get("points", [])))
     variable_charts = parse_variable_charts(args.variable_charts)
     q_values = grid(args.overlap_q_min, args.overlap_q_max, args.mortar_q_samples) if "interface" in blocks else []
     x_values = grid(0.0, 1.0, args.mortar_x_samples) if "interface" in blocks else []
@@ -1380,6 +1382,12 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
         "native_c_rz": native_c_rz_stats(),
         "native_c_pde": native_c_pde,
         "objective_pde_rows": pde_rows,
+        "manual_pde_points": [[q, b] for q, b in manual_pde_points],
+        "pde_points": [[q, b] for q, b in pde_points],
+        "pde_scan_active": {
+            **pde_scan_active_report,
+            "points": [[q, b] for q, b in pde_scan_active_report.get("points", [])],
+        },
         "objective_mortar_rows": objective_mortar_rows,
         "objective_active_guard_points": objective_active_guard_points,
         "selected_by_chart": selected_by_chart,
@@ -1471,9 +1479,12 @@ def mortar_audit_metrics(data: dict[str, Any], rows: list[Any], use_native_c: bo
     }
 
 
-def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
-    if args.max_residual_audit_growth <= 0.0:
-        return {"enabled": False, **vector_metrics([])}
+def residual_audit_point_records(
+    data: dict[str, Any],
+    args: argparse.Namespace,
+    scan_raw: str,
+    h: float,
+) -> dict[str, Any]:
     from validators.compactified_equations import compactified_residual_defined, qb_to_rz
     from validators.compactified_equations_twochart import (
         SCAN_PRESETS,
@@ -1482,9 +1493,7 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
     )
 
     projection = projection_from_twochart(data)
-    scan_raw = args.line_search_residual_audit_scan.strip() or args.scan
     scan_names = parse_scan_names(scan_raw)
-    h = float(args.line_search_residual_audit_h)
     audit_points: list[dict[str, Any]] = []
     skipped_by_scan: list[int] = []
     for scan_index, name in enumerate(scan_names):
@@ -1500,11 +1509,18 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
                     skipped += 1
                     continue
                 audit_points.append(
-                    {"scan_index": scan_index, "q": q, "b": b, "r": r, "z": z}
+                    {"scan_index": scan_index, "scan": name, "q": q, "b": b, "r": r, "z": z}
                 )
         skipped_by_scan.append(skipped)
+
     native_residuals: dict[int, Any] = {}
-    native_stats: dict[str, Any] = {"enabled": bool(args.native_c), "used": False, "points": 0, "cases": 0, "seconds": 0.0}
+    native_stats: dict[str, Any] = {
+        "enabled": bool(args.native_c),
+        "used": False,
+        "points": 0,
+        "cases": 0,
+        "seconds": 0.0,
+    }
     if args.native_c and audit_points:
         native_residuals, native_stats = native_tail_exact_residuals_with_kind(
             data,
@@ -1512,6 +1528,8 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
             [(float(point["q"]), float(point["b"])) for point in audit_points],
             args.residual_kind,
         )
+
+    records: list[dict[str, Any]] = []
     values: list[float] = []
     scan_values_by_index: list[list[float]] = [[] for _name in scan_names]
     scan_points_by_index = [0 for _name in scan_names]
@@ -1535,21 +1553,25 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
         scan_index = int(point["scan_index"])
         local_values = [float(residual.e_psi), float(residual.e_gamma)]
         local_max = max(abs(value) for value in local_values)
+        record = {
+            "scan": scan_names[scan_index],
+            "q": q,
+            "b": b,
+            "r": float(point["r"]),
+            "z": float(point["z"]),
+            "e_psi": float(residual.e_psi),
+            "e_gamma": float(residual.e_gamma),
+            "max_abs": local_max,
+        }
+        records.append(record)
         scan_points_by_index[scan_index] += 1
         scan_values_by_index[scan_index].extend(local_values)
         values.extend(local_values)
         if local_max > float(scan_worst_by_index[scan_index].get("max_abs", -1.0)):
-            scan_worst_by_index[scan_index] = {
-                "q": q,
-                "b": b,
-                "r": float(point["r"]),
-                "z": float(point["z"]),
-                "e_psi": float(residual.e_psi),
-                "e_gamma": float(residual.e_gamma),
-                "max_abs": local_max,
-            }
+            scan_worst_by_index[scan_index] = dict(record)
         if local_max > float(worst.get("max_abs", -1.0)):
-            worst = {"scan": scan_names[scan_index], **scan_worst_by_index[scan_index]}
+            worst = dict(record)
+
     scan_reports: list[dict[str, Any]] = []
     for scan_index, name in enumerate(scan_names):
         spec = SCAN_PRESETS[name]
@@ -1570,13 +1592,64 @@ def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> di
             }
         )
     return {
-        "enabled": True,
         "scan": ",".join(scan_names),
         "h": h,
         "native_c_tail_exact": native_stats,
         "scans": scan_reports,
+        "records": records,
         "worst": worst,
-        **vector_metrics(values),
+        "metrics": vector_metrics(values),
+    }
+
+
+def residual_scan_active_qb_points(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    count = int(getattr(args, "pde_scan_active_count", 0))
+    if count <= 0:
+        return {"enabled": False, "points": [], "selected": []}
+    scan_raw = str(getattr(args, "pde_scan_active_scan", "")).strip()
+    if not scan_raw:
+        scan_raw = args.line_search_residual_audit_scan.strip() or args.scan
+    h = float(getattr(args, "pde_scan_active_h", args.line_search_residual_audit_h))
+    audit = residual_audit_point_records(data, args, scan_raw, h)
+    selected: list[dict[str, Any]] = []
+    points: list[tuple[float, float]] = []
+    seen: set[tuple[float, float]] = set()
+    for record in sorted(audit["records"], key=lambda item: float(item["max_abs"]), reverse=True):
+        key = (round(float(record["q"]), 15), round(float(record["b"]), 15))
+        if key in seen:
+            continue
+        seen.add(key)
+        selected.append(record)
+        points.append((float(record["q"]), float(record["b"])))
+        if len(points) >= count:
+            break
+    return {
+        "enabled": True,
+        "requested_count": count,
+        "scan": audit["scan"],
+        "h": h,
+        "points": points,
+        "selected": selected,
+        "source_worst": audit["worst"],
+        "source_metrics": audit["metrics"],
+        "native_c_tail_exact": audit["native_c_tail_exact"],
+    }
+
+
+def residual_audit_metrics(data: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    if args.max_residual_audit_growth <= 0.0:
+        return {"enabled": False, **vector_metrics([])}
+    scan_raw = args.line_search_residual_audit_scan.strip() or args.scan
+    h = float(args.line_search_residual_audit_h)
+    audit = residual_audit_point_records(data, args, scan_raw, h)
+    return {
+        "enabled": True,
+        "scan": audit["scan"],
+        "h": h,
+        "native_c_tail_exact": audit["native_c_tail_exact"],
+        "scans": audit["scans"],
+        "worst": audit["worst"],
+        **audit["metrics"],
     }
 
 
@@ -2041,6 +2114,8 @@ def write_stage0_row_cache(args: argparse.Namespace, system: dict[str, Any], ite
             "constraint_labels": sorted(parse_label_set(args.guarded_kkt_constraint_labels)),
             "mortar_rows_unfiltered_max_abs": system.get("mortar_rows_unfiltered_max_abs", 0.0),
             "mortar_rows_unfiltered_worst": system.get("mortar_rows_unfiltered_worst", {}),
+            "pde_points": system.get("pde_points", []),
+            "pde_scan_active": system.get("pde_scan_active", {}),
         },
     )
     write_json(args.row_cache_out, cache)
@@ -2343,6 +2418,8 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
                 if rank_report
                 else {},
                 "active_guard_weight": args.active_guard_weight,
+                "pde_points": system.get("pde_points", []),
+                "pde_scan_active": system.get("pde_scan_active", {}),
                 "active_guard_rows": system["active_guard_rows"],
                 "active_guard_points": system["active_guard_points"],
                 "stage0_workers": system.get("stage0_workers", 1),
@@ -2399,6 +2476,9 @@ def run_stage0(args: argparse.Namespace, data: dict[str, Any], hooks: HookReport
             "mortar_active_count": args.mortar_active_count,
             "overlap_q_range": [args.overlap_q_min, args.overlap_q_max],
             "pde_qb_points": [[q, b] for q, b in parse_qb_points(args.pde_qb_points)],
+            "pde_scan_active_count": args.pde_scan_active_count,
+            "pde_scan_active_scan": args.pde_scan_active_scan,
+            "pde_scan_active_h": args.pde_scan_active_h,
             "guard_qb_points": [[q, b] for q, b in guard_points],
             "guard_qb_points_explicit": [[q, b] for q, b in guard_point_report["explicit"]],
             "guard_qb_points_generated": [[q, b] for q, b in guard_point_report["generated"]],
@@ -2695,6 +2775,26 @@ def main() -> None:
     parser.add_argument("--overlap-q-min", type=float, default=0.84)
     parser.add_argument("--overlap-q-max", type=float, default=0.92)
     parser.add_argument("--pde-qb-points", default="")
+    parser.add_argument(
+        "--pde-scan-active-count",
+        type=nonnegative_int,
+        default=0,
+        help="Add this many largest held-out PDE residual scan points to the Stage-0 objective rows.",
+    )
+    parser.add_argument(
+        "--pde-scan-active-scan",
+        default="",
+        help=(
+            "Comma-separated scan presets used to select automatic PDE objective points; "
+            "empty reuses --line-search-residual-audit-scan, then --scan."
+        ),
+    )
+    parser.add_argument(
+        "--pde-scan-active-h",
+        type=positive_float,
+        default=1e-3,
+        help="Axis skip radius h for automatic held-out PDE objective point selection.",
+    )
     parser.add_argument("--guard-qb-points", default="", help="Semicolon-separated q,b points used only as line-search guards.")
     parser.add_argument(
         "--guard-grid",
@@ -2962,6 +3062,8 @@ def main() -> None:
         parse_scan_names(args.scan)
         if args.line_search_residual_audit_scan.strip():
             parse_scan_names(args.line_search_residual_audit_scan)
+        if args.pde_scan_active_scan.strip():
+            parse_scan_names(args.pde_scan_active_scan)
     except ValueError as exc:
         parser.error(str(exc))
     if not args.line_search or any(alpha <= 0.0 for alpha in args.line_search):
