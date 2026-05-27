@@ -15,11 +15,11 @@
     "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
   },
   "commands": [
-    "tools/validate_tail_certificates.py --profile work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
+    "tools/validate_tail_certificates.py --profile work/twochart_stage0_current_profile_mortaraudit128.json --tail-out certs/tail/tail_recurrence.json --indicial-out certs/tail/indicial_pluecker_cover.json --matching-out certs/profile/matching_determinant.json"
   ],
   "dependency_hashes": {
     "code:validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8",
-    "exact_tail_algebra": "92d6a5ce4e271766709f7cbaf022ded01fba4e1cb2292cd145a3b244461851e3"
+    "exact_tail_algebra": "3194e3efa0995a6ca5b13230da9f2b1543f058665e203503a4425a4ccaa25be1"
   },
   "exact_algebraic_subclaims": {
     "B": "1",
@@ -388,7 +388,7 @@
         "profile_format_supported": true,
         "profile_supplied": true
       },
-      "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
+      "profile": "work/twochart_stage0_current_profile_mortaraudit128.json",
       "tolerance": 1e-12
     },
     "infinite_tail_recurrence_pass": false,
@@ -404,7 +404,7 @@
   "exact_tail_algebra_code_hashes": {
     "validators/exact_tail_algebra.py": "551cedca7cc1d1e56c46b1da703ee6cf65ae6e5a3da47d58dbaa9822805c72f8"
   },
-  "exact_tail_algebra_hash_sha256": "92d6a5ce4e271766709f7cbaf022ded01fba4e1cb2292cd145a3b244461851e3",
+  "exact_tail_algebra_hash_sha256": "3194e3efa0995a6ca5b13230da9f2b1543f058665e203503a4425a4ccaa25be1",
   "exponent_semigroup": null,
   "failure_reason": "tail recurrence is not interval-validated with directed rounding; infinite tail remainder majorant is missing; exponent semigroup closure certificate is missing",
   "forced_qp_coefficients": {
@@ -428,7 +428,7 @@
     "0.45"
   ],
   "input_hashes": {
-    "profile": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8"
+    "profile": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12"
   },
   "interval_widths": {
     "max": null,
@@ -437,12 +437,12 @@
   "mathematical_statement": "The profile tail belongs to the natural transseries class: q1 is absent, the forced q^p channel satisfies the formal recurrence, q2 is excluded unless certified legal, and all retained/infinite tail channels satisfy a directed-rounding recurrence with a remainder bound.",
   "pass": false,
   "precision_bits": 53,
-  "profile": "work/twochart_stage0_rz_ineqkkt_c4_shiftB128_coupled_inject_nativeaudit_tailnative_scaled.json",
-  "profile_hash_sha256": "e9c62740a3f0fd46397598d6a685c5c8bf7336c2eed6f2ab248b972e7fb793a8",
+  "profile": "work/twochart_stage0_current_profile_mortaraudit128.json",
+  "profile_hash_sha256": "fa445741d3c9d69ad71b8e97307749c8db8164606f03d20dd50a4d7cbc62cd12",
   "q1_exclusion": "structural",
   "q2_policy": "zero",
   "remainder_bound": null,
-  "repo_commit": "0b3785e784d2111ce83ce1fcdc4320de24a33c04",
+  "repo_commit": "de7eacd5dc13713c268cd88310a2bff69c3b4572",
   "rounding_mode": "nearest",
   "schema_version": "nsproof-cert-v1",
   "tail_metadata": {
