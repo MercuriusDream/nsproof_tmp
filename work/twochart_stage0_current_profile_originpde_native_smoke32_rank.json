@@ -1,0 +1,486 @@
+{
+  "diagnostic_vs_proof": "floating rank/angle diagnostics only; no interval proof",
+  "format": "twochart_guarded_kkt_rank_reports_v1",
+  "input": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
+  "out": "work/twochart_stage0_current_profile_originpde_native_smoke32.json",
+  "reports": [
+    {
+      "angle": {
+        "best_feasible_step_metrics": {
+          "count": 32,
+          "l2": 63697.681412706625,
+          "max_abs": 50081.19911324269,
+          "rms": 11260.265618196288
+        },
+        "predicted_best_factor_inf": 0.008789791149897124,
+        "projected_change_metrics": {
+          "count": 9,
+          "l2": 52035.39428228929,
+          "max_abs": 49632.33239746094,
+          "rms": 17345.131427429766
+        },
+        "rho_grad": 0.9999999999999291,
+        "rho_range": 0.999964911590231
+      },
+      "columns": 32,
+      "constraint_labels": [
+        "active_guard"
+      ],
+      "constraint_space": {
+        "nullity": 14,
+        "rank": 18,
+        "residual_metrics": {
+          "count": 50,
+          "l2": 11026.42509790286,
+          "max_abs": 9177.297620696078,
+          "rms": 1559.3719917945307
+        },
+        "singular_values": [
+          7537753.886913498,
+          316275.7756183241,
+          118723.11631373505,
+          318.44472295621836,
+          120.51497807103515,
+          56.40768208877915,
+          6.488841976103634,
+          2.1237368416243623,
+          1.7976188639342716,
+          0.8524369384269871,
+          0.31139890455039565,
+          0.2663984251800418,
+          0.1080593943403746,
+          0.015376079787916403,
+          0.0021302716248048923,
+          0.001961510456996998,
+          0.0006665220625101034,
+          3.954779916158018e-05,
+          6.8961965513583e-10,
+          6.8961965513583e-10,
+          6.8961965513583e-10,
+          6.8961965513583e-10,
+          6.8961965513583e-10,
+          6.8961965513583e-10
+        ]
+      },
+      "coverage": {
+        "active_primary_raw_max": 4963232.981363486,
+        "coverage": 1.0,
+        "coverage_min": 0.5,
+        "coverage_ok": true,
+        "heldout_global_mortar_max": 4963232.981363486,
+        "note": "coverage uses unweighted raw residual metadata when provided"
+      },
+      "diagnostic_vs_proof": "floating guarded-KKT rank/angle diagnostic only; no interval proof",
+      "iteration": 0,
+      "linear_algebra_backend": "numpy_svd_lstsq",
+      "mortar_rows_active": 8,
+      "mortar_rows_available": 30,
+      "mortar_rows_unfiltered_worst": {
+        "abs_residual": 4963232.981363486,
+        "component": "F",
+        "coordinate": "RZ",
+        "derivative": "dRRRR",
+        "dq_order": 4,
+        "dx_order": 0,
+        "jacobian": [
+          {
+            "value": 9.345986834834587,
+            "var_index": 4235
+          },
+          {
+            "value": 11.440771953767225,
+            "var_index": 8591
+          },
+          {
+            "value": 103321.03882734162,
+            "var_index": 4236
+          },
+          {
+            "value": 48.82388034190511,
+            "var_index": 12947
+          },
+          {
+            "value": 241.0242386077264,
+            "var_index": 4246
+          },
+          {
+            "value": 103302.40159768952,
+            "var_index": 8592
+          },
+          {
+            "value": 5034862.785202552,
+            "var_index": 4237
+          },
+          {
+            "value": 102955.02004789108,
+            "var_index": 12948
+          },
+          {
+            "value": 101231.99610051225,
+            "var_index": 4247
+          },
+          {
+            "value": 268.7869666587765,
+            "var_index": 8602
+          },
+          {
+            "value": 5882.656175933483,
+            "var_index": 4257
+          },
+          {
+            "value": 613.3414628203651,
+            "var_index": 12958
+          },
+          {
+            "value": -24.0,
+            "var_index": 26150
+          },
+          {
+            "value": 98189273.36018293,
+            "var_index": 4238
+          },
+          {
+            "value": 4997032.5991659295,
+            "var_index": 8593
+          },
+          {
+            "value": 1637890.9871688012,
+            "var_index": 4248
+          },
+          {
+            "value": 4621832.968511501,
+            "var_index": 12949
+          },
+          {
+            "value": 46311.88041845082,
+            "var_index": 4258
+          },
+          {
+            "value": 100965.89199477891,
+            "var_index": 8603
+          },
+          {
+            "value": -4.9820070039850215,
+            "var_index": 26155
+          },
+          {
+            "value": 60682.350555814686,
+            "var_index": 4268
+          },
+          {
+            "value": 97457.3725158945,
+            "var_index": 12959
+          },
+          {
+            "value": -1861643535784.4253,
+            "var_index": 4344
+          },
+          {
+            "value": -726269285088.1777,
+            "var_index": 4322
+          },
+          {
+            "value": 1071761512233.813,
+            "var_index": 4355
+          },
+          {
+            "value": 126805377.08945888,
+            "var_index": 4345
+          },
+          {
+            "value": -1824224643080.185,
+            "var_index": 8700
+          },
+          {
+            "value": 1707486858307.7087,
+            "var_index": 4333
+          },
+          {
+            "value": 1672934739922.9944,
+            "var_index": 8689
+          },
+          {
+            "value": -1703112054026.3928,
+            "var_index": 4289
+          },
+          {
+            "value": 1692008997778.7368,
+            "var_index": 4245
+          },
+          {
+            "value": -1668853948155.812,
+            "var_index": 8645
+          },
+          {
+            "value": 1658047550303.058,
+            "var_index": 8601
+          },
+          {
+            "value": 1535207540441.8047,
+            "var_index": 4300
+          },
+          {
+            "value": 1504460513503.0254,
+            "var_index": 8656
+          },
+          {
+            "value": -1488987992356.3057,
+            "var_index": 13056
+          },
+          {
+            "value": 1363616523685.8982,
+            "var_index": 13045
+          },
+          {
+            "value": -1361961616673.8918,
+            "var_index": 13001
+          },
+          {
+            "value": 1353738848134.12,
+            "var_index": 12957
+          },
+          {
+            "value": -1258994891881.5513,
+            "var_index": 4256
+          },
+          {
+            "value": -1233754557906.8994,
+            "var_index": 8612
+          },
+          {
+            "value": 1228885986956.675,
+            "var_index": 13012
+          },
+          {
+            "value": 1050514225556.4775,
+            "var_index": 8711
+          },
+          {
+            "value": 1011664694421.9258,
+            "var_index": 4278
+          },
+          {
+            "value": 991233527859.2241,
+            "var_index": 8634
+          },
+          {
+            "value": -1007560470321.9583,
+            "var_index": 12968
+          },
+          {
+            "value": 859860153266.8953,
+            "var_index": 13067
+          },
+          {
+            "value": 812594469947.75,
+            "var_index": 4332
+          },
+          {
+            "value": 808288702761.6487,
+            "var_index": 12990
+          },
+          {
+            "value": 796243210109.3739,
+            "var_index": 8688
+          },
+          {
+            "value": -796741778941.5834,
+            "var_index": 4343
+          }
+        ],
+        "jacobian_nnz": 51,
+        "origin_value": -83529.33297670742,
+        "q": 0.91,
+        "residual_tail_minus_origin": -4963232.981363486,
+        "row_index": 14,
+        "tail_value": -5046762.314340193,
+        "total_order": 4,
+        "x": 1.0
+      },
+      "primary_labels": [
+        "mortar",
+        "pde"
+      ],
+      "primary_space": {
+        "rank": 9,
+        "rank_projected": 8,
+        "residual_metrics": {
+          "count": 9,
+          "l2": 52037.220185594415,
+          "max_abs": 49632.32981363486,
+          "rms": 17345.740061864806
+        },
+        "singular_values": [
+          48894956550.66554,
+          2163624247.29291,
+          472349374.17928654,
+          2129404.3265142706,
+          324283.6653123926,
+          13.567322769885939,
+          0.24511637925437704,
+          0.06496545116193723,
+          0.04712228607245085
+        ],
+        "singular_values_projected": [
+          48894956550.66555,
+          2163624247.2929106,
+          472349374.1792864,
+          324283.66531217884,
+          13.567184593359768,
+          0.04900055290707566,
+          0.02334810771518483,
+          0.01942214522653924,
+          6.039673117746437e-11
+        ]
+      },
+      "provided_step": {
+        "constraint_change_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "max_signed_constraint_growth": 0.0,
+        "metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "positive_signed_constraint_growth_count": 0,
+        "predicted_constraint_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "present": false,
+        "signed_constraint_growth_metrics": {
+          "count": 0,
+          "l2": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0
+        }
+      },
+      "rank_obstruction": false,
+      "row_space_note": "uses the residual/Jacobian rows supplied by the caller, typically post row-scaling",
+      "rows": {
+        "constraints": 50,
+        "primary": 9,
+        "total": 59
+      },
+      "status": "GUARDED_KKT_RANK_DIAGNOSTIC_NOT_PROOF",
+      "top_variables": [
+        {
+          "column": 16,
+          "gradient": 932476858003971.0,
+          "leverage": 18633787513.07716,
+          "projected_gradient": 932476858003971.1,
+          "score": 932476858003971.1,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[9,10]"
+        },
+        {
+          "column": 18,
+          "gradient": 913782257263199.1,
+          "leverage": 18259344408.595505,
+          "projected_gradient": 913782257263199.0,
+          "score": 913782257263199.1,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p35].c[9,10]"
+        },
+        {
+          "column": 20,
+          "gradient": -883393719191754.0,
+          "leverage": 17245376226.463955,
+          "projected_gradient": -883393719191753.9,
+          "score": 883393719191754.0,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[8,10]"
+        },
+        {
+          "column": 22,
+          "gradient": -865548981720624.1,
+          "leverage": 16896663292.800215,
+          "projected_gradient": -865548981720623.9,
+          "score": 865548981720624.1,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p35].c[8,10]"
+        },
+        {
+          "column": 24,
+          "gradient": 859845562992259.9,
+          "leverage": 17059167807.477776,
+          "projected_gradient": 859845562992260.2,
+          "score": 859845562992260.2,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[4,10]"
+        },
+        {
+          "column": 26,
+          "gradient": -847073764523825.9,
+          "leverage": 16926871744.103088,
+          "projected_gradient": -847073764523826.0,
+          "score": 847073764523826.0,
+          "step": 0.0,
+          "variable": "tail.F_an[p35].c[0,10]"
+        },
+        {
+          "column": 28,
+          "gradient": 842587248314150.1,
+          "leverage": 16716159322.832134,
+          "projected_gradient": 842587248314150.0,
+          "score": 842587248314150.1,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p35].c[4,10]"
+        },
+        {
+          "column": 30,
+          "gradient": -830111682173748.5,
+          "leverage": 16587195581.029182,
+          "projected_gradient": -830111682173748.1,
+          "score": 830111682173748.5,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p35].c[0,10]"
+        },
+        {
+          "column": 0,
+          "gradient": 377757032.57257175,
+          "leverage": 865903.1914380284,
+          "projected_gradient": -1.0987237357518239e-11,
+          "score": 377757032.57257175,
+          "step": 0.0,
+          "variable": "tail.F_an[p29].c[10,0]"
+        },
+        {
+          "column": 2,
+          "gradient": 370418272.29072803,
+          "leverage": 849081.119573552,
+          "projected_gradient": 1.5166585234794662e-07,
+          "score": 370418272.29072803,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p29].c[10,0]"
+        },
+        {
+          "column": 4,
+          "gradient": -334307690.58389896,
+          "leverage": 766307.6296091529,
+          "projected_gradient": -1.0820010105823873e-06,
+          "score": 334307690.58389896,
+          "step": 0.0,
+          "variable": "tail.F_an[p29].c[10,3]"
+        },
+        {
+          "column": 6,
+          "gradient": -327720603.53967625,
+          "leverage": 751208.5600960611,
+          "projected_gradient": 8.542677519931898e-07,
+          "score": 327720603.53967625,
+          "step": 0.0,
+          "variable": "tail.F_frac[f1][p29].c[10,3]"
+        }
+      ]
+    }
+  ],
+  "status": "TWOCHART_NEWTON_STAGE0_ANALYTIC_GN_NOT_PROOF"
+}

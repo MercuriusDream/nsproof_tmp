@@ -649,6 +649,29 @@ def _native_c_library() -> ctypes.CDLL:
         c_int_p,
     ]
     lib.nsproof_pde_tail_coeff_columns_batch.restype = ctypes.c_int
+    lib.nsproof_pde_origin_coeff_columns_batch.argtypes = [
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        ctypes.c_double,
+        c_int_p,
+        c_int_p,
+        c_int_p,
+        c_double_p,
+        c_double_p,
+        c_int_p,
+    ]
+    lib.nsproof_pde_origin_coeff_columns_batch.restype = ctypes.c_int
     lib.nsproof_stage0_prediction_scan_batch.argtypes = [
         ctypes.c_int,
         ctypes.c_int,

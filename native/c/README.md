@@ -43,6 +43,14 @@ PDE/guard tail-coefficient column batch path are wired into Stage-0 behind
     quotients as the Python path.
   - Uses caller-provided base profile scalars so Python can still own profile
     evaluation while the repeated tail-column work moves to C.
+- `nsproof_pde_origin_coeff_columns_batch(...)`
+  - Batched physical-space PDE linearized residual columns for active origin
+    Taylor coefficients at one `(q,b)` point.
+  - Evaluates origin monomial perturbations `R^a Z^b`, with `R=r^2` and
+    `Z=z^2`, inside the same `psi = r^2 z q^p F` and
+    `Gamma = r^2 q^p G` envelopes used by the Python jet path.
+  - Uses nonnegative integer jet powers for the origin monomials so zero-valued
+    monomial bases do not depend on real-power jets.
 - `nsproof_stage0_prediction_scan_batch(...)`
   - Batched linear prediction metrics for already-built Stage-0 rows.
   - Evaluates `residual + alpha * J * step` for several applied alphas and
@@ -132,10 +140,11 @@ current_128_exact_c_accelerable_without_solver_changes = false
 ```
 
 That probe is now historical for the q/x inner-kernel boundary. The current C
-ABI also includes the R/Z chain-rule kernel, a PDE/guard tail-column kernel, and
-a linear prediction scan kernel, so the remaining large non-native slice in the
-128 run is mostly origin-column PDE work, base profile evaluation, active-set
-linear algebra, and nonlinear objective/guard reevaluation.
+ABI also includes the R/Z chain-rule kernel, PDE/guard tail-column and
+origin-column kernels, and a linear prediction scan kernel, so the remaining
+large non-native slice in the 128 run is mostly base profile evaluation,
+active-set linear algebra, row selection, and nonlinear objective/guard
+reevaluation.
 
 ## Stage-0 Native Paths
 

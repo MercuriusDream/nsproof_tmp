@@ -846,6 +846,7 @@ def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str
     from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
         linearized_residual_with_kind,
+        native_origin_linearized_residuals_with_kind,
         native_tail_linearized_residuals_with_kind,
     )
 
@@ -857,9 +858,12 @@ def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str
     raw = projection.exact_residual_at(r, z)
     residual = residual_with_kind(raw, q, b, projection.p, _STAGE0_WORKER_RESIDUAL_KIND)
     native_tail_columns: dict[int, Any] = {}
+    native_origin_columns: dict[int, Any] = {}
     native_stats: dict[str, Any] = {"enabled": False, "cases": 0, "seconds": 0.0}
     if _STAGE0_WORKER_NATIVE_C:
-        native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+        tail_stats: dict[str, Any]
+        origin_stats: dict[str, Any]
+        native_tail_columns, tail_stats = native_tail_linearized_residuals_with_kind(
             _STAGE0_WORKER_DATA,
             projection,
             _STAGE0_WORKER_VARIABLES,
@@ -867,10 +871,21 @@ def _stage0_point_worker(task: tuple[float, float, float, str, str]) -> dict[str
             b,
             _STAGE0_WORKER_RESIDUAL_KIND,
         )
+        native_origin_columns, origin_stats = native_origin_linearized_residuals_with_kind(
+            projection,
+            _STAGE0_WORKER_VARIABLES,
+            q,
+            b,
+            _STAGE0_WORKER_RESIDUAL_KIND,
+        )
+        _merge_native_stat(native_stats, tail_stats)
+        _merge_native_stat(native_stats, origin_stats)
     columns = []
     for variable in _STAGE0_WORKER_VARIABLES:
         if _STAGE0_WORKER_NATIVE_C and variable.chart == "tail":
             columns.append(native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
+        elif _STAGE0_WORKER_NATIVE_C and variable.chart == "origin":
+            columns.append(native_origin_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
         else:
             columns.append(
                 linearized_residual_with_kind(
@@ -957,11 +972,17 @@ def build_stage0_point_rows(
         raw = projection.exact_residual_at(r, z)
         residual = residual_with_kind(raw, q, b, projection.p, residual_kind)
         native_tail_columns: dict[int, Any] = {}
+        native_origin_columns: dict[int, Any] = {}
         native_stats: dict[str, Any] = {"enabled": False, "cases": 0, "seconds": 0.0}
         if use_native_c:
-            from validators.compactified_equations_twochart import native_tail_linearized_residuals_with_kind
+            from validators.compactified_equations_twochart import (
+                native_origin_linearized_residuals_with_kind,
+                native_tail_linearized_residuals_with_kind,
+            )
 
-            native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+            tail_stats: dict[str, Any]
+            origin_stats: dict[str, Any]
+            native_tail_columns, tail_stats = native_tail_linearized_residuals_with_kind(
                 data,
                 projection,
                 selected,
@@ -969,10 +990,21 @@ def build_stage0_point_rows(
                 b,
                 residual_kind,
             )
+            native_origin_columns, origin_stats = native_origin_linearized_residuals_with_kind(
+                projection,
+                selected,
+                q,
+                b,
+                residual_kind,
+            )
+            _merge_native_stat(native_stats, tail_stats)
+            _merge_native_stat(native_stats, origin_stats)
         columns = []
         for variable in selected:
             if use_native_c and variable.chart == "tail":
                 columns.append(native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
+            elif use_native_c and variable.chart == "origin":
+                columns.append(native_origin_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0)))
             else:
                 columns.append(linearized_residual_with_kind(data, projection, variable, q, b, residual_kind))
         rows.append(
@@ -998,6 +1030,7 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
     from validators.compactified_equations import Residual, compactified_residual_defined, qb_to_rz, residual_with_kind
     from validators.compactified_equations_twochart import (
         linearized_residual_with_kind,
+        native_origin_linearized_residuals_with_kind,
         native_tail_linearized_residuals_with_kind,
         projection_from_twochart,
     )
@@ -1357,8 +1390,11 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             if not selected_components or record is None:
                 continue
             native_tail_columns: dict[int, Any] = {}
+            native_origin_columns: dict[int, Any] = {}
             if args.native_c:
-                native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+                tail_stats: dict[str, Any]
+                origin_stats: dict[str, Any]
+                native_tail_columns, tail_stats = native_tail_linearized_residuals_with_kind(
                     data,
                     projection,
                     pde_variable_pool,
@@ -1366,13 +1402,20 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
                     b,
                     args.residual_kind,
                 )
-                if native_stats.get("enabled"):
-                    native_c_pde_injection["enabled"] = True
-                    native_c_pde_injection["cases"] += int(native_stats.get("cases", 0))
-                    native_c_pde_injection["seconds"] += float(native_stats.get("seconds", 0.0))
+                native_origin_columns, origin_stats = native_origin_linearized_residuals_with_kind(
+                    projection,
+                    pde_variable_pool,
+                    q,
+                    b,
+                    args.residual_kind,
+                )
+                _merge_native_stat(native_c_pde_injection, tail_stats)
+                _merge_native_stat(native_c_pde_injection, origin_stats)
             for variable in pde_variable_pool:
                 if args.native_c and variable.chart == "tail":
                     column = native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
+                elif args.native_c and variable.chart == "origin":
+                    column = native_origin_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
                 else:
                     column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
                 component_scores: list[tuple[str, float, float, float]] = []
@@ -1495,8 +1538,11 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
             if component in selected_components:
                 pde_rows.append({"q": q, "b": b, "component": component, "residual": record[component]})
         native_tail_columns: dict[int, Any] = {}
+        native_origin_columns: dict[int, Any] = {}
         if args.native_c:
-            native_tail_columns, native_stats = native_tail_linearized_residuals_with_kind(
+            tail_stats: dict[str, Any]
+            origin_stats: dict[str, Any]
+            native_tail_columns, tail_stats = native_tail_linearized_residuals_with_kind(
                 data,
                 projection,
                 candidate_variables,
@@ -1504,13 +1550,20 @@ def build_stage0_system(data: dict[str, Any], args: argparse.Namespace, blocks: 
                 b,
                 args.residual_kind,
             )
-            if native_stats.get("enabled"):
-                native_c_pde_prescore["enabled"] = True
-                native_c_pde_prescore["cases"] += int(native_stats.get("cases", 0))
-                native_c_pde_prescore["seconds"] += float(native_stats.get("seconds", 0.0))
+            native_origin_columns, origin_stats = native_origin_linearized_residuals_with_kind(
+                projection,
+                candidate_variables,
+                q,
+                b,
+                args.residual_kind,
+            )
+            _merge_native_stat(native_c_pde_prescore, tail_stats)
+            _merge_native_stat(native_c_pde_prescore, origin_stats)
         for variable in candidate_variables:
             if args.native_c and variable.chart == "tail":
                 column = native_tail_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
+            elif args.native_c and variable.chart == "origin":
+                column = native_origin_columns.get(variable.index, Residual(e_psi=0.0, e_gamma=0.0))
             else:
                 column = linearized_residual_with_kind(data, projection, variable, q, b, args.residual_kind)
             if "e_psi" in selected_components:

@@ -488,6 +488,75 @@ def native_tail_linearized_residuals_with_kind(
     }, {"enabled": True, "cases": count, "seconds": elapsed}
 
 
+def native_origin_linearized_residuals_with_kind(
+    projection: ProjectedProfile,
+    variables: list[CoefficientVariable],
+    q: float,
+    b: float,
+    residual_kind: str,
+) -> tuple[dict[int, Residual], dict[str, Any]]:
+    if residual_kind not in PDE_RESIDUAL_KIND_IDS:
+        raise ValueError(f"unknown residual kind {residual_kind!r}")
+    r0, z0 = qb_to_rz(q, b)
+    if r0 <= 0.0:
+        raise ValueError("native PDE rows are undefined on the axis r=0")
+    cases: list[CoefficientVariable] = []
+    for variable in variables:
+        if variable.chart != "origin":
+            continue
+        origin = projection.f_origin if variable.component == "F" else projection.g_origin
+        if not origin.enabled or q < origin.q_min:
+            continue
+        cases.append(variable)
+    if not cases:
+        return {}, {"enabled": True, "cases": 0, "seconds": 0.0}
+
+    scalars = base_linearization_scalars(projection, r0, z0)
+    lib = native_c_library()
+    count = len(cases)
+    double_array = ctypes.c_double * count
+    int_array = ctypes.c_int * count
+    r_power_values = int_array(*[int(variable.r_power) for variable in cases])
+    z_power_values = int_array(*[int(variable.z_power) for variable in cases])
+    component_values = int_array(*[0 if variable.component == "F" else 1 for variable in cases])
+    out_e_psi = double_array()
+    out_e_gamma = double_array()
+    statuses = int_array()
+
+    start = time.perf_counter()
+    rc = lib.nsproof_pde_origin_coeff_columns_batch(
+        count,
+        PDE_RESIDUAL_KIND_IDS[residual_kind],
+        float(projection.gamma),
+        float(projection.p),
+        float(q),
+        float(b),
+        float(scalars["psi_r"]),
+        float(scalars["psi_z"]),
+        float(scalars["swirl"]),
+        float(scalars["swirl_r"]),
+        float(scalars["swirl_z"]),
+        float(scalars["a"]),
+        float(scalars["a_r"]),
+        float(scalars["a_z"]),
+        r_power_values,
+        z_power_values,
+        component_values,
+        out_e_psi,
+        out_e_gamma,
+        statuses,
+    )
+    elapsed = time.perf_counter() - start
+    if rc != 0:
+        bad_statuses = sorted(set(int(statuses[index]) for index in range(count)))
+        raise RuntimeError(f"native C PDE origin batch failed rc={rc} statuses={bad_statuses}")
+
+    return {
+        variable.index: Residual(e_psi=float(out_e_psi[row]), e_gamma=float(out_e_gamma[row]))
+        for row, variable in enumerate(cases)
+    }, {"enabled": True, "cases": count, "seconds": elapsed}
+
+
 def _append_tail_coeff_cases(
     cases: list[tuple[float, float, float, float, float, float, int, int, int]],
     patches: list[dict[str, Any]],

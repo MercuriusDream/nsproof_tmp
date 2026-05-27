@@ -136,15 +136,17 @@ background.
 Latest repo update in this prompt:
 
 ```text
-Add coupled audit acceptance, target explicit edge/C4 rows, run chart-balanced
-tail-origin diagnostics, catch one-point C4 overfit with a broad native audit,
-and record a small two-q broad-audit Stage-0 improvement. The theorem
-certificate remains 0/5.
+Add automatic dense-C4 active-row promotion, port origin PDE coefficient
+columns to the native C batch kernel, verify native origin columns against the
+Python jet path, and run a 128-variable C-backed dense-C4 active-row diagnostic.
+The theorem certificate remains 0/5.
 ```
 
 Latest commits:
 
 ```text
+f06cafa Promote dense C4 mortar active rows
+0f46f54 Record dense C4 active row diagnostics
 1e0aaf3 Target explicit edge and C4 mortar rows
 ceeda01 Add coupled audit Stage-0 metric
 1b8877b Update GPT Pro prompt with patchfix diagnostics
@@ -168,7 +170,7 @@ Current stop-condition ledger:
 
 | Gate | Current artifact | Evidence type | Status | Blocking certificate |
 | --- | --- | --- | --- | --- |
-| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics through `work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch_*`; automatic dense-C4 active-row diagnostic `work/twochart_stage0_current_profile_densec4active160_step33_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, max-norm raw gates, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. Step32 reduces held-out edge to `4.284755945898e2`, but dense C0-C4 R/Z mortar worsens to `5.913592917574e6`. Step33 promotes dense C4 rows automatically and accepts no step (`predicted_best_factor_inf=9.999916809043151e-1`). This is not NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
+| Exact profile equation `F_gamma(U_*,P_*)=0` | Current promoted profile `work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json`; exact audit `certs/profile/exact_residual_twochart_audit.json`; finite NK ledger `certs/profile/profile_nk.json`; targeted explicit-row diagnostics through `work/twochart_stage0_current_profile_targeted_edge_c4_q89909192_edge990_explicitaudit160_step32_rawmax_nativebatch_*`; automatic dense-C4 active-row diagnostic `work/twochart_stage0_current_profile_densec4active160_step33_nativebatch_*`; origin-native 128 diagnostic `work/twochart_stage0_current_profile_originpde_densec4active128_step34_nativebatch_*` | Floating/sample diagnostic and scaffold ledger only. Native C, KKT, finite-block NK, row cache, prediction diagnostics, max-norm raw gates, and coupled audit metrics are not interval certificates. | Not certified. Current exact audit has sampled residual max `4.362578130070414e2`; C0-C4 physical R/Z mortar max `4.963232981363504e6`; `profile_nk.json` has `pass=false`; finite full-block diagnostics have `Z0>1`. Step32 reduces held-out edge to `4.284755945898e2`, but dense C0-C4 R/Z mortar worsens to `5.913592917574e6`. Step33 promotes dense C4 rows automatically and accepts no step (`predicted_best_factor_inf=9.999916809043151e-1`). Step34 ports origin PDE columns to native C and accepts a tiny dense-audit step: edge `4.326812264740e2 -> 4.325344334293e2`, C0-C4 R/Z mortar `4.922540831420e6 -> 4.920054735867e6`. This is still far from NK entry. | `certs/profile/profile_nk.json` with directed-rounding interval Newton/radii-polynomial validation, plus `certs/profile/pressure_reconstruction.json`. |
 | Validated exponent `2/5<gamma<1/2` | Fixed branch `gamma=9/20`, `p=20/9`, `B=1` | Exact algebraic inequality for the rational exponent only; floating linkage to uncertified profile. | Not certified as a theorem gate because no interval-certified admissible profile is linked to it. | `certs/profile/profile_nk.json`, `certs/tail/tail_recurrence.json`, and `certs/final_theorem_manifest.json` linkage. |
 | Natural tail, transseries, indicial certification | q1-free, forced-`q^p`, q2-zero tail gate in the current seed; floating Pluecker/Evans probes. | Formal/floating; no interval recurrence certificate and no interval indicial box cover. | Not certified. q1 exclusion and forced `q^p` are enforced in the current seed, but recurrence, q2 exclusion as a theorem, admissible exponent semigroup, and indicial exclusion are not interval-certified. | `certs/tail/tail_recurrence.json`, `certs/tail/indicial_pluecker_cover.json`, `certs/profile/matching_determinant.json`. |
 | Finite unstable projection `rank P_+<infinity` | `tools/linearized_spectrum_probe.py` | Floating residual-Jacobian scaffold, not the true Leray-projected 3D operator. | Not certified. Geometric modes, Riesz projection, Fredholm setup, and finite-rank contour validation are missing. | `certs/spectrum/projected_spectrum.json`. |
@@ -909,6 +911,122 @@ interpretation:
   not a branch kill, but it is stronger than manual q-row chasing: with the
   dense 9x9 C4 blockers promoted, the feasible projected primary space has
   weak effective descent and no accepted nonlinear step.
+```
+
+Native origin PDE-column update:
+
+```text
+implementation:
+  native/c/nsproof_kernel.c now exports
+  nsproof_pde_origin_coeff_columns_batch(...).
+
+  The origin column kernel evaluates origin Taylor monomial perturbations
+  (R^a Z^b) inside the existing physical envelope:
+    delta psi   = r^2 z q^p delta F,
+    delta Gamma = r^2 q^p delta G.
+
+  It mirrors the tail PDE-column kernel's residual linearization and quotient
+  normalization, but uses nonnegative integer jet powers for R=r^2 and Z=z^2
+  so zero-axis/equator monomial cases do not go through real-power jets.
+
+  validators/compactified_equations_twochart.py wraps this as
+  native_origin_linearized_residuals_with_kind(...).
+
+  tools/profile_newton_twochart.py now uses native C columns for both tail and
+  origin variables in:
+    stage-0 point workers,
+    serial objective PDE-row construction,
+    PDE candidate injection,
+    PDE candidate prescoring.
+
+verification:
+  python3 -m py_compile validators/compactified_equations_twochart.py \
+    validators/twochart_mortar_jacobian.py tools/profile_newton_twochart.py
+
+  direct native-vs-Python origin-column check:
+    points = (0.90,0.20), (0.91,0.70), (0.94,0.98), (0.96,0.35)
+    origin cases = 432 residual components
+    max_abs = 1.0658141036401503e-13
+    max_rel = 3.668236317481109e-15
+
+production smoke:
+  work/twochart_stage0_current_profile_originpde_native_smoke32*
+
+  selected_by_chart = tail:16, origin:16
+  native_c_pde cases = 898
+  accepted_any_step = true
+```
+
+Origin-native 128 dense-C4 active-row diagnostic:
+
+```text
+artifact:
+  work/twochart_stage0_current_profile_originpde_densec4active128_step34_nativebatch*
+
+input:
+  work/twochart_stage0_current_profile_targeted_edge_c4_q91092_broadaudit128_step28_nativebatch.json
+
+setup:
+  --mortar-active-source audit
+  --line-search-mortar-audit-order 4
+  --line-search-mortar-audit-q-samples 9
+  --line-search-mortar-audit-x-samples 9
+  --mortar-active-count 96
+  --mortar-active-per-q 4
+  --mortar-active-per-derivative 2
+  --pde-qb-points 0.8999999999999999,0.98;0.9,0.99
+  --max-variables 128
+  --native-c
+  --stage0-workers 8
+
+selection:
+  selected_by_chart = tail:74, origin:54
+  selected_by_block =
+    origin.F_origin_taylor:27
+    origin.G_origin_taylor:27
+    tail.F_an:28
+    tail.F_frac:46
+  row_groups = pde:2, mortar:96, active_guard:242
+  native_c_pde cases = 3139, seconds = 0.008138875999998074
+  native_c_rz cases = 39888, seconds = 0.11334900499999723
+  native_c_prediction cases = 1566720, seconds = 0.021977585000003685
+
+rank:
+  coverage = 1.0
+  constraint rank/nullity = 50/78
+  projected change max_abs = 4.9223375e4
+  rho_grad = 8.208533313446829e-1
+  rho_range = 9.649717354802322e-1
+  predicted_best_factor_inf = 3.282823654953756e-1
+  best feasible step max_abs = 5.458994357297978e5
+
+result:
+  accepted_any_step = true
+  accepted_block = block:F_frac
+  accepted_alpha = 0.015625
+  dense C4 line-search audit:
+    4.922540831420457e6 -> 4.920054735867473e6
+  edge line-search audit:
+    4.326812264740244e2 -> 4.3253443342925294e2
+  coupled normalized audit value:
+    1.0 -> 9.996607362746757e-1
+
+posthoc audit of emitted profile:
+  standard = 1.016228983517e1
+  focused = 1.016228983517e1
+  secondary = 1.422825435582e1
+  origin = 9.132497540774e1
+  edge = 4.325344334293e2
+  overlap = 3.239711929243e2
+  C0-C4 R/Z mortar = 4.920054735867e6
+
+interpretation:
+  This is the first 128-variable dense-C4 active-row diagnostic with native C
+  PDE columns for both tail and origin variables. It is real but tiny floating
+  progress, not proof progress and not NK-entry scale. It shows the C-backed
+  coupled tail-origin path is wired and can move both the edge blocker and the
+  dense C4 blocker in the same accepted step, but the improvement is only about
+  0.034% on edge and 0.0505% on C4 mortar.
 ```
 
 Performance direction from `AGENTS.md`:
