@@ -1,0 +1,35 @@
+name: Degree sensitivity RP4 Boolean label search
+
+on:
+  workflow_dispatch:
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: degree-sensitivity-rp4-20260826
+      - name: Install GAP and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gap python3-pip git
+          python3 -m pip install --break-system-packages numpy
+          mkdir -p "$HOME/.gap/pkg"
+          git clone --depth 1 https://github.com/simpcomp-team/simpcomp.git "$HOME/.gap/pkg/simpcomp"
+      - name: Reconstruct RP4 and run original exact audit
+        run: |
+          python3 degree_sensitivity/rp4_exact.py
+      - name: Search every Boolean labeling of attained Euler values
+        run: |
+          python3 degree_sensitivity/rp4_label_search_v2.py | tee rp4_label_output/run.log
+      - name: Upload exact results
+        uses: actions/upload-artifact@v4
+        with:
+          name: degree-sensitivity-rp4-label-search
+          path: |
+            rp4_label_output
+            **/facets.json
+            **/values.json
+          if-no-files-found: error
