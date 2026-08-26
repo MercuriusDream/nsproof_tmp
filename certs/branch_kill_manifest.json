@@ -1,0 +1,22 @@
+{
+  "branch_kill_pass": true,
+  "certificate_name": "branch_kill_manifest",
+  "dependencies": [
+    {
+      "pass": true,
+      "path": "certs/obstructions/axisymmetric_subparabolic_no_go.json",
+      "sha256": "4295f27e6b230b525d650a7a2bedd74b5af6ad632dc05085198c092e34da9a85"
+    },
+    {
+      "pass": false,
+      "path": "certs/final_theorem_manifest.json",
+      "role": "unchanged positive manifest",
+      "sha256": "c684407c2a7f3344c83fd67d70cb152bdd064841ef5417649676bd2888812f19"
+    }
+  ],
+  "pass": true,
+  "positive_theorem_pass": false,
+  "resolution_type": "exact_analytical_no_go_for_frozen_target_class",
+  "schema_version": "nsproof-branch-kill-v1",
+  "target_profile_class_empty": true
+}

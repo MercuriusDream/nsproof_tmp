@@ -1,0 +1,265 @@
+{
+  "audited_base_commit": "46ddb7e3e1c576ee4697a12581298b25651e3c54",
+  "branch_kill_pass": true,
+  "certificate_name": "axisymmetric_subparabolic_no_go",
+  "conclusion": "TARGET CLASS EMPTY",
+  "exact_arithmetic": {
+    "1-2gamma": "1/10",
+    "1/gamma": "20/9",
+    "U_tail_exponent": "-11/9",
+    "gamma": "9/20",
+    "gradU_Omega_tail_exponent": "-20/9"
+  },
+  "final_navier_stokes_theorem_certificate_percent": 0.0,
+  "hypothesis_checks": [
+    {
+      "check_id": "exact_exponent",
+      "evidence": {
+        "1-2gamma": "1/10",
+        "1/2-gamma": "1/20",
+        "gamma": "9/20",
+        "gamma-2/5": "1/20"
+      },
+      "pass": true
+    },
+    {
+      "check_id": "tail_power",
+      "evidence": {
+        "1/gamma": "20/9",
+        "U_tail": "-11/9",
+        "gradU_Omega_tail": "-20/9"
+      },
+      "pass": true
+    },
+    {
+      "check_id": "repository_target_contract",
+      "evidence": {
+        "execution_sha256": "8c7b96381bccdd207782ad4112f3cf573e25a562d5f7f6499e2af962bace3da4",
+        "missing": [],
+        "problem_sha256": "fb19ee94e8ae883218ef0a0411c4755696700b2e42c0e75b991b6f156b527c64"
+      },
+      "pass": true
+    },
+    {
+      "check_id": "global_two_chart_domain",
+      "evidence": {
+        "origin_chart": {
+          "active_domain": {
+            "R_plus_Z": [
+              0.0,
+              0.4172335600907031
+            ],
+            "q": [
+              0.84,
+              1.0
+            ]
+          },
+          "coordinates": [
+            "R",
+            "Z"
+          ],
+          "definitions": {
+            "R": "rho2*(1-x)",
+            "Z": "rho2*x",
+            "q": "(1+R+Z)^(-1/2)",
+            "rho2": "q^-2 - 1",
+            "x": "Z/(R+Z), with x=0 at R=Z=0 by convention"
+          },
+          "source_origin_q_min": 0.9
+        },
+        "overlap": {
+          "q_band": [
+            0.84,
+            0.92
+          ],
+          "rho2_band": [
+            0.1814744801512287,
+            0.4172335600907031
+          ]
+        },
+        "tail_chart": {
+          "active_domain": {
+            "q": [
+              0.0,
+              0.92
+            ],
+            "x": [
+              0.0,
+              1.0
+            ]
+          },
+          "coordinates": [
+            "q",
+            "x"
+          ],
+          "x_definition": "x=b^2"
+        }
+      },
+      "pass": true
+    },
+    {
+      "check_id": "bounded_tail_factors",
+      "evidence": {
+        "blocks": {
+          "F_an": {
+            "patches": 36,
+            "q_range": [
+              0.0,
+              1.0
+            ],
+            "x_range": [
+              0.0,
+              1.0
+            ]
+          },
+          "F_frac": {
+            "patches": 72,
+            "q_range": [
+              0.0,
+              1.0
+            ],
+            "x_range": [
+              0.0,
+              1.0
+            ]
+          },
+          "G_an": {
+            "patches": 36,
+            "q_range": [
+              0.0,
+              1.0
+            ],
+            "x_range": [
+              0.0,
+              1.0
+            ]
+          },
+          "G_frac": {
+            "patches": 72,
+            "q_range": [
+              0.0,
+              1.0
+            ],
+            "x_range": [
+              0.0,
+              1.0
+            ]
+          }
+        },
+        "representation": {
+          "F": "1/2 + q^2 F_an(q,x) + sum_k q^(k/gamma) F_k(q,x)",
+          "G": "B + q^2 G_an(q,x) + sum_k q^(k/gamma) G_k(q,x)",
+          "fractional_blocks": 2,
+          "ordinary_q1_channel": "structurally_absent_in_projection",
+          "origin_patch": "least_squares_RZ_Taylor_scaffold",
+          "x_variable": "x=b^2"
+        }
+      },
+      "pass": true
+    },
+    {
+      "check_id": "C2_origin_and_interface_target",
+      "evidence": {
+        "mortar_orders": [
+          "dq",
+          "dqq",
+          "dqx",
+          "dx",
+          "dxx"
+        ],
+        "origin_coordinates": "RZ"
+      },
+      "pass": true
+    },
+    {
+      "check_id": "nontrivial_swirl_tail",
+      "evidence": {
+        "B": 1.0,
+        "G0": 1.0
+      },
+      "pass": true
+    },
+    {
+      "check_id": "origin_normalization",
+      "evidence": {
+        "ansatz": "psi=r^2 z q^p F; Gamma=r^2 q^p G",
+        "consequence": "U_r=O(r), U_z=O(z), U_theta=O(r), hence U(0)=0"
+      },
+      "pass": true
+    },
+    {
+      "check_id": "paper_majorant_3_8",
+      "evidence": {
+        "bound": "|U|<=C|y|q^p; |grad U|+|Omega|<=Cq^p",
+        "rates": {
+          "U": "|y|^(-11/9)",
+          "gradU_Omega": "|y|^(-20/9)"
+        }
+      },
+      "pass": true
+    },
+    {
+      "check_id": "positive_manifest_preserved",
+      "evidence": {
+        "gates": {
+          "passed": 0,
+          "total": 5
+        },
+        "pass": false,
+        "sha256": "c684407c2a7f3344c83fd67d70cb152bdd064841ef5417649676bd2888812f19"
+      },
+      "pass": true
+    }
+  ],
+  "inputs": {
+    "execution": {
+      "path": "nss-proof-execution.md",
+      "sha256": "8c7b96381bccdd207782ad4112f3cf573e25a562d5f7f6499e2af962bace3da4"
+    },
+    "positive_manifest": {
+      "path": "certs/final_theorem_manifest.json",
+      "sha256": "c684407c2a7f3344c83fd67d70cb152bdd064841ef5417649676bd2888812f19"
+    },
+    "problem": {
+      "path": "proof-problem.md",
+      "sha256": "fb19ee94e8ae883218ef0a0411c4755696700b2e42c0e75b991b6f156b527c64"
+    },
+    "profile": {
+      "path": "work/twochart_stage0_current_profile_top8pde128_rowlocal_densemortar_step22_nativebatch.json",
+      "sha256": "ed9e0bc8b1fc9cfa2c18cc68ac95a122f8e95d0216a4d0814ec6a6315095268a"
+    }
+  },
+  "positive_theorem_pass": false,
+  "proof_chain": [
+    "The natural tail confines every backward meridional trajectory and preserves r>0.",
+    "Along it, exp((1-2gamma)tau) R U_theta is constant.",
+    "At gamma=9/20, 1-2gamma=1/10>0, so tau->-infinity forces U_theta=0.",
+    "Then Omega_r=Omega_z=0; transport of Omega_theta/r forces Omega_theta=0.",
+    "curl U=div U=0 and grad U->0 imply U is constant; U(0)=0 gives U=0.",
+    "This contradicts the intended nontrivial B=1 swirl profile."
+  ],
+  "schema_version": "nsproof-branch-kill-v1",
+  "scope": {
+    "killed": "C^2 smooth axisymmetric whole-space global exact self-similar natural-tail profiles with 2/5<gamma<1/2",
+    "not_claimed": [
+      "3D Navier-Stokes regularity or blow-up",
+      "non-axisymmetric mechanisms",
+      "below-C^2 profiles",
+      "boundary/local/non-self-similar mechanisms"
+    ]
+  },
+  "source_theorem": {
+    "arxiv": "2602.17570v3",
+    "authors": [
+      "Peter Constantin",
+      "Mihaela Ignatova",
+      "Vlad Vicol"
+    ],
+    "conclusion": "nontrivial C^2 smooth axisymmetric global profile with (3.5),(3.8) implies gamma>=1/2",
+    "theorem": "4.5",
+    "title": "On putative self-similarity for incompressible 3D Euler",
+    "url": "https://arxiv.org/html/2602.17570v3",
+    "version_date_utc": "2026-07-20T03:23:08Z"
+  },
+  "target_profile_class_empty": true
+}
