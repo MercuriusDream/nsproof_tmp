@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  GAP_ROOT_PATH: "/opt/gaproot;"
+
 jobs:
   verify-rp4:
     runs-on: ubuntu-24.04
@@ -20,7 +23,9 @@ jobs:
       - name: Install GAP and simpcomp
         run: |
           sudo apt-get update
-          sudo apt-get install -y gap gap-simpcomp
+          sudo apt-get install -y gap gap-io gap-gapdoc git
+          sudo mkdir -p /opt/gaproot/pkg
+          sudo git clone --depth 1 https://github.com/simpcomp-team/simpcomp.git /opt/gaproot/pkg/simpcomp
           gap -q <<'EOF'
           if LoadPackage("simpcomp") <> true then Error("simpcomp failed to load"); fi;
           Print("SIMPCOMP_OK\n");
